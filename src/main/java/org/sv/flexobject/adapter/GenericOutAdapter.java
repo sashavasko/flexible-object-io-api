@@ -2,6 +2,7 @@ package org.sv.flexobject.adapter;
 
 import org.sv.flexobject.OutAdapter;
 import org.sv.flexobject.stream.Sink;
+import org.sv.flexobject.stream.Source;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -19,6 +20,8 @@ public abstract class GenericOutAdapter<T> implements OutAdapter {
     }
 
     public void setParam(String key, Object value){
+        if ("sink".equals(key) && value != null && value instanceof Sink)
+            sink = (Sink) value;
     }
 
     public abstract T createRecord();

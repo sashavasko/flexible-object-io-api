@@ -28,6 +28,8 @@ public abstract class GenericInAdapter<T> implements InAdapter {
     }
 
     public void setParam(String key, Object value){
+        if ("source".equals(key) && value != null && value instanceof Source)
+            source = (Source<T>) value;
     }
 
     public T getCurrent(){

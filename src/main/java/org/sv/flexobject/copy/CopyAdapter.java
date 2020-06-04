@@ -14,6 +14,7 @@ public class CopyAdapter extends HashMap<String, Object> implements OutAdapter, 
     protected Set<String> allowedInputFields = null;
     protected Set<String> allowedOutputFields = null;
 
+
     public void setAllowedInputFields(Set<String> allowedInputFields) {
         this.allowedInputFields = allowedInputFields;
     }
@@ -137,5 +138,13 @@ public class CopyAdapter extends HashMap<String, Object> implements OutAdapter, 
     @Override
     public void copyRecord(CopyAdapter to) throws Exception {
         to.putAll(this);
+    }
+
+    @Override
+    public void setParam(String key, Object value) {
+        if ("allowedInputFields".equals(key) && value != null && value instanceof Set)
+            allowedInputFields = (Set<String>) value;
+        else if ("allowedOutputFields".equals(key) && value != null && value instanceof Set)
+            allowedOutputFields = (Set<String>) value;
     }
 }

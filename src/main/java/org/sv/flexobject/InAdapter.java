@@ -10,7 +10,7 @@ import java.time.LocalDate;
  * Implementations provide uniform interface to reading various input formats and or medias.
  * This allows for a standard interface to inputs of dramatically different architecture, such as files, Kafka topics, Databases.
  */
-public interface InAdapter extends AutoCloseable{
+public interface InAdapter extends AutoCloseable, Parameterized{
 
     String getString(String fieldName) throws Exception;
 

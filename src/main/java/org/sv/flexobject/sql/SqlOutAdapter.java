@@ -1,8 +1,8 @@
 package org.sv.flexobject.sql;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.sv.flexobject.OutAdapter;
+import org.sv.flexobject.json.MapperFactory;
 
 import java.sql.*;
 import java.util.HashMap;
@@ -12,7 +12,6 @@ public class SqlOutAdapter implements OutAdapter {
 
     protected PreparedStatement preparedStatement = null;
     protected Map<String, Integer> paramNamesXref;
-    protected ObjectMapper objectMapper;
     protected int setParametersCount = 0;
 
     public static Map<String, Integer> buildParamNameXref(String ... args){
@@ -24,6 +23,9 @@ public class SqlOutAdapter implements OutAdapter {
         return xref;
     }
 
+    public SqlOutAdapter() {
+    }
+
     public SqlOutAdapter(Map<String, Integer> paramNamesXref) {
         this(null, paramNamesXref);
     }
@@ -31,7 +33,6 @@ public class SqlOutAdapter implements OutAdapter {
     public SqlOutAdapter(PreparedStatement st, Map<String, Integer> paramNamesXref) {
         this.preparedStatement = st;
         this.paramNamesXref = paramNamesXref;
-        objectMapper = new ObjectMapper();
     }
 
     public SqlOutAdapter setPreparedStatement(PreparedStatement preparedStatement) throws Exception {
@@ -59,7 +60,7 @@ public class SqlOutAdapter implements OutAdapter {
     @Override
     public void setJson(String paramName, JsonNode value) throws Exception {
         if (value != null)
-            setString(paramName, objectMapper.writeValueAsString(value));
+            setString(paramName, MapperFactory.getObjectWriter().writeValueAsString(value));
         else
             setString(paramName, null);
         setParametersCount++;
@@ -143,5 +144,13 @@ public class SqlOutAdapter implements OutAdapter {
     @Override
     public boolean shouldSave() {
         return setParametersCount > 0;
+    }
+
+    @Override
+    public void setParam(String key, Object value) {
+        if ("paramNamesXref".equals(key) && value != null && value instanceof Map)
+            paramNamesXref = (Map<String, Integer>) value;
+        else if ("preparedStatement".equals(key) && value != null && value instanceof PreparedStatement)
+            preparedStatement = (PreparedStatement) value;
     }
 }

@@ -6,7 +6,6 @@ import org.sv.flexobject.adapter.AdapterFactory;
 import org.sv.flexobject.sql.BatchEnvironment;
 import org.sv.flexobject.sql.SqlInputAdapter;
 import org.sv.flexobject.sql.SqlOutAdapter;
-import org.sv.flexobject.util.InstanceFactory;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -20,13 +19,13 @@ public class DataSourceDao implements AutoCloseable{
 
     protected AdapterFactory adapterFactory = new AdapterFactory() {
         @Override
-        public InAdapter createInputAdapter(String id, Object... parameters) {
-            return (InAdapter) InstanceFactory.get(SqlInputAdapter.class, parameters);
+        public InAdapter createInputAdapter(String id) {
+            return new SqlInputAdapter();
         }
 
         @Override
-        public OutAdapter createOutputAdapter(String id, Object... parameters) {
-            return (OutAdapter) InstanceFactory.get(SqlOutAdapter.class, parameters);
+        public OutAdapter createOutputAdapter(String id) {
+            return new SqlOutAdapter();
         }
     };
 

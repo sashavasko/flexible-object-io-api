@@ -1,7 +1,6 @@
 package org.sv.flexobject.json;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -12,7 +11,6 @@ import org.sv.flexobject.copy.Copyable;
 import org.sv.flexobject.stream.Source;
 import org.sv.flexobject.stream.sources.SingleValueSource;
 import org.sv.flexobject.util.ConsumerWithException;
-import org.sv.flexobject.util.InstanceFactory;
 
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -20,8 +18,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class JsonInputAdapter extends GenericInAdapter<JsonNode> implements Copyable {
-    ObjectMapper om = (ObjectMapper) InstanceFactory.get(ObjectMapper.class);
-
     public static final String JSON_DATE_FORMAT = "MMM dd, yyyy hh:mm:ss aa";
     public static final String JSON_DATE_FORMAT_SHORT = "yyyy-MM-dd";
 
@@ -42,7 +38,7 @@ public class JsonInputAdapter extends GenericInAdapter<JsonNode> implements Copy
             return n.asText();
         }
 
-        return om.writeValueAsString(n);
+        return MapperFactory.getObjectWriter().writeValueAsString(n);
     }
 
     @Override

@@ -6,7 +6,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 
-public interface OutAdapter {
+public interface OutAdapter extends Parameterized{
 
     // WARNING: Output adapters are not thread safe and cannot possibly be
     default boolean supportField(String fieldName) {return true;}

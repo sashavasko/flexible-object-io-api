@@ -1,27 +1,30 @@
 package org.sv.flexobject.sql;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.sv.flexobject.InAdapter;
 import org.sv.flexobject.copy.CopyAdapter;
 import org.sv.flexobject.copy.Copyable;
+import org.sv.flexobject.json.MapperFactory;
 
 import java.sql.*;
+import java.util.Map;
 
 public class SqlInputAdapter implements InAdapter, Copyable {
 
-    ObjectMapper objectMapper;
-    PreparedStatement ps;
-    ResultSet rs;
+    PreparedStatement preparedStatement;
+    ResultSet resultSet;
 
-    public SqlInputAdapter(ResultSet rs, PreparedStatement ps) {
-        this.rs = rs;
-        this.ps = ps;
+    public SqlInputAdapter() {
+    }
+
+    public SqlInputAdapter(ResultSet resultSet, PreparedStatement preparedStatement) {
+        this.resultSet = resultSet;
+        this.preparedStatement = preparedStatement;
     }
 
     int getFieldIndex(String fieldName){
         try{
-            return rs.findColumn(translateInputFieldName(fieldName));
+            return resultSet.findColumn(translateInputFieldName(fieldName));
         } catch (SQLException e) {
             return -1;
         }
@@ -32,7 +35,7 @@ public class SqlInputAdapter implements InAdapter, Copyable {
         int idx = getFieldIndex(fieldName);
         if (idx < 0)
             return null;
-        return rs.getString(idx);
+        return resultSet.getString(idx);
     }
 
     @Override
@@ -40,10 +43,8 @@ public class SqlInputAdapter implements InAdapter, Copyable {
         String jsonString = getString(fieldName);
         if (jsonString == null)
             return null;
-        if (objectMapper == null)
-            objectMapper = new ObjectMapper();
 
-        return objectMapper.readTree(jsonString);
+        return MapperFactory.getObjectReader().readTree(jsonString);
     }
 
     @Override
@@ -52,7 +53,7 @@ public class SqlInputAdapter implements InAdapter, Copyable {
         if (idx < 0)
             return null;
 
-        return rs.getInt(idx);
+        return resultSet.getInt(idx);
     }
 
     @Override
@@ -61,7 +62,7 @@ public class SqlInputAdapter implements InAdapter, Copyable {
         if (idx < 0)
             return null;
 
-        return rs.getBoolean(idx);
+        return resultSet.getBoolean(idx);
     }
 
     @Override
@@ -70,7 +71,7 @@ public class SqlInputAdapter implements InAdapter, Copyable {
         if (idx < 0)
             return null;
 
-        return rs.getLong(idx);
+        return resultSet.getLong(idx);
     }
 
     @Override
@@ -79,7 +80,7 @@ public class SqlInputAdapter implements InAdapter, Copyable {
         if (idx < 0)
             return null;
 
-        return rs.getDate(idx);
+        return resultSet.getDate(idx);
     }
 
     @Override
@@ -89,7 +90,7 @@ public class SqlInputAdapter implements InAdapter, Copyable {
             return null;
 
         try {
-            return rs.getTimestamp(idx);
+            return resultSet.getTimestamp(idx);
             // the following is needed when zeroDateTimeBehavior=convertToNull is not used in MySQL connection url
             // gradle requires that : compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.15'
         } catch (SQLException e) {
@@ -105,23 +106,31 @@ public class SqlInputAdapter implements InAdapter, Copyable {
 
     @Override
     public boolean next() throws Exception {
-        return rs.next();
+        return resultSet.next();
     }
 
     @Override
     public void close() throws Exception {
-        rs.close();
-        ps.close();
+        resultSet.close();
+        preparedStatement.close();
     }
 
     @Override
     public void copyRecord(CopyAdapter to) throws Exception {
-        ResultSetMetaData md = rs.getMetaData();
+        ResultSetMetaData md = resultSet.getMetaData();
         for (int i = 1 ; i <= md.getColumnCount() ; ++i){
             String colName = md.getColumnName(i);
-            Object value = rs.getObject(i);
+            Object value = resultSet.getObject(i);
             if (value != null)
                 to.put(colName, value);
         }
+    }
+
+    @Override
+    public void setParam(String key, Object value) {
+        if ("preparedStatement".equals(key) && value != null && value instanceof PreparedStatement)
+            preparedStatement = (PreparedStatement) value;
+        else if ("resultSet".equals(key) && value != null && value instanceof ResultSet)
+            resultSet = (ResultSet) value;
     }
 }
