@@ -14,6 +14,11 @@ import java.sql.Date;
 import java.sql.Timestamp;
 
 public class JsonOutputAdapter extends GenericOutAdapter<ObjectNode> {
+
+    public JsonOutputAdapter() {
+        super();
+    }
+
     public JsonOutputAdapter(Sink<ObjectNode> sink) {
         super(sink);
     }

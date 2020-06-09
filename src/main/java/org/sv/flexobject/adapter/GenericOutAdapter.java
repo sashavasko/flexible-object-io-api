@@ -11,7 +11,7 @@ public abstract class GenericOutAdapter<T> implements OutAdapter {
     protected T currentRecord = null;
     protected Sink sink;
 
-    private GenericOutAdapter() {
+    public GenericOutAdapter() {
         sink = null;
     }
 

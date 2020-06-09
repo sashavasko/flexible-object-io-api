@@ -9,6 +9,8 @@ public class SqlOutBatchAdapter extends SqlOutAdapter implements AutoCloseable {
     protected long recordsExecuted = 0;
     protected long batchSize = 1000;
 
+    public SqlOutBatchAdapter() {
+    }
 
     public SqlOutBatchAdapter(Map<String, Integer> paramNamesXref, long batchSize) {
         super(paramNamesXref);
@@ -36,5 +38,13 @@ public class SqlOutBatchAdapter extends SqlOutAdapter implements AutoCloseable {
     public void close() throws Exception {
         preparedStatement.executeBatch();
         recordsExecuted = recordsAdded;
+    }
+
+    @Override
+    public void setParam(String key, Object value) {
+        if ("batchSize".equals(key) && value != null)
+            batchSize = (long) value;
+        else
+            super.setParam(key, value);
     }
 }
