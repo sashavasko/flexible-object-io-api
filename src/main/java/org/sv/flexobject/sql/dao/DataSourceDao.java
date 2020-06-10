@@ -3,7 +3,6 @@ package org.sv.flexobject.sql.dao;
 import org.sv.flexobject.InAdapter;
 import org.sv.flexobject.OutAdapter;
 import org.sv.flexobject.adapter.AdapterFactory;
-import org.sv.flexobject.sql.BatchEnvironment;
 import org.sv.flexobject.sql.SqlInputAdapter;
 import org.sv.flexobject.sql.SqlOutAdapter;
 

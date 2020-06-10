@@ -3,4 +3,4 @@ Generic api providing infrastructure for building flexible data pipes using adap
 
 This library was originally created for Carfax Inc. 
 Since it does not include any proprietary information or intellectual property, 
-it is released as an Open Source project as contribution back to the community.
+it is released as an Open Source project as a contribution back to the community.
