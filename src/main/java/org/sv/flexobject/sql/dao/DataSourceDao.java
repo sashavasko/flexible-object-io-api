@@ -37,6 +37,14 @@ public class DataSourceDao implements AutoCloseable{
         this.adapterFactory = adapterFactory;
     }
 
+    public InAdapter createInputAdapter(String id){
+        return adapterFactory.createInputAdapter(id);
+    }
+
+    public OutAdapter createOutputAdapter(String id){
+        return adapterFactory.createOutputAdapter(id);
+    }
+
     protected Connection getConnectionFromDataSource() throws SQLException {
         return ds.getConnection();
     }
