@@ -147,8 +147,8 @@ public class SqlInputAdapterTest {
     @Test
     public void setParam() throws Exception {
         SqlInputAdapter adapter = new SqlInputAdapter();
-        adapter.setParam(SqlInputAdapter.PREPARED_STATEMENT_PARAM, ps);
-        adapter.setParam(SqlInputAdapter.RESULT_SET_PARAM, rs);
+        adapter.setParam(SqlInputAdapter.PARAMS.preparedStatement.name(), ps);
+        adapter.setParam(SqlInputAdapter.PARAMS.resultSet.name(), rs);
         adapter.close();
         verify(rs).close();
         verify(ps).close();

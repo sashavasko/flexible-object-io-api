@@ -11,8 +11,11 @@ import java.util.Map;
 
 public class SqlInputAdapter implements InAdapter, Copyable {
 
-    public static final String PREPARED_STATEMENT_PARAM = "preparedStatement";
-    public static final String RESULT_SET_PARAM = "resultSet";
+    public enum PARAMS {
+        preparedStatement,
+        resultSet
+    }
+
     PreparedStatement preparedStatement;
     ResultSet resultSet;
 
@@ -130,9 +133,13 @@ public class SqlInputAdapter implements InAdapter, Copyable {
 
     @Override
     public void setParam(String key, Object value) {
-        if (PREPARED_STATEMENT_PARAM.equals(key) && value != null && value instanceof PreparedStatement)
+        setParam(PARAMS.valueOf(key), value);
+    }
+
+    public void setParam(PARAMS key, Object value) {
+        if (key == PARAMS.preparedStatement && value != null && value instanceof PreparedStatement)
             preparedStatement = (PreparedStatement) value;
-        else if (RESULT_SET_PARAM.equals(key) && value != null && value instanceof ResultSet)
+        else if (key == PARAMS.resultSet && value != null && value instanceof ResultSet)
             resultSet = (ResultSet) value;
     }
 }

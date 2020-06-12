@@ -5,6 +5,10 @@ import java.util.Map;
 
 public class SqlOutBatchAdapter extends SqlOutAdapter implements AutoCloseable {
 
+    public enum PARAMS {
+        batchSize
+    }
+
     protected long recordsAdded = 0;
     protected long recordsExecuted = 0;
     protected long batchSize = 1000;
@@ -28,6 +32,7 @@ public class SqlOutBatchAdapter extends SqlOutAdapter implements AutoCloseable {
         ++recordsAdded;
         if (recordsAdded  >= recordsExecuted + batchSize) {
             preparedStatement.executeBatch();
+            recordsExecuted = recordsAdded;
         }
         clearParameters();
         return this;
@@ -42,9 +47,27 @@ public class SqlOutBatchAdapter extends SqlOutAdapter implements AutoCloseable {
 
     @Override
     public void setParam(String key, Object value) {
-        if ("batchSize".equals(key) && value != null)
-            batchSize = (long) value;
-        else
+        try {
+            setParam(PARAMS.valueOf(key), value);
+        }catch (IllegalArgumentException e){
             super.setParam(key, value);
+        }
+    }
+
+    public long getRecordsAdded() {
+        return recordsAdded;
+    }
+
+    public long getRecordsExecuted() {
+        return recordsExecuted;
+    }
+
+    public void setParam(PARAMS key, Object value) {
+        if (key == PARAMS.batchSize && value != null){
+            if (value instanceof Number)
+                batchSize = ((Number)value).longValue();
+            else if (value instanceof String)
+                batchSize = Long.valueOf((String)value);
+        }
     }
 }

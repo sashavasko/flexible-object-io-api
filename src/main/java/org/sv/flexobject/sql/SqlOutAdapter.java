@@ -10,6 +10,11 @@ import java.util.Map;
 
 public class SqlOutAdapter implements OutAdapter {
 
+    public enum PARAMS {
+        preparedStatement,
+        paramNamesXref
+    }
+
     protected PreparedStatement preparedStatement = null;
     protected Map<String, Integer> paramNamesXref;
     protected int setParametersCount = 0;
@@ -148,9 +153,13 @@ public class SqlOutAdapter implements OutAdapter {
 
     @Override
     public void setParam(String key, Object value) {
-        if ("paramNamesXref".equals(key) && value != null && value instanceof Map)
+        setParam(PARAMS.valueOf(key), value);
+    }
+
+    public void setParam(PARAMS param, Object value) {
+        if (param == PARAMS.paramNamesXref && value != null && value instanceof Map)
             paramNamesXref = (Map<String, Integer>) value;
-        else if ("preparedStatement".equals(key) && value != null && value instanceof PreparedStatement)
+        else if (param == PARAMS.preparedStatement && value != null && value instanceof PreparedStatement)
             preparedStatement = (PreparedStatement) value;
     }
 }

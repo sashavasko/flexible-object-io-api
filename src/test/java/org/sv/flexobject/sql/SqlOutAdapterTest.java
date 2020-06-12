@@ -15,7 +15,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -33,6 +33,14 @@ public class SqlOutAdapterTest {
         paramNamesXref.put("field", 1);
         paramNamesXref.put("anotherfield", 2);
         adapter = new SqlOutAdapter(st, paramNamesXref);
+    }
+
+    @Test
+    public void buildParamNameXref() {
+        Map<String, Integer> xref = SqlOutAdapter.buildParamNameXref("field1", "field2", "field3");
+        assertEquals((Integer)1, xref.get("field1"));
+        assertEquals((Integer)2, xref.get("field2"));
+        assertEquals((Integer)3, xref.get("field3"));
     }
 
     @Test
@@ -75,6 +83,9 @@ public class SqlOutAdapterTest {
         top.set("foo", value);
         adapter.setJson("field", top);
         verify(st).setString(1, "{\"foo\":100}");
+
+        adapter.setJson("field", null);
+        verify(st).setNull(1, Types.VARCHAR);
     }
 
     @Test
@@ -178,6 +189,44 @@ public class SqlOutAdapterTest {
     public void save() throws Exception {
         Mockito.when(st.executeUpdate()).thenReturn(1);
         adapter.save();
-        verify(st).clearParameters();
+
+        Mockito.when(st.executeUpdate()).thenReturn(0);
+        try{
+            adapter.save();
+            throw new RuntimeException("Should have thrown an exception when executeUpdate return 0");
+        }catch (RuntimeException e){
+            assertEquals("Failed to save record - 0 rows affected.", e.getMessage());
+        }
+
+        verify(st,times(2)).clearParameters();
     }
+
+    @Test
+    public void shouldSave() throws Exception {
+        assertFalse(adapter.shouldSave());
+
+        adapter.setString("field", "blah");
+
+        assertTrue(adapter.shouldSave());
+
+        Mockito.when(st.executeUpdate()).thenReturn(1);
+        adapter.save();
+
+        assertFalse(adapter.shouldSave());
+    }
+
+    @Test
+    public void setParam() throws Exception {
+        SqlOutAdapter adapter = new SqlOutAdapter();
+        adapter.setParam(SqlOutAdapter.PARAMS.preparedStatement.name(), st);
+        adapter.setParam(SqlOutAdapter.PARAMS.paramNamesXref.name(), paramNamesXref);
+        adapter.setString("field", "blah");
+
+        assertTrue(adapter.shouldSave());
+
+        Mockito.when(st.executeUpdate()).thenReturn(1);
+        adapter.save();
+        verify(st).executeUpdate();
+    }
+
 }
