@@ -85,12 +85,7 @@ public class JsonInputAdapter extends GenericInAdapter<JsonNode> implements Copy
         return n == null ? null : new Timestamp(n.asLong());
     }
 
-    @Override
-    public void close() throws Exception {
-
-    }
-
-    public static void consume(JsonNode json, ConsumerWithException<JsonInputAdapter, Exception> consumer) throws Exception {
+     public static void consume(JsonNode json, ConsumerWithException<JsonInputAdapter, Exception> consumer) throws Exception {
         if (json != null) {
             Source<JsonNode> source = new SingleValueSource<>(json);
             JsonInputAdapter adapter = new JsonInputAdapter(source);
@@ -104,8 +99,8 @@ public class JsonInputAdapter extends GenericInAdapter<JsonNode> implements Copy
     public void copyRecord(CopyAdapter to) {
         ObjectNode current = (ObjectNode) getCurrent();
         Iterator<Map.Entry<String, JsonNode>> fields = current.fields();
-        Map.Entry<String, JsonNode> field;
-        while ((field = fields.next()) != null){
+        while (fields.hasNext()){
+            Map.Entry<String, JsonNode> field = fields.next();
             switch(field.getValue().getNodeType()){
                 case BOOLEAN: to.put(field.getKey(), field.getValue().asBoolean()); break;
                 case NUMBER: to.put(field.getKey(), field.getValue().asLong()); break;

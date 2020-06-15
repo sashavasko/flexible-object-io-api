@@ -11,8 +11,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.sv.flexobject.copy.CopyAdapter;
 import org.sv.flexobject.stream.sources.QueueSource;
 
+import java.io.IOException;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayDeque;
@@ -20,6 +22,8 @@ import java.util.Queue;
 import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
 public class JsonInputAdapterTest {
@@ -31,7 +35,7 @@ public class JsonInputAdapterTest {
     ObjectNode mockJson;
 
     @Mock
-    ObjectMapper mockObjectMapper;
+    CopyAdapter copyAdapter = new CopyAdapter();
 
     Queue<JsonNode> values = new ArrayDeque<>(2);
     QueueSource<JsonNode> source;
@@ -63,6 +67,14 @@ public class JsonInputAdapterTest {
         adapter.next();
         assertEquals("valueString", adapter.getString("a"));
         assertNull(adapter.getString("badField"));
+    }
+
+    @Test
+    public void getJson() throws Exception {
+        json = objectReader.readTree("{'a':{'subfield':'valueString'}}".replace('\'', '"'));
+        values.add(json);
+        adapter.next();
+        assertEquals(objectReader.readTree("{\"subfield\":\"valueString\"}"), adapter.getJson("a"));
     }
 
     @Test
@@ -140,6 +152,29 @@ public class JsonInputAdapterTest {
         assertTrue(adapter.next());
         assertEquals("string2", adapter.getString("a"));
         assertFalse(adapter.next());
+    }
 
+    @Test
+    public void consume() throws Exception {
+        json = objectReader.readTree("{'a':'foo', 'b':12345}}".replace('\'', '"'));
+        JsonInputAdapter.consume(json, adapter->{
+           assertEquals("foo", adapter.getString("a"));
+           assertEquals(12345, (int)adapter.getInt("b"));
+        });
+    }
+
+    @Test
+    public void copyRecord() throws Exception {
+        json = objectReader.readTree("{'bool':true,'number':1234567,'string':'data','object':{'subfield':'blah'}}".replace('\'', '"'));
+        values.add(json);
+        adapter.next();
+
+        adapter.copyRecord(copyAdapter);
+
+        verify(copyAdapter).put("bool", true);
+        verify(copyAdapter).put("number", 1234567l);
+        verify(copyAdapter).put("string", "data");
+        verify(copyAdapter).put("object", objectReader.readTree("{'subfield':'blah'}".replace('\'', '"')));
+        verifyNoMoreInteractions(copyAdapter);
     }
 }

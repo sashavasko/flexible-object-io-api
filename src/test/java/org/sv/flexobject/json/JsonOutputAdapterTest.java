@@ -43,6 +43,11 @@ public class JsonOutputAdapterTest {
     }
 
     @Test
+    public void defaultConstructor() {
+        adapter = new JsonOutputAdapter();
+    }
+
+    @Test
     public void setString() throws Exception {
         adapter.setString("field", "yes");
         adapter.save();
@@ -114,7 +119,6 @@ public class JsonOutputAdapterTest {
 
     @Test
     public void setDate() throws Exception {
-        adapter = new JsonOutputAdapter(sink);
         Date date = new Date(1544116803000l);
         adapter.setDate("date", date);
         adapter.save();
@@ -130,7 +134,6 @@ public class JsonOutputAdapterTest {
 
     @Test
     public void setTimestamp() throws Exception {
-        adapter = new JsonOutputAdapter(sink);
         Timestamp date = new Timestamp(1544116803000l);
         adapter.setTimestamp("ts", date);
         adapter.save();
@@ -150,5 +153,16 @@ public class JsonOutputAdapterTest {
         adapter.setLong("field", 1l);
         adapter.save();
         assertTrue(adapter.hasOutput());
+    }
+
+    @Test
+    public void produce() throws Exception {
+        ObjectNode jsonOut = JsonOutputAdapter.produce(adapter->{
+           adapter.setString("a", "foo");
+           adapter.setInt("b", 1234567);
+           adapter.save();
+        });
+
+        assertEquals(MapperFactory.getObjectReader().readTree("{'a':'foo','b':1234567}".replace('\'', '"')), jsonOut);
     }
 }
