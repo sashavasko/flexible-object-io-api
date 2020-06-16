@@ -8,6 +8,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public abstract class GenericOutAdapter<T> implements OutAdapter {
+
+    public enum PARAMS {
+        sink
+    }
+
     protected T currentRecord = null;
     protected Sink sink;
 
@@ -20,7 +25,11 @@ public abstract class GenericOutAdapter<T> implements OutAdapter {
     }
 
     public void setParam(String key, Object value){
-        if ("sink".equals(key) && value != null && value instanceof Sink)
+        setParam(PARAMS.valueOf(key), value);
+    }
+
+    public void setParam(PARAMS key, Object value){
+        if (PARAMS.sink == key && value != null && value instanceof Sink)
             sink = (Sink) value;
     }
 

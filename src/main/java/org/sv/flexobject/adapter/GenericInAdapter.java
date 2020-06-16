@@ -9,6 +9,10 @@ import java.lang.reflect.InvocationTargetException;
 
 public abstract class GenericInAdapter<T> implements InAdapter {
 
+    public enum PARAMS {
+        source
+    }
+
     T currentRecord = null;
     Source<T> source;
 
@@ -28,7 +32,11 @@ public abstract class GenericInAdapter<T> implements InAdapter {
     }
 
     public void setParam(String key, Object value){
-        if ("source".equals(key) && value != null && value instanceof Source)
+        setParam(PARAMS.valueOf(key), value);
+    }
+
+    public void setParam(PARAMS key, Object value){
+        if (PARAMS.source == key && value != null && value instanceof Source)
             source = (Source<T>) value;
     }
 
