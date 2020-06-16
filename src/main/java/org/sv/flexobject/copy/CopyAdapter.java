@@ -11,6 +11,11 @@ import java.util.Set;
 
 public class CopyAdapter extends HashMap<String, Object> implements OutAdapter, InAdapter, Copyable {
 
+    public enum PARAMS {
+        allowedInputFields,
+        allowedOutputFields
+    }
+
     protected Set<String> allowedInputFields = null;
     protected Set<String> allowedOutputFields = null;
 
@@ -57,17 +62,27 @@ public class CopyAdapter extends HashMap<String, Object> implements OutAdapter, 
 
     @Override
     public Integer getInt(String fieldName) throws Exception {
-        return (Integer) get(fieldName);
+        Number number = (Number) get(fieldName);
+        return number == null ? null :number.intValue();
     }
 
     @Override
     public Boolean getBoolean(String fieldName) throws Exception {
+        Object o = get(fieldName);
+        if (o instanceof Number)
+            return ((Number)o).intValue() > 0;
+        else if (o instanceof String)
+            return "true".equalsIgnoreCase((String) o)
+                    || "yes".equalsIgnoreCase((String) o)
+                    || "y".equalsIgnoreCase((String) o);
+
         return (Boolean) get(fieldName);
     }
 
     @Override
     public Long getLong(String fieldName) throws Exception {
-        return (Long) get(fieldName);
+        Number number = (Number) get(fieldName);
+        return number == null ? null :number.longValue();
     }
 
     @Override
@@ -142,9 +157,13 @@ public class CopyAdapter extends HashMap<String, Object> implements OutAdapter, 
 
     @Override
     public void setParam(String key, Object value) {
-        if ("allowedInputFields".equals(key) && value != null && value instanceof Set)
+        setParam(PARAMS.valueOf(key), value);
+    }
+
+    public void setParam(PARAMS key, Object value) {
+        if (PARAMS.allowedInputFields == key && value != null && value instanceof Set)
             allowedInputFields = (Set<String>) value;
-        else if ("allowedOutputFields".equals(key) && value != null && value instanceof Set)
+        else if (PARAMS.allowedOutputFields == key && value != null && value instanceof Set)
             allowedOutputFields = (Set<String>) value;
     }
 }
