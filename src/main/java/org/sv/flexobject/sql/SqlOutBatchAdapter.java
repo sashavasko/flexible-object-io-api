@@ -3,7 +3,7 @@ package org.sv.flexobject.sql;
 import java.sql.PreparedStatement;
 import java.util.Map;
 
-public class SqlOutBatchAdapter extends SqlOutAdapter implements AutoCloseable {
+public class SqlOutBatchAdapter extends SqlOutAdapter {
 
     public enum PARAMS {
         batchSize
@@ -43,6 +43,7 @@ public class SqlOutBatchAdapter extends SqlOutAdapter implements AutoCloseable {
     public void close() throws Exception {
         preparedStatement.executeBatch();
         recordsExecuted = recordsAdded;
+        super.close();
     }
 
     @Override

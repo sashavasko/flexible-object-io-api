@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
 public class SqlOutAdapterTest {
 
     @Mock
-    PreparedStatement st;
+    PreparedStatement preparedStatement;
 
     SqlOutAdapter adapter;
 
@@ -32,7 +32,7 @@ public class SqlOutAdapterTest {
     public void setUp() throws Exception {
         paramNamesXref.put("field", 1);
         paramNamesXref.put("anotherfield", 2);
-        adapter = new SqlOutAdapter(st, paramNamesXref);
+        adapter = new SqlOutAdapter(preparedStatement, paramNamesXref);
     }
 
     @Test
@@ -46,9 +46,9 @@ public class SqlOutAdapterTest {
     @Test
     public void setPreparedStatement() throws Exception {
         adapter = new SqlOutAdapter(paramNamesXref);
-        adapter.setPreparedStatement(st);
+        adapter.setPreparedStatement(preparedStatement);
 
-        assertEquals(st, adapter.preparedStatement);
+        assertEquals(preparedStatement, adapter.preparedStatement);
 
     }
 
@@ -61,19 +61,19 @@ public class SqlOutAdapterTest {
     @Test
     public void setStringNull() throws SQLException {
         adapter.setString("field", null);
-        verify(st).setNull(1, Types.VARCHAR);
+        verify(preparedStatement).setNull(1, Types.VARCHAR);
     }
 
     @Test
     public void setStringBadField() throws SQLException {
         adapter.setString("badfield", "Yes");
-        verifyNoMoreInteractions(st);
+        verifyNoMoreInteractions(preparedStatement);
     }
 
     @Test
     public void setString() throws SQLException {
         adapter.setString("field", "yes");
-        verify(st).setString(1, "yes");
+        verify(preparedStatement).setString(1, "yes");
     }
 
     @Test
@@ -82,85 +82,85 @@ public class SqlOutAdapterTest {
         JsonNode value = JsonNodeFactory.instance.numberNode(100);
         top.set("foo", value);
         adapter.setJson("field", top);
-        verify(st).setString(1, "{\"foo\":100}");
+        verify(preparedStatement).setString(1, "{\"foo\":100}");
 
         adapter.setJson("field", null);
-        verify(st).setNull(1, Types.VARCHAR);
+        verify(preparedStatement).setNull(1, Types.VARCHAR);
     }
 
     @Test
     public void setInt() throws SQLException {
         adapter.setInt("field", 1);
-        verify(st).setInt(1, 1);
+        verify(preparedStatement).setInt(1, 1);
     }
 
     @Test
     public void setIntForNull() throws SQLException {
         adapter.setInt("field", null);
-        verify(st).setNull(1, Types.INTEGER);
+        verify(preparedStatement).setNull(1, Types.INTEGER);
     }
 
     @Test
     public void setIntForBadParameter() throws SQLException {
         adapter.setInt("tooManyFields", 1);
-        verifyZeroInteractions(st);
+        verifyZeroInteractions(preparedStatement);
     }
 
     @Test
     public void setBoolean() throws Exception {
         adapter.setBoolean("field", true);
-        verify(st).setBoolean(1, true);
+        verify(preparedStatement).setBoolean(1, true);
     }
 
     @Test
     public void setBooleanNullValue() throws Exception {
         adapter.setBoolean("field", null);
-        verify(st).setNull(1, Types.BOOLEAN);
+        verify(preparedStatement).setNull(1, Types.BOOLEAN);
     }
 
     @Test
     public void setBooleanBadParam() throws Exception {
         adapter.setBoolean("badfield", true);
-        verifyZeroInteractions(st);
+        verifyZeroInteractions(preparedStatement);
     }
 
     @Test
     public void setLong() throws SQLException  {
         adapter.setLong("field", 1l);
-        verify(st).setLong(1, 1l);
+        verify(preparedStatement).setLong(1, 1l);
     }
 
     @Test
     public void setLongForNull() throws SQLException  {
         adapter.setLong("field", null);
-        verify(st).setNull(1, Types.BIGINT);
+        verify(preparedStatement).setNull(1, Types.BIGINT);
     }
 
     @Test
     public void setLongForBadParam() throws SQLException  {
         adapter.setLong("badfield", 1l);
-        verifyZeroInteractions(st);
+        verifyZeroInteractions(preparedStatement);
     }
 
     @Test
     public void setDate()  throws SQLException {
         Date date = new Date(1234567l);
         adapter.setDate("field", date);
-        verify(st).setDate(1, date);
+        verify(preparedStatement).setDate(1, date);
     }
 
     @Test
     public void setDateNullValue() throws Exception {
         adapter.setDate("field", (LocalDate)null);
 
-        verify(st).setNull(1, Types.DATE);
+        verify(preparedStatement).setNull(1, Types.DATE);
     }
 
     @Test
     public void setDateBadField()  throws SQLException {
         Date date = new Date(1234567l);
         adapter.setDate("badfield", date);
-        verifyZeroInteractions(st);
+        verifyZeroInteractions(preparedStatement);
     }
 
     @Test
@@ -169,28 +169,28 @@ public class SqlOutAdapterTest {
         adapter.setTimestamp("field", timestamp);
 //        verify(st).setTimestamp(1, timestamp);
         // Workaround for a bug in MySQL driver resulting in tructation of second fraction :
-        verify(st).setString(1, timestamp.toString());
+        verify(preparedStatement).setString(1, timestamp.toString());
     }
 
     @Test
     public void setTimestampNullValue()  throws SQLException {
         adapter.setTimestamp("field", null);
-        verify(st).setNull(1, Types.TIMESTAMP);
+        verify(preparedStatement).setNull(1, Types.TIMESTAMP);
     }
 
     @Test
     public void setTimestampBadField()  throws SQLException {
         Timestamp timestamp = new Timestamp(1234567l);
         adapter.setTimestamp("badfield", timestamp);
-        verifyZeroInteractions(st);
+        verifyZeroInteractions(preparedStatement);
     }
 
     @Test
     public void save() throws Exception {
-        Mockito.when(st.executeUpdate()).thenReturn(1);
+        Mockito.when(preparedStatement.executeUpdate()).thenReturn(1);
         adapter.save();
 
-        Mockito.when(st.executeUpdate()).thenReturn(0);
+        Mockito.when(preparedStatement.executeUpdate()).thenReturn(0);
         try{
             adapter.save();
             throw new RuntimeException("Should have thrown an exception when executeUpdate return 0");
@@ -198,7 +198,7 @@ public class SqlOutAdapterTest {
             assertEquals("Failed to save record - 0 rows affected.", e.getMessage());
         }
 
-        verify(st,times(2)).clearParameters();
+        verify(preparedStatement,times(2)).clearParameters();
     }
 
     @Test
@@ -209,24 +209,35 @@ public class SqlOutAdapterTest {
 
         assertTrue(adapter.shouldSave());
 
-        Mockito.when(st.executeUpdate()).thenReturn(1);
+        Mockito.when(preparedStatement.executeUpdate()).thenReturn(1);
         adapter.save();
 
         assertFalse(adapter.shouldSave());
     }
 
     @Test
+    public void close() throws Exception {
+        adapter.setString("field", "blah");
+        Mockito.when(preparedStatement.executeUpdate()).thenReturn(1);
+        adapter.save();
+
+        adapter.close();
+
+        Mockito.verify(preparedStatement).close();
+    }
+
+    @Test
     public void setParam() throws Exception {
         SqlOutAdapter adapter = new SqlOutAdapter();
-        adapter.setParam(SqlOutAdapter.PARAMS.preparedStatement.name(), st);
+        adapter.setParam(SqlOutAdapter.PARAMS.preparedStatement.name(), preparedStatement);
         adapter.setParam(SqlOutAdapter.PARAMS.paramNamesXref.name(), paramNamesXref);
         adapter.setString("field", "blah");
 
         assertTrue(adapter.shouldSave());
 
-        Mockito.when(st.executeUpdate()).thenReturn(1);
+        Mockito.when(preparedStatement.executeUpdate()).thenReturn(1);
         adapter.save();
-        verify(st).executeUpdate();
+        verify(preparedStatement).executeUpdate();
     }
 
 }

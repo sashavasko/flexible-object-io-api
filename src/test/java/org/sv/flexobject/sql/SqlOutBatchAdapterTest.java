@@ -70,6 +70,7 @@ public class SqlOutBatchAdapterTest {
 
         adapter.close();
         Mockito.verify(preparedStatement).executeBatch();
+        Mockito.verify(preparedStatement).close();
         assertEquals(1, adapter.getRecordsExecuted());
 
 

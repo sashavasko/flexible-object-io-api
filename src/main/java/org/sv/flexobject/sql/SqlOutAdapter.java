@@ -8,7 +8,7 @@ import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SqlOutAdapter implements OutAdapter {
+public class SqlOutAdapter implements OutAdapter, AutoCloseable {
 
     public enum PARAMS {
         preparedStatement,
@@ -149,6 +149,12 @@ public class SqlOutAdapter implements OutAdapter {
     @Override
     public boolean shouldSave() {
         return setParametersCount > 0;
+    }
+
+    @Override
+    public void close() throws Exception {
+        preparedStatement.close();
+        preparedStatement = null;
     }
 
     @Override
