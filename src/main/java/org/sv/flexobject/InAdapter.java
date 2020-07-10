@@ -59,7 +59,6 @@ public interface InAdapter extends AutoCloseable, Parameterized{
 
     Date getDate(String fieldName) throws Exception;
     Timestamp getTimestamp(String fieldName) throws Exception;
-    boolean next() throws Exception;
 
     /**
      * Retrieves the value of a Date field specified by fieldName converted to LocalDate
@@ -80,6 +79,11 @@ public interface InAdapter extends AutoCloseable, Parameterized{
     default String translateInputFieldName(String fieldName) {
         return fieldName;
     }
+
+    /**
+     * Advances to the next record to input. This must be called before any get methods.
+     */
+    boolean next() throws Exception;
 
     /**
      * Optionally implemented to inform the source of a successful processing of the element from the input.
