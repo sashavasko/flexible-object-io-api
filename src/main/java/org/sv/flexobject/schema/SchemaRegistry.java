@@ -17,6 +17,7 @@ public class SchemaRegistry {
     }
 
     public Map<String, Integer> getParamNamesXref(String name){
+        checkClassLoaded(name);
         return paramNamesXrefs.get(name);
     }
 
@@ -32,6 +33,23 @@ public class SchemaRegistry {
     }
 
     public Schema getSchema(String name){
+        if (!checkClassLoaded(name)) return null;
         return schemas.get(name);
+    }
+
+    public boolean hasSchema(String name){
+        return schemas.containsKey(name);
+    }
+
+    private boolean checkClassLoaded(String name) {
+        if (!schemas.containsKey(name)){
+            try{
+                Class<?> clazz = Class.forName(name);
+                clazz.newInstance();
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+                return false;
+            }
+        }
+        return true;
     }
 }

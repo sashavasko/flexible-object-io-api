@@ -6,17 +6,15 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 
 public class MapperFactory {
 
-    private static ObjectMapper objectMapper;
-    private static ObjectReader objectReader;
-    private static ObjectWriter objectWriter;
+    private static ObjectMapper objectMapper = new ObjectMapper();
+    private static ObjectReader objectReader = objectMapper.reader();
+    private static ObjectWriter objectWriter = objectMapper.writer();
 
-    private static MapperFactory instance = null;
+    private static final MapperFactory instance = new MapperFactory();
 
     private MapperFactory(){reset();}
 
     public static MapperFactory getInstance(){
-        if(instance == null)
-            instance = new MapperFactory();
         return instance;
     }
 
@@ -49,4 +47,5 @@ public class MapperFactory {
     public static void setObjectWriter(ObjectWriter objectWriter) {
         MapperFactory.objectWriter = objectWriter;
     }
+
 }

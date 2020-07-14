@@ -1,6 +1,8 @@
-package org.sv.flexobject;
+package org.sv.flexobject.schema;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.sv.flexobject.InAdapter;
+import org.sv.flexobject.OutAdapter;
 import org.sv.flexobject.util.BiFunctionWithException;
 import org.sv.flexobject.util.TriConsumerWithException;
 

@@ -10,10 +10,11 @@ public class StreamableWithSchema<T extends SchemaElement> implements Streamable
 
     public StreamableWithSchema(T[] fields) {
         String schemaName = getClass().getName();
-        if ((schema = SchemaRegistry.getInstance().getSchema(schemaName)) == null){
+        if (!SchemaRegistry.getInstance().hasSchema(schemaName)){
             schema = new Schema(schemaName, fields);
             SchemaRegistry.getInstance().registerSchema(schema);
-        }
+        } else
+            schema = SchemaRegistry.getInstance().getSchema(schemaName);
     }
 
     @Override
