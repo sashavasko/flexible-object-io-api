@@ -9,4 +9,10 @@ public interface Consumer {
 
     void cleanup() throws Exception;
 
+    default long consumeAll(Iterable producer) throws Exception {
+        for (Object datum : producer){
+            consume((Savable)datum);
+        }
+        return getRecordsConsumed();
+    }
 }
