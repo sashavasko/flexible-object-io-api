@@ -80,6 +80,15 @@ public class SqlInputAdapter implements InAdapter, Copyable {
     }
 
     @Override
+    public Double getDouble(String fieldName) throws SQLException {
+        int idx = getFieldIndex(fieldName);
+        if (idx < 0)
+            return null;
+
+        return resultSet.getDouble(idx);
+    }
+
+    @Override
     public Date getDate(String fieldName) throws SQLException {
         int idx = getFieldIndex(fieldName);
         if (idx < 0)

@@ -63,6 +63,11 @@ public class GenericInAdapterTest {
         }
 
         @Override
+        public Double getDouble(String fieldName) throws Exception {
+            return (Double) getCurrent().get(fieldName);
+        }
+
+        @Override
         public Date getDate(String fieldName) throws Exception {
             return (Date) getCurrent().get(fieldName);
         }

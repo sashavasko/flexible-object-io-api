@@ -64,6 +64,12 @@ public class JsonInputAdapter extends GenericInAdapter<JsonNode> implements Copy
         return n == null ? null : n.asLong();
     }
 
+    @Override
+    public Double getDouble(String fieldName) throws Exception {
+        JsonNode n = getCurrent().get(translateInputFieldName(fieldName));
+        return n == null ? null : n.asDouble();
+    }
+
     public static Date jsonNodeToDate(JsonNode n){
         if (n == null)
             return null;

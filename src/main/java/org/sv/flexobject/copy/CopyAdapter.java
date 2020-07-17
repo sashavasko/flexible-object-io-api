@@ -86,6 +86,12 @@ public class CopyAdapter extends HashMap<String, Object> implements OutAdapter, 
     }
 
     @Override
+    public Double getDouble(String fieldName) throws Exception {
+        Number number = (Number) get(fieldName);
+        return number == null ? null :number.doubleValue();
+    }
+
+    @Override
     public Date getDate(String fieldName) throws Exception {
         return (Date) get(fieldName);
     }
@@ -122,6 +128,11 @@ public class CopyAdapter extends HashMap<String, Object> implements OutAdapter, 
 
     @Override
     public void setLong(String paramName, Long value) throws Exception {
+        put(paramName, value);
+    }
+
+    @Override
+    public void setDouble(String paramName, Double value) throws Exception {
         put(paramName, value);
     }
 

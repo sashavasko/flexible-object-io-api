@@ -57,6 +57,20 @@ public interface InAdapter extends AutoCloseable, Parameterized{
         return value == null ? defaultValue : value;
     }
 
+    Double getDouble(String fieldName) throws Exception;
+
+    /**
+     * Retrieves the value of a Long field specified by fieldName.
+     * @param fieldName - high level name of the field known to the consumer
+     * @param defaultValue - default value
+     * @return value of the field or defaultValue if the field is unset/null
+     * @throws Exception - actual exception thrown is implementation specific
+     */
+    default double getOptionalDouble(String fieldName, double defaultValue) throws Exception{
+        Double value = getDouble(fieldName);
+        return value == null ? defaultValue : value;
+    }
+
     Date getDate(String fieldName) throws Exception;
     Timestamp getTimestamp(String fieldName) throws Exception;
 

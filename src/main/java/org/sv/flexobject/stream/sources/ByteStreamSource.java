@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class ByteStreamSource<T extends ByteRepresentable>  implements Iterator<T>, Iterable<T>, Source<T>, AutoCloseable {
     InputStream inputStream;
@@ -138,5 +140,10 @@ public class ByteStreamSource<T extends ByteRepresentable>  implements Iterator<
     public void close() throws Exception {
         if (closeStream)
             inputStream.close();
+    }
+
+    @Override
+    public Stream<T> stream() {
+        return StreamSupport.stream(spliterator(), false);
     }
 }

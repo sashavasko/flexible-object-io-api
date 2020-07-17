@@ -79,6 +79,11 @@ public class GenericOutAdapterTest {
         }
 
         @Override
+        public void setDouble(String paramName, Double value) throws Exception {
+
+        }
+
+        @Override
         public void setDate(String paramName, Date value) throws Exception {
 
         }

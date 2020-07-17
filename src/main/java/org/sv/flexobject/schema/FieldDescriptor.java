@@ -20,6 +20,22 @@ public class FieldDescriptor {
         this.order = order;
     }
 
+    public FieldDescriptor(Class<?> clazz, String name, DataTypes type, int order) {
+        this.name = name;
+        this.type = type;
+        this.order = order;
+        this.setter = new GenericSetter(clazz, name);
+        this.getter = new GenericGetter(clazz, name);
+    }
+
+    public FieldDescriptor(Class<?> clazz, String name, DataTypes type, FunctionWithException getter, int order) {
+        this.name = name;
+        this.type = type;
+        this.order = order;
+        this.setter = new GenericSetter(clazz, name);
+        this.getter = getter;
+    }
+
     public void load(Loadable o, InAdapter adapter) throws Exception {
         setter.accept(o, type.get(adapter, name));
     }

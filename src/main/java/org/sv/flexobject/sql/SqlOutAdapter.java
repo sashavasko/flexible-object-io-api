@@ -108,6 +108,18 @@ public class SqlOutAdapter implements OutAdapter, AutoCloseable {
     }
 
     @Override
+    public void setDouble(String paramName, Double value) throws SQLException {
+        int paramIdx = getParamIndex(paramName);
+        if (paramIdx >= 0) {
+            if (value != null)
+                preparedStatement.setDouble(paramIdx, value);
+            else
+                preparedStatement.setNull(paramIdx, Types.DOUBLE);
+            setParametersCount++;
+        }
+    }
+
+    @Override
     public void setDate(String paramName, Date value) throws SQLException {
         int paramIdx = getParamIndex(paramName);
         if (paramIdx >= 0) {

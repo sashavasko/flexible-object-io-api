@@ -15,6 +15,7 @@ public interface OutAdapter extends Parameterized{
     void setInt(String paramName, Integer value) throws Exception;
     void setBoolean(String paramName, Boolean value) throws Exception;
     void setLong(String paramName, Long value) throws Exception;
+    void setDouble(String paramName, Double value) throws Exception;
     void setDate(String paramName, Date value) throws Exception;
     default void setDate(String paramName, LocalDate value) throws Exception{
         setDate(paramName, value == null ? null : Date.valueOf(value));

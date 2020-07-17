@@ -3,6 +3,7 @@ package org.sv.flexobject.util;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Stream;
 
 public class NotReallyBlockingQueueWrapper<T> {
     public static int MAX_WAIT_TIMEOUT_SECONDS = 60*5;
@@ -50,5 +51,9 @@ public class NotReallyBlockingQueueWrapper<T> {
 
     public boolean hasOutput() {
         return !getQueue().isEmpty();
+    }
+
+    public Stream<T> stream(){
+        return queue.stream();
     }
 }

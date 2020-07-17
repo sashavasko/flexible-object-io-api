@@ -5,6 +5,7 @@ import org.sv.flexobject.stream.Source;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Queue;
+import java.util.stream.Stream;
 
 public class QueueSource<T> implements Source<T> {
     Queue<T> values;
@@ -18,6 +19,11 @@ public class QueueSource<T> implements Source<T> {
 
     public QueueSource(Queue<T> values) {
         this.values = values;
+    }
+
+    @Override
+    public Stream<T> stream(){
+        return values.stream();
     }
 
     @Override

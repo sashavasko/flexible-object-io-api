@@ -3,6 +3,8 @@ package org.sv.flexobject.io;
 import org.sv.flexobject.Loadable;
 
 import java.util.Iterator;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public abstract class Producer implements Iterable<Loadable> {
 
@@ -18,8 +20,11 @@ public abstract class Producer implements Iterable<Loadable> {
         return exception;
     }
 
-    public void ack(){
+    public Stream stream() {
+        return StreamSupport.stream(spliterator(), false);
+    }
 
+    public void ack(){
     }
 
     public void setEOF() {

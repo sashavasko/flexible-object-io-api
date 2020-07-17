@@ -55,6 +55,12 @@ public class JsonOutputAdapter extends GenericOutAdapter<ObjectNode> {
     }
 
     @Override
+    public void setDouble(String paramName, Double value) {
+        if (value != null)
+            getCurrent().put(translateOutputFieldName(paramName), value);
+    }
+
+    @Override
     public void setDate(String paramName, Date value) {
         if (value != null)
             getCurrent().put(translateOutputFieldName(paramName), new DateTime(value.getTime(), DateTimeZone.UTC).toString(JsonInputAdapter.JSON_DATE_FORMAT));
