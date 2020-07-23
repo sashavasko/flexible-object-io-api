@@ -1,6 +1,7 @@
 package org.sv.flexobject;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.sv.flexobject.util.ConsumerWithException;
 
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -98,6 +99,13 @@ public interface InAdapter extends AutoCloseable, Parameterized{
      * Advances to the next record to input. This must be called before any get methods.
      */
     boolean next() throws Exception;
+
+    default boolean consume(ConsumerWithException<InAdapter, Exception> consumer) throws Exception {
+        if (!next())
+            return false;
+        consumer.accept(this);
+        return true;
+    }
 
     /**
      * Optionally implemented to inform the source of a successful processing of the element from the input.

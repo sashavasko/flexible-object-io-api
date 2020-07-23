@@ -8,17 +8,29 @@ public class StreamableWithSchema<T extends SchemaElement> implements Streamable
 
     Schema schema;
 
-    public StreamableWithSchema(T[] fields) {
-        String schemaName = getClass().getName();
-        if (!SchemaRegistry.getInstance().hasSchema(schemaName)){
-            schema = new Schema(schemaName, fields);
+    public StreamableWithSchema() throws NoSuchFieldException {
+        schema = Schema.getRegisteredSchema(getClass());
+    }
+
+    public StreamableWithSchema(T[] fields) throws NoSuchFieldException {
+        this();
+        if (schema == null){
+            schema = new Schema(getClass(), fields);
             SchemaRegistry.getInstance().registerSchema(schema);
-        } else
-            schema = SchemaRegistry.getInstance().getSchema(schemaName);
+        }
+    }
+
+    public StreamableWithSchema(Enum<?>[] fields) throws NoSuchFieldException {
+        this();
+        if (schema == null){
+            schema = new Schema(getClass(), fields);
+            SchemaRegistry.getInstance().registerSchema(schema);
+        }
     }
 
     @Override
     public boolean load(InAdapter input) throws Exception {
+        schema.clear(this);
         return schema.load(this, input);
     }
 
@@ -31,8 +43,16 @@ public class StreamableWithSchema<T extends SchemaElement> implements Streamable
         return field.getDescriptor().get(this);
     }
 
+    public Object get(Enum field) throws Exception {
+        return schema.getFieldDescriptor(field).get(this);
+    }
+
     public void set(T field, Object value) throws Exception {
         field.getDescriptor().set(this, value);
+    }
+
+    public void set(Enum field, Object value) throws Exception {
+        schema.getFieldDescriptor(field).set(this, value);
     }
 
     @Override

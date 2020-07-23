@@ -16,7 +16,7 @@ public abstract class GenericInAdapter<T> implements InAdapter {
     T currentRecord = null;
     Source<T> source;
 
-    private GenericInAdapter() {
+    public GenericInAdapter() {
         source = null;
     }
 

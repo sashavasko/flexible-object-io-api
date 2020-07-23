@@ -1,71 +1,22 @@
 package org.sv.flexobject;
 
 import com.carrotsearch.junitbenchmarks.AbstractBenchmark;
+import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.Before;
 import org.junit.Test;
-import org.sv.flexobject.schema.DataTypes;
-import org.sv.flexobject.schema.FieldDescriptor;
-import org.sv.flexobject.schema.SchemaElement;
+import org.sv.flexobject.copy.CopyAdapter;
+import org.sv.flexobject.json.JsonInputAdapter;
+import org.sv.flexobject.json.JsonOutputAdapter;
 import org.sv.flexobject.schema.SchemaRegistry;
-import org.sv.flexobject.util.BiConsumerWithException;
-import org.sv.flexobject.util.FunctionWithException;
 
-import java.sql.Date;
-import java.sql.Timestamp;
+import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class StreamableWithSchemaTest extends AbstractBenchmark {
 
-    public static class TestData extends StreamableWithSchema<TestData.FIELDS> {
-        protected Integer int32Field;
-        private Integer int32FieldGeneric;
-        private Integer int32FieldGenericSetter;
-        Long int64Field;
-        String stringField;
-        JsonNode jsonField;
-        Boolean booleanField;
-        Date dateField;
-        Timestamp timestampField;
-
-        public TestData() {
-            super(FIELDS.values());
-        }
-
-        public enum FIELDS implements SchemaElement<FIELDS> {
-
-            int32Field(DataTypes.int32, d->d.int32Field, (d, o)->{d.int32Field = (Integer) o;}),
-            int32FieldGeneric(DataTypes.int32),
-            int32FieldGenericSetter(DataTypes.int32, d -> d.int32FieldGenericSetter),
-            int64Field(DataTypes.int64, (d)->d.int64Field, (d,o)->{d.int64Field = (Long) o;}),
-            stringField(DataTypes.string, (d)->d.stringField, (d,o)->{d.stringField = (String) o;}),
-            jsonField(DataTypes.jsonNode, (d)->d.jsonField, (d,o)->{d.jsonField = (JsonNode) o;}),
-            booleanField(DataTypes.bool, (d)->d.booleanField, (d,o)->{d.booleanField = (Boolean) o;}),
-            dateField(DataTypes.date, (d)->d.dateField, (d,o)->{d.dateField = (Date) o;}),
-            timestampField(DataTypes.timestamp, (d)->d.timestampField, (d,o)->{d.timestampField = (Timestamp) o;});
-
-            protected FieldDescriptor descriptor;
-
-            FIELDS(DataTypes type, FunctionWithException<TestData, Object,Exception> getter, BiConsumerWithException<TestData, Object,Exception> setter) {
-                descriptor = new FieldDescriptor(name(), type, getter, setter, ordinal());
-            }
-
-            FIELDS(DataTypes type) {
-                descriptor = new FieldDescriptor(TestData.class, name(), type, ordinal());
-            }
-
-            FIELDS(DataTypes type, FunctionWithException<TestData, Object,Exception> getter) {
-                descriptor = new FieldDescriptor(TestData.class, name(), type, getter, ordinal());
-            }
-
-            public FieldDescriptor getDescriptor() {
-                return descriptor;
-            }
-        }
-
-    }
+    CopyAdapter adapter = new CopyAdapter();
 
     @Before
     public void setUp() throws Exception {
@@ -74,7 +25,7 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
 
     @Test
     public void schemaRegistered() {
-        assertNotNull(SchemaRegistry.getInstance().getParamNamesXref(TestData.class.getName()));
+        assertNotNull(SchemaRegistry.getInstance().getParamNamesXref(SimpleTestDataWithSchema.class.getName()));
     }
 
 
@@ -82,36 +33,83 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
 //    @BenchmarkOptions(benchmarkRounds = 10000000, warmupRounds = 1)
     @Test
     public void direct() throws Exception {
-        TestData data = new TestData();
+        SimpleTestDataWithSchema data = new SimpleTestDataWithSchema();
         data.int32Field = 777;
 
         assertEquals(777, (int)data.int32Field);
     }
 
-//   @BenchmarkOptions(benchmarkRounds = 10000000, warmupRounds = 1)
+//    @BenchmarkOptions(benchmarkRounds = 10000000, warmupRounds = 1)
+    @BenchmarkOptions(benchmarkRounds = 2, warmupRounds = 1)
     @Test
     public void fullyExplicit() throws Exception {
-        TestData data = new TestData();
-        data.set(TestData.FIELDS.int32Field, 777);
+        SimpleTestDataWithSchema data = new SimpleTestDataWithSchema();
+        data.set(SimpleTestDataWithSchema.FIELDS.int32Field, 777);
 
-        assertEquals(777, data.get(TestData.FIELDS.int32Field));
+        assertEquals(777, data.get(SimpleTestDataWithSchema.FIELDS.int32Field));
     }
 
 //    @BenchmarkOptions(benchmarkRounds = 10000000, warmupRounds = 1)
+    @BenchmarkOptions(benchmarkRounds = 2, warmupRounds = 1)
     @Test
     public void genericSetter() throws Exception {
-        TestData data = new TestData();
-        data.set(TestData.FIELDS.int32FieldGenericSetter, 777);
+        SimpleTestDataWithSchema data = new SimpleTestDataWithSchema();
+        data.set(SimpleTestDataWithSchema.FIELDS.int32FieldGenericSetter, 777);
 
-        assertEquals(777, data.get(TestData.FIELDS.int32FieldGenericSetter));
+        assertEquals(777, data.get(SimpleTestDataWithSchema.FIELDS.int32FieldGenericSetter));
     }
 
 //    @BenchmarkOptions(benchmarkRounds = 10000000, warmupRounds = 1)
+    @BenchmarkOptions(benchmarkRounds = 2, warmupRounds = 1)
     @Test
     public void genericSetterAndGetter() throws Exception {
-        TestData data = new TestData();
-        data.set(TestData.FIELDS.int32FieldGeneric, 777);
+        SimpleTestDataWithSchema data = new SimpleTestDataWithSchema();
+        data.set(SimpleTestDataWithSchema.FIELDS.int32FieldGeneric, 777);
 
-        assertEquals(777, data.get(TestData.FIELDS.int32FieldGeneric));
+        assertEquals(777, data.get(SimpleTestDataWithSchema.FIELDS.int32FieldGeneric));
+    }
+
+//    @BenchmarkOptions(benchmarkRounds = 10000000, warmupRounds = 1)
+    @BenchmarkOptions(benchmarkRounds = 2, warmupRounds = 1)
+    @Test
+    public void annotatedSchema() throws Exception {
+        TestDataWithAnnotatedSchema testData = new TestDataWithAnnotatedSchema();
+
+        testData.set(TestDataWithAnnotatedSchema.FIELDS.intField, 789);
+        assertEquals(789, (int)testData.get(TestDataWithAnnotatedSchema.FIELDS.intField));
+
+        testData.set(TestDataWithAnnotatedSchema.FIELDS.intFieldStoredAsString, 789);
+        assertEquals(789, (int)testData.get(TestDataWithAnnotatedSchema.FIELDS.intFieldStoredAsString));
+
+        JsonInputAdapter.forValue(("{'intField':777, " +
+                "'intFieldStoredAsString':'124567', " +
+                "'intArray':[0,1,23232323,3,4]," +  // results may be non-deterministic if values at index don't much between scalar field and array field
+                "'intList':[0,1]," +
+                "'intMap':{'foofoo': 888, 'barbar':'999'}," +
+                "'json':{'a':{'foo':1.2345, 'bar': true}}," +
+                "'intInArray2':23232323," +
+                "'intInList3':2222," +
+                "'intInMapFoo':565656," +
+                "'intInMapBar':'778877'}").replace('\'', '"')).consume(testData::load);
+
+        assertEquals(777, (int)testData.get(TestDataWithAnnotatedSchema.FIELDS.intField));
+        assertEquals(124567, (int)testData.get(TestDataWithAnnotatedSchema.FIELDS.intFieldStoredAsString));
+        assertEquals(565656, (int)testData.get(TestDataWithAnnotatedSchema.FIELDS.intInMapFoo));
+        assertEquals(778877, (int)testData.get(TestDataWithAnnotatedSchema.FIELDS.intInMapBar));
+        assertNull(testData.get(TestDataWithAnnotatedSchema.FIELDS.intInMapNull));
+        assertEquals(888, (int)testData.get(TestDataWithAnnotatedSchema.FIELDS.intInMapFooFoo));
+        assertEquals(999, (int)testData.get(TestDataWithAnnotatedSchema.FIELDS.intInMapBarBar));
+        assertEquals(23232323, (int)testData.get(TestDataWithAnnotatedSchema.FIELDS.intInArray2));
+        assertEquals(Arrays.asList(0, 1, null, 2222), testData.get(TestDataWithAnnotatedSchema.FIELDS.intList));
+        int intInList3 = (int) testData.get(TestDataWithAnnotatedSchema.FIELDS.intInList3);
+        assertEquals(2222, intInList3);
+        assertEquals(Arrays.asList(0, 1, 23232323, 3, 4,null, null, null,null, null), Arrays.asList((Integer[])testData.get(TestDataWithAnnotatedSchema.FIELDS.intArray)));
+
+        assertEquals(1.2345, (double)testData.get(TestDataWithAnnotatedSchema.FIELDS.doubleInJson), 0.001);
+        assertTrue((boolean)testData.get(TestDataWithAnnotatedSchema.FIELDS.booleanInJson));
+
+        JsonNode jsonOut = JsonOutputAdapter.produce(testData::save);
+        String expectedJsonString = "{\"intField\":777,\"intFieldStoredAsString\":\"124567\",\"intInArray2\":23232323,\"intInList3\":2222,\"intInMapFoo\":565656,\"intInMapBar\":\"778877\",\"intInMapFooFoo\":888,\"intInMapBarBar\":\"999\",\"intList\":[0,1,null,2222],\"intArray\":[0,1,23232323,3,4,null,null,null,null,null],\"intMap\":{\"bar\":778877,\"foo\":565656,\"barbar\":999,\"foofoo\":888},\"doubleInJson\":1.2345,\"booleanInJson\":true,\"json\":{\"a\":{\"foo\":1.2345,\"bar\":true}}}";
+        assertEquals(expectedJsonString, jsonOut.toString());
     }
 }

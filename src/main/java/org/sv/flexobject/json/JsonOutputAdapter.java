@@ -12,11 +12,10 @@ import org.sv.flexobject.util.ConsumerWithException;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 
 public class JsonOutputAdapter extends GenericOutAdapter<ObjectNode> {
-
     public JsonOutputAdapter() {
-        super();
     }
 
     public JsonOutputAdapter(Sink<ObjectNode> sink) {
@@ -60,16 +59,32 @@ public class JsonOutputAdapter extends GenericOutAdapter<ObjectNode> {
             getCurrent().put(translateOutputFieldName(paramName), value);
     }
 
+    public static String formatDate(Date date){
+        return new DateTime(date.getTime(), DateTimeZone.UTC).toString(JsonInputAdapter.JSON_DATE_FORMAT);
+    }
+
+    public static JsonNode dateToJsonNode(Object value){
+        return JsonNodeFactory.instance.textNode(formatDate((Date)value));
+    }
+
+    public static JsonNode localDateToJsonNode(Object value){
+        return dateToJsonNode(Date.valueOf((LocalDate)value));
+    }
+
     @Override
     public void setDate(String paramName, Date value) {
         if (value != null)
-            getCurrent().put(translateOutputFieldName(paramName), new DateTime(value.getTime(), DateTimeZone.UTC).toString(JsonInputAdapter.JSON_DATE_FORMAT));
+            getCurrent().set(translateOutputFieldName(paramName), dateToJsonNode(value));
+    }
+
+    public static JsonNode timestampToJsonNode(Object value){
+        return JsonNodeFactory.instance.numberNode(((Timestamp)value).getTime());
     }
 
     @Override
     public void setTimestamp(String paramName, Timestamp value) {
         if (value != null)
-            getCurrent().put(translateOutputFieldName(paramName), value.getTime());
+            getCurrent().set(translateOutputFieldName(paramName), timestampToJsonNode(value));
     }
 
     @Override

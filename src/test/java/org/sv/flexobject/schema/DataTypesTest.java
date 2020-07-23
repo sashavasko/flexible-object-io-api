@@ -8,9 +8,14 @@ import org.sv.flexobject.SaveException;
 import org.sv.flexobject.copy.CopyAdapter;
 import org.sv.flexobject.json.MapperFactory;
 
+import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -79,9 +84,10 @@ public class DataTypesTest {
         assertEquals(json, adapter.getJson("jsonField"));
     }
 
-    @Test(expected = SaveException.class)
+    @Test
     public void setJsonThrowsOnWrongDatatype() throws Exception {
         DataTypes.setJson(adapter, "jsonField", 12345);
+        assertEquals("12345", adapter.getJson("jsonField").toString());
     }
 
     @Test
@@ -190,7 +196,7 @@ public class DataTypesTest {
         adapter.clear();
     }
 
-    @Test(expected = SaveException.class)
+    @Test(expected = SchemaException.class)
     public void setBooleanThrowsOnWrongDatatype() throws Exception {
         DataTypes.setBoolean(adapter, "boolField", JsonNodeFactory.instance.arrayNode());
     }
@@ -322,5 +328,73 @@ public class DataTypesTest {
 
         DataTypes.setTimestamp(adapter, "timestampField", testTimestamp);
         assertEquals(testTimestamp, adapter.getTimestamp("timestampField"));
+    }
+
+    @Test
+    public void valueOfClass() {
+        assertEquals(DataTypes.string, DataTypes.valueOf(String.class));
+        assertEquals(DataTypes.string, DataTypes.valueOf(String[].class));
+
+        assertEquals(DataTypes.int32, DataTypes.valueOf(int.class));
+        assertEquals(DataTypes.int32, DataTypes.valueOf(int[].class));
+        assertEquals(DataTypes.int32, DataTypes.valueOf(Integer.class));
+        assertEquals(DataTypes.int32, DataTypes.valueOf(Integer[].class));
+        assertEquals(DataTypes.int32, DataTypes.valueOf(short.class));
+        assertEquals(DataTypes.int32, DataTypes.valueOf(short[].class));
+        assertEquals(DataTypes.int32, DataTypes.valueOf(Short.class));
+        assertEquals(DataTypes.int32, DataTypes.valueOf(Short[].class));
+        assertEquals(DataTypes.int32, DataTypes.valueOf(byte.class));
+        assertEquals(DataTypes.int32, DataTypes.valueOf(byte[].class));
+        assertEquals(DataTypes.int32, DataTypes.valueOf(Byte.class));
+        assertEquals(DataTypes.int32, DataTypes.valueOf(Byte[].class));
+
+        assertEquals(DataTypes.int64, DataTypes.valueOf(long.class));
+        assertEquals(DataTypes.int64, DataTypes.valueOf(long[].class));
+        assertEquals(DataTypes.int64, DataTypes.valueOf(Long.class));
+        assertEquals(DataTypes.int64, DataTypes.valueOf(Long[].class));
+        assertEquals(DataTypes.int64, DataTypes.valueOf(BigInteger.class));
+        assertEquals(DataTypes.int64, DataTypes.valueOf(BigInteger[].class));
+
+        assertEquals(DataTypes.float64, DataTypes.valueOf(double.class));
+        assertEquals(DataTypes.float64, DataTypes.valueOf(double[].class));
+        assertEquals(DataTypes.float64, DataTypes.valueOf(Double.class));
+        assertEquals(DataTypes.float64, DataTypes.valueOf(Double[].class));
+        assertEquals(DataTypes.float64, DataTypes.valueOf(float.class));
+        assertEquals(DataTypes.float64, DataTypes.valueOf(float[].class));
+        assertEquals(DataTypes.float64, DataTypes.valueOf(Float.class));
+        assertEquals(DataTypes.float64, DataTypes.valueOf(Float[].class));
+
+        assertEquals(DataTypes.bool, DataTypes.valueOf(boolean.class));
+        assertEquals(DataTypes.bool, DataTypes.valueOf(boolean[].class));
+        assertEquals(DataTypes.bool, DataTypes.valueOf(Boolean.class));
+        assertEquals(DataTypes.bool, DataTypes.valueOf(Boolean[].class));
+
+        assertEquals(DataTypes.date, DataTypes.valueOf(Date.class));
+        assertEquals(DataTypes.date, DataTypes.valueOf(Date[].class));
+
+        assertEquals(DataTypes.localDate, DataTypes.valueOf(LocalDate.class));
+        assertEquals(DataTypes.localDate, DataTypes.valueOf(LocalDate[].class));
+
+        assertEquals(DataTypes.timestamp, DataTypes.valueOf(Timestamp.class));
+        assertEquals(DataTypes.timestamp, DataTypes.valueOf(Timestamp[].class));
+    }
+
+    @Test
+    public void jsonConverterForMap() throws Exception {
+        Map<String, Integer> map = new HashMap<>();
+        map.put("foo", 222);
+        map.put("bar", 777);
+
+        assertEquals("{\"bar\":777,\"foo\":222}", DataTypes.jsonConverter(map).toString());
+
+    }
+
+    @Test
+    public void jsonConverterForList() throws Exception {
+        List<String> list = new ArrayList<>();
+        list.add("foo");
+        list.add("bar");
+
+        assertEquals("[\"foo\",\"bar\"]", DataTypes.jsonConverter(list).toString());
     }
 }

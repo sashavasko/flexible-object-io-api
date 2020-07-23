@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.sv.flexobject.InAdapter;
 import org.sv.flexobject.adapter.GenericInAdapter;
 import org.sv.flexobject.copy.CopyAdapter;
 import org.sv.flexobject.copy.Copyable;
@@ -14,6 +15,7 @@ import org.sv.flexobject.util.ConsumerWithException;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -23,6 +25,9 @@ public class JsonInputAdapter extends GenericInAdapter<JsonNode> implements Copy
 
     public static final DateTimeFormatter jsonDateFormatter = DateTimeFormat.forPattern(JSON_DATE_FORMAT).withZoneUTC();
     public static final DateTimeFormatter jsonDateFormatterShort = DateTimeFormat.forPattern(JSON_DATE_FORMAT_SHORT);
+
+    public JsonInputAdapter() {super();
+    }
 
     public JsonInputAdapter(Source<JsonNode> source) {
         super(source);
@@ -79,30 +84,54 @@ public class JsonInputAdapter extends GenericInAdapter<JsonNode> implements Copy
         return new Date(date.getMillis());
     }
 
+    public static LocalDate jsonNodeToLocalDate(JsonNode n){
+        return n == null ? null : jsonNodeToDate(n).toLocalDate();
+    }
+
     @Override
     public Date getDate(String fieldName) throws Exception {
         JsonNode n = getCurrent().get(translateInputFieldName(fieldName));
         return jsonNodeToDate(n);
     }
 
-    @Override
-    public Timestamp getTimestamp(String fieldName) throws Exception {
-        JsonNode n = getCurrent().get(translateInputFieldName(fieldName));
+    public static Timestamp jsonNodeToTimestamp(JsonNode n){
         return n == null ? null : new Timestamp(n.asLong());
     }
 
-     public static void consume(JsonNode json, ConsumerWithException<JsonInputAdapter, Exception> consumer) throws Exception {
-        if (json != null) {
-            Source<JsonNode> source = new SingleValueSource<>(json);
-            JsonInputAdapter adapter = new JsonInputAdapter(source);
-            adapter.next();
+    @Override
+    public Timestamp getTimestamp(String fieldName) throws Exception {
+        JsonNode n = getCurrent().get(translateInputFieldName(fieldName));
+        return jsonNodeToTimestamp(n);
+    }
 
-            consumer.accept(adapter);
+    public static void consume(JsonNode json, ConsumerWithException<InAdapter, Exception> consumer) throws Exception {
+        JsonInputAdapter adapter = forValue(json);
+        if (adapter != null) {
+            adapter.consume(consumer);
         }
     }
 
+    public static void consume(String jsonString, ConsumerWithException<InAdapter, Exception> consumer) throws Exception {
+        JsonInputAdapter adapter = forValue(jsonString);
+        if (adapter != null) {
+            adapter.consume(consumer);
+        }
+    }
+
+    public static JsonInputAdapter forValue(String jsonString) throws Exception {
+        return forValue(MapperFactory.getObjectReader().readTree(jsonString));
+    }
+
+    public static JsonInputAdapter forValue(JsonNode json) throws Exception {
+        if (json != null) {
+            SingleValueSource<JsonNode> source = new SingleValueSource<>(json);
+            return new JsonInputAdapter(source);
+        }
+        return null;
+    }
+
     @Override
-    public void copyRecord(CopyAdapter to) {
+    public void copyRecord(CopyAdapter to) throws Exception {
         ObjectNode current = (ObjectNode) getCurrent();
         Iterator<Map.Entry<String, JsonNode>> fields = current.fields();
         while (fields.hasNext()){

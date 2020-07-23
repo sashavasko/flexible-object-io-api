@@ -1,9 +1,7 @@
 package org.sv.flexobject.schema;
 
 import org.sv.flexobject.InAdapter;
-import org.sv.flexobject.Loadable;
 import org.sv.flexobject.OutAdapter;
-import org.sv.flexobject.Savable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,10 +12,32 @@ public class Schema {
     protected SchemaElement[] fields;
     protected Map<String, Integer> paramNamesXref = new HashMap<>();
 
-    public Schema(String name, SchemaElement[] fields) {
-        this.name = name;
+    public Schema(Class<?> dataClass, Enum<?>[] fields) throws NoSuchFieldException {
+        this.name = dataClass.getName();
+        this.fields = new SchemaElement[fields.length];
+        for (Enum<?> e : fields){
+            this.fields[e.ordinal()] = new SimpleSchemaElement(dataClass, e);
+        }
+        initParamXref(dataClass);
+    }
+
+    public Schema(Class<?> dataClass, SchemaElement[] fields) throws NoSuchFieldException {
+        this.name = dataClass.getName();
         this.fields = fields;
+        initParamXref(dataClass);
+    }
+
+    public static Schema getRegisteredSchema(Class<?> dataClass){
+        String schemaName = dataClass.getName();
+        return SchemaRegistry.getInstance().hasSchema(schemaName) ?
+                SchemaRegistry.getInstance().getSchema(schemaName) : null;
+    }
+
+    private void initParamXref(Class<?> dataClass) throws NoSuchFieldException {
         for (SchemaElement f  : fields){
+            if (f.getDescriptor() == null) {
+                f.setDescriptor(FieldDescriptor.fromEnum(dataClass, (Enum<?>) f));
+            }
             paramNamesXref.put(f.getDescriptor().getName(), f.getDescriptor().getOrder()+1);
         }
     }
@@ -30,21 +50,32 @@ public class Schema {
         return fields;
     }
 
+    public FieldDescriptor getFieldDescriptor(Enum<?> e) {
+        return fields[e.ordinal()].getDescriptor();
+    }
+
     public Map<String, Integer> getParamNamesXref() {
         return paramNamesXref;
     }
 
-    public boolean load(Loadable datum, InAdapter input) throws Exception {
+    public void clear(Object datum) throws Exception {
+        for (SchemaElement field : fields) {
+            field.getDescriptor().clear(datum);
+        }
+    }
+
+    public boolean load(Object datum, InAdapter input) throws Exception {
         for (SchemaElement field : fields){
             field.getDescriptor().load(datum, input);
         }
         return true;
     }
 
-    public boolean save(Savable datum, OutAdapter output) throws Exception {
+    public boolean save(Object datum, OutAdapter output) throws Exception {
         for (SchemaElement field : fields){
             field.getDescriptor().save(datum, output);
         }
+        output.saveIfYouShould();
         return true;
     }
 
