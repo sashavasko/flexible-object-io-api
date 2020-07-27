@@ -3,13 +3,12 @@ package org.sv.flexobject;
 import org.sv.flexobject.schema.Schema;
 import org.sv.flexobject.schema.SchemaElement;
 import org.sv.flexobject.schema.SchemaException;
-import org.sv.flexobject.schema.SchemaRegistry;
 
 public class StreamableWithSchema<T extends SchemaElement> implements Streamable {
 
     Schema schema;
 
-    public StreamableWithSchema() throws NoSuchFieldException {
+    public StreamableWithSchema() {
         schema = Schema.getRegisteredSchema(getClass());
     }
 
