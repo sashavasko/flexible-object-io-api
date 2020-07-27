@@ -7,6 +7,6 @@ import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ScalarFieldTyped {
-    DataTypes type() default DataTypes.string;
+    DataTypes type();
 
 }

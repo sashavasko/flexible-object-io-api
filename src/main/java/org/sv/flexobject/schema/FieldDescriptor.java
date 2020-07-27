@@ -10,6 +10,8 @@ import org.sv.flexobject.util.BiConsumerWithException;
 import org.sv.flexobject.util.FunctionWithException;
 
 import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 public class FieldDescriptor {
@@ -151,6 +153,24 @@ public class FieldDescriptor {
 
     }
 
+    static FieldDescriptor fromField(Class<?> dataClass, Field field, int order) {
+        Class<?> fieldClass = field.getType();
+        String name = field.getName();
+        DataTypes externalType;
+
+        if (fieldClass.isArray())
+            externalType = DataTypes.jsonNode;
+        else if (List.class.isAssignableFrom(fieldClass)
+                || Map.class.isAssignableFrom(fieldClass)) {
+            externalType = DataTypes.jsonNode;
+        } else {
+            ScalarFieldTyped sft = field.getAnnotation(ScalarFieldTyped.class);
+            externalType = sft != null ? sft.type() :DataTypes.valueOf(fieldClass);
+        }
+
+        return new FieldDescriptor(dataClass, name, externalType, order);
+    }
+
     static FieldDescriptor fromEnum(Class<?> dataClass, Enum <?> e) throws NoSuchFieldException {
         Field field = e.getClass().getField(e.name());
 
@@ -158,8 +178,17 @@ public class FieldDescriptor {
             ScalarField sf = field.getAnnotation(ScalarField.class);
             if (sf != null) {
                 Class<?> fieldClass = dataClass.getDeclaredField(e.name()).getType();
-                DataTypes type = DataTypes.valueOf(fieldClass);
-
+                DataTypes type = DataTypes.invalid;
+                if (fieldClass.isArray())
+                    type = DataTypes.jsonNode;
+                else {
+                    type = DataTypes.valueOf(fieldClass);
+                    if (type == DataTypes.invalid
+                            && (List.class.isAssignableFrom(fieldClass)
+                            || Map.class.isAssignableFrom(fieldClass))) {
+                        type = DataTypes.jsonNode;
+                    }
+                }
                 return new FieldDescriptor(dataClass, e.name(), type, e.ordinal());
             }
         }

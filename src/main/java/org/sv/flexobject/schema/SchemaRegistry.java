@@ -6,9 +6,9 @@ import java.util.Map;
 public class SchemaRegistry {
 
     private static final SchemaRegistry instance = new SchemaRegistry();
-    private static final Map<String, Map<String, Integer>> paramNamesXrefs = new HashMap<>();
+    private final Map<String, Map<String, Integer>> paramNamesXrefs = new HashMap<>();
 
-    private static final Map<String, Schema> schemas = new HashMap<>();
+    private final Map<String, Schema> schemas = new HashMap<>();
 
     private SchemaRegistry(){};
 
@@ -39,6 +39,11 @@ public class SchemaRegistry {
 
     public boolean hasSchema(String name){
         return schemas.containsKey(name);
+    }
+
+    public void clear(){
+        schemas.clear();
+        paramNamesXrefs.clear();
     }
 
     private boolean checkClassLoaded(String name) {
