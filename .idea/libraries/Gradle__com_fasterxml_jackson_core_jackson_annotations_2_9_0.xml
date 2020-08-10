@@ -4,8 +4,6 @@
       <root url="jar://$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.9.0/jackson-annotations-2.9.0.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES>
-      <root url="jar:///var/cache/gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.9.0/a0ad4e203304ccab7e01266fa814115850edb8a9/jackson-annotations-2.9.0-sources.jar!/" />
-    </SOURCES>
+    <SOURCES />
   </library>
 </component>

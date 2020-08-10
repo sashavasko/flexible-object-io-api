@@ -171,7 +171,7 @@ public class FieldDescriptor {
         return new FieldDescriptor(dataClass, name, externalType, order);
     }
 
-    static FieldDescriptor fromEnum(Class<?> dataClass, Enum <?> e) throws NoSuchFieldException {
+    static FieldDescriptor fromEnum(Class<?> dataClass, Enum <?> e) throws NoSuchFieldException, SchemaException {
         Field field = e.getClass().getField(e.name());
 
         {

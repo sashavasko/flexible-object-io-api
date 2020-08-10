@@ -14,6 +14,18 @@ subprojects {
     ext.hadoopVersion = "2.6.0"
 
     dependencies {
+
+        // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+        compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+
+        compile group: 'joda-time', name: 'joda-time', version: '2.10.1'
+
+        // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
+        compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.7'
+        // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+        compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
+
+
         testImplementation "junit:junit:4.13"
         testImplementation 'org.mockito:mockito-core:1.9.5', {exclude group:"org.hamcrest"}
         // https://mvnrepository.com/artifact/com.h2database/h2
@@ -27,13 +39,6 @@ subprojects {
 
 project(':flexible-object-io-core') {
     dependencies {
-        compile group: 'joda-time', name: 'joda-time', version: '2.10.1'
-
-        // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-        compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.7'
-        // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-        compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
-
 
         // https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2
         compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.7.0'

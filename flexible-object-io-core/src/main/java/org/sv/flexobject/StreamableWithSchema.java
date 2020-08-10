@@ -12,13 +12,13 @@ public class StreamableWithSchema<T extends SchemaElement> implements Streamable
         schema = Schema.getRegisteredSchema(getClass());
     }
 
-    public StreamableWithSchema(T[] fields) throws NoSuchFieldException {
+    public StreamableWithSchema(T[] fields) throws NoSuchFieldException, SchemaException {
         if (!Schema.isRegisteredSchema(getClass())){
             schema = new Schema(getClass(), fields);
         }
     }
 
-    public StreamableWithSchema(Enum<?>[] fields) throws NoSuchFieldException {
+    public StreamableWithSchema(Enum<?>[] fields) throws NoSuchFieldException, SchemaException {
         if (!Schema.isRegisteredSchema(getClass())){
             schema = new Schema(getClass(), fields);
         }

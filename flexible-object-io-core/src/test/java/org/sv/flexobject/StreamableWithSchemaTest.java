@@ -13,6 +13,7 @@ import org.sv.flexobject.schema.Schema;
 import org.sv.flexobject.schema.SchemaRegistry;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 
 import static org.junit.Assert.*;
 
@@ -158,5 +159,28 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
         JsonNode jsonOut = JsonOutputAdapter.produce(testData::save);
         String expectedJsonString = "{\"intField\":777,\"intFieldStoredAsString\":\"124567\",\"intArray\":[0,1,23232323,3,4,null,null,null,null,null],\"intList\":[0,1],\"intMap\":{\"barbar\":999,\"foofoo\":888},\"json\":{\"a\":{\"foo\":1.2345,\"bar\":true}}}";
         assertEquals(expectedJsonString, jsonOut.toString());
+    }
+
+    @Test
+    public void classAndEnum() throws Exception {
+        TestDataWithEnumAndClass testData = new TestDataWithEnumAndClass();
+
+        JsonInputAdapter.forValue(("{'clazz':'" + TestDataWithEnumAndClass.TestEnum.class.getName() + "', " +
+                "'enumValue':'uno'," +
+                "'enumSet':'uno,dos'}").replace('\'', '"')).consume(testData::load);
+
+        assertSame(TestDataWithEnumAndClass.TestEnum.class, testData.clazz);
+        assertEquals(TestDataWithEnumAndClass.TestEnum.uno, testData.enumValue);
+        assertEquals(EnumSet.of(TestDataWithEnumAndClass.TestEnum.uno,TestDataWithEnumAndClass.TestEnum.dos), testData.enumSet);
+
+        JsonNode jsonOut = JsonOutputAdapter.produce(testData::save);
+        String expectedJsonString = "{\"clazz\":\"org.sv.flexobject.TestDataWithEnumAndClass$TestEnum\",\"enumValue\":\"uno\",\"enumSet\":\"uno,dos\"}";
+        assertEquals(expectedJsonString, jsonOut.toString());
+
+        JsonInputAdapter.forValue(("{'clazz':'" + TestDataWithEnumAndClass.TestEnum.class.getName() + "', " +
+                "'enumValue':'uno'," +
+                "'enumSet':['uno','dos']}").replace('\'', '"')).consume(testData::load);
+
+        assertEquals(EnumSet.of(TestDataWithEnumAndClass.TestEnum.uno,TestDataWithEnumAndClass.TestEnum.dos), testData.enumSet);
     }
 }

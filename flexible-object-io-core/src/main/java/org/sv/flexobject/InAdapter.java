@@ -1,11 +1,13 @@
 package org.sv.flexobject;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.util.ConsumerWithException;
 
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.util.Set;
 
 /**
  * Implementations provide uniform interface to reading various input formats and or medias.
@@ -84,6 +86,26 @@ public interface InAdapter extends AutoCloseable, Parameterized{
     default LocalDate getLocalDate(String fieldName) throws Exception {
         Date date = getDate(fieldName);
         return date != null ? date.toLocalDate() : null;
+    }
+
+    default Class<?> getClass(String fieldName) throws Exception {
+        String className = getString(fieldName);
+        return DataTypes.classConverter(className);
+    }
+
+    default <T extends Enum<T>> T getEnum(String fieldName, T defaultValue) throws Exception {
+        String valueName = getString(fieldName);
+        return DataTypes.enumConverter(valueName, defaultValue);
+    }
+
+    default Enum getEnum(String fieldName, Class<? extends Enum> enumClass) throws Exception {
+        String valueName = getString(fieldName);
+        return DataTypes.enumConverter(valueName, enumClass);
+    }
+
+    default Set<Enum> getEnumSet(String fieldName, Class<? extends Enum> enumClass, String emptyValue) throws Exception {
+        String valueName = getString(fieldName);
+        return DataTypes.enumSetConverter(valueName, enumClass, emptyValue);
     }
 
     /**

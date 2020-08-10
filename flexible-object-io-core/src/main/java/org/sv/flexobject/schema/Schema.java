@@ -34,7 +34,7 @@ public class Schema {
         SchemaRegistry.getInstance().registerSchema(this);
     }
 
-    public Schema(Class<?> dataClass, Enum<?>[] fields) throws NoSuchFieldException {
+    public Schema(Class<?> dataClass, Enum<?>[] fields) throws NoSuchFieldException, SchemaException {
         this.name = dataClass.getName();
         this.isInferred = false;
         this.fields = new SchemaElement[fields.length];
@@ -45,7 +45,7 @@ public class Schema {
         SchemaRegistry.getInstance().registerSchema(this);
     }
 
-    public Schema(Class<?> dataClass, SchemaElement[] fields) throws NoSuchFieldException {
+    public Schema(Class<?> dataClass, SchemaElement[] fields) throws NoSuchFieldException, SchemaException {
         this.name = dataClass.getName();
         this.isInferred = false;
         this.fields = fields;

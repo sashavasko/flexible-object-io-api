@@ -1,8 +1,10 @@
 package org.sv.flexobject.schema;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
+import org.apache.commons.lang3.StringUtils;
 import org.sv.flexobject.InAdapter;
 import org.sv.flexobject.OutAdapter;
 import org.sv.flexobject.json.JsonInputAdapter;
@@ -16,6 +18,8 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.EnumSet;
+import java.util.Set;
 
 public enum DataTypes {
     string(InAdapter::getString, DataTypes::setString, DataTypes::stringConverter),
@@ -27,6 +31,7 @@ public enum DataTypes {
     date(InAdapter::getDate, DataTypes::setDate, DataTypes::dateConverter),
     timestamp(InAdapter::getTimestamp, DataTypes::setTimestamp, DataTypes::timestampConverter),
     localDate(InAdapter::getLocalDate, DataTypes::setDate, DataTypes::localDateConverter), //   LocalDate getLocalDate (String fieldName) throws Exception
+    classObject(InAdapter::getClass, DataTypes::setString, DataTypes::classConverter),
     invalid((a,n)-> null, (a, n, o)->{}, o->o);
 
     protected BiFunctionWithException<InAdapter, String, Object, Exception> getter;
@@ -61,6 +66,10 @@ public enum DataTypes {
             return (String) value;
         if (value instanceof ValueNode)
             return ((TextNode)value).asText();
+        if (value instanceof Enum)
+            return ((Enum)value).name();
+        if (value instanceof Class)
+            return ((Class)value).getName();
         return value.toString();
     }
 
@@ -193,6 +202,87 @@ public enum DataTypes {
         adapter.setTimestamp(fieldName, timestampConverter(value));
     }
 
+    public static Class<?> classConverter(Object value) throws Exception {
+        if (value == null || value instanceof Class)
+            return (Class) value;
+        String stringValue = stringConverter(value);
+        if (stringValue != null){
+            return Class.forName(stringValue);
+        }
+
+        throw new SchemaException("Attempting to convert value of type " + value.getClass().getName() + " to Class");
+    }
+
+    public static <T extends Enum<T>> T enumConverter(Object value, T defaultValue) throws Exception {
+        if (value == null || value instanceof Enum)
+            return (T) value;
+        try {
+            String stringValue = stringConverter(value);
+            if (stringValue != null) {
+                return Enum.valueOf(defaultValue.getDeclaringClass(), (String) value);
+            }
+        } catch (Exception e) {
+        }
+        return defaultValue;
+    }
+
+    public static Enum enumConverter(Object value, Class<? extends Enum> enumClass) throws Exception {
+        if (value == null || value instanceof Enum)
+            return (Enum) value;
+        String stringValue = stringConverter(value);
+        if (stringValue != null) {
+            return Enum.valueOf(enumClass, (String) value);
+        }
+
+        throw new SchemaException("Attempting to convert value of type " + value.getClass().getName() + " to Enum " + enumClass.getName());
+    }
+
+    public static Set<Enum> enumSetConverter(Object value, Class<? extends Enum> enumClass, String emptyValue) throws Exception {
+        if (value == null || value instanceof Set)
+            return (Set) value;
+
+        Set setOut = EnumSet.noneOf(enumClass);
+        if (value instanceof ArrayNode) {
+            for (JsonNode item : ((ArrayNode)value)) {
+                String valueName = item.asText();
+                if (!valueName.equalsIgnoreCase(emptyValue)) {
+                    setOut.add(Enum.valueOf(enumClass, valueName));
+                }
+            }
+        }else {
+            String valueNames = stringConverter(value);
+            if (StringUtils.isNotBlank(valueNames)) {
+                if (valueNames.startsWith("["))
+                    valueNames = valueNames.substring(1, valueNames.length() - 1)
+                            ;
+                for (String item : valueNames.split(",")) {
+                    String valueName = item.trim();
+                    if (valueName.startsWith("\""))
+                        valueName = valueName.substring(1, valueName.length() - 1).trim();
+                    if (!valueName.equalsIgnoreCase(emptyValue)) {
+                        setOut.add(Enum.valueOf(enumClass, valueName));
+                    }
+                }
+            }
+        }
+        return setOut;
+    }
+
+    public static String enumSetToString(Object value, Class<? extends Enum> enumClass, String emptyValue) throws Exception {
+        Set bits = enumSetConverter(value, enumClass, emptyValue);
+        String stringOut = emptyValue;
+        if (!bits.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (Object bit : bits) {
+                sb.append(((Enum)bit).name()).append(',');
+            }
+            sb.setLength(sb.length() - 1);
+            stringOut = sb.toString();
+        }
+
+        return stringOut;
+    }
+
     public static DataTypes valueOf(Class<?> clazz){
         if (clazz.getName().startsWith("[")){
             if (String[].class.equals(clazz))
@@ -215,6 +305,8 @@ public enum DataTypes {
                 return localDate;
             if (Timestamp[].class.equals(clazz))
                 return timestamp;
+            if (Class[].class.equals(clazz))
+                return classObject;
             return invalid;
         }
         if (String.class.equals(clazz))
@@ -237,8 +329,19 @@ public enum DataTypes {
             return localDate;
         if (Timestamp.class.equals(clazz))
             return timestamp;
+
+        if (Class.class.equals(clazz))
+            return classObject;
+
         if (JsonNode.class.isAssignableFrom(clazz))
             return jsonNode;
+
+        // These are tricky since we need to know which Enum they belong to
+        if (Enum.class.isAssignableFrom(clazz))
+            return string;
+        if (Set.class.isAssignableFrom(clazz))
+            return string;
+
         return invalid;
     }
 

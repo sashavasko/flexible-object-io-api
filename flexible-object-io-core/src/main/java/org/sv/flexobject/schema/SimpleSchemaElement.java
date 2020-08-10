@@ -5,7 +5,7 @@ import java.lang.reflect.Field;
 public class SimpleSchemaElement implements SchemaElement {
     FieldDescriptor fieldDescriptor;
 
-    public SimpleSchemaElement(Class<?> dataClass, Enum<?> e) throws NoSuchFieldException {
+    public SimpleSchemaElement(Class<?> dataClass, Enum<?> e) throws NoSuchFieldException, SchemaException {
         fieldDescriptor = FieldDescriptor.fromEnum(dataClass, e);
     }
 

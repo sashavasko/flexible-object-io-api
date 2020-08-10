@@ -10,6 +10,6 @@ public class ScalarGetter extends FieldWrapper implements FunctionWithException 
 
     @Override
     public Object apply(Object input) throws Exception {
-        return getValue(input);
+        return enumSetAsString(getValue(input));
     }
 }

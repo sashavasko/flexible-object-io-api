@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.schema.SchemaException;
+import org.sv.flexobject.schema.annotations.EnumSetField;
 import org.sv.flexobject.schema.annotations.ValueType;
 
 import java.lang.reflect.Field;
@@ -25,6 +26,9 @@ public class FieldWrapper {
     private DataTypes type;
     private STRUCT structure = STRUCT.unknown;
     private Class<?> fieldClass;
+    private boolean isEnum;
+    private Class<? extends Enum> enumClass;
+    private String emptyValue;
 
     protected String fieldName;
     protected Class<?> clazz;
@@ -34,12 +38,21 @@ public class FieldWrapper {
         this.clazz = clazz;
     }
 
-    public Field getField() throws NoSuchFieldException {
+    public Field getField() throws NoSuchFieldException, SchemaException {
         if (field == null) {
             field = clazz.getDeclaredField(fieldName);
             field.setAccessible(true);
             fieldClass = field.getType();
             type = DataTypes.valueOf(fieldClass);
+            isEnum = Enum.class.isAssignableFrom(fieldClass);
+            if (Set.class.isAssignableFrom(fieldClass)){
+                EnumSetField enumSetField = field.getAnnotation(EnumSetField.class);
+                if (enumSetField == null)
+                    throw new SchemaException("Sets are supported onlu for Enumeration type and require EnumSetField annotation. Field " + fieldName + " in class " + clazz.getName());
+
+                enumClass = enumSetField.enumClass();
+                emptyValue = enumSetField.emptyValue();
+            }
 
             if (type == DataTypes.invalid){
                 ValueType vt = field.getAnnotation(ValueType.class);
@@ -59,7 +72,7 @@ public class FieldWrapper {
     }
 
 
-    public Object getValue(Object o) throws NoSuchFieldException, IllegalAccessException, SchemaException {
+    public Object getValue(Object o) throws Exception {
         Object fieldValue = getField().get(o);
         if (fieldValue == null){
             if (getFieldClass().isArray())
@@ -81,8 +94,15 @@ public class FieldWrapper {
         return fieldValue;
     }
 
-    public void setValue(Object o, Object value) throws NoSuchFieldException, IllegalAccessException {
-        getField().set(o,value);
+    public void setValue(Object o, Object value) throws Exception {
+        if (field == null)
+            getField();
+        if (isEnum){
+            field.set(o, DataTypes.enumConverter(value, (Class<? extends Enum>) fieldClass));
+        }else if (enumClass != null) {
+            field.set(o, DataTypes.enumSetConverter(value, enumClass, emptyValue));
+        }else
+            field.set(o, value);
     }
 
     public void clear(Object o) throws Exception {
@@ -107,21 +127,30 @@ public class FieldWrapper {
             getField().set(o, null);
     }
 
-    public DataTypes getType() throws NoSuchFieldException {
+    public DataTypes getType() throws NoSuchFieldException, SchemaException {
         if (field == null)
             getField();
         return type;
     }
 
-    public STRUCT getStructure() throws NoSuchFieldException {
+    public STRUCT getStructure() throws NoSuchFieldException, SchemaException {
         if (field == null)
             getField();
         return structure;
     }
 
-    public Class<?> getFieldClass() throws NoSuchFieldException {
+    public Class<?> getFieldClass() throws NoSuchFieldException, SchemaException {
         if (field == null)
             getField();
         return fieldClass;
     }
+
+    protected Object enumSetAsString(Object value) throws Exception {
+        if (value != null && value instanceof Set && enumClass != null){
+            return DataTypes.enumSetToString(value, enumClass, emptyValue);
+        }
+        return value;
+    }
+
+
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.schema.FieldDescriptor;
 import org.sv.flexobject.schema.SchemaElement;
+import org.sv.flexobject.schema.SchemaException;
 import org.sv.flexobject.util.BiConsumerWithException;
 import org.sv.flexobject.util.FunctionWithException;
 
@@ -21,7 +22,7 @@ public class SimpleTestDataWithSchema extends StreamableWithSchema<SimpleTestDat
         Date dateField;
         Timestamp timestampField;
 
-        public SimpleTestDataWithSchema() throws NoSuchFieldException {
+        public SimpleTestDataWithSchema() throws NoSuchFieldException, SchemaException {
             super(FIELDS.values());
         }
 

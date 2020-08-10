@@ -2,6 +2,7 @@ package org.sv.flexobject;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.sv.flexobject.schema.DataTypes;
+import org.sv.flexobject.schema.SchemaException;
 import org.sv.flexobject.schema.annotations.*;
 
 import java.util.List;
@@ -28,7 +29,7 @@ public class TestDataWithAnnotatedSchema extends StreamableWithSchema {
         @ScalarField json,
     }
 
-    public TestDataWithAnnotatedSchema() throws NoSuchFieldException {
+    public TestDataWithAnnotatedSchema() throws NoSuchFieldException, SchemaException {
         super(FIELDS.values());
     }
 
