@@ -2,6 +2,12 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
+      <module name="flexible-object-io-api.flexible-object-io-core.main" target="1.8" />
+      <module name="flexible-object-io-api.flexible-object-io-core.test" target="1.8" />
+      <module name="flexible-object-io-api.flexible-object-io-hadoop.main" target="1.8" />
+      <module name="flexible-object-io-api.flexible-object-io-hadoop.test" target="1.8" />
+      <module name="flexible-object-io-api.flexible-object-io-kafka.main" target="1.8" />
+      <module name="flexible-object-io-api.flexible-object-io-kafka.test" target="1.8" />
       <module name="flexible-object-io-api.main" target="1.8" />
       <module name="flexible-object-io-api.test" target="1.8" />
     </bytecodeTargetLevel>

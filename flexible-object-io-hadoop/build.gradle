@@ -1,0 +1,5 @@
+test { systemProperty "file.encoding", "ISO-8859-1" }
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'ISO-8859-1'
+}

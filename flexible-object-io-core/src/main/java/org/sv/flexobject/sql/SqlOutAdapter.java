@@ -136,8 +136,11 @@ public class SqlOutAdapter implements OutAdapter, AutoCloseable {
         int paramIdx = getParamIndex(paramName);
         if (paramIdx >= 0) {
             if (value != null) {
-                // This sucks, but that's the only way to get millisecond precision through the MySQL jdbc driver
-                preparedStatement.setString(paramIdx, value.toString());
+                if (value.getNanos() != 0) {
+                    // This sucks, but that's the only way to get millisecond precision through the MySQL jdbc driver
+                    preparedStatement.setString(paramIdx, value.toString());
+                } else
+                    preparedStatement.setTimestamp(paramIdx, value);
             }else
                 preparedStatement.setNull(paramIdx, Types.TIMESTAMP);
             setParametersCount++;

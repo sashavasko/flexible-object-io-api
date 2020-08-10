@@ -3,8 +3,15 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/1258842656/code.flexible-object-io-api.iml" filepath="$PROJECT_DIR$/.idea/modules/1258842656/code.flexible-object-io-api.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1258842656/flexible-object-io-api.main.iml" filepath="$PROJECT_DIR$/.idea/modules/1258842656/flexible-object-io-api.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1258842656/flexible-object-io-api.test.iml" filepath="$PROJECT_DIR$/.idea/modules/1258842656/flexible-object-io-api.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1304285867/flexible-object-io-api.flexible-object-io-core.iml" filepath="$PROJECT_DIR$/.idea/modules/1304285867/flexible-object-io-api.flexible-object-io-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1304285867/flexible-object-io-api.flexible-object-io-core.main.iml" filepath="$PROJECT_DIR$/.idea/modules/1304285867/flexible-object-io-api.flexible-object-io-core.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1304285867/flexible-object-io-api.flexible-object-io-core.test.iml" filepath="$PROJECT_DIR$/.idea/modules/1304285867/flexible-object-io-api.flexible-object-io-core.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-581919695/flexible-object-io-api.flexible-object-io-hadoop.iml" filepath="$PROJECT_DIR$/.idea/modules/-581919695/flexible-object-io-api.flexible-object-io-hadoop.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-581919695/flexible-object-io-api.flexible-object-io-hadoop.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-581919695/flexible-object-io-api.flexible-object-io-hadoop.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-581919695/flexible-object-io-api.flexible-object-io-hadoop.test.iml" filepath="$PROJECT_DIR$/.idea/modules/-581919695/flexible-object-io-api.flexible-object-io-hadoop.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1785116058/flexible-object-io-api.flexible-object-io-kafka.iml" filepath="$PROJECT_DIR$/.idea/modules/1785116058/flexible-object-io-api.flexible-object-io-kafka.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1785116058/flexible-object-io-api.flexible-object-io-kafka.main.iml" filepath="$PROJECT_DIR$/.idea/modules/1785116058/flexible-object-io-api.flexible-object-io-kafka.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1785116058/flexible-object-io-api.flexible-object-io-kafka.test.iml" filepath="$PROJECT_DIR$/.idea/modules/1785116058/flexible-object-io-api.flexible-object-io-kafka.test.iml" />
     </modules>
   </component>
 </project>
