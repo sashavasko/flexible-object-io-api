@@ -1,18 +1,14 @@
 package org.sv.flexobject.adapter;
 
 import org.sv.flexobject.stream.Sink;
+import org.sv.flexobject.stream.sinks.SingleValueSink;
+import org.sv.flexobject.util.ConsumerWithException;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
 public class MapOutAdapter extends GenericOutAdapter<Map> implements DynamicOutAdapter {
-
-    public enum PARAMS {
-        namespace
-    }
-
-    protected String namespace = "";
 
     public MapOutAdapter() {
         super(()->new HashMap<String, Object>());
@@ -39,26 +35,16 @@ public class MapOutAdapter extends GenericOutAdapter<Map> implements DynamicOutA
     }
 
     @Override
-    public String translateOutputFieldName(String fieldName) {
-        return namespace.isEmpty()? fieldName : namespace + "." + fieldName;
-    }
-
-
-    @Override
     public Object put(String fieldName, Object value) throws Exception{
-        return getCurrent().put(translateOutputFieldName(fieldName), value);
+        return getCurrent().put(fieldName, value);
     }
 
-    public void setParam(String key, Object value){
-        try{
-            setParam(PARAMS.valueOf(key), value);
-        }catch (IllegalArgumentException e){
-            super.setParam(key, value);
-        }
-    }
+    public static Map produce(Class<? extends Map> outputClass, ConsumerWithException<MapOutAdapter, Exception> consumer) throws Exception {
+        SingleValueSink<Map> sink = new SingleValueSink<>();
+        MapOutAdapter adapter = new MapOutAdapter(sink, outputClass);
 
-    public void setParam(PARAMS key, Object value){
-        if (PARAMS.namespace == key && value != null && value instanceof String)
-            namespace = (String) value;
+        consumer.accept(adapter);
+
+        return sink.get();
     }
 }

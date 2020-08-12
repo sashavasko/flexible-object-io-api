@@ -3,6 +3,7 @@ package org.sv.flexobject.adapter;
 
 import org.sv.flexobject.InAdapter;
 import org.sv.flexobject.stream.Source;
+import org.sv.flexobject.translate.Translator;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -10,11 +11,13 @@ import java.lang.reflect.InvocationTargetException;
 public abstract class GenericInAdapter<T> implements InAdapter {
 
     public enum PARAMS {
-        source
+        source,
+        fieldNameTranslator
     }
 
     T currentRecord = null;
     Source<T> source;
+    Translator fieldNameTranslator = null;
 
     public GenericInAdapter() {
         source = null;
@@ -38,6 +41,8 @@ public abstract class GenericInAdapter<T> implements InAdapter {
     public void setParam(PARAMS key, Object value){
         if (PARAMS.source == key && value != null && value instanceof Source)
             source = (Source<T>) value;
+        if (PARAMS.fieldNameTranslator == key && value != null && value instanceof Translator)
+            fieldNameTranslator = (Translator) value;
     }
 
     public T getCurrent(){
@@ -70,4 +75,10 @@ public abstract class GenericInAdapter<T> implements InAdapter {
     public void close() throws Exception {
         source.close();
     }
+
+    @Override
+    public String translateInputFieldName(String fieldName) {
+        return fieldNameTranslator != null ? fieldNameTranslator.apply(fieldName) : fieldName;
+    }
+
 }

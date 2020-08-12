@@ -15,66 +15,66 @@ public interface DynamicInAdapter extends InAdapter {
 
     @Override
     default String getString(String fieldName) throws Exception{
-        return DataTypes.stringConverter(get(fieldName));
+        return DataTypes.stringConverter(get(translateInputFieldName(fieldName)));
     }
 
     @Override
     default JsonNode getJson(String fieldName) throws Exception{
-        return DataTypes.jsonConverter(get(fieldName));
+        return DataTypes.jsonConverter(get(translateInputFieldName(fieldName)));
     }
 
     @Override
     default Integer getInt(String fieldName) throws Exception{
-        return DataTypes.int32Converter(get(fieldName));
+        return DataTypes.int32Converter(get(translateInputFieldName(fieldName)));
     }
 
     @Override
     default Long getLong(String fieldName) throws Exception{
-        return DataTypes.int64Converter(get(fieldName));
+        return DataTypes.int64Converter(get(translateInputFieldName(fieldName)));
     }
 
     @Override
     default Double getDouble(String fieldName) throws Exception{
-        return DataTypes.float64Converter(get(fieldName));
+        return DataTypes.float64Converter(get(translateInputFieldName(fieldName)));
     }
 
     @Override
     default Date getDate(String fieldName) throws Exception{
-        return DataTypes.dateConverter(get(fieldName));
+        return DataTypes.dateConverter(get(translateInputFieldName(fieldName)));
     }
 
     @Override
     default Timestamp getTimestamp(String fieldName) throws Exception {
-        return DataTypes.timestampConverter(get(fieldName));
+        return DataTypes.timestampConverter(get(translateInputFieldName(fieldName)));
     }
 
     @Override
     default LocalDate getLocalDate(String fieldName) throws Exception {
-        return DataTypes.localDateConverter(get(fieldName));
+        return DataTypes.localDateConverter(get(translateInputFieldName(fieldName)));
     }
 
     @Override
     default Boolean getBoolean(String fieldName) throws Exception {
-        return DataTypes.boolConverter(get(fieldName));
+        return DataTypes.boolConverter(get(translateInputFieldName(fieldName)));
     }
 
     @Override
     default Class<?> getClass(String fieldName) throws Exception {
-        return DataTypes.classConverter(get(fieldName));
+        return DataTypes.classConverter(get(translateInputFieldName(fieldName)));
     }
 
     @Override
     default <T extends Enum<T>> T getEnum(String fieldName, T defaultValue) throws Exception {
-        return DataTypes.enumConverter(get(fieldName), defaultValue);
+        return DataTypes.enumConverter(get(translateInputFieldName(fieldName)), defaultValue);
     }
 
     @Override
     default Enum getEnum(String fieldName, Class<? extends Enum> enumClass) throws Exception {
-        return DataTypes.enumConverter(get(fieldName), enumClass);
+        return DataTypes.enumConverter(get(translateInputFieldName(fieldName)), enumClass);
     }
 
     @Override
     default Set<Enum> getEnumSet(String fieldName, Class<? extends Enum> enumClass, String emptyValue) throws Exception {
-        return DataTypes.enumSetConverter(get(fieldName), enumClass, emptyValue);
+        return DataTypes.enumSetConverter(get(translateInputFieldName(fieldName)), enumClass, emptyValue);
     }
 }

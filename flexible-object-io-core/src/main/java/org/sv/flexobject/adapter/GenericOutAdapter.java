@@ -3,6 +3,7 @@ package org.sv.flexobject.adapter;
 import org.sv.flexobject.OutAdapter;
 import org.sv.flexobject.stream.Sink;
 import org.sv.flexobject.stream.Source;
+import org.sv.flexobject.translate.Translator;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -13,13 +14,15 @@ public abstract class GenericOutAdapter<T> implements OutAdapter {
     public enum PARAMS {
         sink,
         recordFactory,
-        recordClass
+        recordClass,
+        fieldNameTranslator
     }
 
     protected Supplier<T> recordFactory = null;
     protected Class<? extends T> recordClass = null;
     protected T currentRecord = null;
     protected Sink sink = null;
+    protected Translator fieldNameTranslator = null;
 
     public GenericOutAdapter() {
     }
@@ -57,6 +60,8 @@ public abstract class GenericOutAdapter<T> implements OutAdapter {
             recordFactory = (Supplier<T>) value;
         else if (PARAMS.recordClass == key && value != null && value instanceof Class)
             recordClass = (Class<? extends T>) value;
+        else if (PARAMS.fieldNameTranslator == key && value != null && value instanceof Translator)
+            fieldNameTranslator = (Translator) value;
     }
 
     public T createRecord() {
@@ -75,6 +80,11 @@ public abstract class GenericOutAdapter<T> implements OutAdapter {
 
     protected Object convertRecordForSink(T record){
         return record;
+    }
+
+    @Override
+    public String translateOutputFieldName(String fieldName) {
+        return fieldNameTranslator != null ? fieldNameTranslator.apply(fieldName) : fieldName;
     }
 
     @Override

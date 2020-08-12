@@ -21,46 +21,46 @@ public interface DynamicOutAdapter extends OutAdapter {
 
     @Override
     default void setString(String paramName, String value) throws Exception{
-        put(paramName, value);
+        put(translateOutputFieldName(paramName), value);
     }
 
     @Override
     default void setJson(String paramName, JsonNode value) throws Exception{
-        put(paramName, value);
+        put(translateOutputFieldName(paramName), value);
     }
 
     @Override
     default void setInt(String paramName, Integer value) throws Exception{
-        put(paramName, value);
+        put(translateOutputFieldName(paramName), value);
     }
 
     @Override
     default void setBoolean(String paramName, Boolean value) throws Exception{
-        put(paramName, value);
+        put(translateOutputFieldName(paramName), value);
     }
 
     @Override
     default void setLong(String paramName, Long value) throws Exception{
-        put(paramName, value);
+        put(translateOutputFieldName(paramName), value);
     }
 
     @Override
     default void setDouble(String paramName, Double value) throws Exception{
-        put(paramName, value);
+        put(translateOutputFieldName(paramName), value);
     }
 
     @Override
     default void setDate(String paramName, Date value) throws Exception{
-        put(paramName, value);
+        put(translateOutputFieldName(paramName), value);
     }
 
     @Override
     default void setDate(String paramName, LocalDate value) throws Exception {
-        put(paramName, value);
+        put(translateOutputFieldName(paramName), value);
     }
 
     @Override
     default void setTimestamp(String paramName, Timestamp value) throws Exception{
-        put(paramName, value);
+        put(translateOutputFieldName(paramName), value);
     }
 }
