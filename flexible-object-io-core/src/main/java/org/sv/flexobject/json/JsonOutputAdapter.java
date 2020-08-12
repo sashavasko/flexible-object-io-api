@@ -13,13 +13,23 @@ import org.sv.flexobject.util.ConsumerWithException;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.util.function.Supplier;
 
 public class JsonOutputAdapter extends GenericOutAdapter<ObjectNode> {
     public JsonOutputAdapter() {
+        super(JsonNodeFactory.instance::objectNode);
     }
 
     public JsonOutputAdapter(Sink<ObjectNode> sink) {
-        super(sink);
+        super(sink, JsonNodeFactory.instance::objectNode);
+    }
+
+    public JsonOutputAdapter(Supplier<ObjectNode> recordFactory) {
+        super(recordFactory);
+    }
+
+    public JsonOutputAdapter(Sink sink, Supplier<ObjectNode> recordFactory) {
+        super(sink, recordFactory);
     }
 
     @Override
@@ -85,11 +95,6 @@ public class JsonOutputAdapter extends GenericOutAdapter<ObjectNode> {
     public void setTimestamp(String paramName, Timestamp value) {
         if (value != null)
             getCurrent().set(translateOutputFieldName(paramName), timestampToJsonNode(value));
-    }
-
-    @Override
-    public ObjectNode createRecord() {
-        return JsonNodeFactory.instance.objectNode();
     }
 
     @Override

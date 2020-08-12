@@ -93,6 +93,11 @@ public interface InAdapter extends AutoCloseable, Parameterized{
         return DataTypes.classConverter(className);
     }
 
+    default Class<?> getOptionalClass(String fieldName, Class<?> defaultValue) throws Exception {
+        Class<?> clazz = getClass(fieldName);
+        return clazz == null ? defaultValue : clazz;
+    }
+
     default <T extends Enum<T>> T getEnum(String fieldName, T defaultValue) throws Exception {
         String valueName = getString(fieldName);
         return DataTypes.enumConverter(valueName, defaultValue);

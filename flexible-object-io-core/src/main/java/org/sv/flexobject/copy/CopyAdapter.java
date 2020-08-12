@@ -1,15 +1,13 @@
 package org.sv.flexobject.copy;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import org.sv.flexobject.InAdapter;
 import org.sv.flexobject.OutAdapter;
+import org.sv.flexobject.adapter.DynamicInAdapter;
+import org.sv.flexobject.adapter.DynamicOutAdapter;
 
-import java.sql.Date;
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Set;
 
-public class CopyAdapter extends HashMap<String, Object> implements OutAdapter, InAdapter, Copyable {
+public class CopyAdapter extends HashMap<String, Object> implements DynamicInAdapter, DynamicOutAdapter, Copyable {
 
     public enum PARAMS {
         allowedInputFields,
@@ -45,105 +43,8 @@ public class CopyAdapter extends HashMap<String, Object> implements OutAdapter, 
     }
 
     @Override
-    public String getString(String fieldName) throws Exception {
-        Object value = get(fieldName);
-        if (value == null)
-            return null;
-
-        if (value instanceof String)
-            return (String) value;
-        return value.toString();
-    }
-
-    @Override
-    public JsonNode getJson(String fieldName) throws Exception {
-        return (JsonNode) get(fieldName);
-    }
-
-    @Override
-    public Integer getInt(String fieldName) throws Exception {
-        Number number = (Number) get(fieldName);
-        return number == null ? null :number.intValue();
-    }
-
-    @Override
-    public Boolean getBoolean(String fieldName) throws Exception {
-        Object o = get(fieldName);
-        if (o instanceof Number)
-            return ((Number)o).intValue() > 0;
-        else if (o instanceof String)
-            return "true".equalsIgnoreCase((String) o)
-                    || "yes".equalsIgnoreCase((String) o)
-                    || "y".equalsIgnoreCase((String) o);
-
-        return (Boolean) get(fieldName);
-    }
-
-    @Override
-    public Long getLong(String fieldName) throws Exception {
-        Number number = (Number) get(fieldName);
-        return number == null ? null :number.longValue();
-    }
-
-    @Override
-    public Double getDouble(String fieldName) throws Exception {
-        Number number = (Number) get(fieldName);
-        return number == null ? null :number.doubleValue();
-    }
-
-    @Override
-    public Date getDate(String fieldName) throws Exception {
-        return (Date) get(fieldName);
-    }
-
-    @Override
-    public Timestamp getTimestamp(String fieldName) throws Exception {
-        return (Timestamp) get(fieldName);
-    }
-
-    @Override
     public boolean next() throws Exception {
         return true;
-    }
-
-    @Override
-    public void setString(String paramName, String value) throws Exception {
-        put(paramName, value);
-    }
-
-    @Override
-    public void setJson(String paramName, JsonNode value) throws Exception {
-        put(paramName, value);
-    }
-
-    @Override
-    public void setInt(String paramName, Integer value) throws Exception {
-        put(paramName, value);
-    }
-
-    @Override
-    public void setBoolean(String paramName, Boolean value) throws Exception {
-        put(paramName, value);
-    }
-
-    @Override
-    public void setLong(String paramName, Long value) throws Exception {
-        put(paramName, value);
-    }
-
-    @Override
-    public void setDouble(String paramName, Double value) throws Exception {
-        put(paramName, value);
-    }
-
-    @Override
-    public void setDate(String paramName, Date value) throws Exception {
-        put(paramName, value);
-    }
-
-    @Override
-    public void setTimestamp(String paramName, Timestamp value) throws Exception {
-        put(paramName, value);
     }
 
     @Override

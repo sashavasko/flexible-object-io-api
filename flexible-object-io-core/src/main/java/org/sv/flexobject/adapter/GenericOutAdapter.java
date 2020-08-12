@@ -6,21 +6,43 @@ import org.sv.flexobject.stream.Source;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.function.Supplier;
 
 public abstract class GenericOutAdapter<T> implements OutAdapter {
 
     public enum PARAMS {
-        sink
+        sink,
+        recordFactory,
+        recordClass
     }
 
+    protected Supplier<T> recordFactory = null;
+    protected Class<? extends T> recordClass = null;
     protected T currentRecord = null;
-    protected Sink sink;
+    protected Sink sink = null;
 
     public GenericOutAdapter() {
-        sink = null;
     }
 
     public GenericOutAdapter(Sink sink) {
+        this.sink = sink;
+    }
+
+    public GenericOutAdapter(Supplier<T> recordFactory) {
+        this(null, recordFactory);
+    }
+
+    public GenericOutAdapter(Sink sink, Supplier<T> recordFactory) {
+        this.sink = sink;
+        this.recordFactory = recordFactory;
+    }
+
+    public GenericOutAdapter(Class<? extends T> recordClass) {
+        this.recordClass = recordClass;
+    }
+
+    public GenericOutAdapter(Sink sink, Class<? extends T> recordClass) {
+        this.recordClass = recordClass;
         this.sink = sink;
     }
 
@@ -31,9 +53,19 @@ public abstract class GenericOutAdapter<T> implements OutAdapter {
     public void setParam(PARAMS key, Object value){
         if (PARAMS.sink == key && value != null && value instanceof Sink)
             sink = (Sink) value;
+        else if (PARAMS.recordFactory == key && value != null && value instanceof Supplier)
+            recordFactory = (Supplier<T>) value;
+        else if (PARAMS.recordClass == key && value != null && value instanceof Class)
+            recordClass = (Class<? extends T>) value;
     }
 
-    public abstract T createRecord();
+    public T createRecord() {
+        try {
+            return recordFactory != null ? recordFactory.get() : recordClass.newInstance();
+        } catch (Exception e){
+            throw new RuntimeException("Failed to create output record", e);
+        }
+    }
 
     protected T getCurrent(){
         if (currentRecord == null)
