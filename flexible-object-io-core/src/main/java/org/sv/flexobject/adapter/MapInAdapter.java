@@ -11,7 +11,7 @@ public class MapInAdapter extends GenericInAdapter<Map> implements DynamicInAdap
     }
 
     @Override
-    public Object get(Object fieldName) {
-        return getCurrent().get(fieldName);
+    public Object get(Object translatedFieldName) {
+        return getCurrent().get(translatedFieldName);
     }
 }

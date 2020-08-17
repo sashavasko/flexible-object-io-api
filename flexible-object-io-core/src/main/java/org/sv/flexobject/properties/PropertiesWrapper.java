@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.function.Supplier;
 
-public class PropertiesWrapper extends StreamableWithSchema {
+public class PropertiesWrapper<T extends PropertiesWrapper> extends StreamableWithSchema {
 
     public PropertiesWrapper(){}
 
@@ -35,24 +35,27 @@ public class PropertiesWrapper extends StreamableWithSchema {
         return MapOutAdapter.produce(mapFactory, this::save);
     }
 
-    public void from(Map source) throws Exception {
+    public T from(Map source) throws Exception {
         new MapInAdapter(new SingleValueSource<>(source)).consume(this::load);
+        return (T) this;
     }
 
-    public void from(Map source, String namespace) throws Exception {
+    public T from(Map source, String namespace) throws Exception {
         GenericInAdapter adapter = new MapInAdapter(new SingleValueSource<>(source));
         adapter.setParam(GenericInAdapter.PARAMS.fieldNameTranslator, new NamespaceTranslator(namespace));
         adapter.consume(this::load);
+        return (T) this;
     }
 
-    public void from(Map source, Translator nameTranslator) throws Exception {
+    public T from(Map source, Translator nameTranslator) throws Exception {
         GenericInAdapter adapter = new MapInAdapter(new SingleValueSource<>(source));
         adapter.setParam(GenericInAdapter.PARAMS.fieldNameTranslator, nameTranslator);
         adapter.consume(this::load);
+        return (T) this;
     }
 
-    public void from(InAdapter source) throws Exception {
+    public T from(InAdapter source) throws Exception {
         source.consume(this::load);
+        return (T) this;
     }
-
 }

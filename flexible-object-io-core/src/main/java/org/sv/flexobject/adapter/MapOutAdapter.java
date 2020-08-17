@@ -35,12 +35,12 @@ public class MapOutAdapter extends GenericOutAdapter<Map> implements DynamicOutA
     }
 
     @Override
-    public Object put(String fieldName, Object value) throws Exception{
+    public Object put(String translatedFieldName, Object value) throws Exception{
         if (value == null) {
-            getCurrent().remove(fieldName);
+            getCurrent().remove(translatedFieldName);
             return null;
         } else
-            return getCurrent().put(fieldName, value);
+            return getCurrent().put(translatedFieldName, value);
     }
 
     public static Map produce(MapOutAdapter adapter, ConsumerWithException<MapOutAdapter, Exception> consumer) throws Exception {

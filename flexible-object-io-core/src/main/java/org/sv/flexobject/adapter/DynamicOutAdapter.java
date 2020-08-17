@@ -12,7 +12,7 @@ public interface DynamicOutAdapter extends OutAdapter {
     /*
      * Returns value on success - same semantics as java.util.Map.put()
      */
-    Object put(String fieldName, Object value) throws Exception;
+    Object put(String translatedFieldName, Object value) throws Exception;
 
     @Override
     default boolean supportField(String fieldName) {

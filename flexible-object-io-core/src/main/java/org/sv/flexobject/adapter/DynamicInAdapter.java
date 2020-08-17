@@ -11,7 +11,7 @@ import java.util.Set;
 
 public interface DynamicInAdapter extends InAdapter {
 
-    Object get(Object fieldName);
+    Object get(Object translatedFieldName);
 
     @Override
     default String getString(String fieldName) throws Exception{

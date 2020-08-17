@@ -27,16 +27,16 @@ public class CopyAdapter extends HashMap<String, Object> implements DynamicInAda
     }
 
     @Override
-    public Object put(String key, Object value) {
-        String fieldName = translateOutputFieldName(key);
+    public Object put(String translatedFieldName, Object value) {
+        String fieldName = translateOutputFieldName(translatedFieldName);
         if (allowedOutputFields == null || allowedOutputFields.contains(fieldName))
             return super.put(fieldName, value);
         return null;
     }
 
     @Override
-    public Object get(Object key) {
-        String fieldName = translateInputFieldName((String)key);
+    public Object get(Object translatedFieldName) {
+        String fieldName = translateInputFieldName((String) translatedFieldName);
         if (allowedInputFields == null || allowedInputFields.contains(fieldName))
             return super.get(fieldName);
         return null;

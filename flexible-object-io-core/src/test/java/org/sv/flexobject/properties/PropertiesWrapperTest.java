@@ -18,7 +18,7 @@ public class PropertiesWrapperTest {
 
     PropertiesWrapper testProps;
 
-    public static class TestProps extends PropertiesWrapper {
+    public static class TestProps extends PropertiesWrapper<TestProps> {
         public Integer intProp;
         public String stringProp;
         public Double doubleProp;
@@ -78,8 +78,7 @@ public class PropertiesWrapperTest {
         map.put("intProp", 789);
         map.put("stringProp", "foo");
 
-        TestProps propsObject = new TestProps();
-        propsObject.from(map);
+        TestProps propsObject = new TestProps().from(map);
 
         assertEquals(789, (int)propsObject.intProp);
         assertEquals("foo", propsObject.stringProp);
@@ -92,7 +91,7 @@ public class PropertiesWrapperTest {
 
         assertEquals("bar", propsObject.stringProp);
         assertEquals(1.456, propsObject.doubleProp, 0.001);
-
+        assertNull(propsObject.nullProp);
     }
 
     @Test
@@ -103,8 +102,7 @@ public class PropertiesWrapperTest {
         map.put("foo.barbar.doubleProp", 3.678);
         map.put("foofoo.bar.boolProp", true);
 
-        TestProps propsObject = new TestProps();
-        propsObject.from(map, "foo.bar");
+        TestProps propsObject = new TestProps().from(map, "foo.bar");
 
         assertEquals(789, (int)propsObject.intProp);
         assertEquals("foo", propsObject.stringProp);
@@ -120,8 +118,7 @@ public class PropertiesWrapperTest {
         map.put("foo.barbar.double_prop", 3.678);
         map.put("foofoo.bar.bool_prop", true);
 
-        TestProps propsObject = new TestProps();
-        propsObject.from(map, new UnderscoreTranslator().andThen(new NamespaceTranslator("foo.bar")));
+        TestProps propsObject = new TestProps().from(map, new UnderscoreTranslator().andThen(new NamespaceTranslator("foo.bar")));
 
         assertEquals(789, (int)propsObject.intProp);
         assertEquals("foo", propsObject.stringProp);
@@ -133,9 +130,7 @@ public class PropertiesWrapperTest {
     public void fromAdapter() throws Exception {
         InAdapter adapter = JsonInputAdapter.forValue("{'intProp':12345,'stringProp':'foo','doubleProp':12.78,'boolProp':true}".replaceAll("'", "\""));
 
-        TestProps propsObject = new TestProps();
-
-        propsObject.from(adapter);
+        TestProps propsObject = new TestProps().from(adapter);
 
         assertEquals(12345, (int)propsObject.intProp);
         assertEquals("foo", propsObject.stringProp);
