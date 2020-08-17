@@ -18,6 +18,7 @@ public class Schema {
     protected String name;
     private boolean isInferred;
     private SchemaElement[] fields;
+    private Map<String, SchemaElement> fieldsByName = new HashMap<>();
     private Map<String, Integer> paramNamesXref = new HashMap<>();
     private Reader reader;
     private Writer writer;
@@ -28,7 +29,7 @@ public class Schema {
         Field[] fields = dataClass.getDeclaredFields();
         this.fields = new SchemaElement[fields.length];
         for (int order = 0 ; order < fields.length ; ++order){
-            this.fields[order] = new SimpleSchemaElement(dataClass, fields[order], order);
+            addField(new SimpleSchemaElement(dataClass, fields[order], order), order);
         }
         initParamXref(dataClass);
         SchemaRegistry.getInstance().registerSchema(this);
@@ -39,7 +40,7 @@ public class Schema {
         this.isInferred = false;
         this.fields = new SchemaElement[fields.length];
         for (Enum<?> e : fields){
-            this.fields[e.ordinal()] = new SimpleSchemaElement(dataClass, e);
+            addField(new SimpleSchemaElement(dataClass, e), e.ordinal());
         }
         initParamXref(dataClass);
         SchemaRegistry.getInstance().registerSchema(this);
@@ -53,9 +54,15 @@ public class Schema {
             if (f.getDescriptor() == null) {
                 f.setDescriptor(FieldDescriptor.fromEnum(dataClass, (Enum<?>) f));
             }
+            fieldsByName.put(f.getDescriptor().getName(), f);
         }
         initParamXref(dataClass);
         SchemaRegistry.getInstance().registerSchema(this);
+    }
+
+    private void addField(SchemaElement field, int order){
+        fields[order] = field;
+        fieldsByName.put(field.getDescriptor().getName(), field);
     }
 
     public static boolean isRegisteredSchema(Class<?> dataClass){
@@ -90,6 +97,10 @@ public class Schema {
 
     public FieldDescriptor getFieldDescriptor(Enum<?> e) {
         return fields[e.ordinal()].getDescriptor();
+    }
+
+    public FieldDescriptor getDescriptor(String fieldName) {
+        return fieldsByName.get(fieldName).getDescriptor();
     }
 
     public Map<String, Integer> getParamNamesXref() {

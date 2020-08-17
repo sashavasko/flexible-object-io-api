@@ -42,6 +42,10 @@ public class StreamableWithSchema<T extends SchemaElement> implements Streamable
         return getSchema().save(this, output);
     }
 
+    public Object get(String fieldName) throws Exception {
+        return getSchema().getDescriptor(fieldName).get(this);
+    }
+
     public Object get(T field) throws Exception {
         if (getSchema().isInferred())
             throw new SchemaException("Generic Getters and Setters only available in Streamable classes with explicit or annotated schema. Class " + schema.getName());
@@ -52,6 +56,10 @@ public class StreamableWithSchema<T extends SchemaElement> implements Streamable
         if (getSchema().isInferred())
             throw new SchemaException("Generic Getters and Setters only available in Streamable classes with explicit or annotated schema. Class " + schema.getName());
         return getSchema().getFieldDescriptor(field).get(this);
+    }
+
+    public void set(String fieldName, Object value) throws Exception {
+        getSchema().getDescriptor(fieldName).set(this, value);
     }
 
     public void set(T field, Object value) throws Exception {

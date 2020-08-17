@@ -36,15 +36,32 @@ public class MapOutAdapter extends GenericOutAdapter<Map> implements DynamicOutA
 
     @Override
     public Object put(String fieldName, Object value) throws Exception{
-        return getCurrent().put(fieldName, value);
+        if (value == null) {
+            getCurrent().remove(fieldName);
+            return null;
+        } else
+            return getCurrent().put(fieldName, value);
     }
 
-    public static Map produce(Class<? extends Map> outputClass, ConsumerWithException<MapOutAdapter, Exception> consumer) throws Exception {
+    public static Map produce(MapOutAdapter adapter, ConsumerWithException<MapOutAdapter, Exception> consumer) throws Exception {
         SingleValueSink<Map> sink = new SingleValueSink<>();
-        MapOutAdapter adapter = new MapOutAdapter(sink, outputClass);
+        adapter.setParam(PARAMS.sink, sink);
 
         consumer.accept(adapter);
 
         return sink.get();
     }
+
+    public static Map produce(Class<? extends Map> outputClass, ConsumerWithException<MapOutAdapter, Exception> consumer) throws Exception {
+        return produce(new MapOutAdapter(outputClass), consumer);
+    }
+
+    public static Map produce(Supplier<Map> mapFactory, ConsumerWithException<MapOutAdapter, Exception> consumer) throws Exception {
+        return produce(new MapOutAdapter(mapFactory), consumer);
+    }
+
+    public static Map produceHashMap(ConsumerWithException<MapOutAdapter, Exception> consumer) throws Exception {
+        return produce(new MapOutAdapter(), consumer);
+    }
+
 }

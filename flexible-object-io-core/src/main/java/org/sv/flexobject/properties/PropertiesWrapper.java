@@ -13,6 +13,7 @@ import org.sv.flexobject.translate.Translator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.Supplier;
 
 public class PropertiesWrapper extends StreamableWithSchema {
 
@@ -28,6 +29,10 @@ public class PropertiesWrapper extends StreamableWithSchema {
 
     public Map getMap(Class<? extends Map> mapClass) throws Exception {
         return MapOutAdapter.produce(mapClass, this::save);
+    }
+
+    public Map getMap(Supplier<Map> mapFactory) throws Exception {
+        return MapOutAdapter.produce(mapFactory, this::save);
     }
 
     public void from(Map source) throws Exception {
