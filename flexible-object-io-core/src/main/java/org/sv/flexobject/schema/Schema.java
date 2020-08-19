@@ -10,6 +10,7 @@ import org.sv.flexobject.io.Reader;
 import org.sv.flexobject.io.Writer;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,10 +28,26 @@ public class Schema {
         this.name = dataClass.getName();
         this.isInferred = true;
         Field[] fields = dataClass.getDeclaredFields();
-        this.fields = new SchemaElement[fields.length];
-        for (int order = 0 ; order < fields.length ; ++order){
-            addField(new SimpleSchemaElement(dataClass, fields[order], order), order);
+
+        int numOfSchemaFields = 0;
+        for (int order = 0 ; order < fields.length ; ++order) {
+            int mods = fields[order].getModifiers();
+            if (!Modifier.isStatic(mods) && !Modifier.isFinal(mods)) {
+                numOfSchemaFields++;
+            }
         }
+
+        this.fields = new SchemaElement[numOfSchemaFields];
+
+        int schemaOrder = 0;
+        for (int order = 0 ; order < fields.length ; ++order){
+            int mods = fields[order].getModifiers();
+            if (!Modifier.isStatic(mods) && !Modifier.isFinal(mods)) {
+                addField(new SimpleSchemaElement(dataClass, fields[order], schemaOrder), schemaOrder);
+                schemaOrder++;
+            }
+        }
+
         initParamXref(dataClass);
         SchemaRegistry.getInstance().registerSchema(this);
     }
