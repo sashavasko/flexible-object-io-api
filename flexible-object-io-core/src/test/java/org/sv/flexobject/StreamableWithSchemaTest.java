@@ -3,17 +3,19 @@ package org.sv.flexobject;
 import com.carrotsearch.junitbenchmarks.AbstractBenchmark;
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.sv.flexobject.copy.CopyAdapter;
 import org.sv.flexobject.json.JsonInputAdapter;
 import org.sv.flexobject.json.JsonOutputAdapter;
+import org.sv.flexobject.json.MapperFactory;
+import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.schema.Schema;
 import org.sv.flexobject.schema.SchemaRegistry;
 
-import java.util.Arrays;
-import java.util.EnumSet;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -103,7 +105,7 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
                 "'intInArray2':23232323," +
                 "'intInList3':2222," +
                 "'intInMapFoo':565656," +
-                "'intInMapBar':'778877'}").replace('\'', '"')).consume(testData::load);
+                "'intInMapBar':'778877'}").replace('\'', '"')).consume(testData);
 
         assertEquals(777, (int)testData.get(TestDataWithAnnotatedSchema.FIELDS.intField));
         assertEquals(124567, (int)testData.get(TestDataWithAnnotatedSchema.FIELDS.intFieldStoredAsString));
@@ -121,7 +123,7 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
         assertEquals(1.2345, (double)testData.get(TestDataWithAnnotatedSchema.FIELDS.doubleInJson), 0.001);
         assertTrue((boolean)testData.get(TestDataWithAnnotatedSchema.FIELDS.booleanInJson));
 
-        JsonNode jsonOut = JsonOutputAdapter.produce(testData::save);
+        JsonNode jsonOut = JsonOutputAdapter.produce(testData);
         String expectedJsonString = "{\"intField\":777,\"intFieldStoredAsString\":\"124567\",\"intInArray2\":23232323,\"intInList3\":2222,\"intInMapFoo\":565656,\"intInMapBar\":\"778877\",\"intInMapFooFoo\":888,\"intInMapBarBar\":\"999\",\"intList\":[0,1,null,2222],\"intArray\":[0,1,23232323,3,4,null,null,null,null,null],\"intMap\":{\"bar\":778877,\"foo\":565656,\"barbar\":999,\"foofoo\":888},\"doubleInJson\":1.2345,\"booleanInJson\":true,\"json\":{\"a\":{\"foo\":1.2345,\"bar\":true}}}";
         assertEquals(expectedJsonString, jsonOut.toString());
     }
@@ -141,7 +143,7 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
                 "'intInArray2':23232323," +
                 "'intInList3':2222," +
                 "'intInMapFoo':565656," +
-                "'intInMapBar':'778877'}").replace('\'', '"')).consume(testData::load);
+                "'intInMapBar':'778877'}").replace('\'', '"')).consume(testData);
 
         assertEquals(777, testData.intField);
         assertEquals(124567, testData.intFieldStoredAsString);
@@ -156,7 +158,7 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
         assertEquals(1.2345, testData.json.get("a").get("foo").asDouble(), 0.001);
         assertTrue(testData.json.get("a").get("bar").asBoolean());
 
-        JsonNode jsonOut = JsonOutputAdapter.produce(testData::save);
+        JsonNode jsonOut = JsonOutputAdapter.produce(testData);
         String expectedJsonString = "{\"intField\":777,\"intFieldStoredAsString\":\"124567\",\"intArray\":[0,1,23232323,3,4,null,null,null,null,null],\"intList\":[0,1],\"intMap\":{\"barbar\":999,\"foofoo\":888},\"json\":{\"a\":{\"foo\":1.2345,\"bar\":true}}}";
         assertEquals(expectedJsonString, jsonOut.toString());
     }
@@ -173,14 +175,135 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
         assertEquals(TestDataWithEnumAndClass.TestEnum.uno, testData.enumValue);
         assertEquals(EnumSet.of(TestDataWithEnumAndClass.TestEnum.uno,TestDataWithEnumAndClass.TestEnum.dos), testData.enumSet);
 
-        JsonNode jsonOut = JsonOutputAdapter.produce(testData::save);
-        String expectedJsonString = "{\"clazz\":\"org.sv.flexobject.TestDataWithEnumAndClass$TestEnum\",\"enumValue\":\"uno\",\"enumSet\":\"uno,dos\"}";
+        JsonNode jsonOut = JsonOutputAdapter.produce(testData);
+        String expectedJsonString = "{\"clazz\":\"com.carfax.dt.streaming.TestDataWithEnumAndClass$TestEnum\",\"enumValue\":\"uno\",\"enumSet\":\"uno,dos\"}";
         assertEquals(expectedJsonString, jsonOut.toString());
 
         JsonInputAdapter.forValue(("{'clazz':'" + TestDataWithEnumAndClass.TestEnum.class.getName() + "', " +
                 "'enumValue':'uno'," +
-                "'enumSet':['uno','dos']}").replace('\'', '"')).consume(testData::load);
+                "'enumSet':['uno','dos']}").replace('\'', '"')).consume(testData);
 
         assertEquals(EnumSet.of(TestDataWithEnumAndClass.TestEnum.uno,TestDataWithEnumAndClass.TestEnum.dos), testData.enumSet);
+    }
+
+    @Test
+    public void subSchemaIsJson() {
+        assertEquals(DataTypes.jsonNode, Schema.getRegisteredSchema(TestDataWithSubSchema.class).getDescriptor("subStruct").getType());
+    }
+
+    @Test
+    public void setSubschemaFromJson() throws Exception {
+        TestDataWithInferredSchema expectedSubStruct = TestDataWithInferredSchema.random(true);
+
+        ObjectNode json = JsonOutputAdapter.produce(expectedSubStruct);
+
+        TestDataWithSubSchema testData = new TestDataWithSubSchema();
+
+        testData.set("subStruct", json);
+
+        assertEquals(expectedSubStruct, testData.subStruct);
+    }
+
+    @Test
+    public void convertsSubschemaToJson() throws Exception {
+        TestDataWithSubSchema testData = new TestDataWithSubSchema();
+        testData.intField = 456;
+        testData.json = (ObjectNode) MapperFactory.getObjectReader().readTree("{'foo':'bar','yes':false}".replace('\'', '"'));
+        testData.subStruct = new TestDataWithInferredSchema();
+        testData.subStruct.intField = 789;
+        testData.subStruct.intMap = new HashMap();
+        testData.subStruct.intMap.put("a", 111);
+        testData.subStruct.intMap.put("b", 222);
+        testData.subStruct.intFieldStoredAsString = 69;
+
+        ObjectNode json = JsonOutputAdapter.produce(testData);
+
+        assertEquals("{\"intField\":456,\"json\":{\"foo\":\"bar\",\"yes\":false},\"subStruct\":{\"intField\":789,\"intFieldStoredAsString\":\"69\",\"intArray\":[null,null,null,null,null,null,null,null,null,null],\"intMap\":{\"a\":111,\"b\":222}}}"
+                , json.toString());
+
+        TestDataWithSubSchema reloaded = new TestDataWithSubSchema();
+        JsonInputAdapter.forValue(json).consume(reloaded);
+
+        assertEquals(testData, reloaded);
+    }
+
+    @Test
+    public void subSchemaInCollectionIsJson() {
+        assertEquals(DataTypes.jsonNode, Schema
+                .getRegisteredSchema(TestDataWithSubSchemaInCollection.class)
+                .getDescriptor("subStructArray")
+                .getType());
+        assertEquals(DataTypes.jsonNode, Schema
+                .getRegisteredSchema(TestDataWithSubSchemaInCollection.class)
+                .getDescriptor("subStructList")
+                .getType());
+        assertEquals(DataTypes.jsonNode, Schema
+                .getRegisteredSchema(TestDataWithSubSchemaInCollection.class)
+                .getDescriptor("subStructMap")
+                .getType());
+    }
+
+    @Test
+    public void setSubschemaInArrayFromJson() throws Exception {
+        List<TestDataWithInferredSchema> listOfTestValues = Arrays.asList(TestDataWithInferredSchema.random(true),
+                TestDataWithInferredSchema.random(true),
+                TestDataWithInferredSchema.random(true),
+                TestDataWithInferredSchema.random(true),
+                TestDataWithInferredSchema.random(true));
+
+        JsonNode json = DataTypes.jsonConverter(listOfTestValues);
+
+        TestDataWithSubSchemaInCollection testData = new TestDataWithSubSchemaInCollection();
+
+        testData.set("subStructArray", json);
+
+        List<TestDataWithInferredSchema> actualList = Arrays.asList(testData.subStructArray);
+
+        assertEquals(listOfTestValues, actualList.subList(0, 5));
+    }
+
+    @Test
+    public void setSubschemaInListFromJson() throws Exception {
+        List<TestDataWithInferredSchema> listOfTestValues = Arrays.asList(TestDataWithInferredSchema.random(true),
+                TestDataWithInferredSchema.random(true),
+                TestDataWithInferredSchema.random(true));
+
+        JsonNode json = DataTypes.jsonConverter(listOfTestValues);
+
+        TestDataWithSubSchemaInCollection testData = new TestDataWithSubSchemaInCollection();
+
+        testData.set("subStructList", json);
+
+        assertEquals(3, testData.subStructList.size());
+        assertEquals(listOfTestValues, testData.subStructList);
+    }
+
+    @Test
+    public void setSubschemaInMapFromJson() throws Exception {
+        Map<String, TestDataWithInferredSchema> expectedMap = new HashMap();
+
+        expectedMap.put("val1", TestDataWithInferredSchema.random(true));
+        expectedMap.put("val2", TestDataWithInferredSchema.random(true));
+        expectedMap.put("val3", TestDataWithInferredSchema.random(true));
+
+        JsonNode json = DataTypes.jsonConverter(expectedMap);
+
+        TestDataWithSubSchemaInCollection testData = new TestDataWithSubSchemaInCollection();
+
+        testData.set("subStructMap", json);
+
+        assertEquals(expectedMap, testData.subStructMap);
+    }
+
+    @Test
+    public void convertsSubschemaInCollectionToJson() throws Exception {
+        TestDataWithSubSchemaInCollection testData = TestDataWithSubSchemaInCollection.random(true);
+
+        ObjectNode json = JsonOutputAdapter.produce(testData);
+
+        TestDataWithSubSchemaInCollection reloaded = new TestDataWithSubSchemaInCollection();
+        JsonInputAdapter.forValue(json).consume(reloaded);
+
+        assertEquals(testData, reloaded);
     }
 }

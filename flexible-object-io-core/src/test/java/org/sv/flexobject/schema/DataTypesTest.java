@@ -12,10 +12,7 @@ import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -380,7 +377,7 @@ public class DataTypesTest {
     }
 
     @Test
-    public void jsonConverterForMap() throws Exception {
+    public void jsonConverterForMapOfInts() throws Exception {
         Map<String, Integer> map = new HashMap<>();
         map.put("foo", 222);
         map.put("bar", 777);
@@ -390,11 +387,40 @@ public class DataTypesTest {
     }
 
     @Test
-    public void jsonConverterForList() throws Exception {
-        List<String> list = new ArrayList<>();
-        list.add("foo");
-        list.add("bar");
+    public void jsonConverterForMapOfStrings() throws Exception {
+        Map<String, String> map = new HashMap<>();
+        map.put("foo", "aaa");
+        map.put("bar", "bbb");
+
+        assertEquals("{\"bar\":\"bbb\",\"foo\":\"aaa\"}", DataTypes.jsonConverter(map).toString());
+
+    }
+
+    @Test
+    public void jsonConverterForListOfStrings() throws Exception {
+        List<String> list = Arrays.asList("foo", "bar");
 
         assertEquals("[\"foo\",\"bar\"]", DataTypes.jsonConverter(list).toString());
+    }
+
+    @Test
+    public void jsonConverterForListOfInts() throws Exception {
+        List<Integer> list = Arrays.asList(123, 456);
+
+        assertEquals("[123,456]", DataTypes.jsonConverter(list).toString());
+    }
+
+    @Test
+    public void jsonConverterForArrayOfStrings() throws Exception {
+        String[] array = new String[]{"foo", "bar"};
+
+        assertEquals("[\"foo\",\"bar\"]", DataTypes.jsonConverter(array).toString());
+    }
+
+    @Test
+    public void jsonConverterForArrayOfInts() throws Exception {
+        Integer[] array = new Integer[]{123, 456};
+
+        assertEquals("[123,456]", DataTypes.jsonConverter(array).toString());
     }
 }

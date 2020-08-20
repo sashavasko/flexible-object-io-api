@@ -1,12 +1,11 @@
 package org.sv.flexobject.schema;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.TextNode;
-import com.fasterxml.jackson.databind.node.ValueNode;
+import com.fasterxml.jackson.databind.node.*;
 import org.apache.commons.lang3.StringUtils;
 import org.sv.flexobject.InAdapter;
 import org.sv.flexobject.OutAdapter;
+import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.json.JsonInputAdapter;
 import org.sv.flexobject.json.MapperFactory;
 import org.sv.flexobject.util.BiFunctionWithException;
@@ -19,6 +18,8 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public enum DataTypes {
@@ -82,6 +83,44 @@ public enum DataTypes {
             return (JsonNode) value;
         if (value instanceof String)
             return MapperFactory.getObjectReader().readTree((String)value);
+        if (value instanceof StreamableWithSchema)
+            return ((StreamableWithSchema)value).toJson();
+        if (value.getClass().isArray()){
+            Object[] array = (Object[]) value;
+            ArrayNode json = JsonNodeFactory.instance.arrayNode(array.length);
+            for (Object o : array) {
+                if (o instanceof String)
+                    json.add((String)o);
+                else
+                    json.add(jsonConverter(o));
+            }
+            return json;
+        }
+        if (value instanceof List){
+            List list = (List) value;
+            ArrayNode json = JsonNodeFactory.instance.arrayNode(list.size());
+            for (Object o : list) {
+                if (o instanceof String)
+                    json.add((String)o);
+                else
+                    json.add(jsonConverter(o));
+            }
+            return json;
+        }
+        if (value instanceof Map){
+            Map map = (Map) value;
+            ObjectNode json = JsonNodeFactory.instance.objectNode();
+            for (Object o : map.entrySet()){
+                Map.Entry entry = (Map.Entry) o;
+                Object entryValue = entry.getValue();
+                String key = stringConverter(entry.getKey());
+                if (entryValue instanceof String)
+                    json.set(key, JsonNodeFactory.instance.textNode((String)(entryValue)));
+                else
+                    json.set(key, jsonConverter(entryValue));
+            }
+            return json;
+        }
         return MapperFactory.getObjectMapper().valueToTree(value);
     }
 
@@ -334,6 +373,9 @@ public enum DataTypes {
             return classObject;
 
         if (JsonNode.class.isAssignableFrom(clazz))
+            return jsonNode;
+
+        if (StreamableWithSchema.class.isAssignableFrom(clazz))
             return jsonNode;
 
         // These are tricky since we need to know which Enum they belong to

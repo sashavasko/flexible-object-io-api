@@ -1,8 +1,17 @@
 package org.sv.flexobject;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.sv.flexobject.adapter.MapInAdapter;
+import org.sv.flexobject.adapter.MapOutAdapter;
+import org.sv.flexobject.json.JsonInputAdapter;
+import org.sv.flexobject.json.JsonOutputAdapter;
 import org.sv.flexobject.schema.Schema;
 import org.sv.flexobject.schema.SchemaElement;
 import org.sv.flexobject.schema.SchemaException;
+
+import java.util.Map;
+import java.util.function.Supplier;
 
 public class StreamableWithSchema<T extends SchemaElement> implements Streamable {
 
@@ -83,5 +92,38 @@ public class StreamableWithSchema<T extends SchemaElement> implements Streamable
             return false;
 
         return getSchema().compareFields(this, other);
+    }
+
+    public ObjectNode toJson() throws Exception {
+        return JsonOutputAdapter.produce(this);
+    }
+
+    public Map toHashMap() throws Exception {
+        return MapOutAdapter.produceHashMap(this);
+    }
+
+    public Map toMap(Supplier<Map> mapFactory) throws Exception {
+        return MapOutAdapter.produce(mapFactory, this);
+    }
+
+    public Map toMap(Class<? extends Map> outputMapClass) throws Exception {
+        return MapOutAdapter.produce(outputMapClass, this);
+    }
+
+    public StreamableWithSchema fromMap(Map map) throws Exception {
+        return MapInAdapter.forValue(map).consume(this) ? this : null;
+    }
+
+    public StreamableWithSchema fromJson(JsonNode json) throws Exception {
+        return JsonInputAdapter.forValue(json).consume(this) ? this : null;
+    }
+
+    @Override
+    public String toString() {
+        try {
+            return toJson().toString();
+        } catch (Exception e) {
+            return super.toString();
+        }
     }
 }

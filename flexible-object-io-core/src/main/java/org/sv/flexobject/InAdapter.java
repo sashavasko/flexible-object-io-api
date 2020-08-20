@@ -127,10 +127,14 @@ public interface InAdapter extends AutoCloseable, Parameterized{
      */
     boolean next() throws Exception;
 
-    default boolean consume(ConsumerWithException<InAdapter, Exception> consumer) throws Exception {
+    default boolean consume(StreamableWithSchema target) throws Exception {
+        return consume(target::load);
+    }
+
+    default boolean consume(ConsumerWithException<InAdapter, Exception> targetConsumer) throws Exception {
         if (!next())
             return false;
-        consumer.accept(this);
+        targetConsumer.accept(this);
         return true;
     }
 

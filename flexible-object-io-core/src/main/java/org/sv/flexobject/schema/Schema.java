@@ -11,6 +11,7 @@ import org.sv.flexobject.io.Writer;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -148,13 +149,13 @@ public class Schema {
         return isInferred;
     }
 
-    public void clear(Object datum) throws Exception {
+    public void clear(Object datum) throws SchemaException {
         for (SchemaElement field : fields) {
             field.getDescriptor().clear(datum);
         }
     }
 
-    public boolean loadFields(Object datum, InAdapter input) throws Exception {
+    public boolean loadFields(Object datum, InAdapter input) throws SchemaException {
         for (SchemaElement field : fields) {
             field.getDescriptor().load(datum, input);
         }
@@ -181,10 +182,21 @@ public class Schema {
             for (SchemaElement field : fields) {
                 FieldDescriptor descriptor = field.getDescriptor();
                 Object value = descriptor.get(o1);
+                Object otherValue = descriptor.get(o2);
                 if (value != null) {
-                    if (!value.equals(descriptor.get(o2)))
+                    if (otherValue == null)
                         return false;
-                }else if (descriptor.get(o2) != null)
+
+                    if (value.getClass().isArray() != otherValue.getClass().isArray())
+                        return false;
+
+                    if (value.getClass().isArray()) {
+                        if (!Arrays.equals((Object[])value, (Object[])otherValue)) {
+                            return false;
+                        }
+                    }else if (!value.equals(otherValue))
+                        return false;
+                }else if (otherValue != null)
                     return false;
             }
         }catch (Exception e) {

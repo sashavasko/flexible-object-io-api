@@ -1,5 +1,6 @@
 package org.sv.flexobject.adapter;
 
+import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.stream.Sink;
 import org.sv.flexobject.stream.sinks.SingleValueSink;
 import org.sv.flexobject.util.ConsumerWithException;
@@ -43,6 +44,10 @@ public class MapOutAdapter extends GenericOutAdapter<Map> implements DynamicOutA
             return getCurrent().put(translatedFieldName, value);
     }
 
+    public static Map produce(MapOutAdapter adapter, StreamableWithSchema data) throws Exception {
+        return produce(adapter, data::save);
+    }
+
     public static Map produce(MapOutAdapter adapter, ConsumerWithException<MapOutAdapter, Exception> consumer) throws Exception {
         SingleValueSink<Map> sink = new SingleValueSink<>();
         adapter.setParam(PARAMS.sink, sink);
@@ -56,12 +61,23 @@ public class MapOutAdapter extends GenericOutAdapter<Map> implements DynamicOutA
         return produce(new MapOutAdapter(outputClass), consumer);
     }
 
+    public static Map produce(Class<? extends Map> outputClass, StreamableWithSchema data) throws Exception {
+        return produce(new MapOutAdapter(outputClass), data::save);
+    }
+
     public static Map produce(Supplier<Map> mapFactory, ConsumerWithException<MapOutAdapter, Exception> consumer) throws Exception {
         return produce(new MapOutAdapter(mapFactory), consumer);
+    }
+
+    public static Map produce(Supplier<Map> mapFactory, StreamableWithSchema data) throws Exception {
+        return produce(new MapOutAdapter(mapFactory), data::save);
     }
 
     public static Map produceHashMap(ConsumerWithException<MapOutAdapter, Exception> consumer) throws Exception {
         return produce(new MapOutAdapter(), consumer);
     }
 
+    public static Map produceHashMap(StreamableWithSchema data) throws Exception {
+        return produce(new MapOutAdapter(), data::save);
+    }
 }

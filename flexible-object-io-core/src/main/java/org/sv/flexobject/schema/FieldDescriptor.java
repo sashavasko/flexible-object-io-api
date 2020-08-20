@@ -241,30 +241,58 @@ public class FieldDescriptor {
         return new Builder();
     }
 
-    public void load(Object o, InAdapter adapter) throws Exception {
-        Object value = type.get(adapter, name);
-        if (value != null)
+    public void load(Object o, InAdapter adapter) throws SchemaException {
+        Object value = null;
+        try {
+            value = type.get(adapter, name);
+        }catch(Exception e){
+            throw new SchemaException("Error reading field " + getQualifiedName(o) + " from adapter " + adapter.getClass().getName(), e);
+        }
+        if (value != null) {
             set(o, value);
+        }
     }
 
-    public void save(Object o, OutAdapter adapter) throws Exception {
-        type.set(adapter, name, getter.apply(o));
+    public String getQualifiedName(Object o){
+        return o.getClass().getName() + "." + name;
     }
 
-    public Object get(Object o) throws Exception {
-        return getter.apply(o);
+
+    public void save(Object o, OutAdapter adapter) throws SchemaException {
+        try {
+            type.set(adapter, name, getter.apply(o));
+        }catch(Exception e){
+            throw new SchemaException("Error saving field " + getQualifiedName(o), e);
+        }
     }
+
+    public Object get(Object o) throws SchemaException {
+        try {
+            return getter.apply(o);
+        }catch(Exception e){
+            throw new SchemaException("Error getting field " + getQualifiedName(o), e);
+        }
+    }
+
 
     // Setter always merges data
-    public void set(Object o, Object value) throws Exception {
-        setter.accept(o, value);
+    public void set(Object o, Object value) throws SchemaException {
+        try {
+            setter.accept(o, value);
+        }catch(Exception e){
+            throw new SchemaException("Error setting field " + getQualifiedName(o), e);
+        }
     }
 
-    public void clear(Object o) throws Exception {
-        if (setter instanceof FieldWrapper)
-            ((FieldWrapper)setter).clear(o);
-        else
-            setter.accept(o, null);
+    public void clear(Object o) throws SchemaException {
+        try {
+            if (setter instanceof FieldWrapper)
+                ((FieldWrapper) setter).clear(o);
+            else
+                setter.accept(o, null);
+        }catch(Exception e) {
+            throw new SchemaException("Error clearing field " + getQualifiedName(o), e);
+        }
     }
 
     public int getOrder() {
