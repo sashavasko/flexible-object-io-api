@@ -433,6 +433,9 @@ public class DataTypesTest {
         assertEquals(testDate, DataTypes.dateConverter(testDateStringMDDYYYY));
         assertEquals(testDate, DataTypes.dateConverter(testDateStringMMDDYYYY));
         assertEquals(testDate, DataTypes.dateConverter(testDateStringYYYYMMDD));
+        assertEquals(Date.valueOf(LocalDate.of(2020,11,30)), DataTypes.dateConverter("20201130"));
+        assertEquals(Date.valueOf(LocalDate.of(2020,11,30)), DataTypes.dateConverter("11302020"));
+        assertEquals(Date.valueOf(LocalDate.of(2020,1,30)), DataTypes.dateConverter("1302020"));
     }
 
     @Test

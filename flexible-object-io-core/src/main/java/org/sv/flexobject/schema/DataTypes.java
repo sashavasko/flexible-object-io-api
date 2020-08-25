@@ -208,10 +208,41 @@ public enum DataTypes {
             return Date.valueOf((LocalDate) value);
         if (value instanceof ValueNode)
             return JsonInputAdapter.jsonNodeToDate((JsonNode)value);
-        if (value instanceof String)
-            return Date.valueOf((String)value);
+        if (value instanceof String) {
+            String dateString = (String) value;
+            if (StringUtils.isNumeric(dateString)){
+                int month;
+                int day;
+                int year;
+                if (dateString.length() == 7){
+                    month = dateString.charAt(0) - '0';
+                    day =  Integer.valueOf(dateString.substring(1, 3));
+                    year =  Integer.valueOf(dateString.substring(3));
+                } else if (dateString.length() != 8){
+                    throw new IllegalArgumentException("All numeric dates must be in either MMDDYYYY or YYYYMMDD format. Actual value :" + dateString);
+                } else {
+                    month = Integer.valueOf(dateString.substring(0, 2));
+                    if (month > 12) {
+                        year =  Integer.valueOf(dateString.substring(0, 4));
+                        month = Integer.valueOf(dateString.substring(4, 6));
+                        day =  Integer.valueOf(dateString.substring(6));
+                    } else {
+                        day =  Integer.valueOf(dateString.substring(2, 4));
+                        year =  Integer.valueOf(dateString.substring(4));
+                    }
+                }
+                return Date.valueOf(LocalDate.of(year, month, day));
+            }
+            return Date.valueOf(dateString);
+        }
         if (value instanceof Timestamp)
             return new Date(((Timestamp)value).getTime());
+
+        if (value instanceof Integer) {
+            // Parquet julian date?
+            return Date.valueOf(LocalDate.of(1970, 1, 1).plusDays((Integer) value));
+        } else if (value instanceof Long)
+            return new Date((Long) value);
 
         throw new SchemaException("Attempting to convert value of type " + value.getClass().getName() + " to Date");
     }
