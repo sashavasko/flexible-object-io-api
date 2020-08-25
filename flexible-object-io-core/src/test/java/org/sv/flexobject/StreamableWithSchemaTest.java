@@ -7,25 +7,36 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sv.flexobject.copy.CopyAdapter;
 import org.sv.flexobject.json.JsonInputAdapter;
 import org.sv.flexobject.json.JsonOutputAdapter;
 import org.sv.flexobject.json.MapperFactory;
 import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.schema.Schema;
+import org.sv.flexobject.schema.SchemaException;
 import org.sv.flexobject.schema.SchemaRegistry;
 
 import java.util.*;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class StreamableWithSchemaTest extends AbstractBenchmark {
 
     CopyAdapter adapter = new CopyAdapter();
 
+    @Mock
+    TestDataWithInferredSchema mockTestDataWithInferredSchema;
+
     @Before
     public void setUp() throws Exception {
         SchemaRegistry.getInstance().clear();
+        when(mockTestDataWithInferredSchema.getSchema()).thenReturn(Schema.getRegisteredSchema(TestDataWithInferredSchema.class));
     }
 
     @After
@@ -187,21 +198,36 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
     }
 
     @Test
-    public void subSchemaIsJson() {
-        assertEquals(DataTypes.jsonNode, Schema.getRegisteredSchema(TestDataWithSubSchema.class).getDescriptor("subStruct").getType());
+    public void subSchemaIsJson() throws NoSuchFieldException, SchemaException {
+        Schema schema = Schema.getRegisteredSchema(TestDataWithSubSchema.class);
+        assertEquals(DataTypes.jsonNode, schema.getDescriptor("subStruct").getType());
+        assertEquals(TestDataWithInferredSchema.class, schema.getDescriptor("subStruct").getSubschema());
+        assertNull(schema.getDescriptor("intField").getSubschema());
     }
 
     @Test
     public void setSubschemaFromJson() throws Exception {
         TestDataWithInferredSchema expectedSubStruct = TestDataWithInferredSchema.random(true);
 
-        ObjectNode json = JsonOutputAdapter.produce(expectedSubStruct);
+        ObjectNode json = expectedSubStruct.toJson();
 
         TestDataWithSubSchema testData = new TestDataWithSubSchema();
 
         testData.set("subStruct", json);
 
         assertEquals(expectedSubStruct, testData.subStruct);
+    }
+
+    @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0)
+    @Test
+    public void clearSubschemaClears() throws Exception {
+        TestDataWithSubSchema testData = new TestDataWithSubSchema();
+
+        testData.set("subStruct", mockTestDataWithInferredSchema);
+
+        testData.clear();
+
+        verify(mockTestDataWithInferredSchema).clear();
     }
 
     @Test
@@ -305,5 +331,15 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
         JsonInputAdapter.forValue(json).consume(reloaded);
 
         assertEquals(testData, reloaded);
+    }
+
+    @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0)
+    @Test
+    public void clearSubschemaClearsCollections() throws Exception {
+        TestDataWithSubSchemaInCollection testData = TestDataWithSubSchemaInCollection.random(true);
+
+        testData.clear();
+
+        assertTrue(testData.isEmpty());
     }
 }

@@ -83,10 +83,13 @@ public class FieldWrapper {
                     type = DataTypes.jsonNode;
                     structure = STRUCT.array;
                 }
-            } else if (fieldClass.isArray())
+            } else if (fieldClass.isArray()) {
                 structure = STRUCT.array;
-            else
+            } else {
                 structure = STRUCT.scalar;
+                if (type == DataTypes.jsonNode && StreamableWithSchema.class.isAssignableFrom(fieldClass))
+                    valueClass = (Class<? extends StreamableWithSchema>) fieldClass;
+            }
         }
         return field;
     }
@@ -135,16 +138,67 @@ public class FieldWrapper {
                 setValue(o, 0);
         } else if (fieldClass.isArray()){
             try {
-                Arrays.fill((Object[]) getValue(o), null);
+                Object[] array = (Object[]) getValue(o);
+                if (valueClass != null){
+                    for (Object elem : array){
+                        if (elem != null)
+                            ((StreamableWithSchema)elem).clear();
+                    }
+                }else
+                    Arrays.fill(array, null);
             }catch (ClassCastException e){
                 throw new SchemaException(getQualifiedName() + ": Only arrays of non-primitive types are allowed in data objects with Schema.", e);
             }
         } else if (Collection.class.isAssignableFrom(getFieldClass())){
             ((Collection)getValue(o)).clear();
+        } else if (Map.class.isAssignableFrom(getFieldClass())){
+            ((Map)getValue(o)).clear();
         }else if (ContainerNode.class.isAssignableFrom(getFieldClass())){
             ((ContainerNode)getValue(o)).removeAll();
+        }else if (valueClass != null){
+            Object value = getField().get(o);
+            if (value != null)
+                ((StreamableWithSchema)value).clear();
         }else
             getField().set(o, null);
+    }
+
+    public boolean isEmpty(StreamableWithSchema o) throws Exception {
+        if (field == null)
+            getField();
+
+        if (fieldClass.isPrimitive()){
+            Object value = getValue(o);
+            return DataTypes.isEmptyPrimitive(value);
+        } else if (fieldClass.isArray()){
+            try {
+                Object[] array = (Object[]) getValue(o);
+                if (valueClass != null){
+                    for (Object elem : array){
+                        if (elem != null && !((StreamableWithSchema)elem).isEmpty())
+                            return false;
+                    }
+                }else {
+                    for (Object elem : array)
+                        if (elem != null)
+                            return false;
+                }
+            }catch (ClassCastException e){
+                throw new SchemaException(getQualifiedName() + ": Only arrays of non-primitive types are allowed in data objects with Schema.", e);
+            }
+            return true;
+        } else if (Collection.class.isAssignableFrom(getFieldClass())){
+            return ((Collection)getValue(o)).isEmpty();
+        } else if (Map.class.isAssignableFrom(getFieldClass())){
+            return ((Map)getValue(o)).isEmpty();
+        }else if (ContainerNode.class.isAssignableFrom(getFieldClass())){
+            return !(((ContainerNode)getValue(o)).fields().hasNext());
+        }else if (valueClass != null){
+            Object value = getField().get(o);
+            return (value == null || ((StreamableWithSchema)value).isEmpty());
+        }
+
+        return getField().get(o) == null;
     }
 
     public DataTypes getType() throws NoSuchFieldException, SchemaException {

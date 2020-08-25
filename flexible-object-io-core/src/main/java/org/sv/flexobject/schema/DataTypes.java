@@ -322,6 +322,27 @@ public enum DataTypes {
         return stringOut;
     }
 
+    public static boolean isEmptyPrimitive(Object primitive){
+        if (primitive == null)
+            return true;
+
+        Class<?> clazz = primitive.getClass();
+        if (Integer.class.equals(clazz) || Short.class.equals(clazz) || Byte.class.equals(clazz)
+                || Long.class.equals(clazz) || BigInteger.class.equals(clazz))
+            return ((Number)primitive).longValue() == 0;
+        if (Double.class.equals(clazz) || Float.class.equals(clazz))
+            return ((Number)primitive).doubleValue() == 0;;
+        if (Boolean.class.equals(clazz))
+            return !((Boolean)primitive);
+        if (Date.class.equals(clazz))
+            return ((Date)primitive).getTime() == 0;
+        if (LocalDate.class.equals(clazz))
+            return ((LocalDate)primitive).getYear() == 0;
+        if (Timestamp.class.equals(clazz))
+            return ((Timestamp)primitive).getTime() == 0;
+        return false;
+    }
+
     public static DataTypes valueOf(Class<?> clazz){
         if (clazz.getName().startsWith("[")){
             if (String[].class.equals(clazz))

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
 import org.sv.flexobject.InAdapter;
 import org.sv.flexobject.OutAdapter;
+import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.schema.annotations.*;
 import org.sv.flexobject.schema.reflect.*;
 import org.sv.flexobject.util.BiConsumerWithException;
@@ -295,6 +296,18 @@ public class FieldDescriptor {
         }
     }
 
+    public boolean isEmpty(StreamableWithSchema o) {
+        try {
+            if (getter instanceof FieldWrapper) {
+                return ((FieldWrapper) getter).isEmpty(o);
+            }else {
+                return getter.apply(o) == null;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public int getOrder() {
         return order;
     }
@@ -305,5 +318,12 @@ public class FieldDescriptor {
 
     public DataTypes getType() {
         return type;
+    }
+
+    public Class<? extends StreamableWithSchema> getSubschema() throws NoSuchFieldException, SchemaException {
+        if (type == DataTypes.jsonNode && setter instanceof FieldWrapper){
+            return((FieldWrapper) setter).getValueClass();
+        }
+        return null;
     }
 }

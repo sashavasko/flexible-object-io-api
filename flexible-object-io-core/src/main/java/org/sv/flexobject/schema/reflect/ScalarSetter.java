@@ -48,14 +48,14 @@ public class ScalarSetter extends FieldWrapper implements BiConsumerWithExceptio
                             throw new SchemaException(getQualifiedName() + ": Arrays of substructures must be initialized with instances, or ValueType annotation must be used.");
                         array[idx] = valueClass.newInstance();
                         ((StreamableWithSchema)array[idx]).fromJson(elemNode);
-                    }else {
+                    } else {
                         array[idx] = getType().convert(elemNode);
                     }
                     idx++;
                     if (idx >= array.length)
                         return;
                 }
-            }else if (getStructure() == STRUCT.list){
+            } else if (getStructure() == STRUCT.list){
                 int idx = 0;
                 List list = (List) getValue(dataObject);
                 for (JsonNode elemNode : arrayNode){
@@ -87,7 +87,7 @@ public class ScalarSetter extends FieldWrapper implements BiConsumerWithExceptio
                     setValue(dataObject, subStruct);
                 }
                 subStruct.fromJson((JsonNode) value);
-            }else {
+            } else {
                 if (getStructure() != STRUCT.map)
                     throw new SchemaException(getQualifiedName() + ": Json ObjectNode can only be converted to a Map");
                 Map map = (Map) getValue(dataObject);
@@ -110,7 +110,10 @@ public class ScalarSetter extends FieldWrapper implements BiConsumerWithExceptio
                     map.put(key, convertedValue);
                 }
             }
-        } else
+        } else if (getValueClass() != null && getValueClass().isAssignableFrom(value.getClass())){
+            setValue(dataObject, value);
+        } else {
             setValue(dataObject, getType().convert(value));
+        }
     }
 }

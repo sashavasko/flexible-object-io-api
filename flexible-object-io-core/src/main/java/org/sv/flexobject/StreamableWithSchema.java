@@ -40,9 +40,17 @@ public class StreamableWithSchema<T extends SchemaElement> implements Streamable
         return schema;
     }
 
+    public void clear() throws SchemaException {
+        getSchema().clear(this);
+    }
+
+    public boolean isEmpty() throws SchemaException {
+        return getSchema().isEmpty(this);
+    }
+
     @Override
     public boolean load(InAdapter input) throws Exception {
-        getSchema().clear(this);
+        clear();
         return getSchema().load(this, input) != null;
     }
 

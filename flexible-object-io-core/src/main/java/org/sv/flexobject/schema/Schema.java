@@ -1,9 +1,6 @@
 package org.sv.flexobject.schema;
 
-import org.sv.flexobject.InAdapter;
-import org.sv.flexobject.Loadable;
-import org.sv.flexobject.OutAdapter;
-import org.sv.flexobject.Savable;
+import org.sv.flexobject.*;
 import org.sv.flexobject.io.GenericReader;
 import org.sv.flexobject.io.GenericWriter;
 import org.sv.flexobject.io.Reader;
@@ -194,15 +191,24 @@ public class Schema {
                         if (!Arrays.equals((Object[])value, (Object[])otherValue)) {
                             return false;
                         }
-                    }else if (!value.equals(otherValue))
+                    } else if (!value.equals(otherValue))
                         return false;
-                }else if (otherValue != null)
+                } else if (otherValue != null)
                     return false;
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             return false;
         }
 
+        return true;
+    }
+
+    public boolean isEmpty(StreamableWithSchema o) throws SchemaException {
+        for (SchemaElement field : fields) {
+            FieldDescriptor descriptor = field.getDescriptor();
+            if (!descriptor.isEmpty(o))
+                return false;
+        }
         return true;
     }
 }
