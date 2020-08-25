@@ -433,9 +433,21 @@ public class DataTypesTest {
         assertEquals(testDate, DataTypes.dateConverter(testDateStringMDDYYYY));
         assertEquals(testDate, DataTypes.dateConverter(testDateStringMMDDYYYY));
         assertEquals(testDate, DataTypes.dateConverter(testDateStringYYYYMMDD));
+        assertEquals(Date.valueOf(LocalDate.of(2020,11,30)), DataTypes.dateConverter("2020-11-30"));
         assertEquals(Date.valueOf(LocalDate.of(2020,11,30)), DataTypes.dateConverter("20201130"));
         assertEquals(Date.valueOf(LocalDate.of(2020,11,30)), DataTypes.dateConverter("11302020"));
         assertEquals(Date.valueOf(LocalDate.of(2020,1,30)), DataTypes.dateConverter("1302020"));
+    }
+
+    @Test
+    public void timestampConverterHandlesNumericDates() throws Exception {
+        assertEquals(new Timestamp(testDate.getTime()), DataTypes.timestampConverter(testDateStringMDDYYYY));
+        assertEquals(new Timestamp(testDate.getTime()), DataTypes.timestampConverter(testDateStringMMDDYYYY));
+        assertEquals(new Timestamp(testDate.getTime()), DataTypes.timestampConverter(testDateStringYYYYMMDD));
+        assertEquals(new Timestamp(Date.valueOf(LocalDate.of(2020,11,30)).getTime()), DataTypes.timestampConverter("2020-11-30"));
+        assertEquals(new Timestamp(Date.valueOf(LocalDate.of(2020,11,30)).getTime()), DataTypes.timestampConverter("20201130"));
+        assertEquals(new Timestamp(Date.valueOf(LocalDate.of(2020,11,30)).getTime()), DataTypes.timestampConverter("11302020"));
+        assertEquals(new Timestamp(Date.valueOf(LocalDate.of(2020,1,30)).getTime()), DataTypes.timestampConverter("1302020"));
     }
 
     @Test

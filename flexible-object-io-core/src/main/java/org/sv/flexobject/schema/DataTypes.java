@@ -132,7 +132,7 @@ public enum DataTypes {
         if (value == null || value instanceof Integer)
             return (Integer) value;
         if (value instanceof String)
-            return Integer.valueOf((String)value);
+            return Integer.valueOf(((String)value).trim());
         if (value instanceof ValueNode)
             return ((ValueNode)value).asInt();
         return ((Number)value).intValue();
@@ -146,10 +146,11 @@ public enum DataTypes {
         if (value == null || value instanceof Boolean)
             return (Boolean) value;
         if (value instanceof String) {
-            switch (((String)value).toUpperCase()){
+            switch (((String)value).trim().toUpperCase()){
                 case "TRUE" :
                 case "YES" :
                 case "Y" :
+                case "1" :
                 case "ON" : return true;
                 default :
                     return false;
@@ -185,7 +186,7 @@ public enum DataTypes {
         if (value == null || value instanceof Double)
             return (Double) value;
         if (value instanceof String)
-            return Double.valueOf((String)value);
+            return Double.valueOf(((String)value).trim());
         if (value instanceof ValueNode)
             return ((ValueNode)value).asDouble();
         return ((Number)value).doubleValue();
@@ -209,7 +210,7 @@ public enum DataTypes {
         if (value instanceof ValueNode)
             return JsonInputAdapter.jsonNodeToDate((JsonNode)value);
         if (value instanceof String) {
-            String dateString = (String) value;
+            String dateString = ((String)value).trim();
             if (StringUtils.isNumeric(dateString)){
                 int month;
                 int day;
@@ -256,8 +257,12 @@ public enum DataTypes {
             return (Timestamp) value;
         if (value instanceof LocalDate)
             return new Timestamp(Date.valueOf((LocalDate) value).getTime());
-        if (value instanceof String)
-            return Timestamp.valueOf((String)value);
+        if (value instanceof String) {
+            String timestampString = ((String) value).trim();
+            if (StringUtils.isNumeric(timestampString) || timestampString.length() < "yyyy-mm-dd hh:mm:ss".length())
+                return new Timestamp(dateConverter(value).getTime());
+            return Timestamp.valueOf((String) value);
+        }
         if (value instanceof ValueNode)
             return Timestamp.valueOf(((ValueNode)value).asText());
         if (value instanceof LocalDateTime)
@@ -275,8 +280,8 @@ public enum DataTypes {
     public static Class<?> classConverter(Object value) throws Exception {
         if (value == null || value instanceof Class)
             return (Class) value;
-        String stringValue = stringConverter(value);
-        if (stringValue != null){
+        String stringValue = stringConverter(value).trim();
+        if (StringUtils.isNotEmpty(stringValue)){
             return Class.forName(stringValue);
         }
 
@@ -287,8 +292,8 @@ public enum DataTypes {
         if (value == null || value instanceof Enum)
             return (T) value;
         try {
-            String stringValue = stringConverter(value);
-            if (stringValue != null) {
+            String stringValue = stringConverter(value).trim();
+            if (StringUtils.isNotEmpty(stringValue)){
                 return Enum.valueOf(defaultValue.getDeclaringClass(), (String) value);
             }
         } catch (Exception e) {
@@ -299,9 +304,9 @@ public enum DataTypes {
     public static Enum enumConverter(Object value, Class<? extends Enum> enumClass) throws Exception {
         if (value == null || value instanceof Enum)
             return (Enum) value;
-        String stringValue = stringConverter(value);
-        if (stringValue != null) {
-            return Enum.valueOf(enumClass, (String) value);
+        String stringValue = stringConverter(value).trim();
+        if (StringUtils.isNotEmpty(stringValue)){
+            return Enum.valueOf(enumClass, stringValue);
         }
 
         throw new SchemaException("Attempting to convert value of type " + value.getClass().getName() + " to Enum " + enumClass.getName());
@@ -314,13 +319,13 @@ public enum DataTypes {
         Set setOut = EnumSet.noneOf(enumClass);
         if (value instanceof ArrayNode) {
             for (JsonNode item : ((ArrayNode)value)) {
-                String valueName = item.asText();
+                String valueName = item.asText().trim();
                 if (!valueName.equalsIgnoreCase(emptyValue)) {
                     setOut.add(Enum.valueOf(enumClass, valueName));
                 }
             }
         }else {
-            String valueNames = stringConverter(value);
+            String valueNames = stringConverter(value).trim();
             if (StringUtils.isNotBlank(valueNames)) {
                 if (valueNames.startsWith("["))
                     valueNames = valueNames.substring(1, valueNames.length() - 1)
