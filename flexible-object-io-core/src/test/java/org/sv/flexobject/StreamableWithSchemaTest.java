@@ -187,7 +187,7 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
         assertEquals(EnumSet.of(TestDataWithEnumAndClass.TestEnum.uno,TestDataWithEnumAndClass.TestEnum.dos), testData.enumSet);
 
         JsonNode jsonOut = JsonOutputAdapter.produce(testData);
-        String expectedJsonString = "{\"clazz\":\"com.carfax.dt.streaming.TestDataWithEnumAndClass$TestEnum\",\"enumValue\":\"uno\",\"enumSet\":\"uno,dos\"}";
+        String expectedJsonString = "{\"clazz\":\"org.sv.flexobject.TestDataWithEnumAndClass$TestEnum\",\"enumValue\":\"uno\",\"enumSet\":\"uno,dos\"}";
         assertEquals(expectedJsonString, jsonOut.toString());
 
         JsonInputAdapter.forValue(("{'clazz':'" + TestDataWithEnumAndClass.TestEnum.class.getName() + "', " +

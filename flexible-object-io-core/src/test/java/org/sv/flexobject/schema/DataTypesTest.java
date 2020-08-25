@@ -21,6 +21,10 @@ public class DataTypesTest {
     CopyAdapter adapter = new CopyAdapter();
 
     LocalDate testLocalDate = LocalDate.of(2020,5,7);
+    Integer testParquetDate = 18389;
+    String testDateStringMDDYYYY = "5072020";
+    String testDateStringMMDDYYYY = "05072020";
+    String testDateStringYYYYMMDD = "20200507";
     Date testDate = Date.valueOf(testLocalDate);
     Timestamp testTimestamp = new Timestamp(testDate.getTime());
 
@@ -422,5 +426,22 @@ public class DataTypesTest {
         Integer[] array = new Integer[]{123, 456};
 
         assertEquals("[123,456]", DataTypes.jsonConverter(array).toString());
+    }
+
+    @Test
+    public void dateConverterHandlesNumericDates() throws Exception {
+        assertEquals(testDate, DataTypes.dateConverter(testDateStringMDDYYYY));
+        assertEquals(testDate, DataTypes.dateConverter(testDateStringMMDDYYYY));
+        assertEquals(testDate, DataTypes.dateConverter(testDateStringYYYYMMDD));
+    }
+
+    @Test
+    public void dateConverterHandlesUnixTime() throws Exception {
+        assertEquals(testDate, DataTypes.dateConverter(testDate.getTime()));
+    }
+
+    @Test
+    public void dateConverterHandlesParquetDate() throws Exception {
+        assertEquals(testDate, DataTypes.dateConverter(testParquetDate));
     }
 }
