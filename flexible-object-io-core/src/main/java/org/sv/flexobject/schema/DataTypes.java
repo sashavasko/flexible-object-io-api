@@ -65,8 +65,10 @@ public enum DataTypes {
     public static String stringConverter(Object value) throws Exception{
         if (value == null || value instanceof String)
             return (String) value;
-        if (value instanceof ValueNode)
+        if (value instanceof TextNode)
             return ((TextNode)value).asText();
+        if (value instanceof JsonNode)
+            return MapperFactory.getObjectWriter().writeValueAsString(value);
         if (value instanceof Enum)
             return ((Enum)value).name();
         if (value instanceof Class)

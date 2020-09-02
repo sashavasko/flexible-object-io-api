@@ -55,17 +55,24 @@ public class DataSourceDao implements AutoCloseable{
     }
 
     public void setupConnection() throws SQLException {
-        if (connection == null) {
+        if (connection == null || connection.isClosed()){
             connection = getConnectionFromDataSource();
         }
     }
 
-    public void closeConnection() throws SQLException {
-        if (connection != null) {
-            connection.close();
-            connection = null;
+    public void invalidateConnection(){
+        try {
+            closeConnection();
+        } catch (SQLException e) {
         }
+        connection = null;
+    }
 
+    public void closeConnection() throws SQLException {
+        if (connection != null && !connection.isClosed())
+            connection.close();
+
+        connection = null;
     }
 
     @Override
