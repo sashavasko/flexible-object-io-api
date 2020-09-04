@@ -320,10 +320,34 @@ public class FieldDescriptor {
         return type;
     }
 
+    public DataTypes getValueType() throws NoSuchFieldException, SchemaException {
+        if (isScalar())
+            return type;
+        else if (setter instanceof FieldWrapper){
+            return((FieldWrapper) setter).getType();
+        }
+        return null;
+
+    }
+
     public Class<? extends StreamableWithSchema> getSubschema() throws NoSuchFieldException, SchemaException {
         if (type == DataTypes.jsonNode && setter instanceof FieldWrapper){
             return((FieldWrapper) setter).getValueClass();
         }
         return null;
+    }
+
+    public FieldWrapper.STRUCT getStructure() {
+        try {
+            if (setter instanceof FieldWrapper)
+                return ((FieldWrapper) setter).getStructure();
+        }catch (Exception e){}
+
+        return FieldWrapper.STRUCT.unknown;
+    }
+
+    public boolean isScalar(){
+        return type != DataTypes.jsonNode
+                || getStructure() == FieldWrapper.STRUCT.scalar;
     }
 }
