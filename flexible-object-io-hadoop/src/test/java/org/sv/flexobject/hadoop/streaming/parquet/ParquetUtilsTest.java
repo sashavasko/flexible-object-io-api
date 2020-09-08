@@ -58,21 +58,23 @@ public class ParquetUtilsTest {
     }
 
     private static void writeTestFile(Configuration conf, Path testFilepath, long int64Field, int int32Field) throws Exception {
-        try (ParquetJsonSink sink = new ParquetJsonSink().forOutput(testFilepath).withSchema(
-                new MessageType("test",
+        try (ParquetJsonSink sink = new ParquetJsonSink()
+                .forOutput(testFilepath)
+                .withSchema(new MessageType("test",
                         ParquetSchema.integerField("int32Field"),
-                        ParquetSchema.longField("int64Field")))) {
-            sink.setConf(conf);
+                        ParquetSchema.longField("int64Field")))
+                .withConf(conf)) {
             sink.put(MapperFactory.getObjectReader().readTree("{\"int32Field\":" + int32Field + ",\"int64Field\":" + int64Field + "}"));
         }
     }
 
     private static void writeEmptyFile(Configuration conf, Path testFilepath) throws Exception {
-        try (ParquetJsonSink sink = new ParquetJsonSink().forOutput(testFilepath).withSchema(
-                new MessageType("test",
+        try (ParquetJsonSink sink = new ParquetJsonSink()
+                .forOutput(testFilepath)
+                .withSchema(new MessageType("test",
                         ParquetSchema.integerField("int32Field"),
-                        ParquetSchema.longField("int64Field")))) {
-            sink.setConf(conf);
+                        ParquetSchema.longField("int64Field")))
+                .withConf(conf)) {
             sink.getWriter();
         }
     }
@@ -90,6 +92,5 @@ public class ParquetUtilsTest {
         assertEquals(2222, ParquetUtils.getMaxValueInFiles(conf, wildcardPath, true, "int32Field"));
         testFilepath.getFileSystem(conf).delete(testFilepath, false);
         testFilepath.getFileSystem(conf).delete(test2Filepath, false);
-
     }
 }
