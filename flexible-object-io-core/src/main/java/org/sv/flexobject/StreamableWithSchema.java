@@ -6,6 +6,7 @@ import org.sv.flexobject.adapter.MapInAdapter;
 import org.sv.flexobject.adapter.MapOutAdapter;
 import org.sv.flexobject.json.JsonInputAdapter;
 import org.sv.flexobject.json.JsonOutputAdapter;
+import org.sv.flexobject.json.MapperFactory;
 import org.sv.flexobject.schema.Schema;
 import org.sv.flexobject.schema.SchemaElement;
 import org.sv.flexobject.schema.SchemaException;
@@ -15,6 +16,7 @@ import java.util.function.Supplier;
 
 public class StreamableWithSchema<T extends SchemaElement> implements Streamable {
 
+    public static final String DEFAULT_CHARSET = "UTF-8";
     Schema schema;
 
     public StreamableWithSchema() {
@@ -100,6 +102,25 @@ public class StreamableWithSchema<T extends SchemaElement> implements Streamable
             return false;
 
         return getSchema().compareFields(this, other);
+    }
+
+    public void fromJsonBytes(byte[] bytes) throws Exception {
+        fromJsonBytes(bytes, DEFAULT_CHARSET);
+    }
+
+    public void fromJsonBytes(byte[] bytes, final String charset) throws Exception {
+        String containerJsonString = new String(bytes, charset);
+        JsonNode container = MapperFactory.getObjectReader().readTree(containerJsonString);
+        JsonInputAdapter.consume(container, this::load);
+    }
+
+    public byte[] toJsonBytes() throws Exception {
+        return toJsonBytes(DEFAULT_CHARSET);
+    }
+
+    public byte[] toJsonBytes(final String charset) throws Exception {
+        ObjectNode container = JsonOutputAdapter.produce(this);
+        return MapperFactory.getObjectWriter().writeValueAsString(container).getBytes(charset);
     }
 
     public ObjectNode toJson() throws Exception {
