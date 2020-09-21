@@ -16,14 +16,29 @@ public class ByteStreamSource<T extends ByteRepresentable>  implements Iterator<
     Class<? extends ByteRepresentable> clazz;
     boolean closeStream = false;
 
+    public ByteStreamSource() {
+    }
+
     public ByteStreamSource(InputStream is, Class<? extends ByteRepresentable> clazz, boolean closeStream) {
-        this.inputStream = is;
-        this.clazz = clazz;
-        this.closeStream = closeStream;
+        start (is, clazz, closeStream);
     }
 
     public ByteStreamSource(InputStream is, Class<? extends ByteRepresentable> clazz) {
-        this(is, clazz, false);
+        start(is, clazz);
+    }
+
+    public void start(InputStream is, Class<? extends ByteRepresentable> clazz) {
+        try {
+            close();
+        } catch (Exception e) { // don't care
+        }
+        start(is, clazz, false);
+    }
+
+    public void start(InputStream is, Class<? extends ByteRepresentable> clazz, boolean closeStream) {
+        this.inputStream = is;
+        this.clazz = clazz;
+        this.closeStream = closeStream;
     }
 
     @Override
@@ -138,8 +153,10 @@ public class ByteStreamSource<T extends ByteRepresentable>  implements Iterator<
 
     @Override
     public void close() throws Exception {
-        if (closeStream)
+        if (closeStream && inputStream != null) {
             inputStream.close();
+            inputStream = null;
+        }
     }
 
     @Override
