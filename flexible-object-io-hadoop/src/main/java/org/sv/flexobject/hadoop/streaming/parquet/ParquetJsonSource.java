@@ -2,10 +2,15 @@ package org.sv.flexobject.hadoop.streaming.parquet;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
 import org.apache.parquet.compression.CompressionCodecFactory;
 import org.apache.parquet.hadoop.ParquetReader;
 import org.apache.parquet.hadoop.util.HadoopCodecs;
+import org.apache.parquet.io.InputFile;
+import org.apache.parquet.schema.MessageType;
+import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.hadoop.streaming.ConfiguredSource;
+import org.sv.flexobject.hadoop.streaming.parquet.read.SchemedParquetReaderBuilder;
 import org.sv.flexobject.hadoop.streaming.parquet.read.json.JsonParquetReaderBuilder;
 
 import java.io.IOException;
@@ -14,11 +19,12 @@ import java.util.stream.Stream;
 public class ParquetJsonSource extends ConfiguredSource<JsonNode> {
 
     private ParquetSourceConf conf;
+    MessageType schema;
 
     private ParquetReader<JsonNode> parquetReader;
     private boolean isEOF = false;
 
-    ParquetReader.Builder builder = null;
+    SchemedParquetReaderBuilder builder = null;
 
     public ParquetJsonSource() {
         conf = new ParquetSourceConf();
@@ -33,10 +39,41 @@ public class ParquetJsonSource extends ConfiguredSource<JsonNode> {
         conf = new ParquetSourceConf(namespace);
     }
 
+    public ParquetJsonSource withConf(Configuration conf){
+        setConf(conf);
+        return this;
+    }
+
+    public ParquetJsonSource withSchema(Class<? extends StreamableWithSchema> dataClass){
+        if (dataClass != null)
+            schema = ParquetSchema.forClass(dataClass);
+        return this;
+    }
+
+    public ParquetJsonSource withSchema(MessageType schema){
+        this.schema = schema;
+        return this;
+    }
+
+    public ParquetJsonSource forInput(String filePath){
+        conf.filePath = filePath;
+        return this;
+    }
+
+    public ParquetJsonSource forInput(Path filePath){
+        return forInput(filePath.toString());
+    }
+
+    public ParquetJsonSource forInput(InputFile file){
+        builder = new JsonParquetReaderBuilder(file);
+        return this;
+    }
+
+
     @Override
-    public void setConf(Configuration conf) {
-        super.setConf(conf);
-        if (conf != null){
+    public void setConf(Configuration configuration) {
+        super.setConf(configuration);
+        if (configuration != null){
             try {
                 close();
             } catch (Exception e) {
@@ -46,14 +83,8 @@ public class ParquetJsonSource extends ConfiguredSource<JsonNode> {
                     throw new RuntimeException("Failed to close on configuration change", e);
             }
             isEOF = false;
-            this.conf.from(conf);
-            try {
-                builder = new JsonParquetReaderBuilder(conf, this.conf.getFilePath())
-                        .withFilter(this.conf.getFilter())
-                        .withCodecFactory(getCodecFactory());
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to read input file :" + this.conf.getFilePath(), e);
-            }
+            conf.from(configuration);
+            withSchema(conf.getDataClass());
         }
     }
 
@@ -65,10 +96,22 @@ public class ParquetJsonSource extends ConfiguredSource<JsonNode> {
         if (parquetReader != null)
             return parquetReader;
 
-        if (builder == null)
-            throw new IllegalArgumentException("Input source must be configured with either a Configuration object or byte[]");
-
-        parquetReader = builder.build();
+        if (builder == null) {
+            try {
+                Path filePath = conf.getFilePath();
+                if (filePath != null)
+                    builder = new JsonParquetReaderBuilder(getConf(), filePath);
+                else
+                    throw new IllegalArgumentException("Input source must be configured with either a Configuration object or byte[]");
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to read input file :" + conf.getFilePath(), e);
+            }
+        }
+        parquetReader = builder
+                .withSchema(schema)
+                .withConf(getConf())
+                .withFilter(conf.getFilter())
+                .withCodecFactory(getCodecFactory()).build();
         return parquetReader;
     }
 

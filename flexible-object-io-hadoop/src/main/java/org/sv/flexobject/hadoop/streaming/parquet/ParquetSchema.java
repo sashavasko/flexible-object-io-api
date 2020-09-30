@@ -154,6 +154,14 @@ public class ParquetSchema {
         return new MessageType(dataClass.getName(), parquetFieldsForClass(dataClass));
     }
 
+    public static Class<? extends StreamableWithSchema> forType(GroupType type){
+        try {
+            return (Class<? extends StreamableWithSchema>) Thread.currentThread().getContextClassLoader().loadClass(type.getName());
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Failed to load data class " + type.getName(), e);
+        }
+    }
+
     public static MessageType forClass(String className){
         try {
             return forClass((Class<? extends StreamableWithSchema>) Thread.currentThread().getContextClassLoader().loadClass(className));

@@ -1,4 +1,4 @@
-package org.sv.flexobject.hadoop.streaming.parquet.read.json;
+package org.sv.flexobject.hadoop.streaming.parquet.read.streamable;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.hadoop.conf.Configuration;
@@ -6,32 +6,34 @@ import org.apache.hadoop.fs.Path;
 import org.apache.parquet.hadoop.api.ReadSupport;
 import org.apache.parquet.hadoop.util.HadoopInputFile;
 import org.apache.parquet.io.InputFile;
+import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.hadoop.streaming.parquet.read.SchemedParquetReaderBuilder;
 import org.sv.flexobject.hadoop.streaming.parquet.read.input.ByteArrayInputFile;
+import org.sv.flexobject.hadoop.streaming.parquet.read.json.JsonReadSupport;
 
 import java.io.IOException;
 
-public class JsonParquetReaderBuilder extends SchemedParquetReaderBuilder<ObjectNode, JsonParquetReaderBuilder> {
-    public JsonParquetReaderBuilder(InputFile file) {
+public class ParquetReaderBuilder extends SchemedParquetReaderBuilder<StreamableWithSchema, ParquetReaderBuilder> {
+    public ParquetReaderBuilder(InputFile file) {
         super(file);
     }
 
     @Override
-    protected JsonParquetReaderBuilder self() {
+    protected ParquetReaderBuilder self() {
         return this;
     }
 
-    public JsonParquetReaderBuilder(byte[] bytes) {
+    public ParquetReaderBuilder(byte[] bytes) {
         super(new ByteArrayInputFile(bytes));
     }
 
-    public JsonParquetReaderBuilder(Configuration conf, Path path) throws IOException {
+    public ParquetReaderBuilder(Configuration conf, Path path) throws IOException {
         super(HadoopInputFile.fromPath(path, conf));
         withConf(conf);
     }
 
     @Override
-    protected ReadSupport<ObjectNode> getReadSupport() {
-        return new JsonReadSupport(getSchema());
+    protected ReadSupport<StreamableWithSchema> getReadSupport() {
+        return new ParquetReadSupport(getSchema());
     }
 }

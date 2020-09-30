@@ -73,9 +73,6 @@ public class ParquetJsonSink extends Configured implements Sink<JsonNode>, AutoC
                     throw new RuntimeException("Failed to close on configuration change", e);
             }
             conf.from(configuration);
-            if (conf.getFilePath() != null) {
-                builder = new JsonParquetWriterBuilder(conf.getFilePath());
-            }
             withSchema(conf.getDataClass());
         }
     }
@@ -91,15 +88,19 @@ public class ParquetJsonSink extends Configured implements Sink<JsonNode>, AutoC
         if (writer != null)
             return writer;
 
-        if (builder == null)
-            throw new RuntimeException("Parquet output must be configured with either OutputFile or path");
+        if (builder == null) {
+            if (conf.getFilePath() != null) {
+                builder = new JsonParquetWriterBuilder(conf.getFilePath());
+            }else
+                throw new RuntimeException("Parquet output must be configured with either OutputFile or path");
+        }
 
         try {
             writer = builder
                     .withSchema(schema)
                     .withConf(getConf()).build();
         } catch (IOException e) {
-            throw new RuntimeException("Failed to startr Parquet output: ", e);
+            throw new RuntimeException("Failed to start Parquet output: ", e);
         }
 
         return writer;
