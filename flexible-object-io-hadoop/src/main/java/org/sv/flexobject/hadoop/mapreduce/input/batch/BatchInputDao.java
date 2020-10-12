@@ -5,5 +5,9 @@ import org.sv.flexobject.hadoop.mapreduce.util.MRDao;
 
 public interface BatchInputDao extends MRDao {
 
+    default long adjustStartKey(long startKey, long maxKey) {
+        return startKey;
+    }
+
     InAdapter startBatch(long startKey, long batchSize) throws Exception;
 }
