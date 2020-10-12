@@ -1,33 +1,28 @@
 package org.sv.flexobject.hadoop.streaming.parquet.write.json;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.sv.flexobject.hadoop.streaming.parquet.write.ParquetWriteException;
 
-public class JsonParquetException extends Exception {
+public class JsonParquetException extends ParquetWriteException {
     JsonNode node;
-    String fieldName;
 
     public JsonParquetException(JsonNode node, String fieldName) {
+        super(fieldName);
         this.node = node;
-        this.fieldName = fieldName;
     }
 
     public JsonParquetException(String message, JsonNode node, String fieldName) {
-        super(message);
+        super(message, fieldName);
         this.node = node;
-        this.fieldName = fieldName;
     }
 
     public JsonParquetException(String message, Throwable cause, JsonNode node, String fieldName) {
-        super(message, cause);
+        super(message, cause, fieldName);
         this.node = node;
-        this.fieldName = fieldName;
     }
 
     @Override
-    public String toString() {
-        return "JsonParquetException: " +getLocalizedMessage() +
-                " {node=" + node +
-                ", fieldName='" + fieldName + '\'' +
-                '}';
+    public String formatOptionalData() {
+        return "node=" + node;
     }
 }

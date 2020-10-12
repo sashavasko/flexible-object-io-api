@@ -20,10 +20,15 @@ import static org.apache.parquet.schema.Type.Repetition.*;
 
 public class ParquetSchema {
 
+    public enum MapElementFields {
+        key,
+        value
+    }
+
     public static final String LIST_OBJECT_NAME = "list";
     public static final String ELEMENT_OBJECT_NAME = "element";
-    public static final String KEY_OBJECT_NAME = "key";
-    public static final String VALUE_OBJECT_NAME = "value";
+    public static final String KEY_OBJECT_NAME = MapElementFields.key.name();
+    public static final String VALUE_OBJECT_NAME = MapElementFields.value.name();
     public static final String KEY_VALUE_OBJECT_NAME = "key_value";
     public static final String JSON_FIELD_NAME_LABEL = "fieldName";
     public static final String JSON_REPETITION_LABEL = "repetition";

@@ -1,20 +1,17 @@
 package org.sv.flexobject.hadoop.streaming.parquet.write;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.parquet.hadoop.api.WriteSupport;
 import org.apache.parquet.io.api.RecordConsumer;
 import org.apache.parquet.schema.MessageType;
-import org.sv.flexobject.hadoop.streaming.parquet.write.json.JsonParquetException;
-import org.sv.flexobject.hadoop.streaming.parquet.write.json.ObjectNodeWriter;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class SchemedWriteSupport<T> extends WriteSupport<T> {
+public abstract class SchemedWriteSupport<T,WT extends SchemedWriter> extends WriteSupport<T> {
     private Map<String, String> extraMetaData;
-    protected MessageType schema;
+    private MessageType schema;
+    private WT groupWriter;
 
     public SchemedWriteSupport(MessageType schema) {
         extraMetaData = new HashMap<>();
@@ -33,4 +30,25 @@ public abstract class SchemedWriteSupport<T> extends WriteSupport<T> {
         }
         return new WriteContext(schema, this.extraMetaData);
     }
+
+    public MessageType getSchema() {
+        return schema;
+    }
+
+    @Override
+    public void prepareForWrite(RecordConsumer recordConsumer) {
+        groupWriter = createWriter(recordConsumer);
+    }
+
+    @Override
+    public void write(T group) {
+        try {
+            groupWriter.write(group);
+        } catch (ParquetWriteException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    abstract protected WT createWriter(RecordConsumer recordConsumer);
+
 }

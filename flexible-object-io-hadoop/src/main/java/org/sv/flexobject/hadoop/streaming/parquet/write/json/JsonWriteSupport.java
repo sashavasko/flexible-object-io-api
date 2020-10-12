@@ -15,9 +15,7 @@ import org.sv.flexobject.hadoop.streaming.parquet.write.SchemedWriteSupport;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JsonWriteSupport extends SchemedWriteSupport<JsonNode> {
-    private ObjectNodeWriter groupWriter;
-
+public class JsonWriteSupport extends SchemedWriteSupport<JsonNode, ObjectNodeWriter> {
     public JsonWriteSupport(MessageType schema) {
         super(schema);
     }
@@ -27,16 +25,7 @@ public class JsonWriteSupport extends SchemedWriteSupport<JsonNode> {
     }
 
     @Override
-    public void prepareForWrite(RecordConsumer recordConsumer) {
-        groupWriter = new ObjectNodeWriter(recordConsumer, schema);
-    }
-
-    @Override
-    public void write(JsonNode jsonNode) {
-        try {
-            groupWriter.write((ObjectNode) jsonNode);
-        } catch (JsonParquetException e) {
-            throw new RuntimeException(e);
-        }
+    protected ObjectNodeWriter createWriter(RecordConsumer recordConsumer) {
+        return new ObjectNodeWriter(recordConsumer, getSchema());
     }
 }

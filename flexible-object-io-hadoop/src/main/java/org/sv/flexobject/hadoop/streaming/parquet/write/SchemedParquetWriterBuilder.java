@@ -27,7 +27,7 @@ public abstract class SchemedParquetWriterBuilder<T,SELF extends ParquetWriter.B
     }
 
     public SELF withSchema(Class<? extends StreamableWithSchema> dataClass){
-        this.schema = ParquetSchema.forClass(dataClass);;
+        this.schema = ParquetSchema.forClass(dataClass);
         return self();
     }
 
