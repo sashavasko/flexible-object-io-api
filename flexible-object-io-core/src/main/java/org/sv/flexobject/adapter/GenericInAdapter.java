@@ -27,7 +27,7 @@ public abstract class GenericInAdapter<T> implements InAdapter {
         this.source = source;
     }
 
-    public static GenericInAdapter build(Class clazz, Source source) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
+    public static GenericInAdapter build(Class<? extends GenericInAdapter> clazz, Source source) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
         Constructor constructor = clazz.getConstructor(new Class[]{Source.class});
         GenericInAdapter adapter = (GenericInAdapter) constructor.newInstance(source);
         adapter.source = source;

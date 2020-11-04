@@ -23,7 +23,6 @@ public class SeparatorTranslator implements Translator{
     }
 
     public static String translate(String s, String separator, StringBuilder sb){
-        sb.setLength(0);
         boolean insideNumber = false;
         for (int i = 0 ; i < s.length() ; ++i){
             char c = s.charAt(i);
@@ -47,6 +46,7 @@ public class SeparatorTranslator implements Translator{
 
     @Override
     public String apply(String s) {
+        sb.setLength(0);
         return translate(s, separator, sb);
     }
 }

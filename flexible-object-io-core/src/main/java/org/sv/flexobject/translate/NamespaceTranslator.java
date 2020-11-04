@@ -1,5 +1,7 @@
 package org.sv.flexobject.translate;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class NamespaceTranslator implements Translator {
 
     String namespace;
@@ -16,6 +18,6 @@ public class NamespaceTranslator implements Translator {
 
     @Override
     public String apply(String s) {
-        return namespace + separator + s;
+        return StringUtils.isNotBlank(namespace) ? namespace + separator + s : s;
     }
 }

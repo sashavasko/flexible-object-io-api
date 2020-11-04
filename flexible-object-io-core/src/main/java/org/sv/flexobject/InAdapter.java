@@ -12,6 +12,11 @@ import java.util.Set;
 /**
  * Implementations provide uniform interface to reading various input formats and or medias.
  * This allows for a standard interface to inputs of dramatically different architecture, such as files, Kafka topics, Databases.
+ * InAdapter is different from Source in the way that Source can only produce complete objects or certain type,
+ * while InAdapter treats incoming data as a flat stream of similar records and provides access to individual fields of such records.
+ * InAdapter is not aware of any nested structures outside of JSON fields, whereas Source can possibly produce an object with complex hierarchy of sub-structures..
+ *
+ * InAdapter could use Source as a source of data - flattening out any complex substructures in Source produced objects.
  */
 public interface InAdapter extends AutoCloseable, Parameterized{
 
