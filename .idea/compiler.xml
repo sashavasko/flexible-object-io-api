@@ -8,6 +8,10 @@
       <module name="flexible-object-io-api.flexible-object-io-hadoop.test" target="1.8" />
       <module name="flexible-object-io-api.flexible-object-io-kafka.main" target="1.8" />
       <module name="flexible-object-io-api.flexible-object-io-kafka.test" target="1.8" />
+      <module name="flexible-object-io-api.flexible-object-io-mongo.main" target="1.8" />
+      <module name="flexible-object-io-api.flexible-object-io-mongo.test" target="1.8" />
+      <module name="flexible-object-io-api.flexible-object-io-streaming.main" target="1.8" />
+      <module name="flexible-object-io-api.flexible-object-io-streaming.test" target="1.8" />
       <module name="flexible-object-io-api.main" target="1.8" />
       <module name="flexible-object-io-api.test" target="1.8" />
     </bytecodeTargetLevel>

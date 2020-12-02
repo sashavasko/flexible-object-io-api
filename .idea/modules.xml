@@ -12,6 +12,9 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/1785116058/flexible-object-io-api.flexible-object-io-kafka.iml" filepath="$PROJECT_DIR$/.idea/modules/1785116058/flexible-object-io-api.flexible-object-io-kafka.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/1785116058/flexible-object-io-api.flexible-object-io-kafka.main.iml" filepath="$PROJECT_DIR$/.idea/modules/1785116058/flexible-object-io-api.flexible-object-io-kafka.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/1785116058/flexible-object-io-api.flexible-object-io-kafka.test.iml" filepath="$PROJECT_DIR$/.idea/modules/1785116058/flexible-object-io-api.flexible-object-io-kafka.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1787387752/flexible-object-io-api.flexible-object-io-mongo.iml" filepath="$PROJECT_DIR$/.idea/modules/1787387752/flexible-object-io-api.flexible-object-io-mongo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1787387752/flexible-object-io-api.flexible-object-io-mongo.main.iml" filepath="$PROJECT_DIR$/.idea/modules/1787387752/flexible-object-io-api.flexible-object-io-mongo.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1787387752/flexible-object-io-api.flexible-object-io-mongo.test.iml" filepath="$PROJECT_DIR$/.idea/modules/1787387752/flexible-object-io-api.flexible-object-io-mongo.test.iml" />
     </modules>
   </component>
 </project>

@@ -1,3 +1,3 @@
 rootProject.name = 'flexible-object-io-api'
-include 'flexible-object-io-core', 'flexible-object-io-hadoop', 'flexible-object-io-kafka'
+include 'flexible-object-io-core', 'flexible-object-io-hadoop', 'flexible-object-io-kafka', 'flexible-object-io-mongo'
 

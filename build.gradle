@@ -11,7 +11,7 @@ subprojects {
         mavenCentral()
     }
 
-    ext.hadoopVersion = "2.6.0"
+    ext.hadoopVersion = "3.3.0"
 
     dependencies {
 
@@ -54,6 +54,24 @@ project(':flexible-object-io-core') {
 project(':flexible-object-io-hadoop') {
     dependencies {
         implementation project(':flexible-object-io-core')
+
+        compile ("org.apache.hadoop:hadoop-client:3.3.0"){
+            exclude group: 'com.fasterxml.jackson.core', module:'jackson-databind'
+            exclude group: 'com.fasterxml.jackson.core', module:'jackson-core'
+        }
+
+        compile ('org.apache.parquet:parquet-hadoop:1.10.1'){
+            exclude group: 'com.fasterxml.jackson.core', module:'jackson-databind'
+            exclude group: 'com.fasterxml.jackson.core', module:'jackson-core'
+            exclude module: 'httpcomponents'
+        }
+        compile ('org.apache.parquet:parquet-avro:1.10.1'){
+            exclude group: 'com.fasterxml.jackson.core', module:'jackson-databind'
+            exclude group: 'com.fasterxml.jackson.core', module:'jackson-core'
+            exclude module: 'httpcomponents'
+        }
+        compile ("joda-time:joda-time:2.7")
+
     }
 }
 
@@ -66,3 +84,11 @@ project(':flexible-object-io-kafka') {
         implementation project(':flexible-object-io-core')
     }
 }
+
+project(':flexible-object-io-mongo') {
+    dependencies {
+        implementation project(':flexible-object-io-core')
+    }
+}
+
+
