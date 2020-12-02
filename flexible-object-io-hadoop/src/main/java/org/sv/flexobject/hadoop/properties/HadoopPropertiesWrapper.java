@@ -10,15 +10,11 @@ public class HadoopPropertiesWrapper<T extends HadoopPropertiesWrapper> extends 
     private String namespace;
 
     public HadoopPropertiesWrapper() {
-        namespace = getDefaultNamespace();
+        this(getDefaultNamespace());
     }
 
     public HadoopPropertiesWrapper(String namespace) {
         this.namespace = namespace;
-    }
-
-    public static String getDefaultNamespace(){
-        return HadoopBatchEnvironment.DEFAULT_NAMESPACE;
     }
 
     public String getSubNamespace(){
@@ -43,6 +39,10 @@ public class HadoopPropertiesWrapper<T extends HadoopPropertiesWrapper> extends 
 
     public String getSettingName(String fieldName){
         return ConfigurationInAdapter.getTranslator(getNamespace()).apply(fieldName);
+    }
+
+    public static String getDefaultNamespace(){
+        return HadoopBatchEnvironment.DEFAULT_NAMESPACE;
     }
 
 }

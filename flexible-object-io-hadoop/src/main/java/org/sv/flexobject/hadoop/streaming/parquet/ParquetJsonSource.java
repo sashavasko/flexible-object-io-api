@@ -16,7 +16,7 @@ import org.sv.flexobject.hadoop.streaming.parquet.read.json.JsonParquetReaderBui
 import java.io.IOException;
 import java.util.stream.Stream;
 
-public class ParquetJsonSource extends ConfiguredSource<JsonNode> {
+public class ParquetJsonSource<SELF extends ParquetJsonSource> extends ConfiguredSource<JsonNode> {
 
     private ParquetSourceConf conf;
     MessageType schema;
@@ -39,36 +39,35 @@ public class ParquetJsonSource extends ConfiguredSource<JsonNode> {
         conf = new ParquetSourceConf(namespace);
     }
 
-    public ParquetJsonSource withConf(Configuration conf){
+    public SELF withConf(Configuration conf){
         setConf(conf);
-        return this;
+        return (SELF)this;
     }
 
-    public ParquetJsonSource withSchema(Class<? extends StreamableWithSchema> dataClass){
+    public SELF withSchema(Class<? extends StreamableWithSchema> dataClass){
         if (dataClass != null)
             schema = ParquetSchema.forClass(dataClass);
-        return this;
+        return (SELF)this;
     }
 
-    public ParquetJsonSource withSchema(MessageType schema){
+    public SELF withSchema(MessageType schema){
         this.schema = schema;
-        return this;
+        return (SELF) this;
     }
 
-    public ParquetJsonSource forInput(String filePath){
+    public SELF forInput(String filePath){
         conf.filePath = filePath;
-        return this;
+        return (SELF) this;
     }
 
-    public ParquetJsonSource forInput(Path filePath){
+    public SELF forInput(Path filePath){
         return forInput(filePath.toString());
     }
 
-    public ParquetJsonSource forInput(InputFile file){
+    public SELF forInput(InputFile file){
         builder = new JsonParquetReaderBuilder(file);
-        return this;
+        return (SELF) this;
     }
-
 
     @Override
     public void setConf(Configuration configuration) {

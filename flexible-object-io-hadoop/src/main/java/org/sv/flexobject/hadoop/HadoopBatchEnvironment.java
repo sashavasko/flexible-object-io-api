@@ -2,13 +2,13 @@ package org.sv.flexobject.hadoop;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
-import org.sv.flexobject.sql.dao.BasicBatchEnvironment;
 
 import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
-public class HadoopBatchEnvironment extends BasicBatchEnvironment {
+@Deprecated
+public class HadoopBatchEnvironment {
 
     public static final String DEFAULT_NAMESPACE = "org.sv.flexobject.hadoop";
 
@@ -33,7 +33,6 @@ public class HadoopBatchEnvironment extends BasicBatchEnvironment {
             properties.setProperty(propertyName, value);
     }
 
-    @Override
     public Properties loadProperties(String appName, String propertiesSubdirectory) {
         Properties properties = new Properties();
 
@@ -50,7 +49,6 @@ public class HadoopBatchEnvironment extends BasicBatchEnvironment {
         return properties;
     }
 
-    @Override
     protected List<File> getBaseDirs() {
         return null;
     }

@@ -21,6 +21,7 @@ public abstract class DaoRecordReader<KT,VT> extends RecordReader<KT,VT> {
 //
     public static final String CURRENT_KEY_FIELD_NAME = "CURRENT_KEY";
     public static final String CURRENT_VALUE_FIELD_NAME = "CURRENT_VALUE";
+    public static final int DEFAULT_MAX_RETRIES_VALUE = 3;
 
     protected MRDao dao;
     protected InAdapter input;
@@ -51,11 +52,11 @@ public abstract class DaoRecordReader<KT,VT> extends RecordReader<KT,VT> {
         Exception ee = null;
         if (conf.daoClass == null)
             throw new RuntimeException("Must specify a DAOclass extending MRDao using property " + conf.getSettingName("recordReaderDaoClass"));
-        keyFieldName = conf.keyFieldName;
-        valueFieldName = conf.valueFieldName;
-        for (int i = 0; i < 10 ; i++){
+        keyFieldName = conf.getKeyFieldName();
+        valueFieldName = conf.getValueFieldName();
+        for (int i = 0; i < conf.getMaxRetries() ; i++){
             try {
-                dao = conf.daoClass.newInstance();
+                dao = conf.createDao();
                 if (dao instanceof Configurable)
                     ((Configurable)dao).setConf(context.getConfiguration());
                 return;
@@ -114,7 +115,8 @@ public abstract class DaoRecordReader<KT,VT> extends RecordReader<KT,VT> {
         try {
             if (input != null)
                 input.close();
-            dao.close();
+            if (dao != null)
+                dao.close();
         } catch (Exception e) {
             logger.error("Failed to close reader", e);
         }

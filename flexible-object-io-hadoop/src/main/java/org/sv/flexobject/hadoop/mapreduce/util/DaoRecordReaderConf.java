@@ -7,6 +7,7 @@ public class DaoRecordReaderConf extends HadoopPropertiesWrapper<DaoRecordReader
 
     protected String keyFieldName = DaoRecordReader.CURRENT_KEY_FIELD_NAME;
     protected String valueFieldName = DaoRecordReader.CURRENT_VALUE_FIELD_NAME;
+    protected int maxRetries = DaoRecordReader.DEFAULT_MAX_RETRIES_VALUE;
     Class<? extends MRDao> daoClass;
 
     public DaoRecordReaderConf() {
@@ -20,4 +21,21 @@ public class DaoRecordReaderConf extends HadoopPropertiesWrapper<DaoRecordReader
     public String getSubNamespace() {
         return SUBNAMESPACE;
     }
+
+    public MRDao createDao() throws IllegalAccessException, InstantiationException {
+        return daoClass.newInstance();
+    }
+
+    public String getKeyFieldName() {
+        return keyFieldName;
+    }
+
+    public String getValueFieldName() {
+        return valueFieldName;
+    }
+
+    public int getMaxRetries() {
+        return maxRetries;
+    }
+
 }
