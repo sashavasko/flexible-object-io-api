@@ -96,6 +96,14 @@ public class Schema {
         return SchemaRegistry.getInstance().getParamNamesXref(schemaName);
     }
 
+    public static Map<String, Integer> getParamNamesXref(Class<?> dataClass, String ... fields){
+        Map<String, Integer> xref = new HashMap<>();
+        int fieldIdx = 1;
+        for (String field : fields)
+            xref.put(field, fieldIdx++);
+        return xref;
+    }
+
     private void initParamXref(Class<?> dataClass) {
         for (SchemaElement f  : fields){
             paramNamesXref.put(f.getDescriptor().getName(), f.getDescriptor().getOrder()+1);

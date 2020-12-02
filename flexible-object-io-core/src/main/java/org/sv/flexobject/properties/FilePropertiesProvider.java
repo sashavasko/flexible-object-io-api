@@ -56,18 +56,23 @@ public class FilePropertiesProvider implements PropertiesProvider {
         return connectionProperties;
     }
 
+    protected PropertiesFile makeFile(String path, String name) throws IOException{
+        return new PropertiesFile(path, name);
+    }
+
+
     protected Properties findFile(String connectionName, String path, Stack<String> hierarchy) throws Exception {
-        File file = new File(path, connectionName + fileExtension);
+        PropertiesFile file = makeFile(path, connectionName + fileExtension);
         if (file.exists())
-            return filter(connectionName, hierarchy, new FileInputStream(file), true);
+            return filter(connectionName, hierarchy, file.open(), true);
         else if (hierarchy != null && !hierarchy.isEmpty()) {
             String top = hierarchy.pop();
 
-            file = new File(path, top + fileExtension);
+            file = makeFile(path, top + fileExtension);
             if (file.exists()) {
-                return filter(connectionName, hierarchy, new FileInputStream(file), false);
+                return filter(connectionName, hierarchy, file.open(), false);
             }
-            file = new File(path, top);
+            file = makeFile(path, top);
             if (file.exists() && file.isDirectory()) {
                 return findFile(connectionName, file.getPath(), hierarchy);
             }
