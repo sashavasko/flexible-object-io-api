@@ -1,13 +1,13 @@
 package org.sv.flexobject.hadoop.properties;
 
-import com.carfax.dt.streaming.connections.ConnectionManager;
-import com.carfax.dt.streaming.connections.SecretProvider;
-import com.carfax.hadoop.utils.IConfigured;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.MRJobConfig;
 import org.apache.log4j.Logger;
+import org.sv.flexobject.connections.ConnectionManager;
+import org.sv.flexobject.connections.SecretProvider;
+import org.sv.flexobject.hadoop.utils.IConfigured;
 
 import java.io.IOException;
 import java.util.Properties;

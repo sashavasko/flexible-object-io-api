@@ -15,7 +15,10 @@ public class DaoRecordReaderConfTest {
     @Test
     public void listSettings() {
         DaoRecordReaderConf conf = new DaoRecordReaderConf();
-        List<String> expectedSettings = Arrays.asList("org.sv.flexobject.hadoop.record.reader.key.field.name", "org.sv.flexobject.hadoop.record.reader.value.field.name", "org.sv.flexobject.hadoop.record.reader.dao.class");
+        List<String> expectedSettings = Arrays.asList("org.sv.flexobject.hadoop.record.reader.key.field.name",
+                "org.sv.flexobject.hadoop.record.reader.value.field.name",
+                "org.sv.flexobject.hadoop.record.reader.max.retries",
+                "org.sv.flexobject.hadoop.record.reader.dao.class");
         List<String> actualSettings = new ArrayList<>();
 
         for (SchemaElement e : Schema.getRegisteredSchema(conf.getClass()).getFields()){

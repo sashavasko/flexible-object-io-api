@@ -1,8 +1,8 @@
 package org.sv.flexobject.hadoop.mapreduce.input.batch;
 
-import org.sv.flexobject.hadoop.mapreduce.util.IConfigured;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.InputSplit;
+import org.sv.flexobject.hadoop.utils.IConfigured;
 
 import java.io.DataInput;
 import java.io.DataOutput;

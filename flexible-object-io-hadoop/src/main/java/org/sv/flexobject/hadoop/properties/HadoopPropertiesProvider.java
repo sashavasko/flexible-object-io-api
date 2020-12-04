@@ -1,8 +1,8 @@
 package org.sv.flexobject.hadoop.properties;
 
-import com.carfax.dt.streaming.properties.FilePropertiesProvider;
-import com.carfax.dt.streaming.properties.PropertiesFile;
-import com.carfax.hadoop.utils.IConfigured;
+import org.sv.flexobject.hadoop.utils.IConfigured;
+import org.sv.flexobject.properties.FilePropertiesProvider;
+import org.sv.flexobject.properties.PropertiesFile;
 
 import java.io.IOException;
 
