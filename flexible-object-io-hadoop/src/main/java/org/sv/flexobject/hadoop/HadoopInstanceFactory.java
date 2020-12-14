@@ -3,6 +3,7 @@ package org.sv.flexobject.hadoop;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,8 +25,17 @@ public class HadoopInstanceFactory {
         return get(propertyName, conf);
     }
 
+    public static Object get(final String propertyName, String defaultClassName) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        return get(propertyName, conf, defaultClassName);
+    }
+
     public static Object get(final String propertyName, Configuration conf) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        String className = conf.get(propertyName);
+        return get(propertyName, conf, null);
+    }
+
+    public static Object get(final String propertyName, Configuration conf, String defaultClassName) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+
+        String className = conf.get(propertyName, defaultClassName);
         if (StringUtils.isBlank(className))
             return null;
 
@@ -33,7 +43,7 @@ public class HadoopInstanceFactory {
         if (clazz == null)
             return null;
 
-        Object instance = clazz.newInstance();
+        Object instance = InstanceFactory.get(clazz);
 
         if (instance != null && instance instanceof Configurable)
             ((Configurable) instance).setConf(conf);
@@ -42,11 +52,19 @@ public class HadoopInstanceFactory {
     }
 
     public static Object getSingleton(final String propertyName) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        return getSingleton(propertyName, conf);
+        return getSingleton(propertyName, conf, null);
+    }
+
+    public static Object getSingleton(final String propertyName, String defaultClassName) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        return getSingleton(propertyName, conf, defaultClassName);
     }
 
     public static Object getSingleton(final String propertyName, Configuration conf) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        String className = conf.get(propertyName);
+        return getSingleton(propertyName, conf, null);
+    }
+
+    public static Object getSingleton(final String propertyName, Configuration conf, String defaultClassName) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        String className = conf.get(propertyName, defaultClassName);
         if (StringUtils.isBlank(className))
             return null;
 
