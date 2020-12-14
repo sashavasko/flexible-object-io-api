@@ -1,5 +1,6 @@
 package org.sv.flexobject.hadoop;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
 
@@ -24,8 +25,11 @@ public class HadoopInstanceFactory {
     }
 
     public static Object get(final String propertyName, Configuration conf) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        String className = conf.get(propertyName);
+        if (StringUtils.isBlank(className))
+            return null;
 
-        Class clazz = conf.getClassByName(conf.get(propertyName));
+        Class clazz = conf.getClassByName(className);
         if (clazz == null)
             return null;
 
@@ -43,6 +47,9 @@ public class HadoopInstanceFactory {
 
     public static Object getSingleton(final String propertyName, Configuration conf) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         String className = conf.get(propertyName);
+        if (StringUtils.isBlank(className))
+            return null;
+
         if (singletons.containsKey(className))
             return singletons.get(className);
 
