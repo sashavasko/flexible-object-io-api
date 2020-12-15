@@ -3,6 +3,7 @@ package org.sv.flexobject.sql;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.sv.flexobject.OutAdapter;
 import org.sv.flexobject.json.MapperFactory;
+import org.sv.flexobject.schema.Schema;
 
 import java.sql.*;
 import java.util.HashMap;
@@ -20,12 +21,7 @@ public class SqlOutAdapter implements OutAdapter, AutoCloseable {
     protected int setParametersCount = 0;
 
     public static Map<String, Integer> buildParamNameXref(String ... args){
-        int paramIdx = 1;
-        Map<String, Integer> xref = new HashMap<>();
-        for (String param : args){
-            xref.put(param, paramIdx++);
-        }
-        return xref;
+        return Schema.getParamNamesXref(null, args);
     }
 
     public SqlOutAdapter() {

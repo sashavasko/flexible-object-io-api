@@ -126,7 +126,8 @@ public class SqlInputAdapter implements InAdapter, Copyable {
     @Override
     public void close() throws Exception {
         resultSet.close();
-        preparedStatement.close();
+        if (preparedStatement != null)
+            preparedStatement.close();
     }
 
     @Override
