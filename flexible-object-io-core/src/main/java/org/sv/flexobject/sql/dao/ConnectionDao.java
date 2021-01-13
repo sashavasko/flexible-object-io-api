@@ -6,15 +6,16 @@ import org.sv.flexobject.adapter.AdapterFactory;
 import org.sv.flexobject.connections.ConnectionManager;
 import org.sv.flexobject.sql.SqlInputAdapter;
 import org.sv.flexobject.sql.SqlOutAdapter;
+import org.sv.flexobject.sql.connection.ConnectionWrapper;
 import org.sv.flexobject.util.InstanceFactory;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class ConnectionDao implements AutoCloseable{
+public class ConnectionDao extends ConnectionWrapper implements AutoCloseable{
 
     protected String connectionName;
-    protected Connection connection = null;
 
     protected AdapterFactory adapterFactory = new AdapterFactory() {
         @Override
@@ -28,8 +29,15 @@ public class ConnectionDao implements AutoCloseable{
         }
     };
 
+    public ConnectionDao(){}
+
     public ConnectionDao(String connectionName) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         this.connectionName = connectionName;
+    }
+
+    public void setConnectionName(String connectionName) {
+        this.connectionName = connectionName;
+        invalidateConnection();
     }
 
     public void setAdapterFactory(AdapterFactory adapterFactory) {
@@ -44,43 +52,13 @@ public class ConnectionDao implements AutoCloseable{
         return adapterFactory.createOutputAdapter(id);
     }
 
-    public Connection getConnection() throws SQLException {
-        setupConnection();
-        return connection;
-    }
-
-    public void setupConnection() throws SQLException {
-        if (connection == null || connection.isClosed()){
-            connection = null;
-            if (connection == null) {
-                try {
-                    connection = (Connection) ConnectionManager.getInstance().getConnection(Connection.class, connectionName);
-                } catch (Exception e) {
-                    if (e instanceof SQLException)
-                        throw (SQLException)e;
-                    throw new SQLException("Failed nto get connection from ConnectionManager", e);
-                }
-            }
-        }
-    }
-
-    public void invalidateConnection(){
+    public Connection setupConnection() throws SQLException {
         try {
-            closeConnection();
-        } catch (SQLException e) {
+            return (Connection) ConnectionManager.getInstance().getConnection(Connection.class, connectionName);
+        } catch (Exception e) {
+            if (e instanceof SQLException)
+                throw (SQLException) e;
+            throw new SQLException("Failed nto get connection from ConnectionManager", e);
         }
-        connection = null;
-    }
-
-    public void closeConnection() throws SQLException {
-        if (connection != null && !connection.isClosed())
-            connection.close();
-
-        connection = null;
-    }
-
-    @Override
-    public void close() throws Exception {
-        closeConnection();
     }
 }

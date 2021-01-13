@@ -7,6 +7,9 @@ import java.util.*;
 
 public class ConnectionManager {
 
+    // TODO add extensive Loggin for providers registration/unregistration
+
+
     private static ConnectionManager instance = null;
     private final Object lock = new Object();
 
