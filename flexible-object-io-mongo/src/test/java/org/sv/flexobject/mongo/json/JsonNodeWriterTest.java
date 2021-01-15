@@ -13,7 +13,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static com.mongodb.MongoClient.getDefaultCodecRegistry;
+import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
 import static junit.framework.TestCase.assertEquals;
 
 
@@ -28,7 +28,7 @@ public class JsonNodeWriterTest {
         );
         BasicDBObject dbObject = BasicDBObject.parse(simpleReportJson);
 
-        JsonNodeWriter writer = new JsonNodeWriter(new JsonWriterSettings());
+        JsonNodeWriter writer = new JsonNodeWriter(JsonWriterSettings.builder().build());
         Encoder encoder = getDefaultCodecRegistry().get(BasicDBObject.class);
         encoder.encode(writer,  dbObject, EncoderContext.builder().isEncodingCollectibleDocument(true).build());
 
@@ -60,9 +60,9 @@ public class JsonNodeWriterTest {
     }
 
 
-    static JsonWriterSettings jsonWriterSettings = new JsonWriterSettings();
+    static JsonWriterSettings jsonWriterSettings = JsonWriterSettings.builder().build();
     static Encoder encoder = getDefaultCodecRegistry().get(BasicDBObject.class);
-    static JsonNodeWriter writer = new JsonNodeWriter(new JsonWriterSettings());
+    static JsonNodeWriter writer = new JsonNodeWriter(jsonWriterSettings);
 
     public static String basicDBObjectToJson (BasicDBObject dbObject) throws JsonProcessingException {
 //        JsonWriter writer = new JsonWriter(new StringWriter(180000), jsonWriterSettings);

@@ -1,4 +1,10 @@
 dependencies {
-    // https://mvnrepository.com/artifact/org.mongodb/mongo-java-driver
-    compile group: 'org.mongodb', name: 'mongo-java-driver', version: '3.12.7'
+    // https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-core
+    compile group: 'org.mongodb', name: 'mongodb-driver-core', version: '4.1.1'
+
+    // https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-sync
+    compile group: 'org.mongodb', name: 'mongodb-driver-sync', version: '4.1.1'
+
+    // https://mvnrepository.com/artifact/de.bwaldvogel/mongo-java-server
+    testCompile group: 'de.bwaldvogel', name: 'mongo-java-server', version: '1.37.0'
 }

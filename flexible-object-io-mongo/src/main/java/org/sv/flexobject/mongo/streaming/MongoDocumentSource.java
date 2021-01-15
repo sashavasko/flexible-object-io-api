@@ -18,10 +18,10 @@ public class MongoDocumentSource extends MongoMapSource<MongoDocumentSource> {
         return (Document) super.get();
     }
 
-    @Override
-    public Iterator<Document> iterator() {
-        return cursor;
-    }
+//    @Override
+//    public Iterator<Document> iterator() {
+//        return cursor;
+//    }
 
     @Override
     public Document next() {

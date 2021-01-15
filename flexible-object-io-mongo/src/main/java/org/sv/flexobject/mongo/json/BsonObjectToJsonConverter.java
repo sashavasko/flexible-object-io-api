@@ -9,7 +9,7 @@ import org.bson.json.JsonWriterSettings;
 
 import java.io.IOException;
 
-import static com.mongodb.MongoClient.getDefaultCodecRegistry;
+import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
 
 public class BsonObjectToJsonConverter {
     public Encoder DBObjectEncoder = getDefaultCodecRegistry().get(DBObject.class);
