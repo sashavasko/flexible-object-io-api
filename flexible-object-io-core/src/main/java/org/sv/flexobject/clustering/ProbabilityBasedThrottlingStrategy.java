@@ -133,6 +133,11 @@ public class ProbabilityBasedThrottlingStrategy implements LoadBalanceStrategy {
         config.from(props);
     }
 
+    @Override
+    public PropertiesWrapper getConfiguration() {
+        return config;
+    }
+
     protected boolean isItMasterTurn(Cluster cluster){
         return cluster.isMasterOnline()
                 && random.nextDouble() < currentMasterProbability;

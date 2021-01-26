@@ -2,11 +2,12 @@ package org.sv.flexobject.clustering;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.sv.flexobject.properties.Configurable;
 import org.sv.flexobject.properties.PropertiesWrapper;
 
 import java.util.Map;
 
-public class LoadBalancer<Q extends ClusteredRequest, R extends ClusterResponse> {
+public class LoadBalancer<Q extends ClusteredRequest, R extends ClusterResponse> implements Configurable {
 
     Logger logger = LogManager.getLogger(LoadBalancer.class);
 
@@ -48,6 +49,12 @@ public class LoadBalancer<Q extends ClusteredRequest, R extends ClusterResponse>
         this.strategy = strategy;
     }
 
+    @Override
+    public PropertiesWrapper getConfiguration() {
+        return config;
+    }
+
+    @Override
     public void configure(Map props) throws Exception{
         config.from(props);
 

@@ -1,5 +1,7 @@
 package org.sv.flexobject.clustering;
 
+import org.sv.flexobject.properties.PropertiesWrapper;
+
 import java.util.Map;
 
 public class FirstAvailableStrategy implements LoadBalanceStrategy {
@@ -25,5 +27,10 @@ public class FirstAvailableStrategy implements LoadBalanceStrategy {
     @Override
     public void configure(Map props) throws Exception {
 
+    }
+
+    @Override
+    public PropertiesWrapper getConfiguration() {
+        return null;
     }
 }

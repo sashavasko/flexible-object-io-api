@@ -2,13 +2,14 @@ package org.sv.flexobject.clustering;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.sv.flexobject.properties.Configurable;
 import org.sv.flexobject.properties.PropertiesWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class Cluster implements AutoCloseable {
+public class Cluster implements AutoCloseable, Configurable {
     Logger logger = LogManager.getLogger(Cluster.class);
 
     public static class Configuration extends PropertiesWrapper<Configuration> {
@@ -81,8 +82,14 @@ public class Cluster implements AutoCloseable {
         return count;
     }
 
+    @Override
     public void configure(Map props) throws Exception {
         config.from(props);
+    }
+
+    @Override
+    public PropertiesWrapper getConfiguration() {
+        return config;
     }
 
     @Override
