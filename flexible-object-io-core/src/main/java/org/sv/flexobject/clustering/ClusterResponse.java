@@ -29,15 +29,15 @@ public interface ClusterResponse {
         }
     }
 
-    static ClusterResponse success(){
+    static SuccessOrFailure success(){
         return new SuccessOrFailure();
     }
 
-    static ClusterResponse failure(Exception e){
+    static SuccessOrFailure failure(Exception e){
         return new SuccessOrFailure(e);
     }
 
-    static ClusterResponse failure(String error){
+    static SuccessOrFailure failure(String error){
         return new SuccessOrFailure(new RuntimeException(error));
     }
 }
