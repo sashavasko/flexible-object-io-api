@@ -6,8 +6,9 @@ import org.sv.flexobject.properties.Configurable;
 import org.sv.flexobject.properties.PropertiesWrapper;
 
 import java.util.Map;
+import java.util.function.Function;
 
-public class LoadBalancer<Q extends ClusteredRequest, R extends ClusterResponse> implements Configurable {
+public class LoadBalancer implements Configurable {
 
     Logger logger = LogManager.getLogger(LoadBalancer.class);
 
@@ -29,6 +30,9 @@ public class LoadBalancer<Q extends ClusteredRequest, R extends ClusterResponse>
     long slaveCounter = 0;
     long nullCounter = 0;
 
+    Function<ClusterResponse, Boolean> abortOnResponse = null;
+    Function<Long, Boolean> abortOnAttemptCount = null;
+    Function<Long, Boolean> abortOnTimeout = null;
 
     public LoadBalanceStrategy getStrategy() {
         if (strategy == null && config.strategyClass != null) {
@@ -68,7 +72,7 @@ public class LoadBalancer<Q extends ClusteredRequest, R extends ClusterResponse>
             strategy.configure(props);
     }
 
-    public R handleRequest(Q request) {
+    public ClusterResponse handleRequest(ClusteredRequest request) {
 
         if (cluster == null){
             throw new RuntimeException("Cluster is not set");
@@ -76,11 +80,14 @@ public class LoadBalancer<Q extends ClusteredRequest, R extends ClusterResponse>
             throw new RuntimeException("Load Balancing Strategy is not set");
         }
 
-        R response = null;
+        ClusterResponse response = null;
         callCounter++;
+        long attempCount = 0;
+        long startTimeNanos = System.nanoTime();
         do {
+            attempCount++;
             try {
-                ClusterMember<Q,R> source = getStrategy().selectSource(cluster);
+                ClusterMember source = getStrategy().selectSource(cluster);
                 if (source != null) {
                     if (cluster.isMaster(source)) {
                         masterCounter++;
@@ -99,8 +106,11 @@ public class LoadBalancer<Q extends ClusteredRequest, R extends ClusterResponse>
                                 + ":queryTime:" + source.getLastQueryTimeMicros());
                         strategy.adjustSlaveProbability(cluster, source);
                     }
-                    if (response == null || response.isError())
-                        Thread.sleep(config.badResponseDelay);
+
+                    if (response != null && !response.isError())
+                        return response;
+
+                    Thread.sleep(config.badResponseDelay);
                 }else {
                     nullCounter++;
                     logger.debug("NULL:"
@@ -112,9 +122,27 @@ public class LoadBalancer<Q extends ClusteredRequest, R extends ClusterResponse>
                 break;
             }
 
-        }while(response == null || response.isError());
+            if ((abortOnResponse != null && abortOnResponse.apply(response))
+                    || (abortOnAttemptCount != null && abortOnAttemptCount.apply(attempCount))
+                    || (abortOnTimeout != null && abortOnTimeout.apply(System.nanoTime() - startTimeNanos))) {
+                break;
+            }
+
+        }while(true);
 
         return response;
+    }
+
+    public void setAbortOnResponse(Function<ClusterResponse, Boolean> abortOnResponse) {
+        this.abortOnResponse = abortOnResponse;
+    }
+
+    public void setAbortOnAttemptCount(Function<Long, Boolean> abortOnAttemptCount) {
+        this.abortOnAttemptCount = abortOnAttemptCount;
+    }
+
+    public void setAbortOnTimeout(Function<Long, Boolean> abortOnTimeout) {
+        this.abortOnTimeout = abortOnTimeout;
     }
 
 }
