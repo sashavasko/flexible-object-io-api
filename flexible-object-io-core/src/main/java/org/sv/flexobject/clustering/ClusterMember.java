@@ -83,8 +83,8 @@ public abstract class ClusterMember<Q extends ClusteredRequest, R extends Cluste
     }
 
     synchronized private void logError(Exception exception) {
-        logger.error("Error getting TCTs from " + connectionName + ":", exception);
-        logger.info("State of " + connectionName + " changed to " + state);
+        logger.error("Error handling request using cluster member '" + connectionName + "':", exception);
+        logger.info("State of '" + connectionName + "' changed to " + state);
     }
 
     public boolean isOffline(long retryTimeout){
