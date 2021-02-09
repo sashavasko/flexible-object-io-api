@@ -14,7 +14,7 @@ public abstract class ConnectionWrapper implements AutoCloseable {
 
     abstract public Connection setupConnection() throws SQLException;
 
-    protected void ensureConnectionIsValid() throws SQLException {
+    synchronized protected void establishConnection() throws SQLException {
         if (connection != null && connection.isClosed()) {
             logger.info("Connection " + connection + " is closed - reconnecting");
             connection = null;
@@ -29,6 +29,15 @@ public abstract class ConnectionWrapper implements AutoCloseable {
             logger.info("Established " + toString());
         }
     }
+
+
+    protected void ensureConnectionIsValid() throws SQLException {
+        if (connection != null && !connection.isClosed())
+            return;
+
+        establishConnection();
+    }
+
 
     @Override
     public String toString() {
@@ -56,7 +65,7 @@ public abstract class ConnectionWrapper implements AutoCloseable {
         return connection;
     }
 
-    public void closeConnection() throws SQLException{
+    synchronized public void closeConnection() throws SQLException{
         if (connection != null && !connection.isClosed()) {
             logger.info("Closing connection " + connection);
             connection.close();
