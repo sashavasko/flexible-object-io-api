@@ -1,5 +1,54 @@
-test { systemProperty "file.encoding", "ISO-8859-1" }
+apply plugin: 'maven'
+apply plugin: 'java'
+apply plugin: 'idea'
+group = 'org.sv'
 
-tasks.withType(JavaCompile) {
-    options.encoding = 'ISO-8859-1'
+sourceCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+ext.hadoopVersion = "3.3.0"
+
+dependencies {
+
+    implementation project(':flexible-object-io-core')
+
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+
+    compile group: 'joda-time', name: 'joda-time', version: '2.10.1'
+
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.7'
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
+
+    compile ("org.apache.hadoop:hadoop-client:3.3.0"){
+        exclude group: 'com.fasterxml.jackson.core', module:'jackson-databind'
+        exclude group: 'com.fasterxml.jackson.core', module:'jackson-core'
+    }
+
+    compile ('org.apache.parquet:parquet-hadoop:1.10.1'){
+        exclude group: 'com.fasterxml.jackson.core', module:'jackson-databind'
+        exclude group: 'com.fasterxml.jackson.core', module:'jackson-core'
+        exclude module: 'httpcomponents'
+    }
+    compile ('org.apache.parquet:parquet-avro:1.10.1'){
+        exclude group: 'com.fasterxml.jackson.core', module:'jackson-databind'
+        exclude group: 'com.fasterxml.jackson.core', module:'jackson-core'
+        exclude module: 'httpcomponents'
+    }
+    compile ("joda-time:joda-time:2.7")
+
+    testImplementation "junit:junit:4.13"
+    testImplementation 'org.mockito:mockito-core:1.9.5', {exclude group:"org.hamcrest"}
+    // https://mvnrepository.com/artifact/com.h2database/h2
+    testCompile group: 'com.h2database', name: 'h2', version: '1.4.200'
+
+    // https://mvnrepository.com/artifact/com.google.guava/guava
+    testCompile group: 'com.google.guava', name: 'guava', version: '19.0'
+    testCompile group: 'com.carrotsearch', name: 'junit-benchmarks', version: '0.7.2'
 }

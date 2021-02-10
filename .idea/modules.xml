@@ -3,6 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/1258842656/code.flexible-object-io-api.iml" filepath="$PROJECT_DIR$/.idea/modules/1258842656/code.flexible-object-io-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1934039973/flexible-object-io-api.buildSrc.iml" filepath="$PROJECT_DIR$/.idea/modules/1934039973/flexible-object-io-api.buildSrc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1934039973/flexible-object-io-api.buildSrc.main.iml" filepath="$PROJECT_DIR$/.idea/modules/1934039973/flexible-object-io-api.buildSrc.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1934039973/flexible-object-io-api.buildSrc.test.iml" filepath="$PROJECT_DIR$/.idea/modules/1934039973/flexible-object-io-api.buildSrc.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/1304285867/flexible-object-io-api.flexible-object-io-core.iml" filepath="$PROJECT_DIR$/.idea/modules/1304285867/flexible-object-io-api.flexible-object-io-core.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/1304285867/flexible-object-io-api.flexible-object-io-core.main.iml" filepath="$PROJECT_DIR$/.idea/modules/1304285867/flexible-object-io-api.flexible-object-io-core.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/1304285867/flexible-object-io-api.flexible-object-io-core.test.iml" filepath="$PROJECT_DIR$/.idea/modules/1304285867/flexible-object-io-api.flexible-object-io-core.test.iml" />

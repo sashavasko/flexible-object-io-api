@@ -8,13 +8,9 @@ sourceCompatibility = 1.8
 repositories {
     mavenLocal()
     mavenCentral()
-    maven { url 'http://packages.confluent.io/maven/' }
 }
 
-ext.hadoopVersion = "3.3.0"
-
 dependencies {
-    implementation project(':flexible-object-io-core')
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
@@ -26,13 +22,15 @@ dependencies {
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
 
+    // https://mvnrepository.com/artifact/commons-io/commons-io
+    compile group: 'commons-io', name: 'commons-io', version: '2.6'
+
+    // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.0'
+    // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.0'
+
 
     testImplementation "junit:junit:4.13"
     testImplementation 'org.mockito:mockito-core:1.9.5', {exclude group:"org.hamcrest"}
-    // https://mvnrepository.com/artifact/com.h2database/h2
-    testCompile group: 'com.h2database', name: 'h2', version: '1.4.200'
-
-    // https://mvnrepository.com/artifact/com.google.guava/guava
-    testCompile group: 'com.google.guava', name: 'guava', version: '19.0'
-    testCompile group: 'com.carrotsearch', name: 'junit-benchmarks', version: '0.7.2'
 }
