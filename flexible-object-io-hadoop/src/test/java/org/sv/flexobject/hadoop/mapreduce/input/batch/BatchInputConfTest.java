@@ -16,12 +16,12 @@ public class BatchInputConfTest {
     public void listSettings() {
         BatchInputConf conf = new BatchInputConf();
         List<String> expectedSettings = Arrays.asList(
-                "org.sv.flexobject.hadoop.input.batch.key.start",
-                "org.sv.flexobject.hadoop.input.batch.size",
-                "org.sv.flexobject.hadoop.input.batch.batches.per.split",
-                "org.sv.flexobject.hadoop.input.batch.batches.num",
-                "org.sv.flexobject.hadoop.input.batch.split.class",
-                "org.sv.flexobject.hadoop.input.batch.reader.class");
+                "org.sv.flexobject.input.batch.key.start",
+                "org.sv.flexobject.input.batch.size",
+                "org.sv.flexobject.input.batch.batches.per.split",
+                "org.sv.flexobject.input.batch.batches.num",
+                "org.sv.flexobject.input.batch.split.class",
+                "org.sv.flexobject.input.batch.reader.class");
         List<String> actualSettings = new ArrayList<>();
 
         for (SchemaElement e : Schema.getRegisteredSchema(conf.getClass()).getFields()){
