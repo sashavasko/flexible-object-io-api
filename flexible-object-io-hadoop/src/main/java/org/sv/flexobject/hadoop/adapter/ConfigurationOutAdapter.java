@@ -6,21 +6,27 @@ import org.sv.flexobject.adapter.GenericInAdapter;
 import org.sv.flexobject.adapter.GenericOutAdapter;
 import org.sv.flexobject.json.JsonOutputAdapter;
 import org.sv.flexobject.schema.DataTypes;
+import org.sv.flexobject.stream.sinks.SingleValueSink;
 import org.sv.flexobject.util.ConsumerWithException;
 
 public class ConfigurationOutAdapter extends GenericOutAdapter<Configuration> implements DynamicOutAdapter {
 
     public ConfigurationOutAdapter() {
+        super(new SingleValueSink());
     }
 
     public ConfigurationOutAdapter(Configuration configuration, String namespace){
+        this();
         setParam(GenericOutAdapter.PARAMS.fieldNameTranslator, ConfigurationInAdapter.getTranslator(namespace));
         currentRecord = configuration;
     }
 
     @Override
     public Object put(String translatedFieldName, Object value) throws Exception {
-        getCurrent().set(translatedFieldName, DataTypes.stringConverter(value));
+        if (value == null)
+            getCurrent().unset(translatedFieldName);
+        else
+            getCurrent().set(translatedFieldName, DataTypes.stringConverter(value));
         return value;
     }
 

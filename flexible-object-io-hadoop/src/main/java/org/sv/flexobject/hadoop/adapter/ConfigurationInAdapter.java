@@ -24,7 +24,7 @@ public class ConfigurationInAdapter extends GenericInAdapter<Configuration> impl
 
     @Override
     public Object get(Object translatedFieldName) {
-        return getCurrent().get(translateInputFieldName((String) translatedFieldName));
+        return getCurrent().get((String) translatedFieldName);
     }
 
     public static ConfigurationInAdapter forValue(Configuration configuration, String namespace) throws Exception {

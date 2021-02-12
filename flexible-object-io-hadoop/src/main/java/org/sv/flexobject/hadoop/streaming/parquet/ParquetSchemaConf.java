@@ -2,6 +2,7 @@ package org.sv.flexobject.hadoop.streaming.parquet;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.InputFormat;
@@ -86,12 +87,16 @@ public class ParquetSchemaConf extends HadoopPropertiesWrapper<ParquetSchemaConf
     }
 
     public static MessageType getSchema(Class<? extends StreamableWithSchema> schemaClass, JsonNode schemaJson){
-        if (schemaClass == null) {
+        if (schemaClass != null) {
             return ParquetSchema.forClass(schemaClass);
         } else if (schemaJson != null) {
             try {
-                List<Type> fields = ParquetSchema.fromJson((ArrayNode) schemaJson);
-                return new MessageType("jsonSchema", fields);
+                if (schemaJson.isArray()){
+                    List<Type> fields = ParquetSchema.fromJson((ArrayNode) schemaJson);
+                    return new MessageType("jsonSchema", fields);
+                } else {
+                    return ParquetSchema.fromJson((ObjectNode) schemaJson);
+                }
             } catch (Exception e) {
                 throw new RuntimeException("failed to parse Parquet schema JSON: \"" + schemaJson + "\"", e);
             }

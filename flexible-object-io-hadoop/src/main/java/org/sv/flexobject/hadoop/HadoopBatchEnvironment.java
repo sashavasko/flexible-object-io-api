@@ -10,7 +10,7 @@ import java.util.Properties;
 @Deprecated
 public class HadoopBatchEnvironment {
 
-    public static final String DEFAULT_NAMESPACE = "org.sv.flexobject.hadoop";
+    public static final String DEFAULT_NAMESPACE = "org.sv.flexobject";
 
     //TODO should probably rewrite it using HadoopPropertiesWrapper
 

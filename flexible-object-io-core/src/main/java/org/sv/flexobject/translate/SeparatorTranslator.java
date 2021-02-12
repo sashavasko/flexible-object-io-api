@@ -46,7 +46,7 @@ public class SeparatorTranslator implements Translator{
 
     @Override
     public String apply(String s) {
-        sb.setLength(0);
-        return translate(s, separator, sb);
+//        sb.setLength(0);
+        return translate(s, separator, new StringBuilder());
     }
 }
