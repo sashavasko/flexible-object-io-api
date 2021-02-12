@@ -16,6 +16,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class JsonWriteSupport extends SchemedWriteSupport<JsonNode, ObjectNodeWriter> {
+
+    public JsonWriteSupport() {
+    }
+
     public JsonWriteSupport(MessageType schema) {
         super(schema);
     }

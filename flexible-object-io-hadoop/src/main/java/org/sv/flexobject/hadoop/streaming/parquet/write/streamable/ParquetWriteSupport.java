@@ -10,6 +10,10 @@ import org.sv.flexobject.hadoop.streaming.parquet.write.json.JsonParquetExceptio
 import java.util.Map;
 
 public class ParquetWriteSupport extends SchemedWriteSupport<StreamableWithSchema, StreamableParquetWriter> {
+
+    public ParquetWriteSupport() {
+    }
+
     public ParquetWriteSupport(MessageType schema) {
         super(schema);
     }

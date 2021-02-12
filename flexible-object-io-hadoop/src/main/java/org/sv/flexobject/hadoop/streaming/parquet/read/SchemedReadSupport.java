@@ -6,12 +6,16 @@ import org.apache.parquet.hadoop.api.ReadSupport;
 import org.apache.parquet.io.api.GroupConverter;
 import org.apache.parquet.io.api.RecordMaterializer;
 import org.apache.parquet.schema.MessageType;
+import org.sv.flexobject.hadoop.streaming.parquet.ParquetSchemaConf;
 
 import java.util.Map;
 
 public abstract class SchemedReadSupport<T> extends ReadSupport<T> {
 
-    MessageType schema;
+    MessageType schema = null;
+
+    public SchemedReadSupport() {
+    }
 
     public SchemedReadSupport(MessageType schema) {
         this.schema = schema;
@@ -21,6 +25,11 @@ public abstract class SchemedReadSupport<T> extends ReadSupport<T> {
 
     @Override
     public ReadContext init(InitContext context) {
+        if (schema == null) {
+            ParquetSchemaConf conf = new ParquetSchemaConf().from(context.getConfiguration());
+            schema = conf.getInputSchema();
+        }
+
         return new ReadContext(schema != null ? schema : context.getFileSchema());
     }
 

@@ -1,8 +1,10 @@
 package org.sv.flexobject.hadoop.properties;
 
 import org.apache.hadoop.conf.Configuration;
+import org.sv.flexobject.OutAdapter;
 import org.sv.flexobject.hadoop.HadoopBatchEnvironment;
 import org.sv.flexobject.hadoop.adapter.ConfigurationInAdapter;
+import org.sv.flexobject.hadoop.adapter.ConfigurationOutAdapter;
 import org.sv.flexobject.properties.PropertiesWrapper;
 
 public class HadoopPropertiesWrapper<T extends HadoopPropertiesWrapper> extends PropertiesWrapper<T> {
@@ -35,6 +37,11 @@ public class HadoopPropertiesWrapper<T extends HadoopPropertiesWrapper> extends 
             }
         }
         return (T) this;
+    }
+
+    public boolean update(Configuration configuration) throws Exception {
+        ConfigurationOutAdapter.update(configuration, getNamespace(), this::save);
+        return true;
     }
 
     public String getSettingName(String fieldName){

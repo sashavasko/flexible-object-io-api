@@ -10,6 +10,8 @@ import org.apache.parquet.schema.*;
 import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.schema.*;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -169,7 +171,20 @@ public class ParquetSchema {
 
     public static MessageType forClass(String className){
         try {
-            return forClass((Class<? extends StreamableWithSchema>) Thread.currentThread().getContextClassLoader().loadClass(className));
+            Class<?> schemaClass = Thread.currentThread().getContextClassLoader().loadClass(className);
+            if (StreamableWithSchema.class.isAssignableFrom(schemaClass))
+                return forClass((Class<? extends StreamableWithSchema>)schemaClass);
+            else {
+                try {
+                    Method method = schemaClass.getMethod("getSchema");
+                    return (MessageType)method.invoke(schemaClass.newInstance());
+                } catch (NoSuchMethodException
+                        | IllegalAccessException
+                        | InstantiationException
+                        | InvocationTargetException e) {
+                    throw new RuntimeException("Requested class " + className +" must either implement StreamableWithSchema or define getSchema() method", e);
+                }
+            }
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Failed to load data class " + className, e);
         }

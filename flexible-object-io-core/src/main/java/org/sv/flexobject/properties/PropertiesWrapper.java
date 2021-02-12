@@ -2,6 +2,7 @@ package org.sv.flexobject.properties;
 
 
 import org.sv.flexobject.InAdapter;
+import org.sv.flexobject.OutAdapter;
 import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.adapter.GenericInAdapter;
 import org.sv.flexobject.adapter.MapInAdapter;

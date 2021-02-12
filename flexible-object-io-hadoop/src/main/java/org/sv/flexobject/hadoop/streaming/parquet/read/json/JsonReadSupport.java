@@ -7,6 +7,9 @@ import org.sv.flexobject.hadoop.streaming.parquet.read.SchemedReadSupport;
 
 public class JsonReadSupport extends SchemedReadSupport<ObjectNode> {
 
+    public JsonReadSupport() {
+    }
+
     public JsonReadSupport(MessageType schema) {
         super(schema);
     }
