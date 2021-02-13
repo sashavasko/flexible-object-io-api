@@ -9,6 +9,14 @@ import org.sv.flexobject.hadoop.streaming.parquet.write.SchemedParquetWriterBuil
 
 public class ParquetWriterBuilder extends SchemedParquetWriterBuilder<StreamableWithSchema, ParquetWriterBuilder> {
 
+    public static SchemedParquetWriterBuilder forPath(Path file) {
+        return new ParquetWriterBuilder (file);
+    }
+
+    public static SchemedParquetWriterBuilder forOutput(OutputFile file) {
+        return new ParquetWriterBuilder (file);
+    }
+
     public ParquetWriterBuilder(Path path) {
         super(path);
     }

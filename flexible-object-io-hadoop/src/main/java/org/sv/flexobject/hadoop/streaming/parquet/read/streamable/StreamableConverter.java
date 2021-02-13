@@ -51,7 +51,7 @@ public class StreamableConverter extends SchemedGroupConverter<StreamableWithSch
         try {
             return dataClass.newInstance();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to materialize the group " + dataClass.getName());
+            throw new RuntimeException("Failed to materialize the group " + dataClass.getName() + ". Make sure it has public default constructor.", e);
         }
     }
 

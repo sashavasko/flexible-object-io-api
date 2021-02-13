@@ -8,17 +8,22 @@ import org.apache.parquet.hadoop.util.HadoopInputFile;
 import org.apache.parquet.io.InputFile;
 import org.sv.flexobject.hadoop.streaming.parquet.read.SchemedParquetReaderBuilder;
 import org.sv.flexobject.hadoop.streaming.parquet.read.input.ByteArrayInputFile;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.IOException;
 
 public class JsonParquetReaderBuilder extends SchemedParquetReaderBuilder<ObjectNode, JsonParquetReaderBuilder> {
-    public JsonParquetReaderBuilder(InputFile file) {
-        super(file);
+
+    public static SchemedParquetReaderBuilder forPath(Configuration conf, Path file) throws IOException {
+        return new JsonParquetReaderBuilder(conf, file);
     }
 
-    @Override
-    protected JsonParquetReaderBuilder self() {
-        return this;
+    public static SchemedParquetReaderBuilder forInput(InputFile file) {
+        return new JsonParquetReaderBuilder (file);
+    }
+
+    public JsonParquetReaderBuilder(InputFile file) {
+        super(file);
     }
 
     public JsonParquetReaderBuilder(byte[] bytes) {
@@ -28,6 +33,11 @@ public class JsonParquetReaderBuilder extends SchemedParquetReaderBuilder<Object
     public JsonParquetReaderBuilder(Configuration conf, Path path) throws IOException {
         super(HadoopInputFile.fromPath(path, conf));
         withConf(conf);
+    }
+
+    @Override
+    protected JsonParquetReaderBuilder self() {
+        return this;
     }
 
     @Override

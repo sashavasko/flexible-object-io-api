@@ -354,6 +354,8 @@ public class ParquetSchema {
     }
 
     public static Type timestampField(String name, Type.Repetition repetition){
+        // TIMESTAMP_NICROS is depricated
+        // This must match converters in DataTypes class
         return new PrimitiveType(repetition, PrimitiveType.PrimitiveTypeName.INT64, name, OriginalType.TIMESTAMP_MILLIS);
     }
 

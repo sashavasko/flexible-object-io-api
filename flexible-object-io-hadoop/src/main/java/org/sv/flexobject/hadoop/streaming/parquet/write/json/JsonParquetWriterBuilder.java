@@ -13,6 +13,14 @@ import org.sv.flexobject.hadoop.streaming.parquet.write.SchemedParquetWriterBuil
 
 public class JsonParquetWriterBuilder extends SchemedParquetWriterBuilder<JsonNode, JsonParquetWriterBuilder> {
 
+    public static SchemedParquetWriterBuilder forPath(Path file) {
+        return new JsonParquetWriterBuilder (file);
+    }
+
+    public static SchemedParquetWriterBuilder forOutput(OutputFile file) {
+        return new JsonParquetWriterBuilder (file);
+    }
+
     public JsonParquetWriterBuilder(Path path) {
         super(path);
     }
