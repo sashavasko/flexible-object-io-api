@@ -177,6 +177,9 @@ public enum DataTypes {
             return Long.valueOf((String)value);
         if (value instanceof ValueNode)
             return ((ValueNode)value).asLong();
+        if (value instanceof Timestamp)
+            return ((Timestamp)value).getTime();
+
         return ((Number)value).longValue();
     }
 
@@ -242,7 +245,7 @@ public enum DataTypes {
             return new Date(((Timestamp)value).getTime());
 
         if (value instanceof Integer) {
-            // Parquet julian date?
+            // Days since Unix Epoch (see Parquet specification)
             return Date.valueOf(LocalDate.of(1970, 1, 1).plusDays((Integer) value));
         } else if (value instanceof Long)
             return new Date((Long) value);
@@ -271,6 +274,8 @@ public enum DataTypes {
             return Timestamp.valueOf((LocalDateTime)value);
         if (value instanceof Date)
             return new Timestamp(((Date)value).getTime());
+        if (value instanceof Long)
+            return new Timestamp((Long)value);
 
         throw new SchemaException("Attempting to convert value of type " + value.getClass().getName() + " to Timestamp");
     }
