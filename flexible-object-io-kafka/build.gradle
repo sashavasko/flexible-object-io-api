@@ -25,8 +25,21 @@ dependencies {
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.7'
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
+    // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.0'
+    // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.0'
 
 
+    // https://mvnrepository.com/artifact/org.apache.kafka/connect-api
+    compile group: 'org.apache.kafka', name: 'connect-api', version: '2.2.1'
+
+    // https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients
+    testCompile group: 'org.apache.kafka', name: 'kafka-clients', version: '2.3.0'
+// https://mvnrepository.com/artifact/io.confluent/kafka-avro-serializer
+    testCompile group: 'io.confluent', name: 'kafka-avro-serializer', version: '5.2.1'
+    // https://mvnrepository.com/artifact/io.confluent/kafka-schema-registry
+    testCompile group: 'io.confluent', name: 'kafka-schema-registry', version: '5.2.1'
     testImplementation "junit:junit:4.13"
     testImplementation 'org.mockito:mockito-core:1.9.5', {exclude group:"org.hamcrest"}
     // https://mvnrepository.com/artifact/com.h2database/h2
