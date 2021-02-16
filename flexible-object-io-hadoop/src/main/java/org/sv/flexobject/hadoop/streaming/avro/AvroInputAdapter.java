@@ -9,6 +9,8 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.sv.flexobject.adapter.GenericInAdapter;
 import org.sv.flexobject.json.JsonInputAdapter;
+import org.sv.flexobject.json.MapperFactory;
+import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.stream.Source;
 import org.sv.flexobject.stream.sources.SingleValueSource;
 import org.sv.flexobject.util.ConsumerWithException;
@@ -18,7 +20,6 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 
 public class AvroInputAdapter extends GenericInAdapter<GenericRecord> {
-    ObjectMapper om = null;
     Schema schema;
     public static final String PARAM_SCHEMA = "schema";
 
@@ -31,12 +32,6 @@ public class AvroInputAdapter extends GenericInAdapter<GenericRecord> {
         super(source);
     }
 
-    public ObjectMapper getObjectMapper() {
-        if (om == null)
-            om = new ObjectMapper();
-        return om;
-    }
-
     @Override
     public void setParam(String key, Object value) {
         if (PARAM_SCHEMA.equals(key))
@@ -44,19 +39,28 @@ public class AvroInputAdapter extends GenericInAdapter<GenericRecord> {
     }
 
     Object getField(String fieldName) {
-        return getCurrent().get(translateInputFieldName(fieldName));
+        String translatedFieldName = translateInputFieldName(fieldName);
+        return translatedFieldName == null ? null : getCurrent().get(translatedFieldName);
     }
 
     @Override
     public String getString(String fieldName) throws Exception {
-        Utf8 utf8 = (Utf8) getField(fieldName);
-        return utf8 == null || utf8.length() == 0 ? null : utf8.toString();
+        Object data = getField(fieldName);
+        if (data == null)
+            return null;
+
+        if (data instanceof Utf8) {
+            Utf8 utf8 = (Utf8)data;
+            return utf8 == null || utf8.length() == 0 ? null : utf8.toString();
+        }
+
+        return DataTypes.stringConverter(data);
     }
 
     @Override
     public JsonNode getJson(String fieldName) throws Exception {
         String jsonString = getString(fieldName);
-        return jsonString == null ? null : getObjectMapper().readTree(jsonString);
+        return jsonString == null ? null : MapperFactory.getObjectReader().readTree(jsonString);
     }
 
     @Override
@@ -110,13 +114,10 @@ public class AvroInputAdapter extends GenericInAdapter<GenericRecord> {
         }
     }
 
-
     @Override
     public String translateInputFieldName(String fieldName) {
-        if (schema.getField(fieldName) != null)
+        if (fieldName != null && schema.getField(fieldName) != null)
             return fieldName;
         return null;
     }
-
-
 }

@@ -41,53 +41,53 @@ public class AvroOutputAdapter extends GenericOutAdapter<GenericRecord> {
         return new GenericData.Record(schema);
     }
 
+    protected void put(String paramName, Object value){
+        String translatedName = translateOutputFieldName(paramName);
+        if (translatedName != null && value != null)
+            getCurrent().put(translatedName, value);
+    }
+
     @Override
     public void setString(String paramName, String value) throws Exception {
-        if(value!= null)
-            getCurrent().put(translateOutputFieldName(paramName), value);
+        put(paramName, value);
     }
 
     @Override
     public void setJson(String paramName, JsonNode value) throws Exception {
-        if(value!= null)
-            getCurrent().put(translateOutputFieldName(paramName), value.toString());
+        if (value != null)
+            put(paramName, value.toString());
     }
 
     @Override
     public void setInt(String paramName, Integer value) throws Exception {
-        if(value!= null)
-            getCurrent().put(translateOutputFieldName(paramName), value);
+        put(paramName, value);
     }
 
     @Override
     public void setBoolean(String paramName, Boolean value) throws Exception {
-        if(value!= null)
-            getCurrent().put(translateOutputFieldName(paramName), value);
+        put(paramName, value);
     }
 
     @Override
     public void setLong(String paramName, Long value) throws Exception {
-        if(value!= null)
-            getCurrent().put(translateOutputFieldName(paramName), value);
+        put(paramName, value);
     }
 
     @Override
     public void setDouble(String paramName, Double value) throws Exception {
-        if(value!= null)
-            getCurrent().put(translateOutputFieldName(paramName), value);
+        put(paramName, value);
     }
 
     @Override
     public void setDate(String paramName, Date value) throws Exception {
         if(value!= null)
-            getCurrent().put(translateOutputFieldName(paramName),
-                new DateTime(value.getTime(), DateTimeZone.UTC).toString(JsonInputAdapter.JSON_DATE_FORMAT));
+            put(paramName, new DateTime(value.getTime(), DateTimeZone.UTC).toString(JsonInputAdapter.JSON_DATE_FORMAT));
     }
 
     @Override
     public void setTimestamp(String paramName, Timestamp value) throws Exception {
         if(value!= null)
-            getCurrent().put(translateOutputFieldName(paramName), value.getTime());
+            put(paramName, value.getTime());
     }
 
     public static GenericRecord produce(Schema schema, ConsumerWithException<AvroOutputAdapter, Exception> consumer) throws Exception {
@@ -99,18 +99,10 @@ public class AvroOutputAdapter extends GenericOutAdapter<GenericRecord> {
         return sink.get();
     }
 
-
-    protected void put(String paramName, Object value){
-        String translatedName = translateOutputFieldName(paramName);
-        getCurrent().put(translatedName, value);
-    }
-
     @Override
     public String translateOutputFieldName(String fieldName) {
-        if(schema.getField(fieldName) != null)
+        if(fieldName != null && schema.getField(fieldName) != null)
             return fieldName;
         return null;
     }
-
-
 }
