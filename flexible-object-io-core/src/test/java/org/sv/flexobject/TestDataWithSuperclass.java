@@ -1,12 +1,14 @@
 package org.sv.flexobject;
 
 import org.sv.flexobject.schema.SchemaException;
+import org.sv.flexobject.schema.annotations.NonStreamableField;
 
 public class TestDataWithSuperclass extends TestDataWithInferredSchema {
 
     public int myInt;
     public Long myLong;
     public String myString;
+    @NonStreamableField public int nonStreamableInt;
 
     public TestDataWithSuperclass() throws NoSuchFieldException, SchemaException {
     }

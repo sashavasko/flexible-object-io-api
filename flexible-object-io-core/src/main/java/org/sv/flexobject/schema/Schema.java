@@ -5,6 +5,7 @@ import org.sv.flexobject.io.GenericReader;
 import org.sv.flexobject.io.GenericWriter;
 import org.sv.flexobject.io.Reader;
 import org.sv.flexobject.io.Writer;
+import org.sv.flexobject.schema.annotations.NonStreamableField;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -34,13 +35,21 @@ public class Schema {
         SchemaRegistry.getInstance().registerSchema(this);
     }
 
+    public static boolean isStreamableField(Field field){
+        int mods = field.getModifiers();
+        if (Modifier.isStatic(mods) || Modifier.isFinal(mods))
+            return false;
+        if (field.getAnnotation(NonStreamableField.class) != null)
+            return false;
+        return true;
+    }
+
     private void addClassFields(Class<?> dataClass, List<SchemaElement> fieldList) {
         if (dataClass != null && !StreamableWithSchema.class.equals(dataClass)) {
             Field[] fields = dataClass.getDeclaredFields();
 
             for (int order = 0; order < fields.length; ++order) {
-                int mods = fields[order].getModifiers();
-                if (!Modifier.isStatic(mods) && !Modifier.isFinal(mods)) {
+                if (isStreamableField(fields[order])) {
                     fieldList.add(new SimpleSchemaElement(dataClass, fields[order], fieldList.size()));
                 }
             }
