@@ -156,7 +156,7 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
                 "'intInMapFoo':565656," +
                 "'intInMapBar':'778877'}").replace('\'', '"')).consume(testData);
 
-        assertEquals(777, testData.intField);
+        assertEquals(777, testData.get("intField"));
         assertEquals(124567, testData.intFieldStoredAsString);
         assertNull(testData.intMap.get("foo"));
         assertNull(testData.intMap.get("bar"));
@@ -236,7 +236,7 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
         testData.intField = 456;
         testData.json = (ObjectNode) MapperFactory.getObjectReader().readTree("{'foo':'bar','yes':false}".replace('\'', '"'));
         testData.subStruct = new TestDataWithInferredSchema();
-        testData.subStruct.intField = 789;
+        testData.subStruct.set("intField", 789);
         testData.subStruct.intMap = new HashMap();
         testData.subStruct.intMap.put("a", 111);
         testData.subStruct.intMap.put("b", 222);
@@ -341,5 +341,37 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
         testData.clear();
 
         assertTrue(testData.isEmpty());
+    }
+
+
+    @Test
+    public void superclassFieldsIncluded() {
+        Schema schema = Schema.getRegisteredSchema(TestDataWithSuperclass.class);
+
+        assertEquals(11, schema.getFields().length);
+    }
+
+    @Test
+    public void convertsSuperclassToJson() throws Exception {
+        TestDataWithSuperclass testData = TestDataWithSuperclass.random();
+
+        ObjectNode json = JsonOutputAdapter.produce(testData);
+
+        System.out.println(json);
+        TestDataWithSuperclass reloaded = new TestDataWithSuperclass();
+        JsonInputAdapter.forValue(json).consume(reloaded);
+
+        assertEquals(testData, reloaded);
+
+    }
+    @Test
+    public void overridesPrivateAndProtectedAccess() throws Exception {
+        TestDataWithSuperclass testData = TestDataWithSuperclass.random();
+
+        testData.set("intField", 7777);
+        assertEquals(7777, testData.get("intField"));
+        testData.set("intFieldOptional", 777);
+        assertEquals(777, testData.get("intFieldOptional"));
+
     }
 }

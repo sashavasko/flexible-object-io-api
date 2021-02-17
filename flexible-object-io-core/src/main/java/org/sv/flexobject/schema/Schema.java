@@ -8,9 +8,7 @@ import org.sv.flexobject.io.Writer;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Schema {
 
@@ -25,29 +23,28 @@ public class Schema {
     public Schema(Class<?> dataClass) {
         this.name = dataClass.getName();
         this.isInferred = true;
-        Field[] fields = dataClass.getDeclaredFields();
+        List<SchemaElement> fieldList = new ArrayList<>();
 
-        int numOfSchemaFields = 0;
-        for (int order = 0 ; order < fields.length ; ++order) {
-            int mods = fields[order].getModifiers();
-            if (!Modifier.isStatic(mods) && !Modifier.isFinal(mods)) {
-                numOfSchemaFields++;
-            }
-        }
+        addClassFields(dataClass.getSuperclass(), fieldList);
+        addClassFields(dataClass, fieldList);
 
-        this.fields = new SchemaElement[numOfSchemaFields];
-
-        int schemaOrder = 0;
-        for (int order = 0 ; order < fields.length ; ++order){
-            int mods = fields[order].getModifiers();
-            if (!Modifier.isStatic(mods) && !Modifier.isFinal(mods)) {
-                addField(new SimpleSchemaElement(dataClass, fields[order], schemaOrder), schemaOrder);
-                schemaOrder++;
-            }
-        }
+        setFields(fieldList);
 
         initParamXref(dataClass);
         SchemaRegistry.getInstance().registerSchema(this);
+    }
+
+    private void addClassFields(Class<?> dataClass, List<SchemaElement> fieldList) {
+        if (dataClass != null && !StreamableWithSchema.class.equals(dataClass)) {
+            Field[] fields = dataClass.getDeclaredFields();
+
+            for (int order = 0; order < fields.length; ++order) {
+                int mods = fields[order].getModifiers();
+                if (!Modifier.isStatic(mods) && !Modifier.isFinal(mods)) {
+                    fieldList.add(new SimpleSchemaElement(dataClass, fields[order], fieldList.size()));
+                }
+            }
+        }
     }
 
     public Schema(Class<?> dataClass, Enum<?>[] fields) throws NoSuchFieldException, SchemaException {
@@ -78,6 +75,13 @@ public class Schema {
     private void addField(SchemaElement field, int order){
         fields[order] = field;
         fieldsByName.put(field.getDescriptor().getName(), field);
+    }
+
+    private void setFields(List<SchemaElement> fieldList){
+        this.fields = new SchemaElement[fieldList.size()];
+        int i = 0;
+        for (SchemaElement field : fieldList)
+            addField(field, i++);
     }
 
     public static boolean isRegisteredSchema(Class<?> dataClass){

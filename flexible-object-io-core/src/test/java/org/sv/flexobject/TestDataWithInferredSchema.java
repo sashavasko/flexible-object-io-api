@@ -16,8 +16,8 @@ public class TestDataWithInferredSchema extends StreamableWithSchema {
     public TestDataWithInferredSchema() throws NoSuchFieldException {
     }
 
-    public int intField;
-    public Integer intFieldOptional;
+    private int intField;
+    protected Integer intFieldOptional;
     @ScalarFieldTyped(type = DataTypes.string) public int intFieldStoredAsString;
     public Integer intFieldStoredAsStringOptional;
     // Arrays must not be arrays of primitives to allow for null values
