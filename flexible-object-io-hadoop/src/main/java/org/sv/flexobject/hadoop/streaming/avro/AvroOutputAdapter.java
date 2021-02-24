@@ -4,10 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.sv.flexobject.adapter.GenericOutAdapter;
-import org.sv.flexobject.json.JsonInputAdapter;
+import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.stream.Sink;
 import org.sv.flexobject.stream.sinks.SingleValueSink;
 import org.sv.flexobject.util.ConsumerWithException;
@@ -81,7 +79,7 @@ public class AvroOutputAdapter extends GenericOutAdapter<GenericRecord> {
     @Override
     public void setDate(String paramName, Date value) throws Exception {
         if(value!= null)
-            put(paramName, new DateTime(value.getTime(), DateTimeZone.UTC).toString(JsonInputAdapter.JSON_DATE_FORMAT));
+            put(paramName, DataTypes.int32Converter(value));
     }
 
     @Override

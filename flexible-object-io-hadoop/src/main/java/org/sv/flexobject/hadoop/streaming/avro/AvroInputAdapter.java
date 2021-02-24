@@ -85,14 +85,17 @@ public class AvroInputAdapter extends GenericInAdapter<GenericRecord> {
 
     @Override
     public Date getDate(String fieldName) throws Exception {
-        String dateString = getString(fieldName);
-        if (dateString == null)
+        Object value = getField(fieldName);
+        if (value == null)
             return null;
 
-        DateTime dt = DateTime.parse(dateString, DateTimeFormat.forPattern(JsonInputAdapter.JSON_DATE_FORMAT));
+        if (value instanceof String) {
+            DateTime dt = DateTime.parse(((String)value), DateTimeFormat.forPattern(JsonInputAdapter.JSON_DATE_FORMAT));
 
-        LocalDate ld = LocalDate.of(dt.getYear(), dt.getMonthOfYear(), dt.getDayOfMonth());
-        return Date.valueOf(ld);
+            LocalDate ld = LocalDate.of(dt.getYear(), dt.getMonthOfYear(), dt.getDayOfMonth());
+            return Date.valueOf(ld);
+        } else
+            return DataTypes.dateConverter(value);
     }
 
     @Override

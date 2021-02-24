@@ -4,13 +4,9 @@ import org.apache.parquet.hadoop.ParquetWriter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.sv.flexobject.hadoop.streaming.TestDataWithInferredSchema;
 import org.sv.flexobject.hadoop.streaming.parquet.ParquetSchema;
 import org.sv.flexobject.hadoop.streaming.parquet.write.output.ByteArrayOutputFile;
-
-import java.io.IOException;
-
-import static org.junit.Assert.*;
+import org.sv.flexobject.hadoop.streaming.testdata.TestDataWithInferredSchema;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ParquetWriterBuilderTest {
