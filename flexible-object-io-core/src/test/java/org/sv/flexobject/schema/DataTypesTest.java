@@ -127,6 +127,11 @@ public class DataTypesTest {
         assertEquals(1234565, (int)adapter.getInt("intField"));
 
         adapter.clear();
+        Date dateValue = Date.valueOf(LocalDate.now());
+        DataTypes.setInt(adapter, "intField", dateValue);
+        assertEquals(dateValue.toLocalDate().toEpochDay(), (int)adapter.getInt("intField"));
+
+        adapter.clear();
     }
 
     @Test

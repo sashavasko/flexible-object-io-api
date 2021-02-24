@@ -137,6 +137,11 @@ public enum DataTypes {
             return Integer.valueOf(((String)value).trim());
         if (value instanceof ValueNode)
             return ((ValueNode)value).asInt();
+        if (value instanceof Date) {
+            long epochDay = ((Date) value).toLocalDate().toEpochDay();
+            return (int)epochDay;
+        }
+
         return ((Number)value).intValue();
     }
 
