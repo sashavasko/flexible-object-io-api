@@ -65,7 +65,14 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
         assertEquals(777, (int)data.int32Field);
     }
 
-//    @BenchmarkOptions(benchmarkRounds = 10000000, warmupRounds = 1)
+    @Test
+    public void setArray() throws Exception {
+        Integer[] values = new Integer[]{234, 345, 567};
+        TestDataWithInferredSchema testData = new TestDataWithInferredSchema();
+        testData.set("intArray", values);
+    }
+
+    //    @BenchmarkOptions(benchmarkRounds = 10000000, warmupRounds = 1)
     @BenchmarkOptions(benchmarkRounds = 2, warmupRounds = 1)
     @Test
     public void fullyExplicit() throws Exception {

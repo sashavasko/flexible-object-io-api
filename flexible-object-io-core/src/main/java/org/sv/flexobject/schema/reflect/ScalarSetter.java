@@ -8,10 +8,7 @@ import org.sv.flexobject.json.JsonInputAdapter;
 import org.sv.flexobject.schema.SchemaException;
 import org.sv.flexobject.util.BiConsumerWithException;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ScalarSetter extends FieldWrapper implements BiConsumerWithException {
 
@@ -30,7 +27,34 @@ public class ScalarSetter extends FieldWrapper implements BiConsumerWithExceptio
     @Override
     public void accept(Object dataObject, Object value) throws Exception {
         Class<? extends StreamableWithSchema> valueClass = getValueClass();
-        if (value instanceof ArrayNode && !JsonNode.class.isAssignableFrom(getFieldClass())){
+        if (value instanceof Map) {
+            if (getStructure() != STRUCT.map)
+                throw new SchemaException(getQualifiedName() + ": Map Objects can only be converted to a Map");
+
+            Map valueMap = (Map) value;
+            setValue(dataObject, valueMap);
+        } else if (value.getClass().isArray()) {
+            Object[] valueArray = (Object[]) value;
+            if (getStructure() == STRUCT.array) {
+                Object[] objectArray = (Object[]) getValue(dataObject);
+                int i = 0;
+                for (; i < objectArray.length && i < valueArray.length; ++i){
+                    Object item = valueArray[i];
+                    if (item == null)
+                        objectArray[i] = null;
+                    else if (getValueClass() != null && getValueClass().isAssignableFrom(item.getClass())){
+                        objectArray[i] = item;
+                    } else {
+                        objectArray[i] = getType().convert(item);
+                    }
+                }
+                for (; i < objectArray.length; ++i){
+                    objectArray[i] = null;
+                }
+            } else if (getStructure() == STRUCT.list){
+                setValue(dataObject, Arrays.asList(valueArray));
+            }
+        }else if (value instanceof ArrayNode && !JsonNode.class.isAssignableFrom(getFieldClass())){
             ArrayNode arrayNode = (ArrayNode) value;
             if (getStructure() == STRUCT.array){
                 int idx = 0;
@@ -48,14 +72,14 @@ public class ScalarSetter extends FieldWrapper implements BiConsumerWithExceptio
                             throw new SchemaException(getQualifiedName() + ": Arrays of substructures must be initialized with instances, or ValueType annotation must be used.");
                         array[idx] = valueClass.newInstance();
                         ((StreamableWithSchema)array[idx]).fromJson(elemNode);
-                    } else {
+                    }else {
                         array[idx] = getType().convert(elemNode);
                     }
                     idx++;
                     if (idx >= array.length)
                         return;
                 }
-            } else if (getStructure() == STRUCT.list){
+            }else if (getStructure() == STRUCT.list){
                 int idx = 0;
                 List list = (List) getValue(dataObject);
                 for (JsonNode elemNode : arrayNode){
@@ -87,7 +111,7 @@ public class ScalarSetter extends FieldWrapper implements BiConsumerWithExceptio
                     setValue(dataObject, subStruct);
                 }
                 subStruct.fromJson((JsonNode) value);
-            } else {
+            }else {
                 if (getStructure() != STRUCT.map)
                     throw new SchemaException(getQualifiedName() + ": Json ObjectNode can only be converted to a Map");
                 Map map = (Map) getValue(dataObject);

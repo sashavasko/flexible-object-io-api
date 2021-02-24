@@ -127,6 +127,14 @@ public class Schema {
         return name;
     }
 
+    public String getSimpleName() {
+        return name.substring(name.lastIndexOf('.')+1);
+    }
+
+    public String getNamespace() {
+        return name.substring(0, name.lastIndexOf('.'));
+    }
+
     public SchemaElement[] getFields() {
         return fields;
     }
@@ -137,6 +145,10 @@ public class Schema {
 
     public FieldDescriptor getDescriptor(String fieldName) {
         return fieldsByName.get(fieldName).getDescriptor();
+    }
+
+    public FieldDescriptor getDescriptor(int i) {
+        return fields[i].getDescriptor();
     }
 
     public Map<String, Integer> getParamNamesXref() {
