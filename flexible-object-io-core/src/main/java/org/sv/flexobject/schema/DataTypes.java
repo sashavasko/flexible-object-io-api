@@ -141,6 +141,10 @@ public enum DataTypes {
             long epochDay = ((Date) value).toLocalDate().toEpochDay();
             return (int)epochDay;
         }
+        if (value instanceof LocalDate) {
+            long epochDay = ((LocalDate) value).toEpochDay();
+            return (int)epochDay;
+        }
 
         return ((Number)value).intValue();
     }
