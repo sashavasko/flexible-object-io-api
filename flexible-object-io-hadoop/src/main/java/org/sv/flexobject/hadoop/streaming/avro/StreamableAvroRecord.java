@@ -1,16 +1,11 @@
 package org.sv.flexobject.hadoop.streaming.avro;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.util.Utf8;
 import org.sv.flexobject.StreamableWithSchema;
-import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.schema.FieldDescriptor;
 import org.sv.flexobject.schema.SchemaException;
-import org.sv.flexobject.schema.reflect.FieldWrapper;
-
-import java.util.*;
 
 public class StreamableAvroRecord implements GenericRecord {
 
@@ -70,52 +65,7 @@ public class StreamableAvroRecord implements GenericRecord {
             FieldDescriptor descriptor = internalSchema.getDescriptor(i);
             Object value = descriptor.get(wrappedObject);
 
-            if (value == null)
-                return null;
-
-            DataTypes type = descriptor.getType();
-            FieldWrapper.STRUCT structure = descriptor.getStructure();
-
-            Class<? extends StreamableWithSchema> subSchema = descriptor.getSubschema();
-            if (descriptor.getSubschema() != null){
-                Schema avroSubSchema = AvroSchema.forClass(subSchema);
-                switch(structure){
-                    case array:
-                        StreamableWithSchema[] array = (StreamableWithSchema[]) value;
-                        List avroArray = new ArrayList(array.length);
-                        for (StreamableWithSchema item : array) {
-                            avroArray.add(item == null ? null : new StreamableAvroRecord(item, avroSubSchema));
-                        }
-                        return avroArray;
-                    case list:
-                        List<StreamableWithSchema> list = (List<StreamableWithSchema>) value;
-                        List avroList = new ArrayList(list.size());
-                        for (StreamableWithSchema item : list) {
-                            avroList.add(item == null ? null : new StreamableAvroRecord(item, avroSubSchema));
-                        }
-                        return avroList;
-                    case map :
-                        Map<String, StreamableWithSchema> map = (Map<String, StreamableWithSchema>) value;
-                        Map<Utf8, StreamableAvroRecord> avroMap = new HashMap<>();
-                        for (Map.Entry<String, StreamableWithSchema> entry : map.entrySet()) {
-                            StreamableWithSchema item = entry.getValue();
-                            avroMap.put(new Utf8(entry.getKey()), item == null ? null : new StreamableAvroRecord(item, avroSubSchema));
-                        }
-                        return avroMap;
-                    default:
-                        return new StreamableAvroRecord((StreamableWithSchema) value, avroSubSchema);
-                }
-            }
-
-            if (type == DataTypes.jsonNode){
-                if (structure == FieldWrapper.STRUCT.array)
-                    return Arrays.asList((Object[])value);
-                // TODO add conversion of values
-                return value instanceof JsonNode ? value.toString() : value;
-            }
-
-            Object converted = descriptor.getType().convert(value);
-            return converted;
+            return AvroSchema.toAvro(descriptor, value);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

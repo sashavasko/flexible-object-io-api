@@ -3,6 +3,8 @@ package org.sv.flexobject.hadoop.streaming.avro.write;
 import org.junit.Test;
 import org.sv.flexobject.hadoop.streaming.avro.AvroSchema;
 import org.sv.flexobject.hadoop.streaming.avro.read.AvroSource;
+import org.sv.flexobject.hadoop.streaming.testdata.ObjectWithClass;
+import org.sv.flexobject.hadoop.streaming.testdata.ObjectWithDate;
 import org.sv.flexobject.hadoop.streaming.testdata.TestDataWithSubSchema;
 import org.sv.flexobject.hadoop.streaming.testdata.TestDataWithSubSchemaInCollection;
 import org.sv.flexobject.hadoop.streaming.testdata.levelone.ObjectWithNestedObject;
@@ -66,6 +68,8 @@ public class AvroSinkTest {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         sink.builder().forOutput(os).withSchema(TestDataWithSubSchemaInCollection.class);
 
+        System.out.println(testData);
+
         sink.put(testData);
         sink.close();
 
@@ -76,4 +80,52 @@ public class AvroSinkTest {
 
         assertEquals(testData, result);
     }
+
+    @Test
+    public void writeReadWithDates() throws Exception {
+        ObjectWithDate testData = ObjectWithDate.random();
+
+        System.out.println(AvroSchema.forClass(ObjectWithDate.class));
+
+        AvroSink<ObjectWithDate> sink = new AvroSink<>();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        sink.builder().forOutput(os).withSchema(ObjectWithDate.class);
+
+        sink.put(testData);
+        sink.close();
+
+        AvroSource<ObjectWithDate> source = new AvroSource<>(ObjectWithDate.class);
+        source.builder().forInput(os.toByteArray());
+
+        ObjectWithDate result = source.get();
+
+        assertEquals(testData.dateField.toLocalDate().toEpochDay(), result.dateField.toLocalDate().toEpochDay());
+        assertEquals(testData.localDateField.toEpochDay(), result.localDateField.toEpochDay());
+        assertEquals(testData.timestampField, result.timestampField);
+    }
+
+    @Test
+    public void writeReadWithClass() throws Exception {
+        ObjectWithClass testData = ObjectWithClass.random();
+
+        System.out.println(AvroSchema.forClass(ObjectWithClass.class));
+
+        AvroSink<ObjectWithClass> sink = new AvroSink<>();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        sink.builder().forOutput(os).withSchema(ObjectWithClass.class);
+
+        sink.put(testData);
+        sink.close();
+
+        AvroSource<ObjectWithClass> source = new AvroSource<>(ObjectWithClass.class);
+        source.builder().forInput(os.toByteArray());
+
+        ObjectWithClass result = source.get();
+
+        assertEquals(testData, result);
+        // org.sv.flexobject.hadoop.streaming.testdata.ObjectWithClass<{"classField":"org.sv.flexobject.hadoop.streaming.testdata.ObjectWithDate","classArray":[null,"org.sv.flexobject.hadoop.streaming.testdata.ObjectWithClass",null,null,null],"classList":["org.sv.flexobject.hadoop.streaming.testdata.ObjectWithClass"],"classMap":{"foo":"org.sv.flexobject.hadoop.streaming.testdata.ObjectWithClass"}}> but was:
+        // org.sv.flexobject.hadoop.streaming.testdata.ObjectWithClass<{"classField":"org.sv.flexobject.hadoop.streaming.testdata.ObjectWithDate","classArray":[null,"org.sv.flexobject.hadoop.streaming.testdata.ObjectWithClass",null,null,null],"classList":["org.sv.flexobject.hadoop.streaming.testdata.ObjectWithClass"],"classMap":{"foo":"org.sv.flexobject.hadoop.streaming.testdata.ObjectWithClass"}}>
+        //	at org.junit.Assert.fail(Assert.java:89)
+    }
+
 }
