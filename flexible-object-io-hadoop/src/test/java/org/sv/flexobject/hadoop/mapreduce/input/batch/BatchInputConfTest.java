@@ -21,7 +21,13 @@ public class BatchInputConfTest {
                 "org.sv.flexobject.input.batch.batches.per.split",
                 "org.sv.flexobject.input.batch.batches.num",
                 "org.sv.flexobject.input.batch.split.class",
-                "org.sv.flexobject.input.batch.reader.class");
+                "org.sv.flexobject.input.batch.reader.class",
+                "org.sv.flexobject.input.batch.key.max.dataset.path",
+                "org.sv.flexobject.input.batch.key.max.dataset.column.name",
+                "org.sv.flexobject.input.batch.key.max.calculator",
+                "org.sv.flexobject.input.batch.key.manager",
+                "org.sv.flexobject.input.batch.key.column.name",
+                "org.sv.flexobject.input.batch.reduce.max.keys");
         List<String> actualSettings = new ArrayList<>();
 
         for (SchemaElement e : Schema.getRegisteredSchema(conf.getClass()).getFields()){
