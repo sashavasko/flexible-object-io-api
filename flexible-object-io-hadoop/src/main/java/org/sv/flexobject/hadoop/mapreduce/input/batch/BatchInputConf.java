@@ -66,7 +66,9 @@ public class BatchInputConf extends HadoopPropertiesWrapper<BatchInputConf> {
     }
 
     public BatchInputSplit getSplit() throws IllegalAccessException, InstantiationException {
-        return splitClass == null ? new BatchInputSplit() : splitClass.newInstance();
+        BatchInputSplit splitInstance = splitClass == null ? new BatchInputSplit() : splitClass.newInstance();
+        splitInstance.setConf(getConf());
+        return splitInstance;
     }
 
     public BatchRecordReader getReader() throws IllegalAccessException, InstantiationException {
@@ -82,11 +84,15 @@ public class BatchInputConf extends HadoopPropertiesWrapper<BatchInputConf> {
     }
 
     public MaxKeyCalculator getKeyMaxCalculator() throws IllegalAccessException, InstantiationException {
-        return keyMaxCalculator == null ? new ParquetMaxKeyCalculator() : keyMaxCalculator.newInstance();
+        MaxKeyCalculator maxKeyCalculatorInstance = keyMaxCalculator == null ? new ParquetMaxKeyCalculator() : keyMaxCalculator.newInstance();
+        maxKeyCalculatorInstance.setConf(getConf());
+        return maxKeyCalculatorInstance;
     }
 
     public BatchKeyManager getKeyManager() throws IllegalAccessException, InstantiationException {
-        return keyManager == null ? new BatchKeyManager() : keyManager.newInstance();
+        BatchKeyManager batchKeyManagerInstance = keyManager == null ? new BatchKeyManager() : keyManager.newInstance();
+        batchKeyManagerInstance.setConf(getConf());
+        return batchKeyManagerInstance;
     }
 
     public String getKeyColumnName() {
