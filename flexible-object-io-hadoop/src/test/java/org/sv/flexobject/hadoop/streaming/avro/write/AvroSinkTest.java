@@ -123,9 +123,6 @@ public class AvroSinkTest {
         ObjectWithClass result = source.get();
 
         assertEquals(testData, result);
-        // org.sv.flexobject.hadoop.streaming.testdata.ObjectWithClass<{"classField":"org.sv.flexobject.hadoop.streaming.testdata.ObjectWithDate","classArray":[null,"org.sv.flexobject.hadoop.streaming.testdata.ObjectWithClass",null,null,null],"classList":["org.sv.flexobject.hadoop.streaming.testdata.ObjectWithClass"],"classMap":{"foo":"org.sv.flexobject.hadoop.streaming.testdata.ObjectWithClass"}}> but was:
-        // org.sv.flexobject.hadoop.streaming.testdata.ObjectWithClass<{"classField":"org.sv.flexobject.hadoop.streaming.testdata.ObjectWithDate","classArray":[null,"org.sv.flexobject.hadoop.streaming.testdata.ObjectWithClass",null,null,null],"classList":["org.sv.flexobject.hadoop.streaming.testdata.ObjectWithClass"],"classMap":{"foo":"org.sv.flexobject.hadoop.streaming.testdata.ObjectWithClass"}}>
-        //	at org.junit.Assert.fail(Assert.java:89)
     }
 
 }
