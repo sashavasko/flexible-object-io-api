@@ -18,18 +18,18 @@ public class BatchInputFormat<VT> extends InputFormat<LongWritable, VT> {
     public List<InputSplit> getSplits(JobContext context) throws IOException, InterruptedException {
         BatchInputConf conf = new BatchInputConf().from(context.getConfiguration());
 
-        long splitsCount = (conf.batchesNum + conf.batchesPerSplit - 1)/conf.batchesPerSplit;
-        long maxControlNumber = conf.keyStart + conf.batchesNum * conf.size;
+        long splitsCount = (conf.getBatchesNum() + conf.getBatchesPerSplit() - 1)/conf.getBatchesPerSplit();
+        long maxControlNumber = conf.getKeyStart() + conf.getBatchesNum() * conf.getSize();
 
         List<InputSplit> splits = new ArrayList<>();
-        long startKey = conf.keyStart;
+        long startKey = conf.getKeyStart();
         for (int i = 0 ; i < splitsCount ; i++){
-            long batchesInSplit = conf.batchesPerSplit;
-            if (maxControlNumber - startKey < conf.batchesPerSplit)
+            long batchesInSplit = conf.getBatchesPerSplit();
+            if (maxControlNumber - startKey < conf.getBatchesPerSplit())
                 batchesInSplit = maxControlNumber - startKey;
 
             try {
-                BatchInputSplit split = conf.splitClass.newInstance();
+                BatchInputSplit split = conf.getSplit();
                 split.setConf(context.getConfiguration());
                 split.setStartKey(startKey);
                 splits.add(split);
@@ -37,7 +37,7 @@ public class BatchInputFormat<VT> extends InputFormat<LongWritable, VT> {
                 e.printStackTrace();
                 throw new RuntimeException("Failed to instantiate split", e);
             }
-            startKey += conf.size * batchesInSplit;
+            startKey += conf.getSize() * batchesInSplit;
         }
         return splits;
     }
@@ -47,8 +47,7 @@ public class BatchInputFormat<VT> extends InputFormat<LongWritable, VT> {
         try {
             return new BatchInputConf()
                     .from(context.getConfiguration())
-                    .readerClass
-                    .newInstance();
+                    .getReader();
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to instantiate record reader", e);

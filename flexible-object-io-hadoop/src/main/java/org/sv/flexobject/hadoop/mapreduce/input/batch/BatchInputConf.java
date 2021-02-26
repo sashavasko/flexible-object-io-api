@@ -6,18 +6,18 @@ public class BatchInputConf extends HadoopPropertiesWrapper<BatchInputConf> {
 
     public static final String SUBNAMESPACE = "input.batch";
 
-    public Long keyStart = 0l; //conf.getLong(CFX_BATCH_KEY_START, 0l);
-    public Integer size = 1000; //conf.getInt(BatchInputSplit.CFX_BATCH_SIZE, 1000);
-    public Integer batchesPerSplit = 200; //conf.getInt(BatchInputSplit.CFX_BATCHES_PER_SPLIT, 200);
-    public Integer batchesNum = 15000; //conf.getInt(CFX_BATCHES_NUM, 15000);
-    public Class<? extends BatchInputSplit> splitClass = BatchInputSplit.class; // conf.getClass(CFX_BATCH_SPLIT_CLASS, BatchInputSplit.class, BatchInputSplit.class);
-    public Class<? extends BatchRecordReader> readerClass = BatchRecordReader.Long.class;
-    public String keyMaxDatasetPath;
-    public String keyMaxDatasetColumnName;
-    public Class<? extends MaxKeyCalculator> keyMaxCalculator = ParquetMaxKeyCalculator.class;
-    public Class<? extends BatchKeyManager> keyManager = BatchKeyManager.class;
-    public String keyColumnName;
-    public Long reduceMaxKeys = 16000000l;
+    private Long keyStart = 0l; //conf.getLong(CFX_BATCH_KEY_START, 0l);
+    private Integer size = 1000; //conf.getInt(BatchInputSplit.CFX_BATCH_SIZE, 1000);
+    private Integer batchesPerSplit = 200; //conf.getInt(BatchInputSplit.CFX_BATCHES_PER_SPLIT, 200);
+    private Integer batchesNum = 15000; //conf.getInt(CFX_BATCHES_NUM, 15000);
+    private Class<? extends BatchInputSplit> splitClass = BatchInputSplit.class; // conf.getClass(CFX_BATCH_SPLIT_CLASS, BatchInputSplit.class, BatchInputSplit.class);
+    private Class<? extends BatchRecordReader> readerClass = BatchRecordReader.Long.class;
+    private String keyMaxDatasetPath;
+    private String keyMaxDatasetColumnName;
+    private Class<? extends MaxKeyCalculator> keyMaxCalculator = ParquetMaxKeyCalculator.class;
+    private Class<? extends BatchKeyManager> keyManager = BatchKeyManager.class;
+    private String keyColumnName;
+    private Long reduceMaxKeys = 16000000l;
 
 
     public BatchInputConf() {
@@ -35,5 +35,69 @@ public class BatchInputConf extends HadoopPropertiesWrapper<BatchInputConf> {
     public void configureMaxKeyDataset(String maxKeyDatasetPath, String keyColumnName) {
         keyMaxDatasetPath = maxKeyDatasetPath;
         keyMaxDatasetColumnName = keyColumnName;
+    }
+
+    public void setKeyColumnName(String keyColumnName) {
+        this.keyColumnName = keyColumnName;
+    }
+
+    public void setKeyStart(Long keyStart) {
+        this.keyStart = keyStart;
+    }
+
+    public void setSize(Integer size) {
+        this.size = size;
+    }
+
+    public long getKeyStart() {
+        return keyStart == null ? 0l : keyStart;
+    }
+
+    public int getSize() {
+        return size == null ? 1000 : size;
+    }
+
+    public int getBatchesPerSplit() {
+        return batchesPerSplit == null ? 200 : batchesPerSplit;
+    }
+
+    public int getBatchesNum() {
+        return batchesNum == null ? 1500 : batchesNum;
+    }
+
+    public BatchInputSplit getSplit() throws IllegalAccessException, InstantiationException {
+        return splitClass == null ? new BatchInputSplit() : splitClass.newInstance();
+    }
+
+    public BatchRecordReader getReader() throws IllegalAccessException, InstantiationException {
+        return readerClass == null ? new BatchRecordReader.Long() : readerClass.newInstance();
+    }
+
+    public String getKeyMaxDatasetPath() {
+        return keyMaxDatasetPath;
+    }
+
+    public String getKeyMaxDatasetColumnName() {
+        return keyMaxDatasetColumnName;
+    }
+
+    public MaxKeyCalculator getKeyMaxCalculator() throws IllegalAccessException, InstantiationException {
+        return keyMaxCalculator == null ? new ParquetMaxKeyCalculator() : keyMaxCalculator.newInstance();
+    }
+
+    public BatchKeyManager getKeyManager() throws IllegalAccessException, InstantiationException {
+        return keyManager == null ? new BatchKeyManager() : keyManager.newInstance();
+    }
+
+    public String getKeyColumnName() {
+        return keyColumnName;
+    }
+
+    public long getReduceMaxKeys() {
+        return reduceMaxKeys == null ? 16000000l : reduceMaxKeys;
+    }
+
+    public void setBatchesNum(int batchesNum) {
+        this.batchesNum = batchesNum;
     }
 }

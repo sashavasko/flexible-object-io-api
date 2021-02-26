@@ -36,7 +36,7 @@ public class BatchKeyManager extends Configured implements Tool {
             inputConf.from(conf);
             MaxKeyCalculator maxKeyCalculator = null;
             try {
-                maxKeyCalculator = inputConf.keyMaxCalculator.newInstance();
+                maxKeyCalculator = inputConf.getKeyMaxCalculator();
             } catch (Exception e) {
                 logger.error("Cannot get max key Calculator", e);
             }
@@ -45,20 +45,19 @@ public class BatchKeyManager extends Configured implements Tool {
             }else if (this.maxKeyCalculator != null){
                 this.maxKeyCalculator.setConf(conf);
             }
-            BatchInputConf batchInputConf = new BatchInputConf().from(conf);
-            maxKeysToProcess = batchInputConf.batchesNum * batchInputConf.size;
+            maxKeysToProcess = inputConf.getBatchesNum() * inputConf.getSize();
         }
     }
 
     public BatchKeyManager(Configuration conf, long maxKeysToProcess, String keyColumnName, MaxKeyCalculator maxKeyCalculator) {
         super(conf);
         this.maxKeysToProcess = maxKeysToProcess;
-        inputConf.keyColumnName = keyColumnName;
+        inputConf.setKeyColumnName(keyColumnName);
         this.maxKeyCalculator = maxKeyCalculator;
     }
 
     public BatchKeyManager(String keyColumnName, MaxKeyCalculator maxKeyCalculator) {
-        inputConf.keyColumnName = keyColumnName;
+        inputConf.setKeyColumnName(keyColumnName);
     }
 
     public BatchKeyManager(Configuration conf) {
@@ -96,7 +95,7 @@ public class BatchKeyManager extends Configured implements Tool {
             }
             startKey = Long.valueOf(path.getName());
             if (filesCount > 0)
-                endKey = (long) ParquetUtils.getMaxValueInFiles(getConf(), path, true, inputConf.keyColumnName);
+                endKey = (long) ParquetUtils.getMaxValueInFiles(getConf(), path, true, inputConf.getKeyColumnName());
             jobSize = FileSystemUtils.readLongFromFile(getConf(), new Path(path, JOB_SIZE_FILE_NAME));
         }
 
@@ -239,7 +238,7 @@ public class BatchKeyManager extends Configured implements Tool {
     }
 
     public void setKeyColumnName(String keyColumnName) {
-        inputConf.keyColumnName = keyColumnName;
+        inputConf.setKeyColumnName(keyColumnName);
     }
 
     public void setMaxKeyCalculator(MaxKeyCalculator maxKeyCalculator) {

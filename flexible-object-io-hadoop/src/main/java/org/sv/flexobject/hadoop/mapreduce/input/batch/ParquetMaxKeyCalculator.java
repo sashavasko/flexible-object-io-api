@@ -26,7 +26,7 @@ public class ParquetMaxKeyCalculator implements MaxKeyCalculator {
 
     @Override
     public Comparable calculateMaxKey() throws IOException {
-        logger.info("Calculating max Key in " + inputConf.keyMaxDatasetPath + " ...");
-        return ParquetUtils.getMaxValueInFiles(getConf(), new Path(inputConf.keyMaxDatasetPath), true, inputConf.keyMaxDatasetColumnName);
+        logger.info("Calculating max Key in " + inputConf.getKeyMaxDatasetPath() + " ...");
+        return ParquetUtils.getMaxValueInFiles(getConf(), new Path(inputConf.getKeyMaxDatasetPath()), true, inputConf.getKeyMaxDatasetColumnName());
     }
 }

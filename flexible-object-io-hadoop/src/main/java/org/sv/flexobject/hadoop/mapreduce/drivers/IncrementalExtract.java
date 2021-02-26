@@ -39,7 +39,7 @@ public abstract class IncrementalExtract extends ParquetMapReduceDriver {
    }
 
     public BatchKeyManager makeKeyManager(Configuration conf) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
-        return inputConf.keyManager.newInstance();
+        return inputConf.getKeyManager();
     }
 
     @Override
@@ -49,8 +49,8 @@ public abstract class IncrementalExtract extends ParquetMapReduceDriver {
     public void preConfigureJob() {
         Configuration conf = getConfiguration();
         inputConf.from(conf);
-        long batchSize = inputConf.size;
-        long batchNum = inputConf.batchesNum;
+        long batchSize = inputConf.getSize();
+        long batchNum = inputConf.getBatchesNum();
         long keysToProcess = batchSize * batchNum;
 
         jobSize = keysToProcess;
@@ -66,10 +66,10 @@ public abstract class IncrementalExtract extends ParquetMapReduceDriver {
         startKey = keyManager.getStartKey();
         logger.info("Adjusted start Key to " + startKey);
         endKey = keyManager.getEndKey();
-        inputConf.keyStart = startKey;
+        inputConf.setKeyStart(startKey);
         keysToProcess = endKey - startKey;
         batchNum = (keysToProcess + batchSize - 1)/batchSize;
-        inputConf.batchesNum = (int)batchNum;
+        inputConf.setBatchesNum((int)batchNum);
         logger.info("Adjusted last Key to " + endKey + " and batch num to " + batchNum);
         logger.info("extracting from " + startKey + " to " + endKey);
 
@@ -90,7 +90,7 @@ public abstract class IncrementalExtract extends ParquetMapReduceDriver {
             throw new RuntimeException(e);
         }
 
-        long numReduces = (keysToProcess + inputConf.reduceMaxKeys - 1)/ inputConf.reduceMaxKeys; // should produce output just under 128MB
+        long numReduces = (keysToProcess + inputConf.getReduceMaxKeys() - 1)/ inputConf.getReduceMaxKeys(); // should produce output just under 128MB        logger.info("Using " + numReduces + " reduces.");
         logger.info("Using " + numReduces + " reduces.");
         setNumReduceTasks((int) numReduces);
         super.preConfigureJob();

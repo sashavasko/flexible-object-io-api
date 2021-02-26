@@ -20,8 +20,8 @@ public class BatchInputSplit extends InputSplit implements IConfigured, Writable
     @Override
     public void reconfigure() {
         BatchInputConf conf = new BatchInputConf().from((getConf()));
-        batchSize = conf.size;
-        batchPerSplit = conf.batchesPerSplit;
+        batchSize = conf.getSize();
+        batchPerSplit = conf.getBatchesPerSplit();
     }
 
     public void setStartKey(long startKey) {
