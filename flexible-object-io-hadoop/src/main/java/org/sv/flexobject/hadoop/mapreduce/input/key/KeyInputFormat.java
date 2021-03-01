@@ -21,12 +21,10 @@ public class KeyInputFormat<KT,VT> extends InputFormat<KT, VT> {
     public List<InputSplit> getSplits(JobContext context) throws IOException, InterruptedException {
         KeyInputConf conf = new KeyInputConf().from(context.getConfiguration());
         try {
-            return conf.splitterClass
-                    .newInstance()
-                    .split(context.getConfiguration());
+            return conf.getSplitter().split(context.getConfiguration());
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Failed to instantiate splitter " + conf.splitterClass.getName(), e);
+            throw new RuntimeException("Failed to instantiate splitter", e);
         }
     }
 
@@ -35,8 +33,7 @@ public class KeyInputFormat<KT,VT> extends InputFormat<KT, VT> {
         try {
             return new KeyInputConf()
                     .from(context.getConfiguration())
-                    .readerClass
-                    .newInstance();
+                    .getReader();
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to instantiate record reader", e);

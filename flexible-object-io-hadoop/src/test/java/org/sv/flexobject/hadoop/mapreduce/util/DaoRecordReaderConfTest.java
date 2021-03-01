@@ -15,7 +15,8 @@ public class DaoRecordReaderConfTest {
     @Test
     public void listSettings() {
         DaoRecordReaderConf conf = new DaoRecordReaderConf();
-        List<String> expectedSettings = Arrays.asList("org.sv.flexobject.record.reader.key.field.name",
+        List<String> expectedSettings = Arrays.asList(
+                "org.sv.flexobject.record.reader.key.field.name",
                 "org.sv.flexobject.record.reader.value.field.name",
                 "org.sv.flexobject.record.reader.max.retries",
                 "org.sv.flexobject.record.reader.dao.class");
