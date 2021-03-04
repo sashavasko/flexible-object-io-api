@@ -10,6 +10,10 @@ public interface IConfigured extends Configurable {
 
     default void reconfigure(){};
 
+    static void setSharedConf(Configuration conf){
+        confHolder.setConf(conf);
+    }
+
     @Override
     default void setConf(Configuration conf){
         if (conf != null) {

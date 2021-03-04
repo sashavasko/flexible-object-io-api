@@ -1,6 +1,7 @@
 package org.sv.flexobject.hadoop.properties;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.MRJobConfig;
@@ -33,6 +34,8 @@ public class HadoopSecretProvider implements SecretProvider, IConfigured {
         String activeNameNode;
         if (StringUtils.isBlank(getConf().get("dfs.nameservices"))){
             activeNameNode = getConf().get("dfs.namenode.servicerpc-address");
+            if (activeNameNode == null)
+                activeNameNode = getConf().get("dfs.namenode.rpc-address");
         } else {
             try {
                 activeNameNode = getNameNodeRPC(0);
@@ -51,8 +54,12 @@ public class HadoopSecretProvider implements SecretProvider, IConfigured {
         return activeNameNode;
     }
 
+    public static String getUserName(Configuration conf){
+        return conf.get(MRJobConfig.USER_NAME, System.getProperty("user.name"));
+    }
+
     public String getUserName(){
-        return getConf().get(MRJobConfig.USER_NAME, System.getProperty("user.name"));
+        return getUserName(getConf());
     }
 
     public String getPassword(String propertyName, ConnectionManager.DeploymentLevel deploymentLevel) {

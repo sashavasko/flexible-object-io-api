@@ -51,6 +51,8 @@ dependencies {
 
     testImplementation "junit:junit:4.13"
     testImplementation 'org.mockito:mockito-core:1.9.5', {exclude group:"org.hamcrest"}
+    // https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-minicluster
+    testImplementation group: 'org.apache.hadoop', name: 'hadoop-minicluster', version: "${hadoopVersion}"
     // https://mvnrepository.com/artifact/com.h2database/h2
     testCompile group: 'com.h2database', name: 'h2', version: '1.4.200'
 

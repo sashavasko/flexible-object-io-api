@@ -34,7 +34,12 @@ public class HadoopPropertiesFile extends PropertiesFile {
     }
 
     @Override
-    public InputStream open() throws IOException {
-        return fs.open(impl);
+    public byte[] readFully() throws IOException {
+        long length = fs.getFileStatus(impl).getLen();
+        byte[] data = new byte[(int) length];
+        try( InputStream is = fs.open(impl)){
+            is.read(data);
+        }
+        return data;
     }
 }

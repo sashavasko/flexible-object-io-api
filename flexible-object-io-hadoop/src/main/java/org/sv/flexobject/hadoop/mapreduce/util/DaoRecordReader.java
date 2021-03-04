@@ -50,8 +50,8 @@ public abstract class DaoRecordReader<KT,VT> extends RecordReader<KT,VT> {
     protected void setupDao(TaskAttemptContext context) {
         DaoRecordReaderConf conf = new DaoRecordReaderConf().from(context.getConfiguration());
         Exception ee = null;
-        if (conf.isDaoConfigured())
-            throw new RuntimeException("Must specify a DAOclass extending MRDao using property " + conf.getSettingName("recordReaderDaoClass"));
+        if (!conf.isDaoConfigured())
+            throw new RuntimeException("Must specify a DAOclass extending MRDao using property " + conf.getSettingName("daoClass"));
         keyFieldName = conf.getKeyFieldName();
         valueFieldName = conf.getValueFieldName();
         for (int i = 0; i < conf.getMaxRetries() ; i++){
