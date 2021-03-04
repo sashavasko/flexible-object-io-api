@@ -83,8 +83,18 @@ public enum DataTypes {
     public static JsonNode jsonConverter(Object value) throws Exception {
         if (value == null || value instanceof JsonNode)
             return (JsonNode) value;
-        if (value instanceof String)
-            return MapperFactory.getObjectReader().readTree((String)value);
+        if (value instanceof String){
+            String string = ((String) value).trim();
+            if (string.startsWith("{") || string.startsWith("["))
+                return MapperFactory.getObjectReader().readTree(string);
+            else {
+                String[] parts = string.split(",");
+                ArrayNode jsonArray = JsonNodeFactory.instance.arrayNode(parts.length);
+                for (String part : parts)
+                    jsonArray.add(part);
+                return jsonArray;
+            }
+        }
         if (value instanceof StreamableWithSchema)
             return ((StreamableWithSchema)value).toJson();
         if (value.getClass().isArray()){
