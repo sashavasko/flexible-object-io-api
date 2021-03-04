@@ -1,6 +1,7 @@
-package org.sv.flexobject.sql.dao;
+package org.sv.flexobject.sql.providers;
 
 import org.junit.Test;
+import org.sv.flexobject.sql.providers.BasicDataSourceProvider;
 
 import java.sql.Connection;
 import java.sql.SQLException;

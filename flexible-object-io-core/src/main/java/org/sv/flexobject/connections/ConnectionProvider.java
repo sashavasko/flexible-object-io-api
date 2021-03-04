@@ -2,7 +2,7 @@ package org.sv.flexobject.connections;
 
 import java.util.Properties;
 
-public interface ConnectionProvider {
+public interface ConnectionProvider extends Provider {
 
     AutoCloseable getConnection(String name, Properties connectionProperties, Object secret) throws Exception;
 

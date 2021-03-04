@@ -6,7 +6,7 @@ import org.sv.flexobject.properties.Namespace;
 import java.util.Map;
 import java.util.Properties;
 
-public interface PropertiesProvider {
+public interface PropertiesProvider extends Provider {
 
     static  Properties fixUrl(Properties props){
         return fixUrl(props, "url");

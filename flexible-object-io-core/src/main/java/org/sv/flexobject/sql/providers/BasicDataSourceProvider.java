@@ -1,22 +1,14 @@
-package org.sv.flexobject.sql.dao;
+package org.sv.flexobject.sql.providers;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.sv.flexobject.connections.ConnectionManager;
-import org.sv.flexobject.connections.ConnectionProvider;
 
-import java.sql.Connection;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-public class BasicDataSourceProvider implements ConnectionProvider, AutoCloseable {
+public class BasicDataSourceProvider implements SqlConnectionProvider, AutoCloseable {
 
     private Map<String, BasicDataSource> dataSources = new HashMap<>();
-
-    public static void register(){
-        ConnectionManager.getInstance().registerProvider(new BasicDataSourceProvider());
-    }
 
     @Override
     public AutoCloseable getConnection(String name, Properties connectionProperties, Object secret) throws Exception {
@@ -40,13 +32,7 @@ public class BasicDataSourceProvider implements ConnectionProvider, AutoCloseabl
         return dataSource.getConnection();
     }
 
-    @Override
-    public Iterable<Class<? extends AutoCloseable>> listConnectionTypes() {
-        return Arrays.asList(Connection.class);
-    }
-
-
-    public void closeConnection(String name) throws Exception{
+    synchronized public void closeConnection(String name) throws Exception{
         BasicDataSource ds = dataSources.get(name);
         if (ds != null) {
             ds.close();

@@ -32,7 +32,11 @@ public class PropertiesFile {
         return impl.getPath();
     }
 
-    public InputStream open() throws IOException {
-        return new FileInputStream(impl);
+    public byte[] readFully() throws IOException {
+        byte[] data = new byte[(int) impl.length()];
+        try( InputStream is = new FileInputStream(impl)){
+            is.read(data);
+        }
+        return data;
     }
 }
