@@ -9,6 +9,7 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.LazyOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.log4j.Logger;
+import org.sv.flexobject.hadoop.HadoopTask;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -34,13 +35,25 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
     String jobName;
     String queueName;
 
-    public static class SwappingIdentityMapper extends Mapper {
+    public static class IdentityMapper extends Mapper {
+
+        @Override
+        protected void setup(Context context) throws IOException, InterruptedException {
+            super.setup(context);
+            try {
+                HadoopTask.configure(context.getConfiguration());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public static class SwappingIdentityMapper extends IdentityMapper {
         @Override
         protected void map(Object key, Object value, Mapper.Context context) throws IOException, InterruptedException {
             super.map(value, key, context);
         }
     }
-
 
     public SELF setInputFormatClass(Class<? extends InputFormat> inputFormatClass) {
         this.inputFormatClass = inputFormatClass;
@@ -53,7 +66,7 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
     }
 
     public SELF setIdentityMapper() {
-        this.mapperClass = Mapper.class;
+        this.mapperClass = IdentityMapper.class;
         return (SELF) this;
     }
 
