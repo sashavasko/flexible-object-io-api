@@ -32,7 +32,7 @@ public class HadoopTask extends Configured {
     }
 
     public static HadoopTaskConf getTaskConf(){
-        return getTaskConf();
+        return getInstance().taskConf;
     }
 
     public static void configure (Configuration conf) throws Exception {
