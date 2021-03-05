@@ -1,5 +1,7 @@
 package org.sv.flexobject.sql.providers;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.sv.flexobject.connections.ConnectionProvider;
 
 import java.sql.Connection;
@@ -8,6 +10,8 @@ import java.util.Arrays;
 import java.util.Properties;
 
 public class UnPooledConnectionProvider implements ConnectionProvider {
+
+    static Logger logger = LogManager.getLogger(UnPooledConnectionProvider.class);
 
     @Override
     public Iterable<Class<? extends AutoCloseable>> listConnectionTypes() {
@@ -26,6 +30,8 @@ public class UnPooledConnectionProvider implements ConnectionProvider {
         Properties propsWithPassword = new Properties();
         propsWithPassword.putAll(connectionProperties);
         propsWithPassword.put("password", secret.toString());
+
+        logger.info("connecting as " + connectionProperties.getProperty("username") + " to: " + url);
 
         return DriverManager.getConnection(url, propsWithPassword);
     }

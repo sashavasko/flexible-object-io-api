@@ -1,6 +1,8 @@
 package org.sv.flexobject.sql.providers;
 
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.sv.flexobject.connections.ConnectionProvider;
 
 import java.sql.Connection;
@@ -10,6 +12,7 @@ import java.util.Map;
 import java.util.Properties;
 
 public class BasicDataSourceProvider implements ConnectionProvider, AutoCloseable {
+    static Logger logger = LogManager.getLogger(BasicDataSourceProvider.class);
 
     private Map<String, BasicDataSource> dataSources = new HashMap<>();
 
@@ -31,8 +34,11 @@ public class BasicDataSourceProvider implements ConnectionProvider, AutoCloseabl
 
             dataSource = new BasicDataSource();
             dataSource.setDriverClassName(driverClassName);
-            dataSource.setUrl(connectionProperties.getProperty("url"));
-            dataSource.setUsername(connectionProperties.getProperty("username"));
+            String url = connectionProperties.getProperty("url");
+            String username = connectionProperties.getProperty("username");
+            logger.info("connecting as " + username + " to: " + url);
+            dataSource.setUrl(url);
+            dataSource.setUsername(username);
             if (secret != null)
                 dataSource.setPassword((String) secret);
             dataSources.put(name, dataSource);
