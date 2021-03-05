@@ -1,14 +1,22 @@
 package org.sv.flexobject.sql.providers;
 
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.sv.flexobject.connections.ConnectionProvider;
 
+import java.sql.Connection;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-public class BasicDataSourceProvider implements SqlConnectionProvider, AutoCloseable {
+public class BasicDataSourceProvider implements ConnectionProvider, AutoCloseable {
 
     private Map<String, BasicDataSource> dataSources = new HashMap<>();
+
+    @Override
+    public Iterable<Class<? extends AutoCloseable>> listConnectionTypes() {
+        return Arrays.asList(Connection.class, PooledSqlConnection.class);
+    }
 
     @Override
     public AutoCloseable getConnection(String name, Properties connectionProperties, Object secret) throws Exception {

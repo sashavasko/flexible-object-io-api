@@ -1,9 +1,19 @@
 package org.sv.flexobject.sql.providers;
 
+import org.sv.flexobject.connections.ConnectionProvider;
+
+import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.Arrays;
 import java.util.Properties;
 
-public class UnPooledConnectionProvider implements SqlConnectionProvider {
+public class UnPooledConnectionProvider implements ConnectionProvider {
+
+    @Override
+    public Iterable<Class<? extends AutoCloseable>> listConnectionTypes() {
+        return Arrays.asList(Connection.class, UnPooledSqlConnection.class);
+    }
+
     @Override
     public AutoCloseable getConnection(String name, Properties connectionProperties, Object secret) throws Exception {
 
