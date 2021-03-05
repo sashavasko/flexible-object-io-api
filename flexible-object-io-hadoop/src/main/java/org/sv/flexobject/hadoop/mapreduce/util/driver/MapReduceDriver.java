@@ -128,7 +128,8 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
     public void postConfigureJob(){}
 
     @Override
-    public void configureJob() {
+    public void configureJob() throws Exception {
+        HadoopTask.configure(getConfiguration());
 
         logger.info("Running pre-configuration procedures...");
         preConfigureJob();

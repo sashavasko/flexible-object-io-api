@@ -12,7 +12,7 @@ public abstract class ConfiguredDriver<SELF extends ConfiguredDriver> extends Ou
     String jobSubmitResult = null;
 
     Logger logger = Logger.getLogger(OutputProducer.class);
-    public abstract void configureJob();
+    public abstract void configureJob() throws Exception;
 
     @Override
     protected String getJobName() {
