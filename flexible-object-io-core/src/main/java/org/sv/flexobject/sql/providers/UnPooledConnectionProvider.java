@@ -34,7 +34,8 @@ public class UnPooledConnectionProvider implements ConnectionProvider {
             if (StringUtils.isBlank(user)) {
                 user = connectionProperties.getProperty("userName");
             }
-            amendedProps.setProperty("user", user);
+            if (user != null)
+                amendedProps.setProperty("user", user);
         }
 
         if (secret == null || connectionProperties.get("password") != null)
