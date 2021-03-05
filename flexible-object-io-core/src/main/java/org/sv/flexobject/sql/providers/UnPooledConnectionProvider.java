@@ -1,5 +1,6 @@
 package org.sv.flexobject.sql.providers;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.sv.flexobject.connections.ConnectionProvider;
@@ -22,17 +23,27 @@ public class UnPooledConnectionProvider implements ConnectionProvider {
     public AutoCloseable getConnection(String name, Properties connectionProperties, Object secret) throws Exception {
 
         Class.forName(connectionProperties.getProperty("driverClassName"));
+
+        Properties amendedProps = new Properties();
+        amendedProps.putAll(connectionProperties);
+
         String url = connectionProperties.getProperty("url");
+        String user = connectionProperties.getProperty("user");
+        if (StringUtils.isBlank(user)) {
+            user = connectionProperties.getProperty("username");
+            if (StringUtils.isBlank(user)) {
+                user = connectionProperties.getProperty("userName");
+            }
+            amendedProps.setProperty("user", user);
+        }
 
         if (secret == null || connectionProperties.get("password") != null)
-            return DriverManager.getConnection(url, connectionProperties);
+            return DriverManager.getConnection(url, amendedProps);
 
-        Properties propsWithPassword = new Properties();
-        propsWithPassword.putAll(connectionProperties);
-        propsWithPassword.put("password", secret.toString());
+        amendedProps.put("password", secret.toString());
 
-        logger.info("connecting as " + connectionProperties.getProperty("username") + " to: " + url);
+        logger.info("connecting as " + user + " to: " + url);
 
-        return DriverManager.getConnection(url, propsWithPassword);
+        return DriverManager.getConnection(url, amendedProps);
     }
 }

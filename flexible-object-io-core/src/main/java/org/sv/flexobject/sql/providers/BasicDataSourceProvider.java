@@ -1,6 +1,7 @@
 package org.sv.flexobject.sql.providers;
 
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.sv.flexobject.connections.ConnectionProvider;
@@ -35,14 +36,24 @@ public class BasicDataSourceProvider implements ConnectionProvider, AutoCloseabl
             dataSource = new BasicDataSource();
             dataSource.setDriverClassName(driverClassName);
             String url = connectionProperties.getProperty("url");
-            String username = connectionProperties.getProperty("username");
-            logger.info("connecting as " + username + " to: " + url);
+            String user = connectionProperties.getProperty("user");
+            if (StringUtils.isBlank(user)) {
+                user = connectionProperties.getProperty("username");
+            }
+            if (StringUtils.isBlank(user)) {
+                user = connectionProperties.getProperty("userName");
+            }
+
             dataSource.setUrl(url);
-            dataSource.setUsername(username);
+            dataSource.setUsername(user);
             if (secret != null)
                 dataSource.setPassword((String) secret);
+
             dataSources.put(name, dataSource);
+
+            logger.info("Created DataSource \"" + name + "\" for USER: " + user + " and URL: " + url);
         }
+
         return dataSource.getConnection();
     }
 
