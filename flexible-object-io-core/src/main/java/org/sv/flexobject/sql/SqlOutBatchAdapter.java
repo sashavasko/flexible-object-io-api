@@ -20,6 +20,7 @@ public class SqlOutBatchAdapter extends SqlOutAdapter {
     protected long recordsUpdated = 0;
     protected long commandsExecuted = 0;
     protected List<Exception> errors = new ArrayList<>();
+    protected boolean stopsOnFailure = false;
     protected long batchSize = 1000;
 
     public SqlOutBatchAdapter() {
@@ -35,7 +36,8 @@ public class SqlOutBatchAdapter extends SqlOutAdapter {
         this.batchSize = batchSize;
     }
 
-    protected void handleUpdateCounts(int[] updateCounts, BatchUpdateException batchUpdateException){
+    protected void handleUpdateCounts(int[] updateCounts, BatchUpdateException batchUpdateException) throws SQLException{
+        boolean continuedOnFailure = false;
         if (updateCounts != null) {
             commandsExecuted += updateCounts.length;
             for (int updateCount : updateCounts) {
@@ -43,8 +45,14 @@ public class SqlOutBatchAdapter extends SqlOutAdapter {
                     recordsUpdated += updateCount;
                 if (updateCount == EXECUTE_FAILED && batchUpdateException != null) {
                     errors.add(batchUpdateException.getNextException());
+                    continuedOnFailure = true;
                 }
             }
+        }
+        if (batchUpdateException != null && !continuedOnFailure){
+            stopsOnFailure = true;
+            SQLException e = batchUpdateException.getNextException();
+            throw e != null ? e : batchUpdateException;
         }
     }
 
@@ -106,6 +114,10 @@ public class SqlOutBatchAdapter extends SqlOutAdapter {
 
     public void clearErrors(){
         errors.clear();
+    }
+
+    public boolean stopsOnFailure() {
+        return stopsOnFailure;
     }
 
     public void setParam(PARAMS key, Object value) {
