@@ -36,12 +36,14 @@ public class SqlOutBatchAdapter extends SqlOutAdapter {
     }
 
     protected void handleUpdateCounts(int[] updateCounts, BatchUpdateException batchUpdateException){
-        commandsExecuted += updateCounts.length;
-        for (int updateCount : updateCounts){
-            if (updateCount >= 0)
-                recordsUpdated += updateCount;
-            if (updateCount == EXECUTE_FAILED && batchUpdateException != null) {
-                errors.add(batchUpdateException.getNextException());
+        if (updateCounts != null) {
+            commandsExecuted += updateCounts.length;
+            for (int updateCount : updateCounts) {
+                if (updateCount >= 0)
+                    recordsUpdated += updateCount;
+                if (updateCount == EXECUTE_FAILED && batchUpdateException != null) {
+                    errors.add(batchUpdateException.getNextException());
+                }
             }
         }
     }
