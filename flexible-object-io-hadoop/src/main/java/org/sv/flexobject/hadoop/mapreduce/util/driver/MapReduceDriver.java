@@ -262,7 +262,9 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
         if (jobNameFromConf != null)
             return jobNameFromConf;
 
-        return jobName != null ? jobName : driverClass.getSimpleName();
+        return jobName != null ? jobName
+                : driverClass != null ? driverClass.getSimpleName()
+                : getClass().getSimpleName();
     }
 
     @Override

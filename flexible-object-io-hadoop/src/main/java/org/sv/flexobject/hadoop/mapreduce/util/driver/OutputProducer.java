@@ -73,14 +73,12 @@ public abstract class OutputProducer<SELF extends OutputProducer> extends Config
         if (cmd.hasOption("i")) {
             defineInputs(Arrays.asList(cmd.getOptionValue("i").split(",")));
         } else {
-            errorMessageToDisplay += "input folder needed\n";
-            throwIllegalArguemntException = true;
+            logger.warn("Input path is not specified (use -i <path> command line option to specify)");
         }
         if (cmd.hasOption("o")) {
             defineOutput(new Path(cmd.getOptionValue("o")));
         } else {
-            errorMessageToDisplay += "output folder needed\n";
-            throwIllegalArguemntException = true;
+            logger.warn("Output path is not specified (use -o <path> command line option to specify)");
         }
 
         if(cmd.getOptions().length == 0 || cmd.hasOption("h") || throwIllegalArguemntException){
@@ -196,10 +194,12 @@ public abstract class OutputProducer<SELF extends OutputProducer> extends Config
     }
 
     public void cleanupOutput() throws IOException {
-        FileSystem fs = getHDFS();
-        if (fs.exists(outputPath)) {
-            logger.info("Output path " + outputPath + " exists, will be deleted.");
-            deletePath(fs, outputPath);
+        if (outputPath != null) {
+            FileSystem fs = getHDFS();
+            if (fs.exists(outputPath)) {
+                logger.info("Output path " + outputPath + " exists, will be deleted.");
+                deletePath(fs, outputPath);
+            }
         }
     }
 
