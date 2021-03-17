@@ -228,7 +228,8 @@ public abstract class OutputProducer<SELF extends OutputProducer> extends Config
     }
 
     protected SELF setOutputToNoOutput(){
-        job.setOutputFormatClass(NoOutputFormat.class);
+        if (job != null)
+            job.setOutputFormatClass(NoOutputFormat.class);
         return (SELF) this;
     }
 

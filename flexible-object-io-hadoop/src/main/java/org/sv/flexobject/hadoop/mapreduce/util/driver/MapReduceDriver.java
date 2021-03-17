@@ -131,12 +131,21 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
     public void configureJob() throws Exception {
         HadoopTask.configure(getConfiguration());
 
+        if (driverClass == null){
+            setDriver(this);
+        }
+
         logger.info("Running pre-configuration procedures...");
         preConfigureJob();
 
-        logger.info("Configuring the job...");
+        logger.info("Driver class is set to " + driverClass);
+        logger.info("Configuring the job " + getJobName() + " ...");
+
         Configuration conf = getConfiguration();
         if (isUnconfigured(conf, Job.MAP_CLASS_ATTR)) {
+            if (mapperClass == null){
+                throw new RuntimeException("Mapper class must be set");
+            }
             job.setMapperClass(mapperClass);
             if (isUnconfigured(conf, "mapreduce.job.running.map.limit")
                     || conf.getInt("mapreduce.job.running.map.limit", 0) == 0) {
@@ -153,6 +162,8 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
         }
 
         if (isUnconfigured(conf, Job.INPUT_FORMAT_CLASS_ATTR)) {
+            if (inputFormatClass == null)
+                throw new RuntimeException("Input format class must be set");
             job.setInputFormatClass(inputFormatClass);
             logger.info("Set input format to " + inputFormatClass.getName());
         }
@@ -160,6 +171,9 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
         if (keyMapOutClass != null || isConfigured(conf, Job.MAP_OUTPUT_KEY_CLASS)) {
             if (isUnconfigured(conf, Job.MAP_OUTPUT_KEY_CLASS)) {
                 job.setMapOutputKeyClass(keyMapOutClass);
+                if (valueMapOutClass == null)
+                    throw new RuntimeException("Map output value class must be set");
+
                 job.setMapOutputValueClass(valueMapOutClass);
                 logger.info("Set map output to (" + keyMapOutClass + ", " + valueMapOutClass + ")");
             }
@@ -168,8 +182,14 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
             logger.info("Enabled snappy compression for Mapper output");
 
             if (isUnconfigured(conf, Job.REDUCE_CLASS_ATTR)) {
-                job.setReducerClass(reducerClass);
-                logger.info("Set reducer to " + reducerClass);
+                if (reducerClass == null){
+                    logger.warn("Reducer class is not set - disabling Reduce phase");
+                    job.setNumReduceTasks(0);
+                    numReduceTasks = null;
+                }else {
+                    job.setReducerClass(reducerClass);
+                    logger.info("Set reducer to " + reducerClass);
+                }
             }
             if (numReduceTasks != null) {
                 job.setNumReduceTasks(numReduceTasks);
@@ -180,15 +200,32 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
             logger.info("Disabled reduce phase");
         }
 
-        if (isUnconfigured(conf, Job.OUTPUT_KEY_CLASS)) {
-            job.setOutputKeyClass(keyOutClass);
-            job.setOutputValueClass(valueOutClass);
-            logger.info( "Set job output to (" + keyOutClass + ", " + valueOutClass + ")");
+        if (isUnconfigured(conf, Job.OUTPUT_KEY_CLASS)){
+            if (keyOutClass != null) {
+                job.setOutputKeyClass(keyOutClass);
+                logger.info( "Set job output key to " + keyOutClass);
+            } else {
+                logger.warn( "Job output key class is not set. Disabling job Output...");
+                LazyOutputFormat.setOutputFormatClass(job, TextOutputFormat.class);
+            }
+        }
+
+        if (isUnconfigured(conf, Job.OUTPUT_VALUE_CLASS)){
+            if (valueOutClass != null) {
+                job.setOutputValueClass(valueOutClass);
+                logger.info( "Set job output value to " + valueOutClass);
+            }else {
+                logger.warn( "Job output value class is not set. Disabling job Output...");
+                LazyOutputFormat.setOutputFormatClass(job, TextOutputFormat.class);
+            }
         }
 
         if (isUnconfigured(conf, Job.OUTPUT_FORMAT_CLASS_ATTR)) {
-            if (outputFormatClass == TextOutputFormat.class) {
-                LazyOutputFormat.setOutputFormatClass(job, outputFormatClass);
+            if (outputFormatClass == null) {
+                logger.warn( "Job output format class is not set. Using Lazy Text Output format...");
+                LazyOutputFormat.setOutputFormatClass(job, TextOutputFormat.class);
+            }else if (outputFormatClass == TextOutputFormat.class) {
+                LazyOutputFormat.setOutputFormatClass(job, TextOutputFormat.class);
                 logger.info("Set output format to " + outputFormatClass + " (lazy)");
             }else{
                 job.setOutputFormatClass(outputFormatClass);

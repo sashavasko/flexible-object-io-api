@@ -8,7 +8,7 @@ import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.log4j.Logger;
 import org.sv.flexobject.InAdapter;
-import org.sv.flexobject.hadoop.HadoopBatchEnvironment;
+import org.sv.flexobject.hadoop.HadoopTask;
 
 import java.io.IOException;
 
@@ -81,7 +81,11 @@ public abstract class DaoRecordReader<KT,VT> extends RecordReader<KT,VT> {
 
     @Override
     public void initialize(InputSplit split, TaskAttemptContext context) throws IOException, InterruptedException {
-        HadoopBatchEnvironment.setConfiguration(context.getConfiguration());
+        try {
+            HadoopTask.configure(context.getConfiguration());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize Dao Record Reader", e);
+        }
         this.split = split;
         setupDao(context);
     }
