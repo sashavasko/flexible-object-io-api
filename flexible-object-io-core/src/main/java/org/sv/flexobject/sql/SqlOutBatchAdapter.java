@@ -1,7 +1,13 @@
 package org.sv.flexobject.sql;
 
+import java.sql.BatchUpdateException;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+
+import static java.sql.Statement.EXECUTE_FAILED;
 
 public class SqlOutBatchAdapter extends SqlOutAdapter {
 
@@ -11,6 +17,9 @@ public class SqlOutBatchAdapter extends SqlOutAdapter {
 
     protected long recordsAdded = 0;
     protected long recordsExecuted = 0;
+    protected long recordsUpdated = 0;
+    protected long commandsExecuted = 0;
+    protected List<Exception> errors = new ArrayList<>();
     protected long batchSize = 1000;
 
     public SqlOutBatchAdapter() {
@@ -26,13 +35,32 @@ public class SqlOutBatchAdapter extends SqlOutAdapter {
         this.batchSize = batchSize;
     }
 
+    protected void handleUpdateCounts(int[] updateCounts, BatchUpdateException batchUpdateException){
+        commandsExecuted += updateCounts.length;
+        for (int updateCount : updateCounts){
+            if (updateCount >= 0)
+                recordsUpdated += updateCount;
+            if (updateCount == EXECUTE_FAILED && batchUpdateException != null) {
+                errors.add(batchUpdateException.getNextException());
+            }
+        }
+    }
+
+    protected void executeBatch() throws SQLException {
+        try {
+            handleUpdateCounts(preparedStatement.executeBatch(), null);
+        } catch (BatchUpdateException batchUpdateException){
+            handleUpdateCounts(batchUpdateException.getUpdateCounts(), batchUpdateException);
+        }
+        recordsExecuted = recordsAdded;
+    }
+
     @Override
     public SqlOutAdapter save() throws Exception {
         preparedStatement.addBatch();
         ++recordsAdded;
         if (recordsAdded  >= recordsExecuted + batchSize) {
             preparedStatement.executeBatch();
-            recordsExecuted = recordsAdded;
         }
         clearParameters();
         return this;
@@ -41,8 +69,7 @@ public class SqlOutBatchAdapter extends SqlOutAdapter {
 
     @Override
     public void close() throws Exception {
-        preparedStatement.executeBatch();
-        recordsExecuted = recordsAdded;
+        executeBatch();
         super.close();
     }
 
@@ -61,6 +88,22 @@ public class SqlOutBatchAdapter extends SqlOutAdapter {
 
     public long getRecordsExecuted() {
         return recordsExecuted;
+    }
+
+    public long getRecordsUpdated() {
+        return recordsUpdated;
+    }
+
+    public long getCommandsExecuted() {
+        return commandsExecuted;
+    }
+
+    public List<Exception> getErrors() {
+        return errors;
+    }
+
+    public void clearErrors(){
+        errors.clear();
     }
 
     public void setParam(PARAMS key, Object value) {
