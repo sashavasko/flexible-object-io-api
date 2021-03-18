@@ -206,7 +206,7 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
                 logger.info( "Set job output key to " + keyOutClass);
             } else {
                 logger.warn( "Job output key class is not set. Disabling job Output...");
-                LazyOutputFormat.setOutputFormatClass(job, TextOutputFormat.class);
+                setOutputToNoOutput();
             }
         }
 
@@ -216,14 +216,14 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
                 logger.info( "Set job output value to " + valueOutClass);
             }else {
                 logger.warn( "Job output value class is not set. Disabling job Output...");
-                LazyOutputFormat.setOutputFormatClass(job, TextOutputFormat.class);
+                setOutputToNoOutput();
             }
         }
 
         if (isUnconfigured(conf, Job.OUTPUT_FORMAT_CLASS_ATTR)) {
             if (outputFormatClass == null) {
-                logger.warn( "Job output format class is not set. Using Lazy Text Output format...");
-                LazyOutputFormat.setOutputFormatClass(job, TextOutputFormat.class);
+                logger.warn( "Job output format class is not set. Disabling job output...");
+                setOutputToNoOutput();
             }else if (outputFormatClass == TextOutputFormat.class) {
                 LazyOutputFormat.setOutputFormatClass(job, TextOutputFormat.class);
                 logger.info("Set output format to " + outputFormatClass + " (lazy)");
