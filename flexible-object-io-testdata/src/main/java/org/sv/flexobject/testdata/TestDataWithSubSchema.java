@@ -1,4 +1,4 @@
-package org.sv.flexobject.hadoop.streaming.testdata;
+package org.sv.flexobject.testdata;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.sv.flexobject.StreamableWithSchema;

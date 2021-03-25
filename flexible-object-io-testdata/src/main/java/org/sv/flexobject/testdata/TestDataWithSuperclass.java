@@ -1,4 +1,4 @@
-package org.sv.flexobject;
+package org.sv.flexobject.testdata;
 
 import org.sv.flexobject.schema.SchemaException;
 import org.sv.flexobject.schema.annotations.NonStreamableField;

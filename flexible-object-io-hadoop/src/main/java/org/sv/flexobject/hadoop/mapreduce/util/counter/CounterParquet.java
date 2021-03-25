@@ -6,6 +6,7 @@ import org.apache.hadoop.mapreduce.TaskAttemptID;
 import org.apache.parquet.hadoop.ParquetFileWriter;
 import org.apache.parquet.hadoop.ParquetWriter;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
+import org.sv.flexobject.hadoop.HadoopTask;
 import org.sv.flexobject.hadoop.streaming.parquet.write.streamable.ParquetWriterBuilder;
 
 import java.sql.Timestamp;
@@ -66,7 +67,7 @@ public class CounterParquet extends Counter implements AutoCloseable {
 
     protected Path makeCounterPath(Configuration conf, TaskAttemptID taskId) {
         // TODO change property name
-        String counterLocation = conf.get("cfx.hadoop.parquet.counters");
+        String counterLocation = conf.get(HadoopTask.getTaskConf().getNamespace() + ".parquet.counters");
         String fileName = counterLocation + "/counter_for_" + taskId + ".snappy.parquet";
         return new Path (fileName);
     }

@@ -1,7 +1,7 @@
-package org.sv.flexobject.hadoop.streaming.testdata.levelone;
+package org.sv.flexobject.testdata.levelone;
 
 import org.sv.flexobject.StreamableWithSchema;
-import org.sv.flexobject.hadoop.streaming.testdata.levelone.leveltwo.SimpleObject;
+import org.sv.flexobject.testdata.levelone.leveltwo.SimpleObject;
 
 public class ObjectWithNestedObject extends StreamableWithSchema {
     int intField;

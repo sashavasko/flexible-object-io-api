@@ -20,8 +20,14 @@ public class SqlOutBatchAdapter extends SqlOutAdapter {
     protected long recordsUpdated = 0;
     protected long commandsExecuted = 0;
     protected List<Exception> errors = new ArrayList<>();
+    /*
+     * Databases that will stop batch on first exception :
+     *    Oracle
+     * Databases that will continue batch after first exception :
+     */
+
     protected boolean stopsOnFailure = false;
-    protected long batchSize = 1000;
+    protected long batchSize = 30; // large batch sizes use more memory without much improvement in performance
 
     public SqlOutBatchAdapter() {
     }
@@ -70,7 +76,7 @@ public class SqlOutBatchAdapter extends SqlOutAdapter {
         preparedStatement.addBatch();
         ++recordsAdded;
         if (recordsAdded  >= recordsExecuted + batchSize) {
-            preparedStatement.executeBatch();
+            executeBatch();
         }
         clearParameters();
         return this;

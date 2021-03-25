@@ -3,10 +3,10 @@ package org.sv.flexobject.hadoop.streaming.parquet;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.parquet.schema.MessageType;
 import org.junit.Test;
-import org.sv.flexobject.hadoop.streaming.testdata.TestDataWithInferredSchema;
-import org.sv.flexobject.hadoop.streaming.testdata.TestDataWithSubSchema;
-import org.sv.flexobject.hadoop.streaming.testdata.TestDataWithSubSchemaInCollection;
 import org.sv.flexobject.json.MapperFactory;
+import org.sv.flexobject.testdata.TestDataWithInferredSchema;
+import org.sv.flexobject.testdata.TestDataWithSubSchema;
+import org.sv.flexobject.testdata.TestDataWithSubSchemaInCollection;
 
 import java.io.IOException;
 
@@ -28,7 +28,7 @@ public class ParquetSchemaTest {
     public void forTestDataWithInferredSchema() {
         MessageType parquetSchema = ParquetSchema.forClass(TestDataWithInferredSchema.class);
 
-        assertEquals("message org.sv.flexobject.hadoop.streaming.testdata.TestDataWithInferredSchema {\n" +
+        assertEquals("message org.sv.flexobject.testdata.TestDataWithInferredSchema {\n" +
                 "  optional int32 intField;\n" +
                 "  optional int32 intFieldOptional;\n" +
                 "  optional binary intFieldStoredAsString (UTF8);\n" +
@@ -56,7 +56,7 @@ public class ParquetSchemaTest {
     public void forTestDataWithSubSchema() {
         MessageType parquetSchema = ParquetSchema.forClass(TestDataWithSubSchema.class);
 
-        assertEquals("message org.sv.flexobject.hadoop.streaming.testdata.TestDataWithSubSchema {\n" +
+        assertEquals("message org.sv.flexobject.testdata.TestDataWithSubSchema {\n" +
                 "  optional int32 intField;\n" +
                 "  optional int32 intFieldOptional;\n" +
                 "  optional binary json (JSON);\n" +
@@ -89,7 +89,7 @@ public class ParquetSchemaTest {
     public void forTestDataWithSubSchemaInCollection() {
         MessageType parquetSchema = ParquetSchema.forClass(TestDataWithSubSchemaInCollection.class);
 
-        assertEquals("message org.sv.flexobject.hadoop.streaming.testdata.TestDataWithSubSchemaInCollection {\n" +
+        assertEquals("message org.sv.flexobject.testdata.TestDataWithSubSchemaInCollection {\n" +
                 "  optional int32 intField;\n" +
                 "  optional int32 intFieldOptional;\n" +
                 "  optional binary json (JSON);\n" +

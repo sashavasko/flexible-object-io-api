@@ -1,5 +1,6 @@
-package org.sv.flexobject;
+package org.sv.flexobject.testdata;
 
+import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.schema.annotations.EnumSetField;
 
 import java.util.EnumSet;

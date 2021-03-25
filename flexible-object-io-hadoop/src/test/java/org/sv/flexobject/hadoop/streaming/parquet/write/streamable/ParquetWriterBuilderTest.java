@@ -6,7 +6,7 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sv.flexobject.hadoop.streaming.parquet.ParquetSchema;
 import org.sv.flexobject.hadoop.streaming.parquet.write.output.ByteArrayOutputFile;
-import org.sv.flexobject.hadoop.streaming.testdata.TestDataWithInferredSchema;
+import org.sv.flexobject.testdata.TestDataWithInferredSchema;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ParquetWriterBuilderTest {

@@ -8,8 +8,8 @@ import org.sv.flexobject.hadoop.mapreduce.input.parquet.JsonParquetInputFormat;
 import org.sv.flexobject.hadoop.mapreduce.input.parquet.StreamableParquetInputFormat;
 import org.sv.flexobject.hadoop.mapreduce.output.parquet.JsonParquetOutputFormat;
 import org.sv.flexobject.hadoop.mapreduce.output.parquet.StreamableParquetOutputFormat;
-import org.sv.flexobject.hadoop.streaming.testdata.TestDataWithSubSchema;
-import org.sv.flexobject.hadoop.streaming.testdata.TestDataWithSubSchemaInCollection;
+import org.sv.flexobject.testdata.TestDataWithSubSchema;
+import org.sv.flexobject.testdata.TestDataWithSubSchemaInCollection;
 
 import static org.junit.Assert.*;
 

@@ -3,11 +3,11 @@ package org.sv.flexobject.hadoop.streaming.avro.write;
 import org.junit.Test;
 import org.sv.flexobject.hadoop.streaming.avro.AvroSchema;
 import org.sv.flexobject.hadoop.streaming.avro.read.AvroSource;
-import org.sv.flexobject.hadoop.streaming.testdata.ObjectWithClass;
-import org.sv.flexobject.hadoop.streaming.testdata.ObjectWithDate;
-import org.sv.flexobject.hadoop.streaming.testdata.TestDataWithSubSchema;
-import org.sv.flexobject.hadoop.streaming.testdata.TestDataWithSubSchemaInCollection;
-import org.sv.flexobject.hadoop.streaming.testdata.levelone.ObjectWithNestedObject;
+import org.sv.flexobject.testdata.ObjectWithClass;
+import org.sv.flexobject.testdata.ObjectWithDate;
+import org.sv.flexobject.testdata.TestDataWithSubSchema;
+import org.sv.flexobject.testdata.TestDataWithSubSchemaInCollection;
+import org.sv.flexobject.testdata.levelone.ObjectWithNestedObject;
 
 import java.io.ByteArrayOutputStream;
 

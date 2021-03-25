@@ -2,11 +2,11 @@ package org.sv.flexobject.hadoop.streaming.avro;
 
 import org.apache.avro.generic.GenericRecord;
 import org.junit.Test;
-import org.sv.flexobject.hadoop.streaming.testdata.ObjectWithDate;
+import org.sv.flexobject.testdata.ObjectWithDate;
 
 import java.sql.Date;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class AvroOutputAdapterTest {
 

@@ -1,9 +1,7 @@
 package org.sv.flexobject.sql.providers;
 
 import org.junit.Test;
-import org.sv.flexobject.sql.providers.BasicDataSourceProvider;
 
-import javax.sql.PooledConnection;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -47,6 +45,6 @@ public class BasicDataSourceProviderTest {
 
     @Test
     public void listConnectionTypes() {
-        assertEquals(Arrays.asList(Connection.class, PooledConnection.class),new BasicDataSourceProvider().listConnectionTypes());
+        assertEquals(Arrays.asList(Connection.class, PooledSqlConnection.class),new BasicDataSourceProvider().listConnectionTypes());
     }
 }

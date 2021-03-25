@@ -1,6 +1,7 @@
-package org.sv.flexobject;
+package org.sv.flexobject.testdata;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.schema.FieldDescriptor;
 import org.sv.flexobject.schema.SchemaElement;

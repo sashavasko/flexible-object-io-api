@@ -1,8 +1,8 @@
-package org.sv.flexobject.hadoop.streaming.testdata.levelone;
+package org.sv.flexobject.testdata.levelone;
 
 import org.sv.flexobject.StreamableWithSchema;
-import org.sv.flexobject.hadoop.streaming.testdata.levelone.leveltwo.SimpleObject;
 import org.sv.flexobject.schema.annotations.ValueClass;
+import org.sv.flexobject.testdata.levelone.leveltwo.SimpleObject;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -2,8 +2,7 @@ package org.sv.flexobject.hadoop.properties;
 
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
-import org.sv.flexobject.OutAdapter;
-import org.sv.flexobject.hadoop.HadoopBatchEnvironment;
+import org.sv.flexobject.hadoop.HadoopTask;
 import org.sv.flexobject.hadoop.adapter.ConfigurationInAdapter;
 import org.sv.flexobject.hadoop.adapter.ConfigurationOutAdapter;
 import org.sv.flexobject.properties.PropertiesWrapper;
@@ -56,7 +55,7 @@ public class HadoopPropertiesWrapper<T extends HadoopPropertiesWrapper> extends 
     }
 
     public static String getDefaultNamespace(){
-        return HadoopBatchEnvironment.DEFAULT_NAMESPACE;
+        return HadoopTask.DEFAULT_NAMESPACE;
     }
 
     @Override

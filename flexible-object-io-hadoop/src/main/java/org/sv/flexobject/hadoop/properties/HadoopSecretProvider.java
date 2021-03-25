@@ -8,6 +8,7 @@ import org.apache.hadoop.mapreduce.MRJobConfig;
 import org.apache.log4j.Logger;
 import org.sv.flexobject.connections.ConnectionManager;
 import org.sv.flexobject.connections.SecretProvider;
+import org.sv.flexobject.hadoop.HadoopTask;
 import org.sv.flexobject.hadoop.utils.IConfigured;
 
 import java.io.IOException;
@@ -86,7 +87,7 @@ public class HadoopSecretProvider implements SecretProvider, IConfigured {
 
     @Override
     public Object getSecret(String connectionName, ConnectionManager.DeploymentLevel deploymentLevel, String environment) {
-        return getPassword("cfx.hadoop.db." + connectionName + ".password", deploymentLevel);
+        return getPassword(HadoopTask.getTaskConf().getNamespace() + ".db." + connectionName + ".password", deploymentLevel);
     }
 
     @Override

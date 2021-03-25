@@ -1,0 +1,16 @@
+apply plugin: 'maven'
+apply plugin: 'java'
+apply plugin: 'idea'
+group = 'org.sv'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+
+    implementation project(':flexible-object-io-core')
+}

@@ -15,10 +15,6 @@ import java.io.IOException;
 public abstract class DaoRecordReader<KT,VT> extends RecordReader<KT,VT> {
     Logger logger = Logger.getLogger(DaoRecordReader.class);
 
-//    public static final String CFX_DAO_READER_KEY_FIELD_NAME = "cfx.batch.key.field.name";
-//    public static final String CFX_DAO_READER_VALUE_FIELD_NAME = "cfx.batch.value.field.name";
-//    public static final String CFX_DAO_CLASS = "cfx.batch.dao.class";
-//
     public static final String CURRENT_KEY_FIELD_NAME = "CURRENT_KEY";
     public static final String CURRENT_VALUE_FIELD_NAME = "CURRENT_VALUE";
     public static final int DEFAULT_MAX_RETRIES_VALUE = 3;

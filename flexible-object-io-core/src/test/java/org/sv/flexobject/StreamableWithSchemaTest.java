@@ -18,6 +18,7 @@ import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.schema.Schema;
 import org.sv.flexobject.schema.SchemaException;
 import org.sv.flexobject.schema.SchemaRegistry;
+import org.sv.flexobject.testdata.*;
 
 import java.util.*;
 
@@ -60,9 +61,9 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
     @Test
     public void direct() throws Exception {
         SimpleTestDataWithSchema data = new SimpleTestDataWithSchema();
-        data.int32Field = 777;
+        data.set("int32Field", 777);
 
-        assertEquals(777, (int)data.int32Field);
+        assertEquals(777, (int)data.get("int32Field"));
     }
 
     @Test
@@ -194,7 +195,7 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
         assertEquals(EnumSet.of(TestDataWithEnumAndClass.TestEnum.uno,TestDataWithEnumAndClass.TestEnum.dos), testData.enumSet);
 
         JsonNode jsonOut = JsonOutputAdapter.produce(testData);
-        String expectedJsonString = "{\"clazz\":\"org.sv.flexobject.TestDataWithEnumAndClass$TestEnum\",\"enumValue\":\"uno\",\"enumSet\":\"uno,dos\"}";
+        String expectedJsonString = "{\"clazz\":\"org.sv.flexobject.testdata.TestDataWithEnumAndClass$TestEnum\",\"enumValue\":\"uno\",\"enumSet\":\"uno,dos\"}";
         assertEquals(expectedJsonString, jsonOut.toString());
 
         JsonInputAdapter.forValue(("{'clazz':'" + TestDataWithEnumAndClass.TestEnum.class.getName() + "', " +

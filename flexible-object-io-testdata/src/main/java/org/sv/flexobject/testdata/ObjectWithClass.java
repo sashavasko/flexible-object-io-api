@@ -1,8 +1,7 @@
-package org.sv.flexobject.hadoop.streaming.testdata;
+package org.sv.flexobject.testdata;
 
 import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.schema.DataTypes;
-import org.sv.flexobject.schema.annotations.ValueClass;
 import org.sv.flexobject.schema.annotations.ValueType;
 
 import java.util.ArrayList;

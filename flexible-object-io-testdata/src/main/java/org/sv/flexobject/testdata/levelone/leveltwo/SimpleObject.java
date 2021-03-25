@@ -1,4 +1,4 @@
-package org.sv.flexobject.hadoop.streaming.testdata.levelone.leveltwo;
+package org.sv.flexobject.testdata.levelone.leveltwo;
 
 import org.sv.flexobject.StreamableWithSchema;
 

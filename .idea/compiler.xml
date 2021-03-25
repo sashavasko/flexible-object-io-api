@@ -14,6 +14,8 @@
       <module name="flexible-object-io-api.flexible-object-io-mongo.test" target="1.8" />
       <module name="flexible-object-io-api.flexible-object-io-streaming.main" target="1.8" />
       <module name="flexible-object-io-api.flexible-object-io-streaming.test" target="1.8" />
+      <module name="flexible-object-io-api.flexible-object-io-testdata.main" target="1.8" />
+      <module name="flexible-object-io-api.flexible-object-io-testdata.test" target="1.8" />
       <module name="flexible-object-io-api.main" target="1.8" />
       <module name="flexible-object-io-api.test" target="1.8" />
     </bytecodeTargetLevel>

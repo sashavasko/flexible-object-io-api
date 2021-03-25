@@ -33,7 +33,7 @@ public class CounterParquetTest {
         Mockito.when(context.getConfiguration()).thenReturn(configuration);
         Mockito.when(context.getTaskAttemptID()).thenReturn(taskId);
         Mockito.when(taskId.toString()).thenReturn("testTask");
-        Mockito.when(configuration.get("cfx.hadoop.parquet.counters")).thenReturn("test_CounterParquet");
+        Mockito.when(configuration.get("org.sv.flexobject.hadoop.parquet.counters")).thenReturn("test_CounterParquet");
         Mockito.when(configuration.get("fs.defaultFS", "file:///")).thenReturn("file:///");
         Mockito.when(configuration.getInt("file.bytes-per-checksum", 512)).thenReturn(512);
         Mockito.when(configuration.getInt("io.file.buffer.size", 4096)).thenReturn(4096);
@@ -85,7 +85,7 @@ public class CounterParquetTest {
 
         counter.close();
 
-        Mockito.verify(configuration).get("cfx.hadoop.parquet.counters");
+        Mockito.verify(configuration).get("org.sv.flexobject.hadoop.parquet.counters");
     }
 
     @Test
@@ -94,6 +94,6 @@ public class CounterParquetTest {
 
         counter.close();
 
-        Mockito.verify(configuration).get("cfx.hadoop.parquet.counters");
+        Mockito.verify(configuration).get("org.sv.flexobject.hadoop.parquet.counters");
     }
 }

@@ -15,6 +15,7 @@
             <option value="/home/code/flexible-object-io-api/flexible-object-io-hadoop" />
             <option value="/home/code/flexible-object-io-api/flexible-object-io-kafka" />
             <option value="/home/code/flexible-object-io-api/flexible-object-io-mongo" />
+            <option value="/home/code/flexible-object-io-api/flexible-object-io-testdata" />
           </set>
         </option>
         <option name="useAutoImport" value="true" />
