@@ -11,18 +11,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
-public class Schema {
+public class Schema extends AbstractSchema{
 
-    protected String name;
     private boolean isInferred;
-    private SchemaElement[] fields;
-    private Map<String, SchemaElement> fieldsByName = new HashMap<>();
-    private Map<String, Integer> paramNamesXref = new HashMap<>();
     private Reader reader;
     private Writer writer;
 
     public Schema(Class<?> dataClass) {
-        this.name = dataClass.getName();
+        super(dataClass);
         this.isInferred = true;
         List<SchemaElement> fieldList = new ArrayList<>();
 
@@ -31,7 +27,7 @@ public class Schema {
 
         setFields(fieldList);
 
-        initParamXref(dataClass);
+        initParamXref();
         SchemaRegistry.getInstance().registerSchema(this);
     }
 
@@ -57,18 +53,18 @@ public class Schema {
     }
 
     public Schema(Class<?> dataClass, Enum<?>[] fields) throws NoSuchFieldException, SchemaException {
-        this.name = dataClass.getName();
+        super(dataClass);
         this.isInferred = false;
         this.fields = new SchemaElement[fields.length];
         for (Enum<?> e : fields){
             addField(new SimpleSchemaElement(dataClass, e), e.ordinal());
         }
-        initParamXref(dataClass);
+        initParamXref();
         SchemaRegistry.getInstance().registerSchema(this);
     }
 
     public Schema(Class<?> dataClass, SchemaElement[] fields) throws NoSuchFieldException, SchemaException {
-        this.name = dataClass.getName();
+        super(dataClass);
         this.isInferred = false;
         this.fields = fields;
         for (SchemaElement f  : this.fields) {
@@ -77,20 +73,8 @@ public class Schema {
             }
             fieldsByName.put(f.getDescriptor().getName(), f);
         }
-        initParamXref(dataClass);
+        initParamXref();
         SchemaRegistry.getInstance().registerSchema(this);
-    }
-
-    private void addField(SchemaElement field, int order){
-        fields[order] = field;
-        fieldsByName.put(field.getDescriptor().getName(), field);
-    }
-
-    private void setFields(List<SchemaElement> fieldList){
-        this.fields = new SchemaElement[fieldList.size()];
-        int i = 0;
-        for (SchemaElement field : fieldList)
-            addField(field, i++);
     }
 
     public static boolean isRegisteredSchema(Class<?> dataClass){
@@ -117,42 +101,16 @@ public class Schema {
         return xref;
     }
 
-    private void initParamXref(Class<?> dataClass) {
-        for (SchemaElement f  : fields){
-            paramNamesXref.put(f.getDescriptor().getName(), f.getDescriptor().getOrder()+1);
-        }
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getSimpleName() {
-        return name.substring(name.lastIndexOf('.')+1);
-    }
-
-    public String getNamespace() {
-        return name.substring(0, name.lastIndexOf('.'));
-    }
-
-    public SchemaElement[] getFields() {
-        return fields;
-    }
-
-    public FieldDescriptor getFieldDescriptor(Enum<?> e) {
-        return fields[e.ordinal()].getDescriptor();
-    }
-
-    public FieldDescriptor getDescriptor(String fieldName) {
-        return fieldsByName.get(fieldName).getDescriptor();
+    public FieldDescriptor getDescriptor(Enum<?> e) {
+        return (FieldDescriptor) getFieldDescriptor(e);
     }
 
     public FieldDescriptor getDescriptor(int i) {
-        return fields[i].getDescriptor();
+        return (FieldDescriptor) getFieldDescriptor(i);
     }
 
-    public Map<String, Integer> getParamNamesXref() {
-        return paramNamesXref;
+    public FieldDescriptor getDescriptor(String fieldName) {
+        return (FieldDescriptor) getFieldDescriptor(fieldName);
     }
 
     public Reader getReader() {
@@ -179,69 +137,11 @@ public class Schema {
         return isInferred;
     }
 
-    public void clear(Object datum) throws SchemaException {
-        for (SchemaElement field : fields) {
-            field.getDescriptor().clear(datum);
-        }
-    }
-
-    public boolean loadFields(Object datum, InAdapter input) throws SchemaException {
-        for (SchemaElement field : fields) {
-            field.getDescriptor().load(datum, input);
-        }
-        return true;
-    }
-
     public Loadable load(Loadable datum, InAdapter input) throws Exception {
         return getReader().convert(input, datum);
     }
 
-    public boolean saveFields(Object datum, OutAdapter output) throws Exception {
-        for (SchemaElement field : fields){
-            field.getDescriptor().save(datum, output);
-        }
-        return output.saveIfYouShould();
-    }
-
     public boolean save(Object datum, OutAdapter output) throws Exception {
         return getWriter().convert((Savable) datum, output);
-    }
-
-    public boolean compareFields(Object o1, Object o2){
-        try {
-            for (SchemaElement field : fields) {
-                FieldDescriptor descriptor = field.getDescriptor();
-                Object value = descriptor.get(o1);
-                Object otherValue = descriptor.get(o2);
-                if (value != null) {
-                    if (otherValue == null)
-                        return false;
-
-                    if (value.getClass().isArray() != otherValue.getClass().isArray())
-                        return false;
-
-                    if (value.getClass().isArray()) {
-                        if (!Arrays.equals((Object[])value, (Object[])otherValue)) {
-                            return false;
-                        }
-                    } else if (!value.equals(otherValue))
-                        return false;
-                } else if (otherValue != null)
-                    return false;
-            }
-        } catch (Exception e) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public boolean isEmpty(StreamableWithSchema o) throws SchemaException {
-        for (SchemaElement field : fields) {
-            FieldDescriptor descriptor = field.getDescriptor();
-            if (!descriptor.isEmpty(o))
-                return false;
-        }
-        return true;
     }
 }

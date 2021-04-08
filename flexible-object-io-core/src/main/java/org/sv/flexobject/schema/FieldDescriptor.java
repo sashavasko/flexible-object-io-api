@@ -15,20 +15,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class FieldDescriptor {
+public class FieldDescriptor extends AbstractFieldDescriptor{
 
-    protected String name;
     protected DataTypes type;
     protected FunctionWithException getter;
     protected BiConsumerWithException setter;
-    protected int order;
 
     public FieldDescriptor(String name, DataTypes type, FunctionWithException getter, BiConsumerWithException setter, int order) {
-        this.name = name;
+        super(name, order);
         this.type = type;
         this.getter = getter;
         this.setter = setter;
-        this.order = order;
     }
 
     public FieldDescriptor(Class<?> clazz, String name, DataTypes type, int order) {
@@ -242,11 +239,14 @@ public class FieldDescriptor {
         return new Builder();
     }
 
+    @Override
     public void load(Object o, InAdapter adapter) throws SchemaException {
         Object value = null;
         try {
             value = type.get(adapter, name);
         }catch(Exception e){
+            if (e instanceof SchemaException)
+                throw (SchemaException) e;
             throw new SchemaException("Error reading field " + getQualifiedName(o) + " from adapter " + adapter.getClass().getName(), e);
         }
         if (value != null) {
@@ -254,37 +254,42 @@ public class FieldDescriptor {
         }
     }
 
-    public String getQualifiedName(Object o){
-        return o.getClass().getName() + "." + name;
-    }
-
-
+    @Override
     public void save(Object o, OutAdapter adapter) throws SchemaException {
         try {
             type.set(adapter, name, getter.apply(o));
         }catch(Exception e){
+            if (e instanceof SchemaException)
+                throw (SchemaException) e;
             throw new SchemaException("Error saving field " + getQualifiedName(o), e);
         }
     }
 
+    @Override
     public Object get(Object o) throws SchemaException {
         try {
             return getter.apply(o);
         }catch(Exception e){
+            if (e instanceof SchemaException)
+                throw (SchemaException) e;
             throw new SchemaException("Error getting field " + getQualifiedName(o), e);
         }
     }
 
 
     // Setter always merges data
+    @Override
     public void set(Object o, Object value) throws SchemaException {
         try {
             setter.accept(o, value);
         }catch(Exception e){
+            if (e instanceof SchemaException)
+                throw (SchemaException) e;
             throw new SchemaException("Error setting field " + getQualifiedName(o), e);
         }
     }
 
+    @Override
     public void clear(Object o) throws SchemaException {
         try {
             if (setter instanceof FieldWrapper)
@@ -292,10 +297,13 @@ public class FieldDescriptor {
             else
                 setter.accept(o, null);
         }catch(Exception e) {
+            if (e instanceof SchemaException)
+                throw (SchemaException) e;
             throw new SchemaException("Error clearing field " + getQualifiedName(o), e);
         }
     }
 
+    @Override
     public boolean isEmpty(StreamableWithSchema o) {
         try {
             if (getter instanceof FieldWrapper) {
@@ -306,14 +314,6 @@ public class FieldDescriptor {
         } catch (Exception e) {
             return false;
         }
-    }
-
-    public int getOrder() {
-        return order;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public DataTypes getType() {

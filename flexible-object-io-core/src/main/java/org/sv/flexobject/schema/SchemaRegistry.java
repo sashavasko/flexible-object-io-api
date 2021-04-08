@@ -11,7 +11,7 @@ public class SchemaRegistry {
     private final Map<String, Map<String, Integer>> paramNamesXrefs = new HashMap<>();
     private final Set<String> loadedClasses = new HashSet<>();
 
-    private final Map<String, Schema> schemas = new HashMap<>();
+    private final Map<String, AbstractSchema> schemas = new HashMap<>();
 
     private SchemaRegistry(){};
 
@@ -20,29 +20,52 @@ public class SchemaRegistry {
     }
 
     public Map<String, Integer> getParamNamesXref(String name){
+        return getParamNamesXref(name, Schema.class);
+    }
+
+    public Map<String, Integer> getParamNamesXref(String name, Class<? extends AbstractSchema> schemaClass){
         checkClassLoaded(name);
-        return paramNamesXrefs.get(name);
+        String key = makeKey(name, schemaClass);
+        return paramNamesXrefs.get(key);
     }
 
     public void setParamNamesXref(String name, Map<String, Integer> xref){
-        paramNamesXrefs.put(name, xref);
+        setParamNamesXref(name, Schema.class, xref);
     }
 
-    public void registerSchema(Schema schema){
-        if (!schemas.containsKey(schema.getName())){
-            schemas.put(schema.getName(), schema);
+    public void setParamNamesXref(String name, Class<? extends AbstractSchema> schemaClass, Map<String, Integer> xref){
+        String key = makeKey(name, schemaClass);
+        paramNamesXrefs.put(key, xref);
+    }
+
+    public static String makeKey(String name, Class<? extends AbstractSchema> schemaClass){
+        return schemaClass.getSimpleName() + "::" + name;
+    }
+
+    public void registerSchema(AbstractSchema schema){
+        String key = makeKey(schema.getName(), schema.getClass());
+        if (!schemas.containsKey(key)){
+            schemas.put(key, schema);
             setParamNamesXref(schema.getName(), schema.getParamNamesXref());
         }
     }
 
-    public Schema getSchema(String name){
+    public AbstractSchema getSchema(String name, Class<? extends AbstractSchema> schemaClass){
         if (!checkClassLoaded(name)) return null;
-        return schemas.get(name);
+        return schemas.get(makeKey(name, schemaClass));
+    }
+
+    public Schema getSchema(String name){
+        return (Schema) getSchema(name, Schema.class);
+    }
+
+    public boolean hasSchema(String name, Class<? extends AbstractSchema> schemaClass){
+        if (!checkClassLoaded(name)) return false;
+        return schemas.containsKey(makeKey(name, schemaClass));
     }
 
     public boolean hasSchema(String name){
-        if (!checkClassLoaded(name)) return false;
-        return schemas.containsKey(name);
+        return hasSchema(name, Schema.class);
     }
 
     public void clear(){
@@ -62,7 +85,7 @@ public class SchemaRegistry {
                     return false;
                 }
             }
-       }
+        }
         return true;
     }
 }

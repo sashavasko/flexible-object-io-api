@@ -27,7 +27,9 @@ public class ScalarSetter extends FieldWrapper implements BiConsumerWithExceptio
     @Override
     public void accept(Object dataObject, Object value) throws Exception {
         Class<? extends StreamableWithSchema> valueClass = getValueClass();
-        if (value instanceof Map) {
+        if (value == null) {
+            setValue(dataObject, null);
+        } else if (value instanceof Map) {
             if (getStructure() != STRUCT.map)
                 throw new SchemaException(getQualifiedName() + ": Map Objects can only be converted to a Map");
 

@@ -57,6 +57,11 @@ public class DataTypesTest {
 
         adapter.clear();
 
+        DataTypes.setString(adapter, "foo", new byte[]{0x1a,0x2b,0x3c});
+        assertEquals("1a2b3c", adapter.get("foo"));
+
+        adapter.clear();
+
         DataTypes.setString(adapter, "foo", 12345);
         assertEquals("12345", adapter.get("foo"));
 
@@ -64,6 +69,25 @@ public class DataTypesTest {
 
         DataTypes.setString(adapter, "foo", JsonNodeFactory.instance.textNode("sometext"));
         assertEquals("sometext", adapter.get("foo"));
+    }
+
+    @Test
+    public void setBinary() throws Exception {
+        DataTypes.setBinary(adapter, "foo", null);
+        assertNull(adapter.get("foo"));
+
+        adapter.clear();
+
+        DataTypes.setBinary(adapter, "foo", "2a2b");
+        assertEquals("2a2b", adapter.get("foo"));
+
+        adapter.clear();
+
+        byte[] data = new byte[]{0x2c,0x2d};
+        DataTypes.setBinary(adapter, "foo", data);
+        assertEquals("2c2d", adapter.get("foo"));
+
+        adapter.clear();
     }
 
     @Test
@@ -355,7 +379,6 @@ public class DataTypesTest {
         assertEquals(DataTypes.int32, DataTypes.valueOf(Short.class));
         assertEquals(DataTypes.int32, DataTypes.valueOf(Short[].class));
         assertEquals(DataTypes.int32, DataTypes.valueOf(byte.class));
-        assertEquals(DataTypes.int32, DataTypes.valueOf(byte[].class));
         assertEquals(DataTypes.int32, DataTypes.valueOf(Byte.class));
         assertEquals(DataTypes.int32, DataTypes.valueOf(Byte[].class));
 
@@ -388,6 +411,8 @@ public class DataTypesTest {
 
         assertEquals(DataTypes.timestamp, DataTypes.valueOf(Timestamp.class));
         assertEquals(DataTypes.timestamp, DataTypes.valueOf(Timestamp[].class));
+
+        assertEquals(DataTypes.binary, DataTypes.valueOf(byte[].class));
     }
 
     @Test

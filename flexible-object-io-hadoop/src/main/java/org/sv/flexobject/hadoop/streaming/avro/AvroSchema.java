@@ -21,6 +21,10 @@ import java.util.Map;
 
 public class AvroSchema {
 
+    static {
+        DataTypes.string.registerCustomConverter(Utf8.class, (v)->((Utf8)v).toString());
+    }
+
     public static Configuration overrideBackwardsOptions(Configuration conf){
         conf.setBoolean("parquet.strict.typing", false);
         conf.setBoolean("parquet.avro.add-list-element-records", false);
@@ -45,7 +49,7 @@ public class AvroSchema {
         SchemaElement[] internalFields = internalSchema.getFields();
         List<Schema.Field> fields = new ArrayList<>(internalFields.length);
         for (SchemaElement field : internalFields){
-            FieldDescriptor descriptor = field.getDescriptor();
+            FieldDescriptor descriptor = (FieldDescriptor) field.getDescriptor();
             fields.add(new Schema.Field(descriptor.getName(), nullable(compileField(descriptor))));
         }
         return fields;

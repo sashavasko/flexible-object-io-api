@@ -47,10 +47,15 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
 
     @Test
     public void schemaRegistered() {
-        assertNotNull(Schema.getParamNamesXref(SimpleTestDataWithSchema.class));
         assertTrue(Schema.isRegisteredSchema(SimpleTestDataWithSchema.class));
+
+        Map<String,Integer> xref = Schema.getParamNamesXref(SimpleTestDataWithSchema.class);
+        assertNotNull(xref);
+        assertTrue(Schema.isRegisteredSchema(SimpleTestDataWithSchema.class));
+
         assertNotNull(Schema.getParamNamesXref(TestDataWithInferredSchema.class));
         assertTrue(Schema.isRegisteredSchema(TestDataWithInferredSchema.class));
+
         assertNotNull(Schema.getParamNamesXref(TestDataWithAnnotatedSchema.class));
         assertTrue(Schema.isRegisteredSchema(TestDataWithAnnotatedSchema.class));
     }

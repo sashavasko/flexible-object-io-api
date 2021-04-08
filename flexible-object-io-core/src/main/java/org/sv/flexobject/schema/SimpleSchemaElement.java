@@ -3,7 +3,7 @@ package org.sv.flexobject.schema;
 import java.lang.reflect.Field;
 
 public class SimpleSchemaElement implements SchemaElement {
-    FieldDescriptor fieldDescriptor;
+    AbstractFieldDescriptor fieldDescriptor;
 
     public SimpleSchemaElement(Class<?> dataClass, Enum<?> e) throws NoSuchFieldException, SchemaException {
         fieldDescriptor = FieldDescriptor.fromEnum(dataClass, e);
@@ -13,13 +13,17 @@ public class SimpleSchemaElement implements SchemaElement {
         fieldDescriptor = FieldDescriptor.fromField(dataClass, field, order);
     }
 
+    public SimpleSchemaElement(AbstractFieldDescriptor fieldDescriptor) {
+        this.fieldDescriptor = fieldDescriptor;
+    }
+
     @Override
-    public FieldDescriptor getDescriptor() {
+    public AbstractFieldDescriptor getDescriptor() {
         return fieldDescriptor;
     }
 
     @Override
-    public void setDescriptor(FieldDescriptor fieldDescriptor) {
+    public void setDescriptor(AbstractFieldDescriptor fieldDescriptor) {
         this.fieldDescriptor = fieldDescriptor;
     }
 }

@@ -1,8 +1,16 @@
 package org.sv.flexobject.schema;
 
 public interface SchemaElement<T extends Enum> {
-    FieldDescriptor getDescriptor();
+    AbstractFieldDescriptor getDescriptor();
 
-    void setDescriptor(FieldDescriptor fieldDescriptor);
+    void setDescriptor(AbstractFieldDescriptor fieldDescriptor);
+
+    default int getOrder() {
+        return getDescriptor().getOrder();
+    }
+
+    default String getName() {
+        return getDescriptor().getName();
+    }
 }
 

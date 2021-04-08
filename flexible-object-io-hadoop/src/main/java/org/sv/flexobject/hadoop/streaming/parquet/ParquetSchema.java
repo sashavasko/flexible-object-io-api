@@ -133,7 +133,7 @@ public class ParquetSchema {
         List<Type> parquetFields = new ArrayList<>(fields.length);
         try {
             for (SchemaElement schemaElement : fields) {
-                FieldDescriptor descriptor = schemaElement.getDescriptor();
+                FieldDescriptor descriptor = (FieldDescriptor) schemaElement.getDescriptor();
                 Type parquetField = null;
                 if (descriptor.isScalar()){
                     parquetField = makeScalarType(descriptor);

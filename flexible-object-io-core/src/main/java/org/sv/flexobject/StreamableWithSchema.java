@@ -7,6 +7,7 @@ import org.sv.flexobject.adapter.MapOutAdapter;
 import org.sv.flexobject.json.JsonInputAdapter;
 import org.sv.flexobject.json.JsonOutputAdapter;
 import org.sv.flexobject.json.MapperFactory;
+import org.sv.flexobject.schema.AbstractFieldDescriptor;
 import org.sv.flexobject.schema.Schema;
 import org.sv.flexobject.schema.SchemaElement;
 import org.sv.flexobject.schema.SchemaException;
@@ -65,15 +66,25 @@ public class StreamableWithSchema<T extends SchemaElement> implements Streamable
         return getSchema().getDescriptor(fieldName).get(this);
     }
 
+    public Object get(AbstractFieldDescriptor descriptor) throws Exception {
+        return descriptor.get(this);
+    }
+
+    public void set(AbstractFieldDescriptor descriptor, Object value) throws Exception {
+//        if (getSchema().isInferred())
+//            throw new SchemaException("Generic Getters and Setters only available in Streamable classes with explicit or annotated schema. Class " + schema.getName());
+        descriptor.set(this, value);
+    }
+
     public Object get(T field) throws Exception {
-        if (getSchema().isInferred())
-            throw new SchemaException("Generic Getters and Setters only available in Streamable classes with explicit or annotated schema. Class " + schema.getName());
+//        if (getSchema().isInferred())
+//            throw new SchemaException("Generic Getters and Setters only available in Streamable classes with explicit or annotated schema. Class " + schema.getName());
         return field.getDescriptor().get(this);
     }
 
     public Object get(Enum field) throws Exception {
-        if (getSchema().isInferred())
-            throw new SchemaException("Generic Getters and Setters only available in Streamable classes with explicit or annotated schema. Class " + schema.getName());
+//        if (getSchema().isInferred())
+//            throw new SchemaException("Enum Generic Getters and Setters only available in Streamable classes with explicit or annotated schema. Class " + schema.getName());
         return getSchema().getFieldDescriptor(field).get(this);
     }
 
@@ -82,14 +93,14 @@ public class StreamableWithSchema<T extends SchemaElement> implements Streamable
     }
 
     public void set(T field, Object value) throws Exception {
-        if (getSchema().isInferred())
-            throw new SchemaException("Generic Getters and Setters only available in Streamable classes with explicit or annotated schema. Class " + schema.getName());
+//        if (getSchema().isInferred())
+//            throw new SchemaException("Generic Getters and Setters only available in Streamable classes with explicit or annotated schema. Class " + schema.getName());
         field.getDescriptor().set(this, value);
     }
 
     public void set(Enum field, Object value) throws Exception {
-        if (getSchema().isInferred())
-            throw new SchemaException("Generic Getters and Setters only available in Streamable classes with explicit or annotated schema. Class " + schema.getName());
+//        if (getSchema().isInferred())
+//            throw new SchemaException("Generic Getters and Setters only available in Streamable classes with explicit or annotated schema. Class " + schema.getName());
         getSchema().getFieldDescriptor(field).set(this, value);
     }
 

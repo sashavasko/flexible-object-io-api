@@ -120,7 +120,9 @@ public class FieldWrapper {
     public void setValue(Object o, Object value) throws Exception {
         if (field == null)
             getField();
-        if (isEnum){
+        if (value == null) {
+            field.set(o, null);
+        } else if (isEnum){
             field.set(o, DataTypes.enumConverter(value, (Class<? extends Enum>) fieldClass));
         }else if (enumClass != null) {
             field.set(o, DataTypes.enumSetConverter(value, enumClass, emptyValue));

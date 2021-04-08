@@ -2,6 +2,7 @@ package org.sv.flexobject.schema;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.*;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.sv.flexobject.InAdapter;
 import org.sv.flexobject.OutAdapter;
@@ -17,10 +18,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public enum DataTypes {
     string(InAdapter::getString, DataTypes::setString, DataTypes::stringConverter),
@@ -33,16 +31,26 @@ public enum DataTypes {
     timestamp(InAdapter::getTimestamp, DataTypes::setTimestamp, DataTypes::timestampConverter),
     localDate(InAdapter::getLocalDate, DataTypes::setDate, DataTypes::localDateConverter), //   LocalDate getLocalDate (String fieldName) throws Exception
     classObject(InAdapter::getClass, DataTypes::setString, DataTypes::classConverter),
+    binary(InAdapter::getString, DataTypes::setBinary, DataTypes::binaryConverter),
     invalid((a,n)-> null, (a, n, o)->{}, o->o);
 
     protected BiFunctionWithException<InAdapter, String, Object, Exception> getter;
     protected TriConsumerWithException<OutAdapter, String, Object, Exception> setter;
     protected FunctionWithException converter;
+    protected Map<Class,FunctionWithException> customConverters = new HashMap<>();
 
     DataTypes(BiFunctionWithException<InAdapter, String, Object, Exception> getter, TriConsumerWithException<OutAdapter, String, Object, Exception> setter, FunctionWithException converter) {
         this.getter = getter;
         this.setter = setter;
         this.converter = converter;
+    }
+
+    public void registerCustomConverter(Class sourceType, FunctionWithException converter){
+        customConverters.put(sourceType, converter);
+    }
+
+    public void unregisterCustomConverter(Class sourceType){
+        customConverters.remove(sourceType);
     }
 
     public Object get(InAdapter adapter, String fieldName) throws Exception {
@@ -62,9 +70,30 @@ public enum DataTypes {
         return converter.apply(value);
     }
 
+    protected Object applyCustomConverter(Object value, FunctionWithException defaultConverter) throws Exception {
+        if (!customConverters.isEmpty()) {
+            Class valueClass = value.getClass();
+            FunctionWithException converter = customConverters.get(valueClass);
+            while (converter == null && valueClass != null) {
+                valueClass = valueClass.getSuperclass();
+                if (valueClass != null)
+                    converter = customConverters.get(valueClass);
+            }
+            if (converter != null)
+                return converter.apply(value);
+        }
+        if (defaultConverter == null)
+            throw new SchemaException("Attempting to convert value of type " + value.getClass().getName() + " to " + name());
+
+        return defaultConverter.apply(value);
+    }
+
     public static String stringConverter(Object value) throws Exception{
         if (value == null || value instanceof String)
             return (String) value;
+
+        if (value instanceof byte[])
+            return Hex.encodeHexString((byte[])value);
         if (value instanceof TextNode)
             return ((TextNode)value).asText();
         if (value instanceof JsonNode)
@@ -73,7 +102,8 @@ public enum DataTypes {
             return ((Enum)value).name();
         if (value instanceof Class)
             return ((Class)value).getName();
-        return value.toString();
+
+        return (String) DataTypes.string.applyCustomConverter(value, (v)->v.toString());
     }
 
     public static void setString(OutAdapter adapter, String fieldName, Object value) throws Exception {
@@ -83,7 +113,7 @@ public enum DataTypes {
     public static JsonNode jsonConverter(Object value) throws Exception {
         if (value == null || value instanceof JsonNode)
             return (JsonNode) value;
-        if (value instanceof String){
+        if (value instanceof String) {
             String string = ((String) value).trim();
             if (string.startsWith("{") || string.startsWith("["))
                 return MapperFactory.getObjectReader().readTree(string);
@@ -95,6 +125,9 @@ public enum DataTypes {
                 return jsonArray;
             }
         }
+//        if (value instanceof byte[])
+//            return JsonNodeFactory.instance.binaryNode((byte[])value);
+
         if (value instanceof StreamableWithSchema)
             return ((StreamableWithSchema)value).toJson();
         if (value.getClass().isArray()){
@@ -133,7 +166,8 @@ public enum DataTypes {
             }
             return json;
         }
-        return MapperFactory.getObjectMapper().valueToTree(value);
+
+        return (JsonNode) DataTypes.jsonNode.applyCustomConverter(value, (v)->MapperFactory.getObjectMapper().valueToTree(v));
     }
 
     public static void setJson(OutAdapter adapter, String fieldName, Object value) throws Exception {
@@ -144,7 +178,7 @@ public enum DataTypes {
         if (value == null || value instanceof Integer)
             return (Integer) value;
         if (value instanceof String)
-            return Integer.valueOf(((String)value).trim());
+            return Integer.valueOf(((String) value).trim());
         if (value instanceof ValueNode)
             return ((ValueNode)value).asInt();
         if (value instanceof Date) {
@@ -156,7 +190,7 @@ public enum DataTypes {
             return (int)epochDay;
         }
 
-        return ((Number)value).intValue();
+        return (Integer) DataTypes.int32.applyCustomConverter(value, (v)->((Number)v).intValue());
     }
 
     public static void setInt(OutAdapter adapter, String fieldName, Object value) throws Exception {
@@ -167,7 +201,7 @@ public enum DataTypes {
         if (value == null || value instanceof Boolean)
             return (Boolean) value;
         if (value instanceof String) {
-            switch (((String)value).trim().toUpperCase()){
+            switch ((((String) value).trim()).toUpperCase()){
                 case "TRUE" :
                 case "YES" :
                 case "Y" :
@@ -182,7 +216,7 @@ public enum DataTypes {
         if (value instanceof ValueNode)
             return ((ValueNode)value).asBoolean();
 
-        throw new SchemaException("Attempting to convert value of type " + value.getClass().getName() + " to Boolean");
+        return (Boolean) DataTypes.bool.applyCustomConverter(value, null);
     }
 
     public static void setBoolean(OutAdapter adapter, String fieldName, Object value) throws Exception {
@@ -199,7 +233,7 @@ public enum DataTypes {
         if (value instanceof Timestamp)
             return ((Timestamp)value).getTime();
 
-        return ((Number)value).longValue();
+        return (Long) DataTypes.int64.applyCustomConverter(value, (v)->((Number)v).longValue());
     }
 
     public static void setLong(OutAdapter adapter, String fieldName, Object value) throws Exception {
@@ -210,10 +244,11 @@ public enum DataTypes {
         if (value == null || value instanceof Double)
             return (Double) value;
         if (value instanceof String)
-            return Double.valueOf(((String)value).trim());
+            return Double.valueOf(((String) value).trim());
         if (value instanceof ValueNode)
             return ((ValueNode)value).asDouble();
-        return ((Number)value).doubleValue();
+
+        return (Double) DataTypes.float64.applyCustomConverter(value, (v)->((Number)v).doubleValue());
     }
 
     public static void setDouble(OutAdapter adapter, String fieldName, Object value) throws Exception {
@@ -223,23 +258,30 @@ public enum DataTypes {
     public static LocalDate localDateConverter(Object value) throws Exception {
         if (value == null || value instanceof LocalDate)
             return (LocalDate) value;
-        return dateConverter(value).toLocalDate();
+        return (LocalDate) DataTypes.localDate.applyCustomConverter(value, (v)->dateConverter(v).toLocalDate());
     }
 
     public static Date dateConverter(Object value) throws Exception {
         if (value == null || value instanceof Date)
             return (Date) value;
+        if (value instanceof java.util.Date)
+            return new Date(((java.util.Date)value).getTime());
         if (value instanceof LocalDate)
             return Date.valueOf((LocalDate) value);
         if (value instanceof ValueNode)
             return JsonInputAdapter.jsonNodeToDate((JsonNode)value);
         if (value instanceof String) {
-            String dateString = ((String)value).trim();
+            String dateString = ((String) value).trim();
             if (StringUtils.isNumeric(dateString)){
                 int month;
                 int day;
                 int year;
-                if (dateString.length() == 7){
+                if (dateString.length() == 6){
+                    // broken add_date made up of juris + sourceId
+                    month = Integer.valueOf(dateString.substring(5));
+                    year = Integer.valueOf(dateString.substring(0, 4));
+                    day = 1;
+                } else if (dateString.length() == 7){
                     month = dateString.charAt(0) - '0';
                     day =  Integer.valueOf(dateString.substring(1, 3));
                     year =  Integer.valueOf(dateString.substring(3));
@@ -258,7 +300,7 @@ public enum DataTypes {
                 }
                 return Date.valueOf(LocalDate.of(year, month, day));
             }
-            return Date.valueOf(dateString);
+            return Date.valueOf((String) value);
         }
         if (value instanceof Timestamp)
             return new Date(((Timestamp)value).getTime());
@@ -269,7 +311,7 @@ public enum DataTypes {
         } else if (value instanceof Long)
             return new Date((Long) value);
 
-        throw new SchemaException("Attempting to convert value of type " + value.getClass().getName() + " to Date");
+        return (Date) DataTypes.date.applyCustomConverter(value, null);
     }
 
     public static void setDate(OutAdapter adapter, String fieldName, Object value) throws Exception {
@@ -293,10 +335,14 @@ public enum DataTypes {
             return Timestamp.valueOf((LocalDateTime)value);
         if (value instanceof Date)
             return new Timestamp(((Date)value).getTime());
+        if (value instanceof java.util.Date)
+            return new Timestamp(((java.util.Date)value).getTime());
         if (value instanceof Long)
             return new Timestamp((Long)value);
+        if (value instanceof Integer)
+            return new Timestamp(((Integer)value).longValue()*1000);
 
-        throw new SchemaException("Attempting to convert value of type " + value.getClass().getName() + " to Timestamp");
+        return (Timestamp) DataTypes.timestamp.applyCustomConverter(value, null);
     }
 
     public static void setTimestamp(OutAdapter adapter, String fieldName, Object value) throws Exception {
@@ -311,7 +357,7 @@ public enum DataTypes {
             return Class.forName(stringValue);
         }
 
-        throw new SchemaException("Attempting to convert value of type " + value.getClass().getName() + " to Class");
+        return (Class<?>) DataTypes.classObject.applyCustomConverter(value, null);
     }
 
     public static <T extends Enum<T>> T enumConverter(Object value, T defaultValue) throws Exception {
@@ -320,7 +366,7 @@ public enum DataTypes {
         try {
             String stringValue = stringConverter(value).trim();
             if (StringUtils.isNotEmpty(stringValue)){
-                return Enum.valueOf(defaultValue.getDeclaringClass(), (String) value);
+                return Enum.valueOf(defaultValue.getDeclaringClass(), ((String) value).trim());
             }
         } catch (Exception e) {
         }
@@ -330,9 +376,9 @@ public enum DataTypes {
     public static Enum enumConverter(Object value, Class<? extends Enum> enumClass) throws Exception {
         if (value == null || value instanceof Enum)
             return (Enum) value;
-        String stringValue = stringConverter(value).trim();
-        if (StringUtils.isNotEmpty(stringValue)){
-            return Enum.valueOf(enumClass, stringValue);
+        String stringValue = stringConverter(value);
+        if (stringValue != null) {
+            return Enum.valueOf(enumClass, ((String) value).trim());
         }
 
         throw new SchemaException("Attempting to convert value of type " + value.getClass().getName() + " to Enum " + enumClass.getName());
@@ -384,6 +430,23 @@ public enum DataTypes {
         return stringOut;
     }
 
+    public static byte[] binaryConverter(Object value) throws Exception{
+        if (value == null || value instanceof byte[])
+            return (byte[]) value;
+
+        if (value instanceof BinaryNode)
+            return ((BinaryNode)value).binaryValue();
+        if (value instanceof String)
+            return Hex.decodeHex(((String)value).toCharArray());
+
+        return (byte[]) DataTypes.binary.applyCustomConverter(value, (v)->v.toString());
+    }
+
+    public static void setBinary(OutAdapter adapter, String fieldName, Object value) throws Exception {
+        adapter.setString(fieldName, value == null ? null : Hex.encodeHexString(binaryConverter(value)));
+    }
+
+
     public static boolean isEmptyPrimitive(Object primitive){
         if (primitive == null)
             return true;
@@ -410,16 +473,18 @@ public enum DataTypes {
             if (String[].class.equals(clazz))
                 return string;
             if (Integer[].class.equals(clazz) || Short[].class.equals(clazz) || Byte[].class.equals(clazz)
-                || int[].class.equals(clazz) || short[].class.equals(clazz) || byte[].class.equals(clazz))
+                    || int[].class.equals(clazz) || short[].class.equals(clazz))
                 return int32;
+            if (byte[].class.equals(clazz))
+                return binary;
             if (Long[].class.equals(clazz) || BigInteger[].class.equals(clazz)
-                || long[].class.equals(clazz))
+                    || long[].class.equals(clazz))
                 return int64;
             if (Double[].class.equals(clazz) || Float[].class.equals(clazz)
-                || double[].class.equals(clazz) || float[].class.equals(clazz))
+                    || double[].class.equals(clazz) || float[].class.equals(clazz))
                 return float64;
             if (Boolean[].class.equals(clazz)
-                || boolean[].class.equals(clazz))
+                    || boolean[].class.equals(clazz))
                 return bool;
             if (Date[].class.equals(clazz))
                 return date;
@@ -434,13 +499,13 @@ public enum DataTypes {
         if (String.class.equals(clazz))
             return string;
         if (Integer.class.equals(clazz) || Short.class.equals(clazz) || Byte.class.equals(clazz)
-            || int.class.equals(clazz) || short.class.equals(clazz) || byte.class.equals(clazz))
+                || int.class.equals(clazz) || short.class.equals(clazz) || byte.class.equals(clazz))
             return int32;
         if (Long.class.equals(clazz) || BigInteger.class.equals(clazz)
                 || long.class.equals(clazz))
             return int64;
         if (Double.class.equals(clazz) || Float.class.equals(clazz)
-            || double.class.equals(clazz) || float.class.equals(clazz))
+                || double.class.equals(clazz) || float.class.equals(clazz))
             return float64;
         if (Boolean.class.equals(clazz)
                 || boolean.class.equals(clazz))
@@ -469,5 +534,4 @@ public enum DataTypes {
 
         return invalid;
     }
-
- }
+}

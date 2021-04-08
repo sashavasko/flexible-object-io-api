@@ -2,10 +2,7 @@ package org.sv.flexobject.testdata;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.sv.flexobject.StreamableWithSchema;
-import org.sv.flexobject.schema.DataTypes;
-import org.sv.flexobject.schema.FieldDescriptor;
-import org.sv.flexobject.schema.SchemaElement;
-import org.sv.flexobject.schema.SchemaException;
+import org.sv.flexobject.schema.*;
 import org.sv.flexobject.util.BiConsumerWithException;
 import org.sv.flexobject.util.FunctionWithException;
 
@@ -58,7 +55,7 @@ public class SimpleTestDataWithSchema extends StreamableWithSchema<SimpleTestDat
             }
 
             @Override
-            public void setDescriptor(FieldDescriptor fieldDescriptor) {
+            public void setDescriptor(AbstractFieldDescriptor fieldDescriptor) {
 
             }
         }
