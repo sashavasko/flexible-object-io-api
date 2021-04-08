@@ -1,5 +1,10 @@
 package org.sv.flexobject.mongo.schema;
 
+import org.bson.codecs.pojo.ClassModelBuilder;
+import org.bson.codecs.pojo.PropertyModel;
+import org.bson.codecs.pojo.PropertyModelBuilder;
+import org.bson.codecs.pojo.annotations.BsonProperty;
+import org.bson.codecs.pojo.annotations.BsonRepresentation;
 import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.mongo.schema.annotations.BsonName;
 import org.sv.flexobject.schema.AbstractFieldDescriptor;
@@ -25,9 +30,10 @@ public class BsonFieldDescriptor extends AbstractFieldDescriptor {
         Class<?> fieldClass = field.getType();
         DataTypes dataType = DataTypes.valueOf(fieldClass);
 
+        BsonProperty bsonProperty = field.getAnnotation(BsonProperty.class);
         BsonName bn = field.getAnnotation(BsonName.class);
-        bsonName = bn != null ? bn.name() : getName();
-        org.sv.flexobject.mongo.schema.annotations.BsonType bt = field.getAnnotation(org.sv.flexobject.mongo.schema.annotations.BsonType.class);
+        bsonName = bn != null ? bn.name() : bsonProperty != null ? bsonProperty.value() : getName();
+
         try {
             if (fieldClass.isArray() || List.class.isAssignableFrom(fieldClass)) {
                 this.isArray = true;
@@ -39,7 +45,9 @@ public class BsonFieldDescriptor extends AbstractFieldDescriptor {
         } catch (NoSuchFieldException | SchemaException e) {
         }
 
-        type = bt != null ? bt.type() : genericBsonType(dataType);
+        BsonRepresentation bsonRepresentation = field.getAnnotation(BsonRepresentation.class);
+        org.sv.flexobject.mongo.schema.annotations.BsonType bt =  field.getAnnotation(org.sv.flexobject.mongo.schema.annotations.BsonType.class);
+        type = bt != null ? bt.type() : bsonRepresentation != null ? bsonRepresentation.value() : genericBsonType(dataType);
     }
 
     private BsonType genericBsonType(DataTypes dataType) {

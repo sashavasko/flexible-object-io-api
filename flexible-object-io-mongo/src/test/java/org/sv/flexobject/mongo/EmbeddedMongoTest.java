@@ -2,9 +2,11 @@ package org.sv.flexobject.mongo;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import de.bwaldvogel.mongo.MongoServer;
 import de.bwaldvogel.mongo.backend.memory.MemoryBackend;
 import org.bson.Document;
+import org.bson.RawBsonDocument;
 import org.junit.After;
 import org.junit.Before;
 
@@ -12,11 +14,14 @@ import java.net.InetSocketAddress;
 import java.util.Properties;
 
 public class EmbeddedMongoTest {
+    public static final String COLLECTION_NAME = "testcollection";
     protected MongoServer server;
     protected InetSocketAddress serverAddress;
     protected MongoClientProvider provider = new MongoClientProvider();
     protected MongoClient client;
+    protected MongoDatabase db;
     protected MongoCollection<Document> collection;
+    protected MongoCollection<RawBsonDocument> collectionRaw;
 
     @Before
     public void setUp() throws Exception {
@@ -33,7 +38,9 @@ public class EmbeddedMongoTest {
         connectionProperties.setProperty("url", "mongodb:/" + serverAddress.toString());
 
         client = (MongoClient) provider.getConnection("blah", connectionProperties, null);
-        collection = client.getDatabase("testdb").getCollection("testcollection");
+        db = client.getDatabase("testdb");
+        collection = db.getCollection(COLLECTION_NAME);
+        collectionRaw = db.getCollection(COLLECTION_NAME, RawBsonDocument.class);
     }
 
     @After

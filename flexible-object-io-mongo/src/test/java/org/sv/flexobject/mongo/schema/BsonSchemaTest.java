@@ -1,15 +1,14 @@
 package org.sv.flexobject.mongo.schema;
 
-import org.sv.flexobject.schema.DataTypes;
-import org.sv.flexobject.testdata.levelone.leveltwo.SimpleObject;
+import com.mongodb.client.MongoCollection;
+import org.bson.*;
+import org.bson.types.ObjectId;
+import org.junit.Test;
 import org.sv.flexobject.mongo.EmbeddedMongoTest;
 import org.sv.flexobject.mongo.schema.testdata.ObjectWithObjectId;
 import org.sv.flexobject.mongo.schema.testdata.ObjectWithTimestampAndDate;
-import org.sv.flexobject.mongo.streaming.DocumentConverter;
-import org.bson.BsonTimestamp;
-import org.bson.Document;
-import org.bson.types.ObjectId;
-import org.junit.Test;
+import org.sv.flexobject.schema.DataTypes;
+import org.sv.flexobject.testdata.levelone.leveltwo.SimpleObject;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -46,7 +45,7 @@ public class BsonSchemaTest extends EmbeddedMongoTest {
         document = bsonSchema.toBson(data);
         assertEquals(data.get("intField"), DataTypes.int32Converter(document.get("intField")));
 
-        SimpleObject convertedData = (SimpleObject) DocumentConverter.convertDocument(document, SimpleObject.class);
+        SimpleObject convertedData = bsonSchema.fromBson(document);
         assertEquals(data, convertedData);
 
         collection.insertOne(document);
@@ -55,9 +54,22 @@ public class BsonSchemaTest extends EmbeddedMongoTest {
         Document documentInCollection = collection.find().first();
         assertEquals(data.get("intField"), documentInCollection.get("intField"));
 
-        convertedData = (SimpleObject) DocumentConverter.convertDocument(documentInCollection, SimpleObject.class);
+        convertedData = bsonSchema.fromBson(documentInCollection);
         assertEquals(data, convertedData);
 
+        RawBsonDocument rawDocumentInCollection = collectionRaw.find().first();
+
+        BsonValue bsonValue = rawDocumentInCollection.get("intField");
+        assertEquals(BsonType.INT32, bsonValue.getBsonType());
+        assertEquals(data.intField, bsonValue.asInt32().getValue());
+
+        convertedData = bsonSchema.fromBson(rawDocumentInCollection);
+        assertEquals(data, convertedData);
+
+        MongoCollection<SimpleObject> pojoCollection = db.getCollection(COLLECTION_NAME, SimpleObject.class);
+
+        convertedData = pojoCollection.find().first();
+        assertEquals(data, convertedData);
     }
 
     @Test
@@ -70,7 +82,7 @@ public class BsonSchemaTest extends EmbeddedMongoTest {
         assertTrue(document.get("objectId") instanceof ObjectId);
         assertEquals(data.objectId, ((ObjectId) document.get("objectId")).toHexString());
 
-        ObjectWithObjectId convertedData = (ObjectWithObjectId) DocumentConverter.convertDocument(document, ObjectWithObjectId.class);
+        ObjectWithObjectId convertedData = bsonSchema.fromBson(document);
         assertEquals(data, convertedData);
 
         ObjectWithObjectId dataWithNullOid = ObjectWithObjectId.random();
@@ -80,7 +92,7 @@ public class BsonSchemaTest extends EmbeddedMongoTest {
         assertEquals(data.get("intField"), DataTypes.int32Converter(document.get("intField")));
         assertFalse(documentWithNullOid.containsKey("objectId"));
 
-        convertedData = (ObjectWithObjectId) DocumentConverter.convertDocument(documentWithNullOid, ObjectWithObjectId.class);
+        convertedData = bsonSchema.fromBson(documentWithNullOid);
         assertEquals(dataWithNullOid, convertedData);
 
         collection.insertOne(document);
@@ -88,7 +100,17 @@ public class BsonSchemaTest extends EmbeddedMongoTest {
         assertEquals(1, collection.countDocuments());
         Document documentInCollection = collection.find().first();
 
-        convertedData = (ObjectWithObjectId) DocumentConverter.convertDocument(documentInCollection, ObjectWithObjectId.class);
+        convertedData = bsonSchema.fromBson(documentInCollection);
+        assertEquals(data, convertedData);
+
+        RawBsonDocument rawDocumentInCollection = collectionRaw.find().first();
+
+        convertedData = bsonSchema.fromBson(rawDocumentInCollection);
+        assertEquals(data, convertedData);
+
+        MongoCollection<ObjectWithObjectId> pojoCollection = db.getCollection(COLLECTION_NAME, ObjectWithObjectId.class);
+
+        convertedData = pojoCollection.find().first();
         assertEquals(data, convertedData);
     }
 
@@ -123,7 +145,7 @@ public class BsonSchemaTest extends EmbeddedMongoTest {
         LocalDate actualLocalDate = DataTypes.localDateConverter(document.get("localDate"));
         assertEquals(data.localDate, actualLocalDate);
 
-        ObjectWithTimestampAndDate convertedData = (ObjectWithTimestampAndDate) DocumentConverter.convertDocument(document, ObjectWithTimestampAndDate.class);
+        ObjectWithTimestampAndDate convertedData = bsonSchema.fromBson(document);
         assertEquals(data, convertedData);
 
         collection.insertOne(document);
@@ -131,8 +153,21 @@ public class BsonSchemaTest extends EmbeddedMongoTest {
         assertEquals(1, collection.countDocuments());
         Document documentInCollection = collection.find().first();
 
-        convertedData = (ObjectWithTimestampAndDate) DocumentConverter.convertDocument(documentInCollection, ObjectWithTimestampAndDate.class);
+        convertedData = bsonSchema.fromBson(documentInCollection);
         assertEquals(data, convertedData);
 
+        RawBsonDocument rawDocumentInCollection = collectionRaw.find().first();
+
+        convertedData = bsonSchema.fromBson(rawDocumentInCollection);
+        assertEquals(data, convertedData);
+
+        MongoCollection<ObjectWithTimestampAndDate> pojoCollection = db.getCollection(COLLECTION_NAME, ObjectWithTimestampAndDate.class);
+
+        convertedData = pojoCollection.find().first();
+
+        // These cannot be done using standard mongo pojo codecs :
+        data.dateFromTimestamp = null;
+        data.timestampFromDate = null;
+        assertEquals(data, convertedData);
     }
 }

@@ -6,13 +6,21 @@ import com.mongodb.client.MongoClients;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bson.codecs.configuration.CodecRegistries;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
 import org.sv.flexobject.connections.ConnectionProvider;
+import org.sv.flexobject.mongo.codecs.SqlDateCodec;
+import org.sv.flexobject.mongo.codecs.TimestampCodec;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 public class MongoClientProvider implements ConnectionProvider {
 
@@ -86,6 +94,13 @@ public class MongoClientProvider implements ConnectionProvider {
 //            servers.add(new ServerAddress(host));
 //        }
 //        builder.applyToClusterSettings(b -> b.hosts(servers));
+
+        CodecRegistry pojoCodecRegistry = fromProviders(PojoCodecProvider.builder().automatic(true).build());
+        CodecRegistry codecRegistry = fromRegistries(
+                CodecRegistries.fromCodecs(new TimestampCodec(),new SqlDateCodec()),
+                MongoClientSettings.getDefaultCodecRegistry(),
+                pojoCodecRegistry);
+        builder.codecRegistry(codecRegistry);
 
         MongoClient mongo = MongoClients.create(builder.build());
         logger.info("connected to Mongo");

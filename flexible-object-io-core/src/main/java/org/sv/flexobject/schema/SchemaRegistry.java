@@ -50,13 +50,13 @@ public class SchemaRegistry {
         }
     }
 
-    public AbstractSchema getSchema(String name, Class<? extends AbstractSchema> schemaClass){
+    public <T extends AbstractSchema> T getSchema(String name, Class<? extends AbstractSchema> schemaClass){
         if (!checkClassLoaded(name)) return null;
-        return schemas.get(makeKey(name, schemaClass));
+        return (T)schemaClass.cast(schemas.get(makeKey(name, schemaClass)));
     }
 
     public Schema getSchema(String name){
-        return (Schema) getSchema(name, Schema.class);
+        return getSchema(name, Schema.class);
     }
 
     public boolean hasSchema(String name, Class<? extends AbstractSchema> schemaClass){

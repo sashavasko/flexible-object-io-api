@@ -8,6 +8,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.bson.*;
 import org.bson.types.Binary;
 import org.bson.types.ObjectId;
+import org.sv.flexobject.util.FunctionWithException;
 
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
@@ -19,17 +20,22 @@ import java.util.Map;
 
 public class BsonSchema extends AbstractSchema {
 
+    public static FunctionWithException bsonTimestampConverter = (v)-> {BsonTimestamp bson = (BsonTimestamp) v; return new Timestamp(bson.getTime()*1000L + bson.getInc()/1000000L);};
+    public static FunctionWithException bsonDateConverter = (v)-> new Date(((BsonDateTime)v).getValue());
+
     static {
         DataTypes.string.registerCustomConverter(ObjectId.class, (v)->((ObjectId)v).toHexString());
+        DataTypes.string.registerCustomConverter(BsonObjectId.class, (v)->((BsonObjectId)v).getValue().toHexString());
         DataTypes.string.registerCustomConverter(Binary.class, (v)-> Hex.encodeHexString(((Binary)v).getData()));
         DataTypes.binary.registerCustomConverter(ObjectId.class, (v)->((ObjectId)v).toByteArray());
+        DataTypes.binary.registerCustomConverter(BsonObjectId.class, (v)->((BsonObjectId)v).getValue().toByteArray());
         DataTypes.binary.registerCustomConverter(Binary.class, (v)-> ((Binary)v).getData());
         // TODO add nanos from ordinal
-        DataTypes.timestamp.registerCustomConverter(BsonTimestamp.class, (v)-> {BsonTimestamp bson = (BsonTimestamp) v; return new Timestamp(bson.getTime()*1000L + bson.getInc()/1000000L);});
+        DataTypes.timestamp.registerCustomConverter(BsonTimestamp.class, bsonTimestampConverter);
         DataTypes.timestamp.registerCustomConverter(BsonDateTime.class, (v)-> new Timestamp(((BsonDateTime)v).getValue()));
 
         DataTypes.date.registerCustomConverter(BsonTimestamp.class, (v)-> new Date(((BsonTimestamp)v).getTime()*1000L));
-        DataTypes.date.registerCustomConverter(BsonDateTime.class, (v)-> new Date(((BsonDateTime)v).getValue()));
+        DataTypes.date.registerCustomConverter(BsonDateTime.class, bsonDateConverter);
         DataTypes.localDate.registerCustomConverter(BsonTimestamp.class, (v)-> new Date(((BsonTimestamp)v).getTime()*1000L).toLocalDate());
         DataTypes.localDate.registerCustomConverter(BsonDateTime.class, (v)-> new Date(((BsonDateTime)v).getValue()).toLocalDate());
 
@@ -55,8 +61,16 @@ public class BsonSchema extends AbstractSchema {
     public static BsonSchema getRegisteredSchema(Class<? extends StreamableWithSchema> dataClass) {
         String schemaName = dataClass.getName();
         return SchemaRegistry.getInstance().hasSchema(schemaName, BsonSchema.class) ?
-            (BsonSchema) SchemaRegistry.getInstance().getSchema(dataClass.getName(), BsonSchema.class)
-                : new BsonSchema(dataClass);
+            SchemaRegistry.getInstance().getSchema(dataClass.getName(), BsonSchema.class)
+            : new BsonSchema(dataClass);
+    }
+
+    public BsonFieldDescriptor getFieldDescriptor(int i) {
+        return (BsonFieldDescriptor) super.getFieldDescriptor(i);
+    }
+
+    public BsonFieldDescriptor getFieldDescriptor(String fieldName) {
+        return (BsonFieldDescriptor) super.getFieldDescriptor(fieldName);
     }
 
     private void addClassFields(Class<?> dataClass, List<SchemaElement> fieldList) {
@@ -72,12 +86,16 @@ public class BsonSchema extends AbstractSchema {
         }
     }
 
+    private String getBsonFieldName(String fieldName) {
+        return ((BsonFieldDescriptor)getFieldDescriptor(fieldName)).getBsonName();
+    }
+
     public Document toBson(StreamableWithSchema value) throws Exception {
         Document bson = new Document();
         Schema schema = value.getSchema();
         for (int i = 0 ; i < fields.length ; ++i){
-            FieldDescriptor schemaElement = (FieldDescriptor) schema.getFieldDescriptor(i);
-            BsonFieldDescriptor bsonSchemaElement = (BsonFieldDescriptor) getFieldDescriptor(i);
+            FieldDescriptor schemaElement = schema.getDescriptor(i);
+            BsonFieldDescriptor bsonSchemaElement = getFieldDescriptor(i);
             Object bsonValue = toBson(schemaElement, bsonSchemaElement, value.get(schemaElement));
             if (bsonValue != null)
                 bson.put(bsonSchemaElement.getBsonName(), bsonValue);
@@ -92,7 +110,7 @@ public class BsonSchema extends AbstractSchema {
         FieldWrapper.STRUCT structure = descriptor.getStructure();
 
         Class<? extends StreamableWithSchema> subSchema = descriptor.getSubschema();
-        BsonSchema bsonSubSchema = subSchema == null ? null : (BsonSchema) SchemaRegistry.getInstance().getSchema(subSchema.getName(), BsonSchema.class);
+        BsonSchema bsonSubSchema = subSchema == null ? null : getRegisteredSchema(subSchema);
 
         switch (structure) {
             case array:
@@ -124,6 +142,18 @@ public class BsonSchema extends AbstractSchema {
         return toBson(value, descriptor, bsonSchemaElement, bsonSubSchema);
     }
 
+    public static BsonTimestamp toBsonTimestamp(Object value) throws Exception {
+        return toBsonTimestamp(DataTypes.timestampConverter(value));
+    }
+
+    public static BsonTimestamp toBsonTimestamp(Timestamp timestamp) {
+        return new BsonTimestamp((int)(timestamp.getTime()/1000), timestamp.getNanos());
+    }
+
+    public static BsonDateTime toBsonDateTime(Date date) {
+        return new BsonDateTime(date.getTime());
+    }
+
     public Object toBson(Object value, BsonFieldDescriptor bsonSchemaElement) throws Exception {
         if (value == null)
             return null;
@@ -142,10 +172,9 @@ public class BsonSchema extends AbstractSchema {
                 case BOOLEAN: return new BsonBoolean(DataTypes.boolConverter(value));
                 case OBJECT_ID: return new ObjectId(DataTypes.stringConverter(value));
                 case DATE_TIME:
-                    return new BsonDateTime(DataTypes.dateConverter(value).getTime());
+                    return toBsonDateTime(DataTypes.dateConverter(value));
                 case TIMESTAMP:
-                    Timestamp timestamp = DataTypes.timestampConverter(value);
-                    return new BsonTimestamp((int)(timestamp.getTime()/1000), timestamp.getNanos());
+                    return toBsonTimestamp(value);
             }
         }
 
@@ -173,6 +202,58 @@ public class BsonSchema extends AbstractSchema {
         }
 
         return toBson(descriptor.getValueType().convert(value), bsonSchemaElement);
+    }
+
+    public <T extends StreamableWithSchema> T fromBson(Map<String, ?> src) throws Exception {
+        Class<? extends StreamableWithSchema> dstClass = (Class<? extends StreamableWithSchema>) Class.forName(getName());
+        return (T) dstClass.cast(fromBson(src, dstClass, this));
+    }
+
+    public static <T extends StreamableWithSchema> T fromBson(Map<String, ?> src, Class<? extends StreamableWithSchema> dstClass) throws Exception {
+        BsonSchema bsonSchema = BsonSchema.getRegisteredSchema(dstClass);
+        return (T) dstClass.cast(fromBson(src, dstClass, bsonSchema));
+    }
+    public static StreamableWithSchema fromBson(Map<String, ?> src, Class<? extends StreamableWithSchema> dstClass, BsonSchema bsonSchema) throws Exception {
+        StreamableWithSchema dst = dstClass.newInstance();
+        for (SchemaElement field : dst.getSchema().getFields()) {
+            String fieldName = field.getDescriptor().getName();
+            FieldDescriptor descriptor = (FieldDescriptor) field.getDescriptor();
+            Class<? extends StreamableWithSchema> recordSchema = descriptor.getSubschema();
+            Object value = src.get(bsonSchema.getBsonFieldName(fieldName));
+            DataTypes valueType = descriptor.getValueType();
+            if (value == null){
+                dst.set(fieldName, null);
+            } else {
+                if (value instanceof List) {
+                    dst.set(fieldName, fromBsonList((List) value, recordSchema, valueType));
+                } else if (recordSchema != null) {
+                    dst.set(fieldName, fromBson((Map<String, ?>) value, recordSchema));
+                } else
+                    dst.set(fieldName, fromBsonValue(value, null));
+            }
+        }
+        return dst;
+    }
+
+    public static List fromBsonList(List avroList, Class<? extends StreamableWithSchema> recordSchema, DataTypes valueType) throws Exception {
+        List convertedList = new ArrayList(avroList.size());
+        for (Object item : avroList)
+            convertedList.add(fromBsonValue(item, recordSchema, valueType));
+        return convertedList;
+    }
+
+    public static Object fromBsonValue(Object value, Class<? extends StreamableWithSchema>  recordSchema) throws Exception {
+        return fromBsonValue(value, recordSchema, null);
+    }
+
+    public static Object fromBsonValue(Object value, Class<? extends StreamableWithSchema>  recordSchema, DataTypes valueType) throws Exception {
+        if (value == null)
+            return null;
+
+        if (value instanceof Map)
+            return fromBson((Map<String, ?>) value, recordSchema);
+
+        return valueType == null ? value : valueType.convert(value);
     }
 
 }

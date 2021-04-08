@@ -1,5 +1,6 @@
 package org.sv.flexobject.mongo.schema.testdata;
 
+import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.sv.flexobject.testdata.levelone.leveltwo.SimpleObject;
 import org.sv.flexobject.mongo.schema.annotations.BsonType;
 
@@ -11,9 +12,11 @@ import java.time.LocalDateTime;
 public class ObjectWithTimestampAndDate extends SimpleObject<ObjectWithTimestampAndDate> {
     @BsonType(type= org.bson.BsonType.TIMESTAMP)
     public Timestamp timestamp;
+    @BsonIgnore // standard mongo POJO converters cannot do cross-type conversion
     @BsonType(type= org.bson.BsonType.TIMESTAMP)
     public Date timestampFromDate;
 
+    @BsonIgnore  // standard mongo POJO converters cannot do cross-type conversion
     @BsonType(type= org.bson.BsonType.DATE_TIME)
     public Timestamp dateFromTimestamp;
     @BsonType(type= org.bson.BsonType.DATE_TIME)

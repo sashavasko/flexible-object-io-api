@@ -28,11 +28,11 @@ dependencies {
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.7'
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
-    // https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-core
-    compile group: 'org.mongodb', name: 'mongodb-driver-core', version: '4.1.1'
+// https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-core
+    implementation group: 'org.mongodb', name: 'mongodb-driver-core', version: '4.2.3'
 
     // https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-sync
-    compile group: 'org.mongodb', name: 'mongodb-driver-sync', version: '4.1.1'
+    compile group: 'org.mongodb', name: 'mongodb-driver-sync', version: '4.2.3'
 
     // https://mvnrepository.com/artifact/de.bwaldvogel/mongo-java-server
     testCompile group: 'de.bwaldvogel', name: 'mongo-java-server', version: '1.38.0'
