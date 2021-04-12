@@ -29,9 +29,32 @@ public class ScalarSetter extends FieldWrapper implements BiConsumerWithExceptio
         Class<? extends StreamableWithSchema> valueClass = getValueClass();
         if (value == null) {
             setValue(dataObject, null);
+            return;
+        }
+
+        if (value instanceof List) {
+            if (getStructure() == STRUCT.array) {
+                List list = (List) value;
+                Object[] array = (Object[]) getValue(dataObject);
+                if (array == null)
+                    throw new SchemaException(getQualifiedName() + ": Arrays must be initialized in data objects with Schema. Field " + fieldName + " in class " + clazz.getName());
+                int idx = 0;
+                for (Object elem : list) {
+                    if (elem == null || array[idx] instanceof StreamableWithSchema) {
+                        array[idx] = elem;
+                    } else {
+                        array[idx] = getType().convert(elem);
+                    }
+                    idx++;
+                    if (idx >= array.length)
+                        return;
+                }
+            } else
+                setValue(dataObject, value);
         } else if (value instanceof Map) {
-            if (getStructure() != STRUCT.map)
-                throw new SchemaException(getQualifiedName() + ": Map Objects can only be converted to a Map");
+            if (getStructure() != STRUCT.map) {
+                throw new SchemaException(getQualifiedName() + ": Map Objects can only be converted to a Map or Json");
+            }
 
             Map valueMap = (Map) value;
             setValue(dataObject, valueMap);

@@ -1,6 +1,10 @@
 package org.sv.flexobject.mongo.schema;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.json.MapperFactory;
+import org.sv.flexobject.mongo.json.BsonObjectToJsonConverter;
 import org.sv.flexobject.schema.*;
 import org.sv.flexobject.schema.reflect.FieldWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -15,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -175,6 +180,7 @@ public class BsonSchema extends AbstractSchema {
                     return toBsonDateTime(DataTypes.dateConverter(value));
                 case TIMESTAMP:
                     return toBsonTimestamp(value);
+                case DOCUMENT: return Document.parse(value.toString());
             }
         }
 
@@ -190,7 +196,7 @@ public class BsonSchema extends AbstractSchema {
 
         switch (descriptor.getValueType()){
             case jsonNode :
-                return toBson(value instanceof JsonNode ? value.toString() : value, bsonSchemaElement);
+                return toBson(value, bsonSchemaElement);
             case date:
                 return toBson(DataTypes.dateConverter(value), bsonSchemaElement);
             case localDate:
@@ -229,15 +235,15 @@ public class BsonSchema extends AbstractSchema {
                 } else if (recordSchema != null) {
                     dst.set(fieldName, fromBson((Map<String, ?>) value, recordSchema));
                 } else
-                    dst.set(fieldName, fromBsonValue(value, null));
+                    dst.set(fieldName, fromBsonValue(value, null, value instanceof Map ? valueType : null));
             }
         }
         return dst;
     }
 
-    public static List fromBsonList(List avroList, Class<? extends StreamableWithSchema> recordSchema, DataTypes valueType) throws Exception {
-        List convertedList = new ArrayList(avroList.size());
-        for (Object item : avroList)
+    public static List fromBsonList(List bsonList, Class<? extends StreamableWithSchema> recordSchema, DataTypes valueType) throws Exception {
+        List convertedList = new ArrayList(bsonList.size());
+        for (Object item : bsonList)
             convertedList.add(fromBsonValue(item, recordSchema, valueType));
         return convertedList;
     }
@@ -247,11 +253,25 @@ public class BsonSchema extends AbstractSchema {
     }
 
     public static Object fromBsonValue(Object value, Class<? extends StreamableWithSchema>  recordSchema, DataTypes valueType) throws Exception {
-        if (value == null)
+        if (value == null || value instanceof BsonNull)
             return null;
 
-        if (value instanceof Map)
-            return fromBson((Map<String, ?>) value, recordSchema);
+        if (value instanceof Map) {
+            Map<String, ?> map = (Map<String, ?>) value;
+            if (recordSchema != null)
+                return fromBson(map, recordSchema);
+            else {// actual map of values
+                if (valueType == DataTypes.jsonNode){
+                    return BsonObjectToJsonConverter.getInstance().convert(value);
+                }else {
+                    Map<String, Object> convertedMap = new HashMap<>();
+                    for (Map.Entry<String, ?> entry : map.entrySet()) {
+                        convertedMap.put(entry.getKey(), fromBsonValue(entry.getValue(), recordSchema, valueType));
+                    }
+                    return convertedMap;
+                }
+            }
+        }
 
         return valueType == null ? value : valueType.convert(value);
     }

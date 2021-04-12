@@ -15,7 +15,7 @@ public class BsonObjectToJsonConverterTest {
     public void convert() throws Exception {
 
         BasicDBObject dbObject = new BasicDBObject("foo", "bar");
-        JsonNode json = new BsonObjectToJsonConverter().convert(dbObject);
+        JsonNode json = BsonObjectToJsonConverter.getInstance().convert(dbObject);
 
         assertEquals("{\"foo\":\"bar\"}", objectMapper.writeValueAsString(json));
 

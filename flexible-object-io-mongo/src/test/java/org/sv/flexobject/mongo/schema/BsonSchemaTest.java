@@ -8,6 +8,9 @@ import org.sv.flexobject.mongo.EmbeddedMongoTest;
 import org.sv.flexobject.mongo.schema.testdata.ObjectWithObjectId;
 import org.sv.flexobject.mongo.schema.testdata.ObjectWithTimestampAndDate;
 import org.sv.flexobject.schema.DataTypes;
+import org.sv.flexobject.testdata.SimpleTestDataWithSchema;
+import org.sv.flexobject.testdata.TestDataWithEnumAndClass;
+import org.sv.flexobject.testdata.TestDataWithInferredSchema;
 import org.sv.flexobject.testdata.levelone.leveltwo.SimpleObject;
 
 import java.sql.Timestamp;
@@ -169,5 +172,38 @@ public class BsonSchemaTest extends EmbeddedMongoTest {
         data.dateFromTimestamp = null;
         data.timestampFromDate = null;
         assertEquals(data, convertedData);
+    }
+
+    @Test
+    public void toBsonTestDataWithInferredSchema() throws Exception {
+        TestDataWithInferredSchema data = new TestDataWithInferredSchema();
+        BsonSchema bsonSchema = BsonSchema.getRegisteredSchema(data.getClass());
+        Document document = bsonSchema.toBson(data);
+
+        assertEquals(6, document.size());
+
+        data = TestDataWithInferredSchema.random(true);
+        document = bsonSchema.toBson(data);
+
+        TestDataWithInferredSchema convertedData = bsonSchema.fromBson(document);
+        assertEquals(data, convertedData);
+
+        collection.insertOne(document);
+
+        assertEquals(1, collection.countDocuments());
+        Document documentInCollection = collection.find().first();
+
+        convertedData = bsonSchema.fromBson(documentInCollection);
+        assertEquals(data, convertedData);
+
+        RawBsonDocument rawDocumentInCollection = collectionRaw.find().first();
+
+        convertedData = bsonSchema.fromBson(rawDocumentInCollection);
+        assertEquals(data, convertedData);
+
+        // Unsupported for POJOs with arrays!
+//        MongoCollection<TestDataWithInferredSchema> pojoCollection = db.getCollection(COLLECTION_NAME, TestDataWithInferredSchema.class);
+//        convertedData = pojoCollection.find().first();
+//        assertEquals(data, convertedData);
     }
 }
