@@ -10,7 +10,7 @@ import java.util.stream.Stream;
  */
 public interface Source<T>{
 
-    T get() throws Exception;
+    <O extends T> O get() throws Exception;
 
     boolean isEOF();
 
