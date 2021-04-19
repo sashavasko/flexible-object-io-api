@@ -127,7 +127,7 @@ public class AvroSchema {
         return null;
     }
 
-    public static StreamableWithSchema convertGenericRecord(GenericRecord src, Schema avroSchema) throws Exception {
+    public static <T extends StreamableWithSchema> T convertGenericRecord(GenericRecord src, Schema avroSchema) throws Exception {
         Class<? extends StreamableWithSchema> dstClass = (Class<? extends StreamableWithSchema>) Class.forName(avroSchema.getFullName());
         StreamableWithSchema dst = dstClass.newInstance();
         org.sv.flexobject.schema.Schema internalSchema = dst.getSchema();
@@ -153,7 +153,7 @@ public class AvroSchema {
                     dst.set(field.name(), convertAvroValue(value, null));
             }
         }
-        return dst;
+        return (T) dstClass.cast(dst);
     }
 
     public static Map convertAvroMap(Map<Utf8, Object> avroMap, Schema recordSchema, DataTypes valueType) throws Exception {

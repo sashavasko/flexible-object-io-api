@@ -16,12 +16,12 @@ public class AvroGenericSource<A,T> extends Configured implements Source<T>, Aut
     DataFileReader<A> reader;
 
     @Override
-    public T get() throws Exception {
+    public <O extends T> O  get() throws Exception {
         return unwrap(getReader().next());
     }
 
-    protected T unwrap(A value) {
-        return (T)value;
+    protected <O extends T> O unwrap(A value) {
+        return (O)value;
     }
 
     protected DataFileReader<A> getReader() throws IOException {

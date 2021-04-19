@@ -29,7 +29,7 @@ public class AvroSinkTest {
         sink.put(testData);
         sink.close();
 
-        AvroSource<ObjectWithNestedObject> source = new AvroSource<>(ObjectWithNestedObject.class);
+        AvroSource source = new AvroSource(ObjectWithNestedObject.class);
         source.builder().forInput(os.toByteArray());
 
         ObjectWithNestedObject result = source.get();
@@ -50,7 +50,7 @@ public class AvroSinkTest {
         sink.put(testData);
         sink.close();
 
-        AvroSource<TestDataWithSubSchema> source = new AvroSource<>(TestDataWithSubSchema.class);
+        AvroSource source = new AvroSource(TestDataWithSubSchema.class);
         source.builder().forInput(os.toByteArray());
 
         TestDataWithSubSchema result = source.get();
@@ -73,7 +73,7 @@ public class AvroSinkTest {
         sink.put(testData);
         sink.close();
 
-        AvroSource<TestDataWithSubSchemaInCollection> source = new AvroSource<>(TestDataWithSubSchemaInCollection.class);
+        AvroSource source = new AvroSource(TestDataWithSubSchemaInCollection.class);
         source.builder().forInput(os.toByteArray());
 
         TestDataWithSubSchemaInCollection result = source.get();
@@ -94,7 +94,7 @@ public class AvroSinkTest {
         sink.put(testData);
         sink.close();
 
-        AvroSource<ObjectWithDate> source = new AvroSource<>(ObjectWithDate.class);
+        AvroSource source = new AvroSource(ObjectWithDate.class);
         source.builder().forInput(os.toByteArray());
 
         ObjectWithDate result = source.get();
@@ -117,7 +117,7 @@ public class AvroSinkTest {
         sink.put(testData);
         sink.close();
 
-        AvroSource<ObjectWithClass> source = new AvroSource<>(ObjectWithClass.class);
+        AvroSource source = new AvroSource(ObjectWithClass.class);
         source.builder().forInput(os.toByteArray());
 
         ObjectWithClass result = source.get();
