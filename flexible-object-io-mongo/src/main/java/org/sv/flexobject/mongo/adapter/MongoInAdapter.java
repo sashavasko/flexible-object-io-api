@@ -3,6 +3,7 @@ package org.sv.flexobject.mongo.adapter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.mongodb.DBObject;
 import org.bson.Document;
+import org.bson.RawBsonDocument;
 import org.sv.flexobject.adapter.GenericInAdapter;
 import org.sv.flexobject.json.MapperFactory;
 import org.sv.flexobject.mongo.json.BsonObjectToJsonConverter;
@@ -35,7 +36,7 @@ public class MongoInAdapter extends GenericInAdapter<Map<String,Object>> {
     @Override
     public JsonNode getJson(String fieldName) throws Exception {
         Object data = getCurrent().get(fieldName);
-        if (data instanceof Document || data instanceof DBObject){
+        if (data instanceof Document || data instanceof RawBsonDocument || data instanceof DBObject){
             return converter.convert(data);
         }
         if (data instanceof JsonNode) {
@@ -86,10 +87,16 @@ public class MongoInAdapter extends GenericInAdapter<Map<String,Object>> {
             SingleValueSource<Document> source = new SingleValueSource<>(bson);
             MongoInAdapter adapter = new MongoInAdapter(source);
             adapter.next();
-
             consumer.accept(adapter);
         }
     }
 
-
+    public static void consume(RawBsonDocument bson, ConsumerWithException<MongoInAdapter, Exception> consumer) throws Exception {
+        if (bson != null) {
+            SingleValueSource<RawBsonDocument> source = new SingleValueSource<>(bson);
+            MongoInAdapter adapter = new MongoInAdapter(source);
+            adapter.next();
+            consumer.accept(adapter);
+        }
+    }
 }

@@ -95,6 +95,10 @@ public class BsonSchema extends AbstractSchema {
         return ((BsonFieldDescriptor)getFieldDescriptor(fieldName)).getBsonName();
     }
 
+    public static Document serialize(StreamableWithSchema value) throws Exception {
+        return getRegisteredSchema(value.getClass()).toBson(value);
+    }
+
     public Document toBson(StreamableWithSchema value) throws Exception {
         Document bson = new Document();
         Schema schema = value.getSchema();

@@ -11,6 +11,7 @@ import java.util.Date;
 public class ObjectWithObjectId extends SimpleObject<ObjectWithObjectId> {
     @BsonRepresentation(value = org.bson.BsonType.OBJECT_ID)
     @BsonType(type= org.bson.BsonType.OBJECT_ID)
+    @BsonProperty(value="_id")
     public String objectId;
 
     @Override

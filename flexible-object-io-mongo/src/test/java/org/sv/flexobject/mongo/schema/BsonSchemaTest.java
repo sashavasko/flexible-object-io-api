@@ -8,9 +8,8 @@ import org.sv.flexobject.mongo.EmbeddedMongoTest;
 import org.sv.flexobject.mongo.schema.testdata.ObjectWithObjectId;
 import org.sv.flexobject.mongo.schema.testdata.ObjectWithTimestampAndDate;
 import org.sv.flexobject.schema.DataTypes;
-import org.sv.flexobject.testdata.SimpleTestDataWithSchema;
-import org.sv.flexobject.testdata.TestDataWithEnumAndClass;
 import org.sv.flexobject.testdata.TestDataWithInferredSchema;
+import org.sv.flexobject.testdata.TestDataWithSubSchema;
 import org.sv.flexobject.testdata.levelone.leveltwo.SimpleObject;
 
 import java.sql.Timestamp;
@@ -82,8 +81,8 @@ public class BsonSchemaTest extends EmbeddedMongoTest {
         Document document = bsonSchema.toBson(data);
 
         assertEquals(data.get("intField"), DataTypes.int32Converter(document.get("intField")));
-        assertTrue(document.get("objectId") instanceof ObjectId);
-        assertEquals(data.objectId, ((ObjectId) document.get("objectId")).toHexString());
+        assertTrue(document.get("_id") instanceof ObjectId);
+        assertEquals(data.objectId, ((ObjectId) document.get("_id")).toHexString());
 
         ObjectWithObjectId convertedData = bsonSchema.fromBson(document);
         assertEquals(data, convertedData);
@@ -93,7 +92,7 @@ public class BsonSchemaTest extends EmbeddedMongoTest {
         Document documentWithNullOid = bsonSchema.toBson(dataWithNullOid);
 
         assertEquals(data.get("intField"), DataTypes.int32Converter(document.get("intField")));
-        assertFalse(documentWithNullOid.containsKey("objectId"));
+        assertFalse(documentWithNullOid.containsKey("_id"));
 
         convertedData = bsonSchema.fromBson(documentWithNullOid);
         assertEquals(dataWithNullOid, convertedData);
@@ -186,6 +185,39 @@ public class BsonSchemaTest extends EmbeddedMongoTest {
         document = bsonSchema.toBson(data);
 
         TestDataWithInferredSchema convertedData = bsonSchema.fromBson(document);
+        assertEquals(data, convertedData);
+
+        collection.insertOne(document);
+
+        assertEquals(1, collection.countDocuments());
+        Document documentInCollection = collection.find().first();
+
+        convertedData = bsonSchema.fromBson(documentInCollection);
+        assertEquals(data, convertedData);
+
+        RawBsonDocument rawDocumentInCollection = collectionRaw.find().first();
+
+        convertedData = bsonSchema.fromBson(rawDocumentInCollection);
+        assertEquals(data, convertedData);
+
+        // Unsupported for POJOs with arrays!
+//        MongoCollection<TestDataWithInferredSchema> pojoCollection = db.getCollection(COLLECTION_NAME, TestDataWithInferredSchema.class);
+//        convertedData = pojoCollection.find().first();
+//        assertEquals(data, convertedData);
+    }
+
+    @Test
+    public void toBsonTestDataWithSubSchema() throws Exception {
+        TestDataWithSubSchema data = new TestDataWithSubSchema();
+        BsonSchema bsonSchema = BsonSchema.getRegisteredSchema(data.getClass());
+        Document document = bsonSchema.toBson(data);
+
+        assertEquals(2, document.size());
+
+        data = TestDataWithSubSchema.random(true);
+        document = bsonSchema.toBson(data);
+
+        TestDataWithSubSchema convertedData = bsonSchema.fromBson(document);
         assertEquals(data, convertedData);
 
         collection.insertOne(document);
