@@ -18,10 +18,7 @@ import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BsonSchema extends AbstractSchema {
 
@@ -30,11 +27,14 @@ public class BsonSchema extends AbstractSchema {
 
     static {
         DataTypes.string.registerCustomConverter(ObjectId.class, (v)->((ObjectId)v).toHexString());
+        DataTypes.string.registerCustomConverter(BsonString.class, (v)->((BsonString)v).getValue());
         DataTypes.string.registerCustomConverter(BsonObjectId.class, (v)->((BsonObjectId)v).getValue().toHexString());
         DataTypes.string.registerCustomConverter(Binary.class, (v)-> Hex.encodeHexString(((Binary)v).getData()));
+        DataTypes.string.registerCustomConverter(BsonBinary.class, (v)-> Hex.encodeHexString(((BsonBinary)v).getData()));
         DataTypes.binary.registerCustomConverter(ObjectId.class, (v)->((ObjectId)v).toByteArray());
         DataTypes.binary.registerCustomConverter(BsonObjectId.class, (v)->((BsonObjectId)v).getValue().toByteArray());
         DataTypes.binary.registerCustomConverter(Binary.class, (v)-> ((Binary)v).getData());
+        DataTypes.binary.registerCustomConverter(BsonBinary.class, (v)-> ((BsonBinary)v).getData());
         // TODO add nanos from ordinal
         DataTypes.timestamp.registerCustomConverter(BsonTimestamp.class, bsonTimestampConverter);
         DataTypes.timestamp.registerCustomConverter(BsonDateTime.class, (v)-> new Timestamp(((BsonDateTime)v).getValue()));
@@ -123,27 +123,32 @@ public class BsonSchema extends AbstractSchema {
 
         switch (structure) {
             case array:
-                Object[] array = (Object[]) value;
-                List bsonArray = new ArrayList(array.length);
-                for (Object item : array) {
-                    bsonArray.add(toBson(item, descriptor, bsonSchemaElement, bsonSubSchema));
+                if (descriptor.getType() == DataTypes.binary){
+                    return new BsonBinary((byte[])value);
+                } else {
+                    Object[] array = (Object[]) value;
+                    List bsonArray = new ArrayList(array.length);
+                    for (Object item : array) {
+                        bsonArray.add(toBson(item, descriptor, bsonSchemaElement, bsonSubSchema));
+                    }
+                    return bsonArray;
                 }
-                return bsonArray;
+
             case list:
-                List list = (List) value;
+                Collection list = (Collection) value;
                 List bsonList = new ArrayList(list.size());
                 for (Object item : list) {
                     bsonList.add(toBson(item, descriptor, bsonSchemaElement, bsonSubSchema));
                 }
                 return bsonList;
             case map:
-                Map<String, Object> map = (Map<String, Object>) value;
+                Map<Object,Object> map = (Map) value;
                 Document bsonMap = new Document();
-                for (Map.Entry<String, Object> entry : map.entrySet()) {
+                for (Map.Entry<Object,Object> entry : map.entrySet()) {
                     Object item = entry.getValue();
                     Object bsonValue = toBson(item, descriptor, bsonSchemaElement, bsonSubSchema);
                     if (bsonValue != null)
-                        bsonMap.put(entry.getKey(), bsonValue);
+                        bsonMap.put(DataTypes.stringConverter(entry.getKey()), bsonValue);
                 }
                 return bsonMap;
         }
