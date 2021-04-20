@@ -8,6 +8,7 @@ import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.schema.SchemaException;
 import org.sv.flexobject.schema.annotations.EnumSetField;
+import org.sv.flexobject.schema.annotations.KeyType;
 import org.sv.flexobject.schema.annotations.ValueClass;
 import org.sv.flexobject.schema.annotations.ValueType;
 
@@ -35,6 +36,7 @@ public class FieldWrapper {
     protected String fieldName;
     protected Class<?> clazz;
     protected Class<? extends StreamableWithSchema> valueClass; // For Collections
+    protected DataTypes keyType = DataTypes.string; // for Maps
 
     public FieldWrapper(Class<?> clazz, String fieldName) {
         this.fieldName = fieldName;
@@ -44,7 +46,7 @@ public class FieldWrapper {
     private STRUCT figureOutCollectionStructure() throws SchemaException {
         if (Map.class.isAssignableFrom(fieldClass))
             return STRUCT.map;
-        else if (List.class.isAssignableFrom(fieldClass))
+        else if (List.class.isAssignableFrom(fieldClass) || Set.class.isAssignableFrom(fieldClass))
             return STRUCT.list;
         else if (fieldClass.isArray())
             return STRUCT.array;
@@ -62,11 +64,18 @@ public class FieldWrapper {
             isEnum = Enum.class.isAssignableFrom(fieldClass);
             if (Set.class.isAssignableFrom(fieldClass)){
                 EnumSetField enumSetField = field.getAnnotation(EnumSetField.class);
-                if (enumSetField == null)
-                    throw new SchemaException(getQualifiedName() + ": Sets are supported onlu for Enumeration type and require EnumSetField annotation.");
-
-                enumClass = enumSetField.enumClass();
-                emptyValue = enumSetField.emptyValue();
+                if (enumSetField != null){
+                    enumClass = enumSetField.enumClass();
+                    emptyValue = enumSetField.emptyValue();
+                } else {
+                    ValueType vt = field.getAnnotation(ValueType.class);
+                    if (vt != null) {
+                        type = vt.type();
+                        structure = figureOutCollectionStructure();
+                        return field;
+                    }else
+                        throw new SchemaException(getQualifiedName() + ": Sets are supported only for Enumeration type (with EnumSetField annotation) or ValueType annotation must be used.");
+                }
             }
 
             if (type == DataTypes.invalid){
@@ -75,6 +84,11 @@ public class FieldWrapper {
                 if (vt != null){
                     type = vt.type();
                     structure = figureOutCollectionStructure();
+                    if (structure == STRUCT.map){
+                        KeyType kt = field.getAnnotation(KeyType.class);
+                        if (kt != null)
+                            keyType = kt.type();
+                    }
                 }else if (vc != null) {
                     type = DataTypes.jsonNode;
                     valueClass = vc.valueClass();
@@ -98,9 +112,12 @@ public class FieldWrapper {
     public Object getValue(Object o) throws Exception {
         Object fieldValue = getField().get(o);
         if (fieldValue == null){
-            if (getFieldClass().isArray())
-                throw new SchemaException(getQualifiedName() + ": Arrays must be initialized in data objects with Schema.");
-            if (structure == STRUCT.list) {
+            if (getFieldClass().isArray()) {
+                if (getType() == DataTypes.binary){
+                    return null;
+                }else
+                    throw new SchemaException(getQualifiedName() + ": Arrays must be initialized in data objects with Schema.");
+            }else if (structure == STRUCT.list) {
                 fieldValue = new ArrayList<>();
                 setValue(o, fieldValue);
             } else if (structure == STRUCT.map) {

@@ -105,6 +105,11 @@ public class AbstractSchema {
                         if (!Arrays.equals((Object[])value, (Object[])otherValue)) {
                             return false;
                         }
+                    } else if (value instanceof Map) {
+                        if (otherValue instanceof Map){
+                            return ((Map)value).entrySet().equals(((Map)otherValue).entrySet());
+                        } else
+                            return false;
                     } else if (!value.equals(otherValue))
                         return false;
                 } else if (otherValue != null)

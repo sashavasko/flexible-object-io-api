@@ -14,6 +14,7 @@ import org.sv.flexobject.util.FunctionWithException;
 import org.sv.flexobject.util.TriConsumerWithException;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -439,7 +440,7 @@ public enum DataTypes {
         if (value instanceof String)
             return Hex.decodeHex(((String)value).toCharArray());
 
-        return (byte[]) DataTypes.binary.applyCustomConverter(value, (v)->v.toString());
+        return (byte[]) DataTypes.binary.applyCustomConverter(value, (v)->v.toString().getBytes(StandardCharsets.UTF_8));
     }
 
     public static void setBinary(OutAdapter adapter, String fieldName, Object value) throws Exception {

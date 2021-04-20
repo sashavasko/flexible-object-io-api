@@ -156,13 +156,13 @@ public class FieldDescriptor extends AbstractFieldDescriptor{
         String name = field.getName();
         DataTypes externalType;
 
-        if (fieldClass.isArray())
+        ScalarFieldTyped sft = field.getAnnotation(ScalarFieldTyped.class);
+        if (fieldClass.isArray() && sft == null)
             externalType = DataTypes.jsonNode;
         else if (List.class.isAssignableFrom(fieldClass)
                 || Map.class.isAssignableFrom(fieldClass)) {
             externalType = DataTypes.jsonNode;
         } else {
-            ScalarFieldTyped sft = field.getAnnotation(ScalarFieldTyped.class);
             externalType = sft != null ? sft.type() :DataTypes.valueOf(fieldClass);
         }
 
