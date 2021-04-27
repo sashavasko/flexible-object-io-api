@@ -1,5 +1,6 @@
 package org.sv.flexobject.hadoop.streaming.parquet.write;
 
+import org.apache.log4j.Logger;
 import org.apache.parquet.io.api.RecordConsumer;
 import org.apache.parquet.schema.GroupType;
 import org.apache.parquet.schema.OriginalType;
@@ -7,7 +8,11 @@ import org.apache.parquet.schema.PrimitiveType;
 import org.apache.parquet.schema.Type;
 import org.sv.flexobject.hadoop.streaming.parquet.ParquetSchema;
 
+import java.util.Collection;
+import java.util.Map;
+
 abstract public class SchemedWriter<GT, VT> {
+    static Logger logger = Logger.getLogger(SchemedWriter.class);
 
     private final RecordConsumer recordConsumer;
     private final GroupType schema;
@@ -58,7 +63,7 @@ abstract public class SchemedWriter<GT, VT> {
 
         // writing special list subgroup!
         getRecordConsumer().startField(fieldName, 0);
-        writeMap((VT)group, fieldType);
+        writeMap((VT) group, fieldType);
         getRecordConsumer().endField(fieldName, 0);
     }
 
@@ -71,8 +76,19 @@ abstract public class SchemedWriter<GT, VT> {
         }
     }
 
+    protected static boolean isEmptyField(Object value) {
+        if (value == null)
+            return true;
+
+        if (value instanceof Collection && ((Collection) value).isEmpty())
+            return true;
+        if (value instanceof Map && ((Map) value).isEmpty())
+            return true;
+        return false;
+    }
+
     protected void writeField(int field, VT value, GroupType type) throws ParquetWriteException {
-        if (value != null) {
+        if (!isEmptyField(value)) {
             Type fieldType = type.getType(field);
             String fieldName = fieldType.getName();
             getRecordConsumer().startField(fieldName, field);
@@ -90,17 +106,19 @@ abstract public class SchemedWriter<GT, VT> {
 
     }
 
-    protected void writeSingle(VT fieldNode, Type fieldType) throws ParquetWriteException {
-        if (fieldType.isPrimitive()) {
-            writeValue(fieldNode, (PrimitiveType) fieldType);
-        } else {
-            writeChildObject((GT) fieldNode, fieldType.asGroupType());
-            //TODO check for "elements" subfield and in this case delegate arrayNode in that subfield
+    protected void writeSingle(VT value, Type fieldType) throws ParquetWriteException {
+        if (!isEmptyField(value)) {
+            if (fieldType.isPrimitive()) {
+                writeValue(value, (PrimitiveType) fieldType);
+            } else {
+                writeChildObject((GT) value, fieldType.asGroupType());
+                //TODO check for "elements" subfield and in this case delegate arrayNode in that subfield
+            }
         }
     }
 
     protected void writeListElement(VT fieldNode, Type fieldType) throws ParquetWriteException {
-        System.out.println("writeListElement for :" + fieldNode + " Field type : " + fieldType);
+        logger.debug("writeListElement for :" + fieldNode + " Field type : " + fieldType);
         // Field Type is: repeated group list { optional element }
         GroupType listType = fieldType.asGroupType();
         getRecordConsumer().startGroup();
@@ -110,7 +128,7 @@ abstract public class SchemedWriter<GT, VT> {
     }
 
     protected void writeMapElement(Object key, Object value, Type fieldType) throws ParquetWriteException {
-        System.out.println("writeMapElement for : (" + key + "," + value + ") Field type : " + fieldType);
+        logger.debug("writeMapElement for : (" + key + "," + value + ") Field type : " + fieldType);
         // Field Type is: repeated group key_value { required binary key ; optional value; }
         GroupType keyValueType = fieldType.asGroupType();
         getRecordConsumer().startGroup();

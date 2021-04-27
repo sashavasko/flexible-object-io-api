@@ -8,7 +8,7 @@ public class NopConverter extends StreamableConverter {
     static NopConverter instance = null;
 
     private NopConverter() {
-        super(null);
+        super(null, null, null);
     }
 
     public static NopConverter getInstance() {

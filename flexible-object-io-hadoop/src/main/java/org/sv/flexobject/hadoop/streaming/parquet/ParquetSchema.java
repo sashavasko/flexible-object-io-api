@@ -15,6 +15,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.apache.parquet.schema.OriginalType.LIST;
 import static org.apache.parquet.schema.OriginalType.UTF8;
 import static org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.BINARY;
 import static org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.INT32;
@@ -24,7 +25,13 @@ public class ParquetSchema {
 
     public enum MapElementFields {
         key,
-        value
+        value;
+
+        public static MapElementFields forType(Type type){
+            if (ELEMENT_OBJECT_NAME.equals(type.getName()))
+                return value;
+            return valueOf(type.getName());
+        }
     }
 
     public static final String LIST_OBJECT_NAME = "list";
@@ -47,6 +54,8 @@ public class ParquetSchema {
 
     public static Type makeScalarType(DataTypes type, String name, Type.Repetition repetition) throws NoSuchFieldException, SchemaException {
         switch (type) {
+            case binary:
+                return binaryField(name, repetition);
             case classObject:
             case string:
                 return stringField(name, repetition);
@@ -289,6 +298,14 @@ public class ParquetSchema {
     //
     // We limit ourselves to the following data types for sanity sake:
     //
+    public static Type binaryField(String name){
+        return binaryField(name, OPTIONAL);
+    }
+
+    public static Type binaryField(String name, Type.Repetition repetition){
+        return new PrimitiveType(repetition, BINARY, name);
+    }
+
     public static Type stringField(String name){
         return stringField(name, OPTIONAL);
     }
@@ -366,5 +383,40 @@ public class ParquetSchema {
     public static Type groupField(String name, List<Type> fields){
         return new GroupType(Type.Repetition.OPTIONAL, name, fields);
     }
+    public static List<Type> correctFieldsForSimpleLists(GroupType requestedSchema, GroupType fileSchema){
+        List<Type> correctedFields = new ArrayList<>(requestedSchema.getFieldCount());
+        for (Type requestedField : requestedSchema.getFields()){
+            if (fileSchema.containsField(requestedField.getName())){
+                if (requestedField.isPrimitive())
+                    correctedFields.add(requestedField);
+                else {
+                    GroupType requestedGroupField = requestedField.asGroupType();
+                    GroupType fileGroupField = fileSchema.getType(requestedField.getName()).asGroupType();
 
+                    if (requestedField.getOriginalType() == LIST && !fileGroupField.containsField(LIST_OBJECT_NAME)){
+                        correctedFields.add(fileGroupField);
+                    } else {
+                        correctedFields.add(correctGroupForSimpleLists(requestedGroupField, fileGroupField));
+                    }
+                }
+            }
+        }
+        return correctedFields;
+    }
+
+    public static GroupType correctGroupForSimpleLists (GroupType requestedSchema, GroupType fileSchema){
+        List<Type> correctedFields = correctFieldsForSimpleLists(requestedSchema, fileSchema);
+
+        GroupType correctedGroup = Types.buildGroup(requestedSchema.getRepetition())
+                .as(requestedSchema.getOriginalType())
+                .named(requestedSchema.getName())
+                .withNewFields(correctedFields);
+        return requestedSchema.getId() != null ? correctedGroup.withId(requestedSchema.getId().intValue()) : correctedGroup;
+
+    }
+
+    public static MessageType correctSchemaForSimpleLists(MessageType requestedSchema, MessageType fileSchema) {
+        List<Type> correctedFields = correctFieldsForSimpleLists(requestedSchema, fileSchema);
+        return new MessageType(requestedSchema.getName(), correctedFields);
+    }
 }

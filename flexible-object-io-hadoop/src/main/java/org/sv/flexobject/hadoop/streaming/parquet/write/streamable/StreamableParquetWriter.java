@@ -10,6 +10,7 @@ import org.sv.flexobject.hadoop.streaming.parquet.write.ParquetWriteException;
 import org.sv.flexobject.hadoop.streaming.parquet.write.SchemedWriter;
 import org.sv.flexobject.schema.DataTypes;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -78,8 +79,8 @@ public class StreamableParquetWriter extends SchemedWriter<StreamableWithSchema,
         if (o.getClass().isArray()){
             for (Object child : ((Object[])o))
                 writeListElement(child, fieldType);
-        } else if (List.class.isAssignableFrom(o.getClass())){
-            for (Object child : (List)o)
+        } else if (Collection.class.isAssignableFrom(o.getClass())){
+            for (Object child : (Collection)o)
                 writeListElement(child, fieldType);
         } else
             writeListElement(o, fieldType);

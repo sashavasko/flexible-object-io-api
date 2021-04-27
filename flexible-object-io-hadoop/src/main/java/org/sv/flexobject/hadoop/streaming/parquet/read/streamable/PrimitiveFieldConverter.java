@@ -17,13 +17,18 @@ public class PrimitiveFieldConverter extends SchemedPrimitiveConverter<Streamabl
         super(type);
     }
 
+    protected void setValue(Object value) throws Exception {
+        getCurrent().set(getType().getName(), value);
+    }
+
     private void set(Object value) {
         try {
-            getCurrent().set(getType().getName(), value);
+            setValue(value);
         } catch (Exception e) {
-            e.printStackTrace();
+            if (e instanceof RuntimeException)
+                throw (RuntimeException)e;
+            throw new RuntimeException("Failed to set value for " + getType(), e);
         }
-
     }
 
     @Override

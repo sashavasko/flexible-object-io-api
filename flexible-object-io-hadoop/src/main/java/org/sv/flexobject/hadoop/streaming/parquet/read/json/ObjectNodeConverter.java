@@ -8,15 +8,16 @@ import org.apache.parquet.schema.GroupType;
 import org.apache.parquet.schema.PrimitiveType;
 import org.sv.flexobject.hadoop.streaming.parquet.read.SchemedGroupConverter;
 import org.sv.flexobject.hadoop.streaming.parquet.read.SchemedPrimitiveConverter;
+import org.sv.flexobject.hadoop.streaming.parquet.read.SchemedRepeatedConverter;
 
 public class ObjectNodeConverter extends SchemedGroupConverter<ObjectNode> {
 
-    public ObjectNodeConverter(GroupType schema) {
-        super(schema);
+    public ObjectNodeConverter(GroupType schema, GroupType fileSchema) {
+        super(schema, fileSchema, ObjectNode.class);
     }
 
-    public ObjectNodeConverter(ObjectNodeConverter parent, String parentName, GroupType type) {
-        super(parent, parentName, type);
+    public ObjectNodeConverter(ObjectNodeConverter parent, String parentName, GroupType type, GroupType fileSchema) {
+        super(parent, parentName, type, fileSchema, ObjectNode.class);
     }
 
     @Override
@@ -25,8 +26,13 @@ public class ObjectNodeConverter extends SchemedGroupConverter<ObjectNode> {
     }
 
     @Override
-    protected SchemedGroupConverter<ObjectNode> newGroupConverter(String parentName, GroupType type) {
-        return new ObjectNodeConverter(this, parentName, type);
+    protected SchemedGroupConverter<ObjectNode> newGroupConverter(String parentName, GroupType type, GroupType fileSchema) {
+        return new ObjectNodeConverter(this, parentName, type, fileSchema);
+    }
+
+    @Override
+    protected SchemedRepeatedConverter newRepeatedConverter(String parentName, GroupType type, GroupType fileSchema) {
+        return null;
     }
 
     protected ObjectNode newGroupInstance(){

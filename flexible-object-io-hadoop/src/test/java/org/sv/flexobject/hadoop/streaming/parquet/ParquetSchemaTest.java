@@ -1,10 +1,21 @@
 package org.sv.flexobject.hadoop.streaming.parquet;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.parquet.hadoop.ParquetReader;
+import org.apache.parquet.hadoop.ParquetWriter;
 import org.apache.parquet.schema.MessageType;
 import org.junit.Test;
+import org.sv.flexobject.hadoop.streaming.parquet.read.input.ByteArrayInputFile;
+import org.sv.flexobject.hadoop.streaming.parquet.read.streamable.ParquetReaderBuilder;
+import org.sv.flexobject.hadoop.streaming.parquet.testdata.ListOfBinaries;
+import org.sv.flexobject.hadoop.streaming.parquet.testdata.ListOfStrings;
+import org.sv.flexobject.hadoop.streaming.parquet.testdata.StreamableWithListOfObjects;
+import org.sv.flexobject.hadoop.streaming.parquet.testdata.StreamableWithMapOfObjects;
+import org.sv.flexobject.hadoop.streaming.parquet.write.output.ByteArrayOutputFile;
+import org.sv.flexobject.hadoop.streaming.parquet.write.streamable.ParquetWriterBuilder;
 import org.sv.flexobject.json.MapperFactory;
 import org.sv.flexobject.testdata.TestDataWithInferredSchema;
+import org.sv.flexobject.testdata.TestDataWithInferredSchemaAndList;
 import org.sv.flexobject.testdata.TestDataWithSubSchema;
 import org.sv.flexobject.testdata.TestDataWithSubSchemaInCollection;
 
@@ -32,6 +43,7 @@ public class ParquetSchemaTest {
                 "  optional int32 intField;\n" +
                 "  optional int32 intFieldOptional;\n" +
                 "  optional binary intFieldStoredAsString (UTF8);\n" +
+                "  optional int32 intFieldStoredAsStringOptional;\n" +
                 "  optional group intArray (LIST) {\n" +
                 "    repeated group list {\n" +
                 "      optional int32 element;\n" +
@@ -64,6 +76,7 @@ public class ParquetSchemaTest {
                 "    optional int32 intField;\n" +
                 "    optional int32 intFieldOptional;\n" +
                 "    optional binary intFieldStoredAsString (UTF8);\n" +
+                "    optional int32 intFieldStoredAsStringOptional;\n" +
                 "    optional group intArray (LIST) {\n" +
                 "      repeated group list {\n" +
                 "        optional int32 element;\n" +
@@ -86,6 +99,37 @@ public class ParquetSchemaTest {
     }
 
     @Test
+    public void forListOfBinaries() {
+        MessageType parquetSchema = ParquetSchema.forClass(ListOfBinaries.class);
+
+        assertEquals("message org.sv.flexobject.hadoop.streaming.parquet.testdata.ListOfBinaries {\n" +
+                "  optional group binaryFieldRepeated (LIST) {\n" +
+                "    repeated group list {\n" +
+                "      optional binary element;\n" +
+                "    }\n" +
+                "  }\n" +
+                "}\n", parquetSchema.toString());
+    }
+
+    @Test
+    public void forListOfStrings() {
+        MessageType parquetSchema = ParquetSchema.forClass(ListOfStrings.class);
+
+        assertEquals("message org.sv.flexobject.hadoop.streaming.parquet.testdata.ListOfStrings {\n" +
+                "  optional group binaryFieldRepeated (LIST) {\n" +
+                "    repeated group list {\n" +
+                "      optional binary element (UTF8);\n" +
+                "    }\n" +
+                "  }\n" +
+                "  optional group binaryFieldSimpleRepeated (LIST) {\n" +
+                "    repeated group list {\n" +
+                "      optional binary element (UTF8);\n" +
+                "    }\n" +
+                "  }\n" +
+                "}\n", parquetSchema.toString());
+    }
+
+    @Test
     public void forTestDataWithSubSchemaInCollection() {
         MessageType parquetSchema = ParquetSchema.forClass(TestDataWithSubSchemaInCollection.class);
 
@@ -99,6 +143,7 @@ public class ParquetSchemaTest {
                 "        optional int32 intField;\n" +
                 "        optional int32 intFieldOptional;\n" +
                 "        optional binary intFieldStoredAsString (UTF8);\n" +
+                "        optional int32 intFieldStoredAsStringOptional;\n" +
                 "        optional group intArray (LIST) {\n" +
                 "          repeated group list {\n" +
                 "            optional int32 element;\n" +
@@ -125,6 +170,7 @@ public class ParquetSchemaTest {
                 "        optional int32 intField;\n" +
                 "        optional int32 intFieldOptional;\n" +
                 "        optional binary intFieldStoredAsString (UTF8);\n" +
+                "        optional int32 intFieldStoredAsStringOptional;\n" +
                 "        optional group intArray (LIST) {\n" +
                 "          repeated group list {\n" +
                 "            optional int32 element;\n" +
@@ -152,6 +198,7 @@ public class ParquetSchemaTest {
                 "        optional int32 intField;\n" +
                 "        optional int32 intFieldOptional;\n" +
                 "        optional binary intFieldStoredAsString (UTF8);\n" +
+                "        optional int32 intFieldStoredAsStringOptional;\n" +
                 "        optional group intArray (LIST) {\n" +
                 "          repeated group list {\n" +
                 "            optional int32 element;\n" +
@@ -174,4 +221,68 @@ public class ParquetSchemaTest {
                 "  }\n" +
                 "}\n", parquetSchema.toString());
     }
+
+
+    @Test
+    public void readWriteTestDataWithInferredSchemaList() throws Exception {
+        ByteArrayOutputFile outputFile = new ByteArrayOutputFile();
+        TestDataWithInferredSchemaAndList data = TestDataWithInferredSchemaAndList.random(false);
+        try(ParquetWriter<TestDataWithInferredSchemaAndList> writer = ParquetWriterBuilder.forOutput(outputFile).withSchema(TestDataWithInferredSchemaAndList.class).build()){
+            writer.write(data);
+        }
+
+        TestDataWithInferredSchemaAndList convertedData;
+        try(ParquetReader<TestDataWithInferredSchemaAndList> reader = ParquetReaderBuilder.forInput(new ByteArrayInputFile(outputFile.toByteArray())).withSchema(TestDataWithInferredSchemaAndList.class).build()){
+            convertedData = reader.read();
+        }
+
+        assertEquals(data, convertedData);
+    }
+
+    @Test
+    public void readWriteTestDataWithInferredSchema() throws Exception {
+        ByteArrayOutputFile outputFile = new ByteArrayOutputFile();
+        TestDataWithInferredSchema data = TestDataWithInferredSchema.random(false);
+        try(ParquetWriter<TestDataWithInferredSchema> writer = ParquetWriterBuilder.forOutput(outputFile).withSchema(TestDataWithInferredSchema.class).build()){
+            writer.write(data);
+        }
+
+        TestDataWithInferredSchema convertedData;
+        try(ParquetReader<TestDataWithInferredSchema> reader = ParquetReaderBuilder.forInput(new ByteArrayInputFile(outputFile.toByteArray())).withSchema(TestDataWithInferredSchema.class).build()){
+            convertedData = reader.read();
+        }
+
+        assertEquals(data, convertedData);
+    }
+
+    @Test
+    public void readWriteTestDataWithListOfObject() throws Exception {
+        ByteArrayOutputFile outputFile = new ByteArrayOutputFile();
+        StreamableWithListOfObjects data = StreamableWithListOfObjects.random();
+        try(ParquetWriter<StreamableWithListOfObjects> writer = ParquetWriterBuilder.forOutput(outputFile).withSchema(StreamableWithListOfObjects.class).build()){
+            writer.write(data);
+        }
+
+        StreamableWithListOfObjects convertedData;
+        try(ParquetReader<StreamableWithListOfObjects> reader = ParquetReaderBuilder.forInput(new ByteArrayInputFile(outputFile.toByteArray())).withSchema(StreamableWithListOfObjects.class).build()){
+            convertedData = reader.read();
+        }
+        assertEquals(data, convertedData);
+    }
+
+    @Test
+    public void readWriteTestDataWithMapOfObject() throws Exception {
+        ByteArrayOutputFile outputFile = new ByteArrayOutputFile();
+        StreamableWithMapOfObjects data = StreamableWithMapOfObjects.random();
+        try(ParquetWriter<StreamableWithMapOfObjects> writer = ParquetWriterBuilder.forOutput(outputFile).withSchema(StreamableWithMapOfObjects.class).build()){
+            writer.write(data);
+        }
+
+        StreamableWithMapOfObjects convertedData;
+        try(ParquetReader<StreamableWithMapOfObjects> reader = ParquetReaderBuilder.forInput(new ByteArrayInputFile(outputFile.toByteArray())).withSchema(StreamableWithMapOfObjects.class).build()){
+            convertedData = reader.read();
+        }
+        assertEquals(data, convertedData);
+    }
+
 }

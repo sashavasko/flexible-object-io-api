@@ -15,7 +15,7 @@ public class JsonReadSupport extends SchemedReadSupport<ObjectNode> {
     }
 
     @Override
-    public SchemedGroupConverter<ObjectNode> newGroupConverter(MessageType schema) {
-        return new ObjectNodeConverter(schema);
+    public SchemedGroupConverter<ObjectNode> newGroupConverter(MessageType schema, MessageType fileSchema) {
+        return new ObjectNodeConverter(schema, fileSchema);
     }
 }
