@@ -391,12 +391,21 @@ public class ParquetSchema {
                     correctedFields.add(requestedField);
                 else {
                     GroupType requestedGroupField = requestedField.asGroupType();
-                    GroupType fileGroupField = fileSchema.getType(requestedField.getName()).asGroupType();
-
-                    if (requestedField.getOriginalType() == LIST && !fileGroupField.containsField(LIST_OBJECT_NAME)){
-                        correctedFields.add(fileGroupField);
+                    Type fileField = fileSchema.getType(requestedField.getName());
+                    if (fileField.isPrimitive()){
+                        if (fileField.isRepetition(REPEATED) && requestedField.getOriginalType() == LIST){
+                            correctedFields.add(fileField);
+                        } else {
+                            throw new InvalidSchemaException("Field " + requestedField.getName() + " in requested schema is Group, but in file it is a primitive!");
+                        }
                     } else {
-                        correctedFields.add(correctGroupForSimpleLists(requestedGroupField, fileGroupField));
+                        GroupType fileGroupField = fileField.asGroupType();
+
+                        if (requestedField.getOriginalType() == LIST && !fileGroupField.containsField(LIST_OBJECT_NAME)) {
+                            correctedFields.add(fileGroupField);
+                        } else {
+                            correctedFields.add(correctGroupForSimpleLists(requestedGroupField, fileGroupField));
+                        }
                     }
                 }
             }

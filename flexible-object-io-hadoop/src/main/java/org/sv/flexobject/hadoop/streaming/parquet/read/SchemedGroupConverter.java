@@ -58,9 +58,14 @@ public abstract class SchemedGroupConverter<T> extends GroupConverter {
 
                 Type fileField = fileSchema.containsField(field.getName()) ? fileSchema.getType(field.getName()) : null;
 
-                if (field.isPrimitive())
+                if (field.isPrimitive()) {
+                    if (field.isRepetition(Type.Repetition.REPEATED)){
+                        logger.info("Creating Non-Compliant List converter for field \n" + field + " and file field \n" + fileField);
+                    }else {
+                        logger.debug("Creating primitive converter for field \n" + field + " and file field \n" + fileField);
+                    }
                     converters[i++] = newPrimitiveConverter(field.asPrimitiveType());
-                else {
+                } else {
                     GroupType groupType = field.asGroupType();
                     GroupType fileGroupType = fileField != null && !fileField.isPrimitive() ? fileField.asGroupType() : null;
                     if (groupType.getOriginalType() == OriginalType.LIST) {

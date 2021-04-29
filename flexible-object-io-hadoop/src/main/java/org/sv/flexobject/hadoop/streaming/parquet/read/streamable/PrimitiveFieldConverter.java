@@ -7,9 +7,12 @@ import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.hadoop.streaming.parquet.read.SchemedPrimitiveConverter;
 import org.sv.flexobject.json.MapperFactory;
 import org.sv.flexobject.schema.DataTypes;
+import org.sv.flexobject.schema.FieldDescriptor;
+import org.sv.flexobject.schema.reflect.FieldWrapper;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.Collection;
 
 public class PrimitiveFieldConverter extends SchemedPrimitiveConverter<StreamableWithSchema> {
 
@@ -18,7 +21,13 @@ public class PrimitiveFieldConverter extends SchemedPrimitiveConverter<Streamabl
     }
 
     protected void setValue(Object value) throws Exception {
-        getCurrent().set(getType().getName(), value);
+        StreamableWithSchema current = getCurrent();
+        FieldDescriptor descriptor = current.getSchema().getDescriptor(getType().getName());
+        if (descriptor.getStructure() == FieldWrapper.STRUCT.list){
+            Collection list = (Collection)current.get(getType().getName());
+            list.add(value);
+        } else
+            current.set(getType().getName(), value);
     }
 
     private void set(Object value) {
