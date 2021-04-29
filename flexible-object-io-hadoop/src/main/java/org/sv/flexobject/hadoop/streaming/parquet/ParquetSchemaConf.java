@@ -29,6 +29,12 @@ public class ParquetSchemaConf extends HadoopPropertiesWrapper<ParquetSchemaConf
     JsonNode outputSchemaJson;
 
     public ParquetSchemaConf() {
+        super();
+    }
+
+    @Override
+    public ParquetSchemaConf setDefaults() {
+        return this;
     }
 
     public ParquetSchemaConf(String namespace) {

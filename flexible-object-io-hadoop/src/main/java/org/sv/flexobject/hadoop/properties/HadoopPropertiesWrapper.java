@@ -8,7 +8,7 @@ import org.sv.flexobject.hadoop.adapter.ConfigurationOutAdapter;
 import org.sv.flexobject.properties.PropertiesWrapper;
 import org.sv.flexobject.schema.annotations.NonStreamableField;
 
-public class HadoopPropertiesWrapper<T extends HadoopPropertiesWrapper> extends PropertiesWrapper<T> implements Configurable {
+public abstract class HadoopPropertiesWrapper<T extends HadoopPropertiesWrapper> extends PropertiesWrapper<T> implements Configurable {
 
     @NonStreamableField
     private String namespace;

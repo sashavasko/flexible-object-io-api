@@ -13,6 +13,12 @@ public class ParquetSourceConf extends HadoopPropertiesWrapper<ParquetSourceConf
     Class<? extends StreamableWithSchema> dataClass;
 
     public ParquetSourceConf() {
+        super();
+    }
+
+    @Override
+    public ParquetSourceConf setDefaults() {
+        return this;
     }
 
     public ParquetSourceConf(String namespace) {

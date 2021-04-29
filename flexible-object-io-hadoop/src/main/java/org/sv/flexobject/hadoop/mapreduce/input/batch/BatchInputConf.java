@@ -6,21 +6,36 @@ public class BatchInputConf extends HadoopPropertiesWrapper<BatchInputConf> {
 
     public static final String SUBNAMESPACE = "input.batch";
 
-    private Long keyStart = 0l; //conf.getLong(CFX_BATCH_KEY_START, 0l);
-    private Integer size = 1000; //conf.getInt(BatchInputSplit.CFX_BATCH_SIZE, 1000);
-    private Integer batchesPerSplit = 200; //conf.getInt(BatchInputSplit.CFX_BATCHES_PER_SPLIT, 200);
-    private Integer batchesNum = 15000; //conf.getInt(CFX_BATCHES_NUM, 15000);
-    private Class<? extends BatchInputSplit> splitClass = BatchInputSplit.class; // conf.getClass(CFX_BATCH_SPLIT_CLASS, BatchInputSplit.class, BatchInputSplit.class);
-    private Class<? extends BatchRecordReader> readerClass = BatchRecordReader.Long.class;
+    private Long keyStart;
+    private Integer size;
+    private Integer batchesPerSplit;
+    private Integer batchesNum;
+    private Class<? extends BatchInputSplit> splitClass;
+    private Class<? extends BatchRecordReader> readerClass;
     private String keyMaxDatasetPath;
     private String keyMaxDatasetColumnName;
-    private Class<? extends MaxKeyCalculator> keyMaxCalculator = ParquetMaxKeyCalculator.class;
-    private Class<? extends BatchKeyManager> keyManager = BatchKeyManager.class;
+    private Class<? extends MaxKeyCalculator> keyMaxCalculator;
+    private Class<? extends BatchKeyManager> keyManager;
     private String keyColumnName;
-    private Long reduceMaxKeys = 16000000l;
-
+    private Long reduceMaxKeys;
 
     public BatchInputConf() {
+        super();
+    }
+
+    @Override
+    public BatchInputConf setDefaults() {
+        keyStart = 0l; //conf.getLong(CFX_BATCH_KEY_START, 0l);
+        size = 1000; //conf.getInt(BatchInputSplit.CFX_BATCH_SIZE, 1000);
+        batchesPerSplit = 200; //conf.getInt(BatchInputSplit.CFX_BATCHES_PER_SPLIT, 200);
+        batchesNum = 15000; //conf.getInt(CFX_BATCHES_NUM, 15000);
+        splitClass = BatchInputSplit.class; // conf.getClass(CFX_BATCH_SPLIT_CLASS, BatchInputSplit.class, BatchInputSplit.class);
+        readerClass = BatchRecordReader.Long.class;
+        keyMaxCalculator = ParquetMaxKeyCalculator.class;
+        keyManager = BatchKeyManager.class;
+        reduceMaxKeys = 16000000l;
+
+        return this;
     }
 
     public BatchInputConf(String namespace) {

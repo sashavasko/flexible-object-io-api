@@ -5,10 +5,18 @@ import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
 public class KeyInputConf extends HadoopPropertiesWrapper<KeyInputConf> {
     public static final String SUBNAMESPACE = "input.key";
 
-    private Class<? extends KeySplitter> splitterClass = ModSplitter.class;
-    private Class<? extends KeyRecordReader> readerClass = KeyRecordReader.LongText.class;
+    private Class<? extends KeySplitter> splitterClass;
+    private Class<? extends KeyRecordReader> readerClass;
 
     public KeyInputConf() {
+        super();
+    }
+
+    @Override
+    public KeyInputConf setDefaults() {
+        splitterClass = ModSplitter.class;
+        readerClass = KeyRecordReader.LongText.class;
+        return this;
     }
 
     public KeyInputConf(String namespace) {

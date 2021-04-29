@@ -5,12 +5,21 @@ import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
 public class DaoRecordReaderConf extends HadoopPropertiesWrapper<DaoRecordReaderConf> {
     public static final String SUBNAMESPACE = "record.reader";
 
-    protected String keyFieldName = DaoRecordReader.CURRENT_KEY_FIELD_NAME;
-    protected String valueFieldName = DaoRecordReader.CURRENT_VALUE_FIELD_NAME;
-    protected Integer maxRetries = DaoRecordReader.DEFAULT_MAX_RETRIES_VALUE;
+    protected String keyFieldName;
+    protected String valueFieldName;
+    protected Integer maxRetries;
     Class<? extends MRDao> daoClass;
 
     public DaoRecordReaderConf() {
+        super();
+    }
+
+    @Override
+    public DaoRecordReaderConf setDefaults() {
+        keyFieldName = DaoRecordReader.CURRENT_KEY_FIELD_NAME;
+        valueFieldName = DaoRecordReader.CURRENT_VALUE_FIELD_NAME;
+        maxRetries = DaoRecordReader.DEFAULT_MAX_RETRIES_VALUE;
+        return this;
     }
 
     public DaoRecordReaderConf(String namespace) {

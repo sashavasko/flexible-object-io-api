@@ -31,6 +31,12 @@ public class HadoopTaskConf extends HadoopPropertiesWrapper<HadoopTaskConf> {
     private String connectionManagerEnvironment;
 
     public HadoopTaskConf() {
+        super();
+    }
+
+    @Override
+    public HadoopTaskConf setDefaults() {
+        return this;
     }
 
     public HadoopTaskConf(String namespace) {

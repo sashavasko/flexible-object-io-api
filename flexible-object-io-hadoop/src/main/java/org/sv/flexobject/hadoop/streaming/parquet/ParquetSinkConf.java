@@ -12,6 +12,12 @@ public class ParquetSinkConf extends HadoopPropertiesWrapper<ParquetSinkConf> {
     Class<? extends StreamableWithSchema> dataClass;
 
     public ParquetSinkConf() {
+        super();
+    }
+
+    @Override
+    public ParquetSinkConf setDefaults() {
+        return this;
     }
 
     public ParquetSinkConf(String namespace) {
