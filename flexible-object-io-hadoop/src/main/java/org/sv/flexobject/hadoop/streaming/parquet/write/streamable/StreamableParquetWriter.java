@@ -75,7 +75,6 @@ public class StreamableParquetWriter extends SchemedWriter<StreamableWithSchema,
     }
 
     public void writeRepeated(Object o, Type fieldType) throws ParquetWriteException {
-        System.out.println("writeRepeated for " + o.getClass() + " field Type:" + fieldType);
         if (o.getClass().isArray()){
             for (Object child : ((Object[])o))
                 writeListElement(child, fieldType);
@@ -88,7 +87,6 @@ public class StreamableParquetWriter extends SchemedWriter<StreamableWithSchema,
 
     @Override
     public void writeMap(Object o, Type fieldType) throws ParquetWriteException {
-        System.out.println("writeMap for " + o.getClass() + " field Type:" + fieldType);
         if (Map.class.isAssignableFrom(o.getClass())){
             for (Object child : ((Map)o).entrySet())
                 writeMapElement(((Map.Entry)child).getKey(), ((Map.Entry)child).getValue(), fieldType);
