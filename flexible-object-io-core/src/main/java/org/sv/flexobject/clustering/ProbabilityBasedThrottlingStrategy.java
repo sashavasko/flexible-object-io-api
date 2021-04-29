@@ -110,6 +110,10 @@ public class ProbabilityBasedThrottlingStrategy implements LoadBalanceStrategy {
 
     }
 
+    public static Builder builder(){
+        return new Builder();
+    }
+
     @Override
     public ClusterMember selectSource(Cluster cluster) {
         int onlineSlavesCount = cluster.countOnlineSlaves();
