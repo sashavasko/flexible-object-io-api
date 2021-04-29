@@ -34,7 +34,7 @@ public class IncomingBlockingQueueWrapper<T> extends NotReallyBlockingQueueWrapp
             return queue.offer(value, timeout, timeoutUnit);
     }
 
-    public T get() throws Exception {
+    public T get() {
         T value;
         while((value = queue.poll()) == null) {
 //            logger.info("queue size is " + queue.size() + " and EOF is " + EOF);
@@ -42,7 +42,10 @@ public class IncomingBlockingQueueWrapper<T> extends NotReallyBlockingQueueWrapp
                 return null;
             }
 
-            Thread.sleep(10);
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+            }
         }
         return value;
     }

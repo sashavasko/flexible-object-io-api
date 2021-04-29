@@ -16,9 +16,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.function.Supplier;
 
-public class PropertiesWrapper<T extends PropertiesWrapper> extends StreamableWithSchema {
+public abstract class PropertiesWrapper<T extends PropertiesWrapper> extends StreamableWithSchema {
 
-    public PropertiesWrapper(){}
+    public PropertiesWrapper(){
+        setDefaults();
+    }
 
     public Properties getProps() throws Exception {
         return (Properties) MapOutAdapter.produce(Properties.class, this::save);
@@ -42,21 +44,25 @@ public class PropertiesWrapper<T extends PropertiesWrapper> extends StreamableWi
     }
 
     public T from(Map source, String namespace) throws Exception {
-        GenericInAdapter adapter = new MapInAdapter(new SingleValueSource<>(source));
-        adapter.setParam(GenericInAdapter.PARAMS.fieldNameTranslator, new NamespaceTranslator(namespace));
-        adapter.consume(this::load);
+        MapInAdapter.builder().from(source).translator(new NamespaceTranslator(namespace)).build().consume(this::load);
         return (T) this;
     }
 
     public T from(Map source, Translator nameTranslator) throws Exception {
-        GenericInAdapter adapter = new MapInAdapter(new SingleValueSource<>(source));
-        adapter.setParam(GenericInAdapter.PARAMS.fieldNameTranslator, nameTranslator);
-        adapter.consume(this::load);
+        MapInAdapter.builder().from(source).translator(nameTranslator).build().consume(this::load);
         return (T) this;
     }
 
     public T from(InAdapter source) throws Exception {
         source.consume(this::load);
         return (T) this;
+    }
+
+    public abstract T setDefaults();
+
+    @Override
+    public boolean load(InAdapter input) throws Exception {
+//        clear(); DO NOT WANT TO ERASE DEFAULTS IF SOMETHING IS NOT SET IN INPUT
+        return getSchema().load(this, input) != null;
     }
 }

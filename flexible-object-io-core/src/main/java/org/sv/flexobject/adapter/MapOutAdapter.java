@@ -3,6 +3,7 @@ package org.sv.flexobject.adapter;
 import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.stream.Sink;
 import org.sv.flexobject.stream.sinks.SingleValueSink;
+import org.sv.flexobject.translate.Translator;
 import org.sv.flexobject.util.ConsumerWithException;
 
 import java.util.HashMap;
@@ -51,10 +52,12 @@ public class MapOutAdapter extends GenericOutAdapter<Map> implements DynamicOutA
     public static Map produce(MapOutAdapter adapter, ConsumerWithException<MapOutAdapter, Exception> consumer) throws Exception {
         SingleValueSink<Map> sink = new SingleValueSink<>();
         adapter.setParam(PARAMS.sink, sink);
+        return adapter.produce(consumer);
+    }
 
-        consumer.accept(adapter);
-
-        return sink.get();
+    public Map produce(ConsumerWithException<MapOutAdapter, Exception> consumer) throws Exception {
+        consumer.accept(this);
+        return (Map) getSink().get();
     }
 
     public static Map produce(Class<? extends Map> outputClass, ConsumerWithException<MapOutAdapter, Exception> consumer) throws Exception {
@@ -79,5 +82,51 @@ public class MapOutAdapter extends GenericOutAdapter<Map> implements DynamicOutA
 
     public static Map produceHashMap(StreamableWithSchema data) throws Exception {
         return produce(new MapOutAdapter(), data::save);
+    }
+
+    public static class Builder {
+        Class<? extends Map> outputClass;
+        Supplier<Map> mapFactory;
+        Sink<Map> sink;
+        Translator fieldNameTranslator;
+
+        public Builder forClass(Class<? extends Map> outputClass){
+            this.outputClass = outputClass;
+            return this;
+        }
+
+        public Builder withFactory(Supplier<Map> mapFactory){
+            this.mapFactory = mapFactory;
+            return this;
+        }
+
+        public Builder toSink(Sink<Map> sink){
+            this.sink = sink;
+            return this;
+        }
+
+        public Builder translator(Translator fieldNameTranslator){
+            this.fieldNameTranslator = fieldNameTranslator;
+            return this;
+        }
+
+        public MapOutAdapter build(){
+            MapOutAdapter adapter = new MapOutAdapter();
+            if (outputClass != null)
+                adapter.setParam(PARAMS.recordClass, outputClass);
+            if (mapFactory != null)
+                adapter.setParam(PARAMS.recordFactory, mapFactory);
+            if (fieldNameTranslator != null)
+                adapter.setParam(PARAMS.fieldNameTranslator, fieldNameTranslator);
+            if (sink != null)
+                adapter.setParam(PARAMS.sink, sink);
+            else
+                adapter.setParam(PARAMS.sink, new SingleValueSink<>());
+            return adapter;
+        }
+    }
+
+    public static Builder builder(){
+        return new Builder();
     }
 }

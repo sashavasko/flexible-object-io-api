@@ -2,6 +2,8 @@ package org.sv.flexobject.clustering;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.sv.flexobject.properties.Namespace;
+import org.sv.flexobject.properties.NamespacePropertiesWrapper;
 import org.sv.flexobject.properties.PropertiesWrapper;
 import org.sv.flexobject.util.InstanceFactory;
 import org.sv.flexobject.util.SeededRandom;
@@ -11,9 +13,9 @@ import java.util.Random;
 
 public class ProbabilityBasedThrottlingStrategy implements LoadBalanceStrategy {
 
-    Logger logger = LogManager.getLogger(ProbabilityBasedThrottlingStrategy.class);
+    static Logger logger = LogManager.getLogger(ProbabilityBasedThrottlingStrategy.class);
 
-    public static class Configuration extends PropertiesWrapper<Configuration> {
+    public static class Configuration extends NamespacePropertiesWrapper<Configuration> {
         public static final Long DEFAULT_MASTER_UNDERLOADED_RESPONSE_MICROS = 6l*1000;
         public static final Long DEFAULT_MASTER_CONCERNING_RESPONSE_MICROS = 13l*1000;
         public static final Long DEFAULT_MASTER_OVERLOADED_RESPONSE_MICROS = 30l*1000;
@@ -26,18 +28,39 @@ public class ProbabilityBasedThrottlingStrategy implements LoadBalanceStrategy {
         public static final Long DEFAULT_FIRST_AVAILABLE_SLAVE_THRESHOLD_MICROS = 60*1000l;
         public static final Double DEFAULT_USE_RUNNING_AVERAGE_THRESHOLD = 0.7;
 
-        protected long masterUnderloadedResponseMicros = DEFAULT_MASTER_UNDERLOADED_RESPONSE_MICROS;
-        protected long masterConcerningResponseMicros = DEFAULT_MASTER_CONCERNING_RESPONSE_MICROS;
-        protected long masterOverloadedResponseMicros = DEFAULT_MASTER_OVERLOADED_RESPONSE_MICROS;
+        protected long masterUnderloadedResponseMicros;
+        protected long masterConcerningResponseMicros;
+        protected long masterOverloadedResponseMicros;
 
-        protected double masterConcernedCoefficient = DEFAULT_MASTER_CONCERNED_COEFFICIENT;
-        protected double masterOverloadedCoefficient = DEFAULT_MASTER_OVERLOADED_COEFFICIENT;
-        protected double masterRecoveryCoefficient = DEFAULT_MASTER_RECOVERY_COEFFICIENT;
-        protected double maxMasterProbability = DEFAULT_MASTER_PROBABILITY;
-        protected double minMasterProbability = DEFAULT_MIN_MASTER_PROBABILITY;
-        protected double dampeningFactor = DEFAULT_DAMPENING_FACTOR;
-        protected long firstAvailableSlaveThresholdMicros = DEFAULT_FIRST_AVAILABLE_SLAVE_THRESHOLD_MICROS;
-        protected double useRunningAverageThreshold = DEFAULT_USE_RUNNING_AVERAGE_THRESHOLD;
+        protected double masterConcernedCoefficient;
+        protected double masterOverloadedCoefficient;
+        protected double masterRecoveryCoefficient;
+        protected double maxMasterProbability;
+        protected double minMasterProbability;
+        protected double dampeningFactor;
+        protected long firstAvailableSlaveThresholdMicros;
+        protected double useRunningAverageThreshold;
+
+        public Configuration(Namespace parent) {
+            super(parent, "strategy");
+        }
+
+        @Override
+        public Configuration setDefaults() {
+            masterUnderloadedResponseMicros = DEFAULT_MASTER_UNDERLOADED_RESPONSE_MICROS;
+            masterConcerningResponseMicros = DEFAULT_MASTER_CONCERNING_RESPONSE_MICROS;
+            masterOverloadedResponseMicros = DEFAULT_MASTER_OVERLOADED_RESPONSE_MICROS;
+
+            masterConcernedCoefficient = DEFAULT_MASTER_CONCERNED_COEFFICIENT;
+            masterOverloadedCoefficient = DEFAULT_MASTER_OVERLOADED_COEFFICIENT;
+            masterRecoveryCoefficient = DEFAULT_MASTER_RECOVERY_COEFFICIENT;
+            maxMasterProbability = DEFAULT_MASTER_PROBABILITY;
+            minMasterProbability = DEFAULT_MIN_MASTER_PROBABILITY;
+            dampeningFactor = DEFAULT_DAMPENING_FACTOR;
+            firstAvailableSlaveThresholdMicros = DEFAULT_FIRST_AVAILABLE_SLAVE_THRESHOLD_MICROS;
+            useRunningAverageThreshold = DEFAULT_USE_RUNNING_AVERAGE_THRESHOLD;
+            return this;
+        }
     }
 
 
@@ -45,12 +68,47 @@ public class ProbabilityBasedThrottlingStrategy implements LoadBalanceStrategy {
     Configuration config;
     double currentMasterProbability;
 
-    public ProbabilityBasedThrottlingStrategy() {
-        random = InstanceFactory.get(SeededRandom.class);
-        config = new Configuration();
-        currentMasterProbability = config.maxMasterProbability;
+    protected ProbabilityBasedThrottlingStrategy() {
     }
 
+    public static class Builder{
+        Cluster cluster;
+        Random random = new Random(System.nanoTime());
+        Map properties;
+
+        public Builder forCluster(Cluster cluster){
+            this.cluster = cluster;
+            return this;
+        }
+
+        public Builder withRandomGenerator(Random randomNumberGenerator){
+            this.random = randomNumberGenerator;
+            return this;
+        }
+
+        public Builder withProperties(Map props){
+            this.properties = props;
+            return this;
+        }
+
+        public LoadBalanceStrategy build(){
+            ProbabilityBasedThrottlingStrategy strategy = new ProbabilityBasedThrottlingStrategy();
+            strategy.config = new Configuration(cluster.getConfiguration().getNamespace());
+            strategy.random = random;
+
+            if (properties != null) {
+                try {
+                    strategy.configure(properties);
+                } catch (Exception e) {
+                    logger.error("Failed to configure from supplied properties", e);
+                }
+            }
+
+            strategy.currentMasterProbability = strategy.config.maxMasterProbability;
+            return strategy;
+        }
+
+    }
 
     @Override
     public ClusterMember selectSource(Cluster cluster) {
@@ -70,7 +128,7 @@ public class ProbabilityBasedThrottlingStrategy implements LoadBalanceStrategy {
         for (ClusterMember slave : cluster.onlineSlaves()) {
             int queryTime = (1 - currentMasterProbability) > config.useRunningAverageThreshold
                     ? slave.getAverageQueryTimeMicros()
-                        : slave.getLastQueryTimeMicros();
+                    : slave.getLastQueryTimeMicros();
 
             if (config.firstAvailableSlaveThresholdMicros > queryTime
                     || random.nextDouble() < slaveProbability){
@@ -134,7 +192,7 @@ public class ProbabilityBasedThrottlingStrategy implements LoadBalanceStrategy {
     }
 
     @Override
-    public PropertiesWrapper getConfiguration() {
+    public NamespacePropertiesWrapper getConfiguration() {
         return config;
     }
 

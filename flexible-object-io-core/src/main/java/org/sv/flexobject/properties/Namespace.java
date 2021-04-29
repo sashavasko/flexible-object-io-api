@@ -14,6 +14,8 @@ public class Namespace {
     public static final Namespace DB = new Namespace("db");
     public static final String DEFAULT_SEPARATOR = ".";
 
+    private static Namespace defaultNamespace = new Namespace("sv");
+
     private Namespace parent;
     private String name;
     private String separator = DEFAULT_SEPARATOR;
@@ -30,7 +32,7 @@ public class Namespace {
         this.name = subSpace.name;
     }
 
-    public Namespace(String namespace) {
+    protected Namespace(String namespace) {
         this.name = namespace;
     }
 
@@ -68,6 +70,14 @@ public class Namespace {
         return ns;
     }
 
+    public static void setDefaultNamespace(String namespace){
+        defaultNamespace = new Namespace(namespace);
+    }
+
+    public static Namespace getDefaultNamespace(){
+        return defaultNamespace;
+    }
+
     public String getName(){
         return name;
     }
@@ -86,6 +96,10 @@ public class Namespace {
 
     public static Translator getTranslator(String namespace, String separator) {
         return new SeparatorTranslator(separator).andThen(new NamespaceTranslator(namespace));
+    }
+
+    public Translator getTranslator() {
+        return new SeparatorTranslator(getSeparator()).andThen(new NamespaceTranslator(getNamespace()));
     }
 
     public String getSettingName(String fieldName){

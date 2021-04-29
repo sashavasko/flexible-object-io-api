@@ -25,6 +25,11 @@ public class PropertiesWrapperTest {
         public Boolean boolProp;
         public Boolean nullProp;
 
+
+        @Override
+        public TestProps setDefaults() {
+            return this;
+        }
     }
 
     @Before

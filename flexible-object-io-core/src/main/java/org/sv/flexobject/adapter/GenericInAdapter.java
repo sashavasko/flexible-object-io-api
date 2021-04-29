@@ -38,11 +38,12 @@ public abstract class GenericInAdapter<T> implements InAdapter {
         setParam(PARAMS.valueOf(key), value);
     }
 
-    public void setParam(PARAMS key, Object value){
+    public GenericInAdapter<T> setParam(PARAMS key, Object value){
         if (PARAMS.source == key && value != null && value instanceof Source)
             source = (Source<T>) value;
         if (PARAMS.fieldNameTranslator == key && value != null && value instanceof Translator)
             fieldNameTranslator = (Translator) value;
+        return this;
     }
 
     public T getCurrent(){

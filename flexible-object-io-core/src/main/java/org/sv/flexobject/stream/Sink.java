@@ -7,4 +7,6 @@ public interface Sink<T> {
     default void setEOF() {}
 
     boolean hasOutput();
+
+    default T get(){return null;}
 }

@@ -53,7 +53,7 @@ public abstract class GenericOutAdapter<T> implements OutAdapter {
         setParam(PARAMS.valueOf(key), value);
     }
 
-    public void setParam(PARAMS key, Object value){
+    public GenericOutAdapter<T> setParam(PARAMS key, Object value){
         if (PARAMS.sink == key && value != null && value instanceof Sink)
             sink = (Sink) value;
         else if (PARAMS.recordFactory == key && value != null && value instanceof Supplier)
@@ -62,6 +62,7 @@ public abstract class GenericOutAdapter<T> implements OutAdapter {
             recordClass = (Class<? extends T>) value;
         else if (PARAMS.fieldNameTranslator == key && value != null && value instanceof Translator)
             fieldNameTranslator = (Translator) value;
+        return this;
     }
 
     public T createRecord() {

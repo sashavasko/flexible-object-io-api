@@ -29,13 +29,17 @@ public class OutgoingBlockingQueueWrapper<T> extends NotReallyBlockingQueueWrapp
         return true;
     }
 
-    public T get() throws Exception {
-        if (timeout < 0){
-            return timedTake();
-        } else if (timeout == 0) {
-            return queue.poll();
-        } else
-            return queue.poll(timeout, timeoutUnit);
+    public T get() {
+        try {
+            if (timeout < 0) {
+                return timedTake();
+            } else if (timeout == 0) {
+                return queue.poll();
+            } else
+                return queue.poll(timeout, timeoutUnit);
+        } catch (InterruptedException | TimeoutException e) {
+            return null;
+        }
     }
 
 }

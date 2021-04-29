@@ -3,6 +3,8 @@ package org.sv.flexobject.clustering;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.sv.flexobject.properties.Configurable;
+import org.sv.flexobject.properties.Namespace;
+import org.sv.flexobject.properties.NamespacePropertiesWrapper;
 import org.sv.flexobject.properties.PropertiesWrapper;
 
 import java.util.Map;
@@ -10,19 +12,31 @@ import java.util.function.Function;
 
 public class LoadBalancer implements Configurable {
 
-    Logger logger = LogManager.getLogger(LoadBalancer.class);
+    static Logger logger = LogManager.getLogger(LoadBalancer.class);
 
-    public static class Configuration extends PropertiesWrapper<Configuration> {
+    public static class Configuration extends NamespacePropertiesWrapper<Configuration> {
         public static long DEFAULT_BAD_RESPONSE_DELAY = 1000;
         public static long DEFAULT_NO_AVAILABLE_MEMBER_DELAY = 5000;
 
-        long badResponseDelay = DEFAULT_BAD_RESPONSE_DELAY;
-        long noAvailableMemberDelay = DEFAULT_NO_AVAILABLE_MEMBER_DELAY;
-        Class<? extends LoadBalanceStrategy> strategyClass;
+        public long badResponseDelay;
+        public long noAvailableMemberDelay;
+        public Class<? extends LoadBalanceStrategy> strategyClass;
+
+        public Configuration(Namespace parent) {
+            super(parent, "loadbalancer");
+        }
+
+        @Override
+        public Configuration setDefaults() {
+            badResponseDelay = DEFAULT_BAD_RESPONSE_DELAY;
+            noAvailableMemberDelay = DEFAULT_NO_AVAILABLE_MEMBER_DELAY;
+            strategyClass = null;
+            return this;
+        }
     }
 
     Cluster cluster;
-    Configuration config = new Configuration();
+    Configuration config;
     LoadBalanceStrategy strategy;
 
     long callCounter = 0;
@@ -34,6 +48,86 @@ public class LoadBalancer implements Configurable {
     Function<Long, Boolean> abortOnAttemptCount = null;
     Function<Long, Boolean> abortOnTimeout = null;
 
+    protected LoadBalancer(){}
+
+    protected void setCluster(Cluster cluster) {
+        this.cluster = cluster;
+        this.config = new Configuration(cluster.getConfiguration().getNamespace());
+    }
+
+    protected void setStrategy(LoadBalanceStrategy strategy) {
+        this.strategy = strategy;
+    }
+
+    public static class Builder {
+        Cluster cluster;
+        LoadBalanceStrategy strategy;
+        Map properties;
+        Function<ClusterResponse, Boolean> abortOnResponse = null;
+        Function<Long, Boolean> abortOnAttemptCount = null;
+        Function<Long, Boolean> abortOnTimeout = null;
+
+        public Builder forCluster(Cluster cluster){
+            this.cluster = cluster;
+            return this;
+        }
+
+        public Builder withStrategy(LoadBalanceStrategy strategy){
+            this.strategy = strategy;
+            return this;
+        }
+
+        public Builder withProperties(Map props){
+            this.properties = props;
+            return this;
+        }
+
+        public Builder abortOnResponse(Function<ClusterResponse, Boolean> abortOnResponse){
+            this.abortOnResponse = abortOnResponse;
+            return this;
+        }
+
+        public Builder abortOnAttemptCount(Function<Long, Boolean> abortOnAttemptCount){
+            this.abortOnAttemptCount = abortOnAttemptCount;
+            return this;
+        }
+
+        public Builder abortOnTimeout(Function<Long, Boolean> abortOnTimeout){
+            this.abortOnTimeout = abortOnTimeout;
+            return this;
+        }
+
+        public LoadBalancer build() {
+            if (cluster == null)
+                throw new RuntimeException("Load Balancer needs cluster set.");
+
+            LoadBalancer loadBalancer = new LoadBalancer();
+            loadBalancer.setCluster(cluster);
+
+            if (strategy != null)
+                loadBalancer.setStrategy(strategy);
+            if (abortOnResponse != null)
+                loadBalancer.setAbortOnResponse(abortOnResponse);
+            if (abortOnAttemptCount != null)
+                loadBalancer.setAbortOnAttemptCount(abortOnAttemptCount);
+            if (abortOnTimeout != null)
+                loadBalancer.setAbortOnTimeout(abortOnTimeout);
+
+            if (properties != null) {
+                try {
+                    loadBalancer.configure(properties);
+                } catch (Exception e) {
+                    logger.error("Failed to configure Load Balancer with supplied properties", e);
+                }
+            }
+            return loadBalancer;
+        }
+    }
+
+    public static Builder builder(){
+        return new Builder();
+    }
+
     public LoadBalanceStrategy getStrategy() {
         if (strategy == null && config.strategyClass != null) {
             try {
@@ -43,14 +137,6 @@ public class LoadBalancer implements Configurable {
             }
         }
         return strategy;
-    }
-
-    public void setCluster(Cluster cluster) {
-        this.cluster = cluster;
-    }
-
-    public void setStrategy(LoadBalanceStrategy strategy) {
-        this.strategy = strategy;
     }
 
     @Override
@@ -97,7 +183,7 @@ public class LoadBalancer implements Configurable {
                                 + ":of:" + callCounter
                                 + ":queryTime:" + source.getLastQueryTimeMicros());
                         strategy.adjustMasterProbability(cluster, source);
-                    }else {
+                    } else {
                         slaveCounter++;
                         response = source.handleRequest(request);
                         logger.debug("SLAVE" + source.getConnectionName() + ":"
@@ -111,7 +197,7 @@ public class LoadBalancer implements Configurable {
                         return response;
 
                     Thread.sleep(config.badResponseDelay);
-                }else {
+                } else {
                     nullCounter++;
                     logger.debug("NULL:"
                             + nullCounter
@@ -144,5 +230,4 @@ public class LoadBalancer implements Configurable {
     public void setAbortOnTimeout(Function<Long, Boolean> abortOnTimeout) {
         this.abortOnTimeout = abortOnTimeout;
     }
-
 }

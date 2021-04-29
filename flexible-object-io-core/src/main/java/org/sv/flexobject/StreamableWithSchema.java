@@ -151,7 +151,7 @@ public class StreamableWithSchema<T extends SchemaElement> implements Streamable
     }
 
     public StreamableWithSchema fromMap(Map map) throws Exception {
-        return MapInAdapter.forValue(map).consume(this) ? this : null;
+        return MapInAdapter.builder().from(map).build().consume(this) ? this : null;
     }
 
     public StreamableWithSchema fromJson(JsonNode json) throws Exception {
