@@ -77,8 +77,10 @@ public abstract class SchemedRepeatedConverter<T,CT> extends SchemedGroupConvert
 
     @Override
     public void end() {
-        if (commitOnEnd)
+        if (commitOnEnd){
             commit(getCollection());
+            setCollection(null);
+        }
     }
 
     public SchemedRepeatedConverter<T,CT> setCommitOnEnd() {
