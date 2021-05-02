@@ -60,6 +60,7 @@ public class StreamableConverter extends SchemedGroupConverter<StreamableWithSch
 
     @Override
     protected void addChildGroup(String name, StreamableWithSchema child) {
+        ParquetReadSupport.setField(current, name, child);
     }
 
     @Override

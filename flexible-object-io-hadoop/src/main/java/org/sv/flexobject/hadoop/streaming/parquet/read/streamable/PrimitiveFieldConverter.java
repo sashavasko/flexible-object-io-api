@@ -20,7 +20,7 @@ public class PrimitiveFieldConverter extends SchemedPrimitiveConverter<Streamabl
         super(type);
     }
 
-    private void set(Object value) {
+    protected void set(Object value) {
         ParquetReadSupport.setField(getCurrent(), getType().getName(), value);
     }
 

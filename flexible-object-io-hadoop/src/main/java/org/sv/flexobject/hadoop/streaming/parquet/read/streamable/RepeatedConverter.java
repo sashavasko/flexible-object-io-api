@@ -25,7 +25,7 @@ public class RepeatedConverter<CT> extends SchemedRepeatedConverter<StreamableWi
     protected SchemedPrimitiveConverter<StreamableWithSchema> newPrimitiveConverter(PrimitiveType type) {
         return new PrimitiveFieldConverter(type) {
             @Override
-            protected void setValue(Object value) throws Exception {
+            protected void set(Object value) {
                 consume(ParquetSchema.MapElementFields.forType(getType()), value);
             }
         };
