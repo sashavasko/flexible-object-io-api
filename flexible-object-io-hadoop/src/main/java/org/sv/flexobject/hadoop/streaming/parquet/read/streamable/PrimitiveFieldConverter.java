@@ -20,24 +20,8 @@ public class PrimitiveFieldConverter extends SchemedPrimitiveConverter<Streamabl
         super(type);
     }
 
-    protected void setValue(Object value) throws Exception {
-        StreamableWithSchema current = getCurrent();
-        FieldDescriptor descriptor = current.getSchema().getDescriptor(getType().getName());
-        if (descriptor.getStructure() == FieldWrapper.STRUCT.list){
-            Collection list = (Collection)current.get(getType().getName());
-            list.add(value);
-        } else
-            current.set(getType().getName(), value);
-    }
-
     private void set(Object value) {
-        try {
-            setValue(value);
-        } catch (Exception e) {
-            if (e instanceof RuntimeException)
-                throw (RuntimeException)e;
-            throw new RuntimeException("Failed to set value for " + getType(), e);
-        }
+        ParquetReadSupport.setField(getCurrent(), getType().getName(), value);
     }
 
     @Override
