@@ -1,5 +1,6 @@
 package org.sv.flexobject.hadoop.streaming.parquet;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -7,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.hadoop.mapreduce.OutputFormat;
+import org.apache.parquet.filter2.predicate.FilterPredicate;
 import org.apache.parquet.schema.MessageType;
 import org.apache.parquet.schema.Type;
 import org.sv.flexobject.StreamableWithSchema;
@@ -27,6 +29,7 @@ public class ParquetSchemaConf extends HadoopPropertiesWrapper<ParquetSchemaConf
     Class<? extends StreamableWithSchema> outputSchemaClass;
     JsonNode inputSchemaJson;
     JsonNode outputSchemaJson;
+    JsonNode filterPredicateJson;
 
     public ParquetSchemaConf() {
         super();
@@ -129,5 +132,21 @@ public class ParquetSchemaConf extends HadoopPropertiesWrapper<ParquetSchemaConf
     public Class<? extends Writable> getOutputClass() {
         // this should be fine as Parquet does not use actual methods from Writable:
         return (Class<? extends Writable>)(outputSchemaClass == null ?  JsonNode.class : outputSchemaClass);
+    }
+
+    public FilterPredicate getFilterPredicate() {
+        FilterPredicate filter = null;
+        if (filterPredicateJson != null)
+            filter = ParquetFilterParser.json2FilterPredicate(filterPredicateJson);
+        return filter;
+    }
+
+    public ParquetSchemaConf setFilterPredicate(String predicateJson) throws JsonProcessingException {
+        this.filterPredicateJson = MapperFactory.getObjectReader().readTree(predicateJson);
+        return this;
+    }
+
+    public boolean hasFilterPredicate() {
+        return filterPredicateJson != null && !filterPredicateJson.isEmpty();
     }
 }

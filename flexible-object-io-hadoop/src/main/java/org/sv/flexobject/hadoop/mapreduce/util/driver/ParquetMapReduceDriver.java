@@ -1,5 +1,6 @@
 package org.sv.flexobject.hadoop.mapreduce.util.driver;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.log4j.Logger;
@@ -14,12 +15,13 @@ import org.sv.flexobject.hadoop.streaming.parquet.ParquetSchemaConf;
 import java.io.IOException;
 
 public abstract class ParquetMapReduceDriver<SELF extends ParquetMapReduceDriver> extends MapReduceDriver<SELF> {
-    Logger logger = Logger.getLogger(ParquetMapReduceDriver.class);
+    static Logger logger = Logger.getLogger(ParquetMapReduceDriver.class);
 
     public static final String PARQUET_FILTER_PREDICATE = "mapreduce.parquet.filter.predicate.json";
 
     Class<? extends StreamableWithSchema> inputSchemaClass;
     String inputSchemaJson;
+    String parquetPredicateJson;
     Class<? extends StreamableWithSchema> outputSchemaClass;
     String outputSchemaJson;
     boolean useFileSchema = false;
@@ -49,7 +51,13 @@ public abstract class ParquetMapReduceDriver<SELF extends ParquetMapReduceDriver
         return (SELF) this;
     }
 
-    public static void setParquetPredicate(Logger logger, Configuration config){
+    public SELF setParquetPredicateJson(String parquetPredicateJson) {
+        this.parquetPredicateJson = parquetPredicateJson;
+        return (SELF) this;
+    }
+
+    @Deprecated
+    public static void setParquetPredicate(Configuration config){
         String parquetPredicateJson = config.get(PARQUET_FILTER_PREDICATE);
         if (StringUtils.isNotEmpty(parquetPredicateJson)){
             try {
@@ -77,14 +85,26 @@ public abstract class ParquetMapReduceDriver<SELF extends ParquetMapReduceDriver
                     parquetConf.setInputSchemaJson(inputSchemaJson);
                     logger.info("Set input parquet schema to \"" + inputSchemaJson +"\"");
                 } catch (IOException e) {
-                    logger.error("Failed to parse input schema JSON: \"" + inputSchemaJson + "\"");
+                    logger.error("Failed to parse input schema JSON: \"" + inputSchemaJson + "\"", e);
                 }
+            }
+        }
+
+        if (!parquetConf.hasFilterPredicate() && StringUtils.isNotBlank(parquetPredicateJson)){
+            try {
+                parquetConf.setFilterPredicate(parquetPredicateJson);
+            } catch (JsonProcessingException e) {
+                logger.error("Failed to parse parquet predicate JSON: \"" + parquetPredicateJson + "\"", e);
             }
         }
 
         if (parquetConf.hasInputSchema() || useFileSchema) {
             setInputFormatClass(parquetConf.getInputFormat());
-            setParquetPredicate(logger, conf);
+            if (parquetConf.hasFilterPredicate()) {
+                FilterPredicate predicate = parquetConf.getFilterPredicate();
+                logger.info("Using Parquet predicate filter:" + predicate.toString());
+                ParquetInputFormat.setFilterPredicate(conf, predicate);
+            }
         }
 
         if (!parquetConf.hasOutputSchema()){
@@ -96,7 +116,7 @@ public abstract class ParquetMapReduceDriver<SELF extends ParquetMapReduceDriver
                     parquetConf.setOutputSchemaJson(outputSchemaJson);
                     logger.info("Set output parquet schema to \"" + outputSchemaJson +"\"");
                 } catch (IOException e) {
-                    logger.error("Failed to parse output schema JSON: \"" + outputSchemaJson + "\"");
+                    logger.error("Failed to parse output schema JSON: \"" + outputSchemaJson + "\"", e);
                 }
             }
         }

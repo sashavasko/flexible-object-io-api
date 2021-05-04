@@ -21,6 +21,7 @@ public class ParquetSchemaConfTest {
 
         assertFalse(parquetConf.hasInputSchema());
         assertFalse(parquetConf.hasOutputSchema());
+        assertFalse(parquetConf.hasFilterPredicate());
         assertSame(JsonParquetInputFormat.class, parquetConf.getInputFormat());
         assertSame(JsonParquetOutputFormat.class, parquetConf.getOutputFormat());
         assertSame(JsonNode.class, parquetConf.getOutputClass());
@@ -39,6 +40,10 @@ public class ParquetSchemaConfTest {
         assertSame(StreamableParquetOutputFormat.class, parquetConf.getOutputFormat());
         assertSame(TestDataWithSubSchemaInCollection.class, parquetConf.getOutputClass());
 
+        parquetConf.setFilterPredicate("{'eq':{'binary':'text','value':'foobar'}}".replace('\'', '"'));
+        assertTrue(parquetConf.hasFilterPredicate());
+        assertEquals("eq(text, Binary{\"foobar\"})", parquetConf.getFilterPredicate().toString());
+
         Configuration conf = new Configuration(false);
 
         parquetConf.update(conf);
@@ -49,6 +54,7 @@ public class ParquetSchemaConfTest {
         assertEquals(TestDataWithSubSchemaInCollection.class.getName(), conf.get("org.sv.flexobject.parquet.output.schema.class"));
         assertNull(conf.get("org.sv.flexobject.parquet.input.schema.json"));
         assertNull(conf.get("org.sv.flexobject.parquet.output.schema.json"));
+        assertEquals("{\"eq\":{\"binary\":\"text\",\"value\":\"foobar\"}}", conf.get("org.sv.flexobject.parquet.filter.predicate.json"));
 
         ParquetSchemaConf parquetConf2 = new ParquetSchemaConf().from(conf);
 
@@ -63,7 +69,7 @@ public class ParquetSchemaConfTest {
         assertSame(StreamableParquetInputFormat.class, parquetConf2.getInputFormat());
         assertSame(StreamableParquetOutputFormat.class, parquetConf2.getOutputFormat());
         assertSame(TestDataWithSubSchemaInCollection.class, parquetConf2.getOutputClass());
-
+        assertEquals("eq(text, Binary{\"foobar\"})", parquetConf2.getFilterPredicate().toString());
     }
 
     @Test
