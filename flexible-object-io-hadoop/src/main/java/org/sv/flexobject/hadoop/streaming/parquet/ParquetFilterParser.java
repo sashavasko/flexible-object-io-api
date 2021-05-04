@@ -66,55 +66,61 @@ public class ParquetFilterParser {
     }
 
     private static FilterPredicate binaryOp(String opName, String columnName, JsonNode valueNode) {
+        Binary value = valueNode.isNull() ? null : Binary.fromString(valueNode.asText());
         switch(opName){
-            case "eq" : return eq(binaryColumn(columnName), Binary.fromString(valueNode.asText()));
-            case "notEq" : return notEq(binaryColumn(columnName), Binary.fromString(valueNode.asText()));
+            case "eq" : return eq(binaryColumn(columnName), value);
+            case "notEq" : return notEq(binaryColumn(columnName), value);
         }
         throw new RuntimeException("Invalid Filter Predicate Operation name:" + opName);
     }
 
     private static FilterPredicate intOp(String opName, String columnName, JsonNode valueNode) {
+        Integer value = valueNode.isNull() ? null : valueNode.asInt();
         switch(opName){
-            case "eq" : return eq(intColumn(columnName), valueNode.asInt());
-            case "notEq" : return notEq(intColumn(columnName), valueNode.asInt());
-            case "lt" : return lt(intColumn(columnName), valueNode.asInt());
-            case "ltEq" : return ltEq(intColumn(columnName), valueNode.asInt());
-            case "gt" : return gt(intColumn(columnName), valueNode.asInt());
-            case "gtEq" : return gtEq(intColumn(columnName), valueNode.asInt());
+            case "eq" : return eq(intColumn(columnName), value);
+            case "notEq" : return notEq(intColumn(columnName), value);
+            case "lt" : return lt(intColumn(columnName), value);
+            case "ltEq" : return ltEq(intColumn(columnName), value);
+            case "gt" : return gt(intColumn(columnName), value);
+            case "gtEq" : return gtEq(intColumn(columnName), value);
         }
         throw new RuntimeException("Invalid Filter Predicate Operation name:" + opName);
     }
 
     private static FilterPredicate longOp(String opName, String columnName, JsonNode valueNode) {
+        Long value = valueNode.isNull() ? null : valueNode.asLong();
         switch(opName){
-            case "eq" : return eq(longColumn(columnName), valueNode.asLong());
-            case "notEq" : return notEq(longColumn(columnName), valueNode.asLong());
-            case "lt" : return lt(longColumn(columnName), valueNode.asLong());
-            case "ltEq" : return ltEq(longColumn(columnName), valueNode.asLong());
-            case "gt" : return gt(longColumn(columnName), valueNode.asLong());
-            case "gtEq" : return gtEq(longColumn(columnName), valueNode.asLong());
+            case "eq" : return eq(longColumn(columnName), value);
+            case "notEq" : return notEq(longColumn(columnName), value);
+            case "lt" : return lt(longColumn(columnName), value);
+            case "ltEq" : return ltEq(longColumn(columnName), value);
+            case "gt" : return gt(longColumn(columnName), value);
+            case "gtEq" : return gtEq(longColumn(columnName), value);
         }
         throw new RuntimeException("Invalid Filter Predicate Operation name:" + opName);
     }
 
     private static FilterPredicate booleanOp(String opName, String columnName, JsonNode valueNode) {
+        Boolean value = valueNode.isNull() ? null : valueNode.asBoolean();
         switch(opName){
-            case "eq" : return eq(booleanColumn(columnName), valueNode.asBoolean());
-            case "notEq" : return notEq(booleanColumn(columnName), valueNode.asBoolean());
+            case "eq" : return eq(booleanColumn(columnName), value);
+            case "notEq" : return notEq(booleanColumn(columnName), value);
         }
         throw new RuntimeException("Invalid Filter Predicate Operation name:" + opName);
     }
 
     private static FilterPredicate doubleOp(String opName, String columnName, JsonNode valueNode) {
+        Double value = valueNode.isNull() ? null : valueNode.asDouble();
         switch(opName){
-            case "lt" : return lt(doubleColumn(columnName), valueNode.asDouble());
-            case "ltEq" : return ltEq(doubleColumn(columnName), valueNode.asDouble());
-            case "gt" : return gt(doubleColumn(columnName), valueNode.asDouble());
-            case "gtEq" : return gtEq(doubleColumn(columnName), valueNode.asDouble());
+            case "lt" : return lt(doubleColumn(columnName), value);
+            case "ltEq" : return ltEq(doubleColumn(columnName), value);
+            case "gt" : return gt(doubleColumn(columnName), value);
+            case "gtEq" : return gtEq(doubleColumn(columnName), value);
+            case "eq" : return eq(doubleColumn(columnName), value);
+            case "notEq" : return notEq(doubleColumn(columnName), value);
         }
         throw new RuntimeException("Invalid Filter Predicate Operation name:" + opName);
     }
-
 
     private static List<FilterPredicate> jsonArray2Predicates(JsonNode jsonArray) {
         List<FilterPredicate> predicates = new ArrayList<>();
