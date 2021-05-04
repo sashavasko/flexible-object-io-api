@@ -103,16 +103,19 @@ public abstract class SchemedGroupConverter<T> extends GroupConverter {
         } catch (Exception e) {
             throw new RuntimeException("Failed to materialize the group " + instanceClass.getName() + ". Make sure it has public default constructor.", e);
         }
-    };
+    }
     protected abstract void addChildGroup(String parentName, T child);
+
+    protected void addCurrentToParent(){
+        if (parent != null){
+            parent.addChildGroup(parentName, current);
+        }
+    }
 
     @Override
     public void start() {
         current = newGroupInstance();
-        if (parent != null){
-            parent.addChildGroup(parentName, current);
-        }
-
+        addCurrentToParent();
         for (Converter converter : converters) {
             if (converter != null) {
                 if (converter instanceof SchemedPrimitiveConverter)

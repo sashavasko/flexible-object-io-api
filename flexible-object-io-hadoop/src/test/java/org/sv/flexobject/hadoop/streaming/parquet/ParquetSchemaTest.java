@@ -7,10 +7,7 @@ import org.apache.parquet.schema.MessageType;
 import org.junit.Test;
 import org.sv.flexobject.hadoop.streaming.parquet.read.input.ByteArrayInputFile;
 import org.sv.flexobject.hadoop.streaming.parquet.read.streamable.ParquetReaderBuilder;
-import org.sv.flexobject.hadoop.streaming.parquet.testdata.ListOfBinaries;
-import org.sv.flexobject.hadoop.streaming.parquet.testdata.ListOfStrings;
-import org.sv.flexobject.hadoop.streaming.parquet.testdata.StreamableWithListOfObjects;
-import org.sv.flexobject.hadoop.streaming.parquet.testdata.StreamableWithMapOfObjects;
+import org.sv.flexobject.hadoop.streaming.parquet.testdata.*;
 import org.sv.flexobject.hadoop.streaming.parquet.write.output.ByteArrayOutputFile;
 import org.sv.flexobject.hadoop.streaming.parquet.write.streamable.ParquetWriterBuilder;
 import org.sv.flexobject.json.MapperFactory;
@@ -20,6 +17,8 @@ import org.sv.flexobject.testdata.TestDataWithSubSchema;
 import org.sv.flexobject.testdata.TestDataWithSubSchemaInCollection;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -268,6 +267,49 @@ public class ParquetSchemaTest {
             convertedData = reader.read();
         }
         assertEquals(data, convertedData);
+    }
+
+    @Test
+    public void readWriteTestDataSubSchema() throws Exception {
+        ByteArrayOutputFile outputFile = new ByteArrayOutputFile();
+        StreamableWithNonRepeatedSubschema data = StreamableWithNonRepeatedSubschema.random();
+        try(ParquetWriter<StreamableWithNonRepeatedSubschema> writer = ParquetWriterBuilder
+                .forOutput(outputFile)
+                .withSchema(StreamableWithNonRepeatedSubschema.class).build()){
+            writer.write(data);
+        }
+
+        StreamableWithNonRepeatedSubschema convertedData;
+        try(ParquetReader<StreamableWithNonRepeatedSubschema> reader = ParquetReaderBuilder
+                .forInput(new ByteArrayInputFile(outputFile.toByteArray()))
+                .withSchema(StreamableWithNonRepeatedSubschema.class).build()){
+            convertedData = reader.read();
+        }
+        assertEquals(data, convertedData);
+    }
+
+    @Test
+    public void readWriteTestDataWithListOfObjectSeveral() throws Exception {
+        ByteArrayOutputFile outputFile = new ByteArrayOutputFile();
+        List<StreamableWithListOfObjects> originalData = new ArrayList<>();
+        try(ParquetWriter<StreamableWithListOfObjects> writer = ParquetWriterBuilder.forOutput(outputFile).withSchema(StreamableWithListOfObjects.class).build()){
+            for (int i = 0 ; i < 10 ; ++i) {
+                StreamableWithListOfObjects data = StreamableWithListOfObjects.random();
+                writer.write(data);
+                originalData.add(data);
+            }
+        }
+
+        List<StreamableWithListOfObjects> convertedList = new ArrayList<>();
+        try(ParquetReader<StreamableWithListOfObjects> reader = ParquetReaderBuilder.forInput(new ByteArrayInputFile(outputFile.toByteArray())).withSchema(StreamableWithListOfObjects.class).build()){
+            StreamableWithListOfObjects convertedData;
+            do {
+                convertedData = reader.read();
+                if (convertedData != null)
+                    convertedList.add(convertedData);
+            } while (convertedData != null);
+        }
+        assertEquals(originalData, convertedList);
     }
 
     @Test

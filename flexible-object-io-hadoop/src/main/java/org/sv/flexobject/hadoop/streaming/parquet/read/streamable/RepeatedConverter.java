@@ -43,7 +43,7 @@ public class RepeatedConverter<CT> extends SchemedRepeatedConverter<StreamableWi
         return new StreamableConverter(parent, parentName, type, fileSchema, elementClass) {
 
             @Override
-            public void end() {
+            protected void addCurrentToParent() {
                 consume(ParquetSchema.MapElementFields.value, current);
             }
         };
