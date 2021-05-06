@@ -147,6 +147,6 @@ public class ParquetSchemaConf extends HadoopPropertiesWrapper<ParquetSchemaConf
     }
 
     public boolean hasFilterPredicate() {
-        return filterPredicateJson != null && !filterPredicateJson.isEmpty();
+        return filterPredicateJson != null  && filterPredicateJson.size() != 0;
     }
 }

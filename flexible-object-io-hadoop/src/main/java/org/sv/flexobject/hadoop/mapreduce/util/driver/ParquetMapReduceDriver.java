@@ -100,11 +100,6 @@ public abstract class ParquetMapReduceDriver<SELF extends ParquetMapReduceDriver
 
         if (parquetConf.hasInputSchema() || useFileSchema) {
             setInputFormatClass(parquetConf.getInputFormat());
-            if (parquetConf.hasFilterPredicate()) {
-                FilterPredicate predicate = parquetConf.getFilterPredicate();
-                logger.info("Using Parquet predicate filter:" + predicate.toString());
-                ParquetInputFormat.setFilterPredicate(conf, predicate);
-            }
         }
 
         if (!parquetConf.hasOutputSchema()){
