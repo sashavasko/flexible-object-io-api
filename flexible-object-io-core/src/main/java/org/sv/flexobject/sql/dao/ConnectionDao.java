@@ -58,7 +58,7 @@ public class ConnectionDao extends ConnectionWrapper implements AutoCloseable{
         } catch (Exception e) {
             if (e instanceof SQLException)
                 throw (SQLException) e;
-            throw new SQLException("Failed nto get connection from ConnectionManager", e);
+            throw new SQLException("Failed to get connection from ConnectionManager", e);
         }
     }
 }
