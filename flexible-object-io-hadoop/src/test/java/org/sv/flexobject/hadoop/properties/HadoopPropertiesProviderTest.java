@@ -7,6 +7,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.ClusterMapReduceTestCase;
 import org.junit.Test;
 import org.sv.flexobject.connections.ConnectionManager;
+import org.sv.flexobject.hadoop.HadoopTask;
 import org.sv.flexobject.sql.providers.UnPooledConnectionProvider;
 
 import java.io.OutputStream;
@@ -25,7 +26,7 @@ public class HadoopPropertiesProviderTest extends ClusterMapReduceTestCase {
         FileSystem fs = getFileSystem();
         HadoopSecretProviderTest.publishTestSecret(conf, fs);
 
-        Path expectedConnectionsPath = new Path("/user/" + HadoopSecretProvider.getUserName(conf) + "/connections");
+        Path expectedConnectionsPath = new Path("/user/" + HadoopTask.getUserName(conf) + "/connections");
         Path expectedPropertiesPath = new Path(expectedConnectionsPath, "alpha/test-connection.xml");
 
         OutputStream os = fs.create(expectedPropertiesPath);

@@ -7,6 +7,7 @@ import org.apache.hadoop.mapred.ClusterMapReduceTestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.sv.flexobject.connections.ConnectionManager;
+import org.sv.flexobject.hadoop.HadoopTask;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +31,7 @@ public class HadoopSecretProviderTest extends ClusterMapReduceTestCase {
     */
 
     public static void publishTestSecret(Configuration conf, FileSystem fs) throws IOException {
-        Path expectedSecretPath = new Path("/user/" + HadoopSecretProvider.getUserName(conf) + "/creds/alpha/secret.jceks");
+        Path expectedSecretPath = new Path("/user/" + HadoopTask.getUserName(conf) + "/creds/alpha/secret.jceks");
         try(OutputStream os = fs.create(expectedSecretPath);
             InputStream is = conf.getClass().getClassLoader().getResourceAsStream("secret.jceks")) {
             byte[] buf = new byte[8192];

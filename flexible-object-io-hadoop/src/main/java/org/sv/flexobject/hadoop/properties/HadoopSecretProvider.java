@@ -18,56 +18,11 @@ public class HadoopSecretProvider implements SecretProvider, IConfigured {
 
     Logger logger = Logger.getLogger(HadoopSecretProvider.class);
 
-    public String getNameNodeRPC(int order){
-        String nameservice = getConf().get("dfs.nameservices");
-        if (StringUtils.isNotBlank(nameservice)){
-            String namenodes = getConf().get("dfs.ha.namenodes." + nameservice);
-            String[] nodes = namenodes.split(",");
-            if (order >= nodes.length)
-                return null;
-            String rpc = getConf().get("dfs.namenode.servicerpc-address." + nameservice + "." + nodes[order]);
-            return rpc;
-        }
-        return null;
-    }
-
-    public String getActiveNameNodeRPC() {
-        String activeNameNode;
-        if (StringUtils.isBlank(getConf().get("dfs.nameservices"))){
-            activeNameNode = getConf().get("dfs.namenode.servicerpc-address");
-            if (activeNameNode == null)
-                activeNameNode = getConf().get("dfs.namenode.rpc-address");
-        } else {
-            try {
-                activeNameNode = getNameNodeRPC(0);
-                FileSystem.get(new Path("hdfs://" + activeNameNode + "/").toUri(), getConf()).isFile(new Path("/tmp"));
-            } catch (Exception e) {
-                try {
-                    activeNameNode = getNameNodeRPC(1);
-                    FileSystem.get(new Path("hdfs://" + activeNameNode + "/").toUri(), getConf()).isFile(new Path("/tmp"));
-                } catch (IOException ex) {
-                    logger.error("Cannot find any active Name Node", ex);
-                    throw new RuntimeException("Cannot determine active Name Node", ex);
-                }
-            }
-        }
-        logger.info("Active HDFS Name Node rpc is determined to be " + activeNameNode);
-        return activeNameNode;
-    }
-
-    public static String getUserName(Configuration conf){
-        return conf.get(MRJobConfig.USER_NAME, System.getProperty("user.name"));
-    }
-
-    public String getUserName(){
-        return getUserName(getConf());
-    }
-
     public String getPassword(String propertyName, ConnectionManager.DeploymentLevel deploymentLevel) {
         String credentialsPath = "jceks://hdfs@"
-                + getActiveNameNodeRPC()
+                + HadoopTask.getActiveNameNodeRPC(getConf())
                 + "/user/"
-                + getUserName()
+                + HadoopTask.getUserName(getConf())
                 + "/creds/"
                 + deploymentLevel;
         logger.info("Using credentials path : " + credentialsPath);

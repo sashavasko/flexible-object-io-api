@@ -2,13 +2,14 @@ package org.sv.flexobject.io.consumers;
 
 
 import org.sv.flexobject.Savable;
+import org.sv.flexobject.io.CloseableConsumer;
 import org.sv.flexobject.io.Consumer;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class FanOutConsumer implements Consumer {
+public class FanOutConsumer implements CloseableConsumer {
 
     List<Consumer> consumers = new ArrayList<>();
     long recordsConsumed = 0;
@@ -55,6 +56,8 @@ public class FanOutConsumer implements Consumer {
     }
 
     @Override
-    public void cleanup() throws Exception {
+    public void close() throws Exception {
+        for (Consumer consumer : consumers)
+            consumer.cleanup();
     }
 }

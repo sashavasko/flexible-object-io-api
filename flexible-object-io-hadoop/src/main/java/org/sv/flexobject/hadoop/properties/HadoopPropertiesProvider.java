@@ -1,6 +1,7 @@
 package org.sv.flexobject.hadoop.properties;
 
 import org.apache.hadoop.conf.Configuration;
+import org.sv.flexobject.hadoop.HadoopTask;
 import org.sv.flexobject.hadoop.utils.IConfigured;
 import org.sv.flexobject.properties.FilePropertiesProvider;
 import org.sv.flexobject.properties.PropertiesFile;
@@ -27,7 +28,7 @@ public class HadoopPropertiesProvider extends FilePropertiesProvider implements 
     }
 
     public List<String> getHadoopPathToFiles(){
-        return Arrays.asList( "/user/" + HadoopSecretProvider.getUserName(getConf()) + "/connections");
+        return Arrays.asList( "/user/" + HadoopTask.getUserName(getConf()) + "/connections");
     }
 
     @Override
