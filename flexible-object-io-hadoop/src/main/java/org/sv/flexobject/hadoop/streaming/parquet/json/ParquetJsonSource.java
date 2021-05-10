@@ -1,4 +1,4 @@
-package org.sv.flexobject.hadoop.streaming.parquet;
+package org.sv.flexobject.hadoop.streaming.parquet.json;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.hadoop.conf.Configuration;
@@ -10,6 +10,8 @@ import org.apache.parquet.io.InputFile;
 import org.apache.parquet.schema.MessageType;
 import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.hadoop.streaming.ConfiguredSource;
+import org.sv.flexobject.hadoop.streaming.parquet.ParquetSchema;
+import org.sv.flexobject.hadoop.streaming.parquet.ParquetSourceConf;
 import org.sv.flexobject.hadoop.streaming.parquet.read.SchemedParquetReaderBuilder;
 import org.sv.flexobject.hadoop.streaming.parquet.read.json.JsonParquetReaderBuilder;
 

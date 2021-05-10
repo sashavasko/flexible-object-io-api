@@ -6,6 +6,7 @@ import org.apache.parquet.schema.MessageType;
 import org.joda.time.DateTime;
 import org.joda.time.MutableDateTime;
 import org.junit.Test;
+import org.sv.flexobject.hadoop.streaming.parquet.json.ParquetJsonSink;
 import org.sv.flexobject.json.MapperFactory;
 
 import static org.junit.Assert.assertEquals;
@@ -58,24 +59,25 @@ public class ParquetUtilsTest {
     }
 
     private static void writeTestFile(Configuration conf, Path testFilepath, long int64Field, int int32Field) throws Exception {
-        try (ParquetJsonSink sink = new ParquetJsonSink()
+        MessageType schema = new MessageType("test",
+                ParquetSchema.integerField("int32Field"),
+                ParquetSchema.longField("int64Field"));
+
+        try (ParquetJsonSink sink = ParquetJsonSink.builder()
                 .forOutput(testFilepath)
-                .withSchema(new MessageType("test",
-                        ParquetSchema.integerField("int32Field"),
-                        ParquetSchema.longField("int64Field")))
-                .withConf(conf)) {
+                .withSchema(schema)
+                .withConf(conf).build()) {
             sink.put(MapperFactory.getObjectReader().readTree("{\"int32Field\":" + int32Field + ",\"int64Field\":" + int64Field + "}"));
         }
     }
 
     private static void writeEmptyFile(Configuration conf, Path testFilepath) throws Exception {
-        try (ParquetJsonSink sink = new ParquetJsonSink()
+        try (ParquetJsonSink sink = ParquetJsonSink.builder()
                 .forOutput(testFilepath)
                 .withSchema(new MessageType("test",
                         ParquetSchema.integerField("int32Field"),
                         ParquetSchema.longField("int64Field")))
-                .withConf(conf)) {
-            sink.getWriter();
+                .withConf(conf).build()) {
         }
     }
 

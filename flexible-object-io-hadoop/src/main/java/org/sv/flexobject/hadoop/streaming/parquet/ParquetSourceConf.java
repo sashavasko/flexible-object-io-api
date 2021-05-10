@@ -9,8 +9,8 @@ public class ParquetSourceConf extends HadoopPropertiesWrapper<ParquetSourceConf
 
     public static final String SUBNAMESPACE = "input.streaming.parquet";
 
-    String filePath;
-    Class<? extends StreamableWithSchema> dataClass;
+    public String filePath;
+    public Class<? extends StreamableWithSchema> dataClass;
 
     public ParquetSourceConf() {
         super();
