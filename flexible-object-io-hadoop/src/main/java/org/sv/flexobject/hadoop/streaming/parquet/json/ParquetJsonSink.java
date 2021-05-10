@@ -19,12 +19,8 @@ import java.io.IOException;
 
 public class ParquetJsonSink extends AbstractParquetSink<JsonNode> {
 
-    protected ParquetJsonSink(ParquetSinkConf conf, ParquetWriter<JsonNode> writer) {
-        super(conf, writer);
-    }
-
     public static Builder<JsonNode, ParquetJsonSink> builder(){
-        return new Builder<JsonNode, ParquetJsonSink>() {
+        return new Builder<JsonNode, ParquetJsonSink>(ParquetJsonSink.class) {
             @Override
             protected SchemedParquetWriterBuilder<JsonNode, ?> makeBuilder(Path filePath) {
                 return new JsonParquetWriterBuilder(filePath);
@@ -33,11 +29,6 @@ public class ParquetJsonSink extends AbstractParquetSink<JsonNode> {
             @Override
             protected SchemedParquetWriterBuilder<JsonNode, ?> makeBuilder(OutputFile file) {
                 return new JsonParquetWriterBuilder(file);
-            }
-
-            @Override
-            protected ParquetJsonSink makeInstance(ParquetSinkConf conf, ParquetWriter<JsonNode> writer) {
-                return new ParquetJsonSink(conf, writer);
             }
         };
     }

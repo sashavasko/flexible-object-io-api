@@ -10,6 +10,7 @@ import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.hadoop.streaming.parquet.write.SchemedParquetWriterBuilder;
 import org.sv.flexobject.hadoop.streaming.parquet.write.streamable.ParquetWriterBuilder;
 import org.sv.flexobject.stream.Sink;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.IOException;
 
@@ -19,9 +20,7 @@ public class AbstractParquetSink<T> implements Sink<T>, AutoCloseable {
 
     private boolean hasOutput = false;
 
-    protected AbstractParquetSink(ParquetSinkConf conf, ParquetWriter<T> writer) {
-        this.conf = conf;
-        this.writer = writer;
+    protected AbstractParquetSink() {
     }
 
     @Override
@@ -55,13 +54,18 @@ public class AbstractParquetSink<T> implements Sink<T>, AutoCloseable {
         }
     }
 
-    public abstract static class Builder<T,SINK>{
+    public abstract static class Builder<T,SINK extends AbstractParquetSink>{
         String namespace;
         Configuration conf;
         MessageType schema;
         Class<? extends StreamableWithSchema> dataClass;
         Path filePath;
         OutputFile file;
+        Class<? extends AbstractParquetSink> sinkClass;
+
+        public Builder(Class<? extends AbstractParquetSink> sinkClass) {
+            this.sinkClass = sinkClass;
+        }
 
         public Builder<T,SINK> nameSpace(String namespace){
             this.namespace = namespace;
@@ -99,7 +103,6 @@ public class AbstractParquetSink<T> implements Sink<T>, AutoCloseable {
 
         protected abstract SchemedParquetWriterBuilder<T, ?> makeBuilder(Path filePath);
         protected abstract SchemedParquetWriterBuilder<T, ?> makeBuilder(OutputFile file);
-        protected abstract SINK makeInstance(ParquetSinkConf conf, ParquetWriter<T> writer);
 
         public SINK build() throws IOException {
             ParquetSinkConf parquetConf  = null;
@@ -136,7 +139,10 @@ public class AbstractParquetSink<T> implements Sink<T>, AutoCloseable {
 
             parquetBuilder.withConf(conf);
             parquetBuilder.withSchema(schema);
-            return makeInstance(parquetConf, parquetBuilder.build());
+            SINK sink = (SINK) sinkClass.cast(InstanceFactory.get(sinkClass));
+            sink.conf = parquetConf;
+            sink.writer = parquetBuilder.build();
+            return sink;
         }
     }
 }

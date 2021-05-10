@@ -11,12 +11,8 @@ import org.sv.flexobject.hadoop.streaming.parquet.write.streamable.ParquetWriter
 
 public class ParquetSink extends AbstractParquetSink<StreamableWithSchema> {
 
-    protected ParquetSink(ParquetSinkConf conf, ParquetWriter<StreamableWithSchema> writer) {
-        super(conf, writer);
-    }
-
     public static Builder<StreamableWithSchema, ParquetSink> builder() {
-        return new Builder<StreamableWithSchema, ParquetSink>() {
+        return new Builder<StreamableWithSchema, ParquetSink>(ParquetSink.class) {
 
             @Override
             protected SchemedParquetWriterBuilder<StreamableWithSchema, ?> makeBuilder(Path filePath) {
@@ -26,11 +22,6 @@ public class ParquetSink extends AbstractParquetSink<StreamableWithSchema> {
             @Override
             protected SchemedParquetWriterBuilder<StreamableWithSchema, ?> makeBuilder(OutputFile file) {
                 return new ParquetWriterBuilder(file);
-            }
-
-            @Override
-            protected ParquetSink makeInstance(ParquetSinkConf conf, ParquetWriter<StreamableWithSchema> writer) {
-                return new ParquetSink(conf, writer);
             }
         };
     }
