@@ -60,6 +60,7 @@ public class AbstractParquetSink<T> implements Sink<T>, AutoCloseable {
         MessageType schema;
         Class<? extends StreamableWithSchema> dataClass;
         Path filePath;
+        boolean overwrite = false;
         OutputFile file;
         Class<? extends AbstractParquetSink> sinkClass;
 
@@ -96,6 +97,11 @@ public class AbstractParquetSink<T> implements Sink<T>, AutoCloseable {
             return this;
         }
 
+        public Builder<T,SINK> overwrite(){
+            this.overwrite = true;
+            return this;
+        }
+
         public Builder<T,SINK> forOutput(OutputFile file){
             this.file = file;
             return this;
@@ -121,12 +127,19 @@ public class AbstractParquetSink<T> implements Sink<T>, AutoCloseable {
 
             if (file != null)
                 parquetBuilder = makeBuilder(file);
-            else if (filePath != null)
+            else {
+                if (filePath == null && parquetConf.filePathIsSet())
+                    parquetBuilder = makeBuilder(parquetConf.getFilePath());
+                if (filePath == null)
+                    throw new IllegalArgumentException("Output is not set");
+
+                if (overwrite) {
+                    try {
+                        filePath.getFileSystem(conf).delete(filePath, true);
+                    }catch(IOException e){}
+                }
                 parquetBuilder = makeBuilder(filePath);
-            else if (parquetConf.filePathIsSet())
-                parquetBuilder = makeBuilder(parquetConf.getFilePath());
-            else
-                throw new IllegalArgumentException("Output is not set");
+            }
 
             if(schema == null){
                 if (dataClass != null)
