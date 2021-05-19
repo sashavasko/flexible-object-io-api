@@ -11,6 +11,7 @@ repositories {
 }
 
 ext.hadoopVersion = "3.3.0"
+ext.sparkVersion = "3.1.1"
 
 dependencies {
 
@@ -27,12 +28,14 @@ dependencies {
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
 
-    compile ("org.apache.hadoop:hadoop-client:3.3.0"){
+    compile ("org.apache.hadoop:hadoop-client:${hadoopVersion}"){
         exclude group: 'com.fasterxml.jackson.core', module:'jackson-databind'
         exclude group: 'com.fasterxml.jackson.core', module:'jackson-core'
         exclude group: 'org.apache.avro', module:'avro'
     }
-
+    compileOnly (group: 'org.apache.spark', name: 'spark-core_2.12', version: "${sparkVersion}"){
+        exclude group: 'org.apache.avro', module:'avro-mapred'
+    }
     // https://mvnrepository.com/artifact/org.apache.avro/avro
     implementation group: 'org.apache.avro', name: 'avro', version: '1.10.1'
 
