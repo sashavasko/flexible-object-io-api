@@ -6,13 +6,14 @@ import org.bson.RawBsonDocument;
 import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.mongo.schema.BsonSchema;
 import org.sv.flexobject.stream.Source;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.util.Iterator;
 import java.util.Map;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class MongoSource implements Source<StreamableWithSchema>,  Iterator<StreamableWithSchema>, Iterable<StreamableWithSchema>, AutoCloseable {
+public class MongoSource extends MongoConnectionOwner implements Source<StreamableWithSchema>,  Iterator<StreamableWithSchema>, Iterable<StreamableWithSchema>, AutoCloseable {
     MongoCursor<RawBsonDocument> cursor;
     Class<? extends StreamableWithSchema> schema;
     BsonSchema bsonSchema;
@@ -20,30 +21,26 @@ public class MongoSource implements Source<StreamableWithSchema>,  Iterator<Stre
     public MongoSource() {
     }
 
-    public MongoSource(Class<? extends StreamableWithSchema> schema) {
-        forSchema(schema);
-    }
-
-    public MongoSource(MongoCursor<RawBsonDocument> cursor) {
+    public MongoSource(Class<? extends StreamableWithSchema> schema, MongoCursor<RawBsonDocument> cursor) {
         this.cursor = cursor;
-    }
-
-    public MongoSource forCursor(MongoCursor<RawBsonDocument> cursor){
-        close();
-        this.cursor = cursor;
-        return this;
-    }
-
-    public MongoSource forCursor(FindIterable<RawBsonDocument> iterable){
-        close();
-        this.cursor = iterable.cursor();
-        return this;
-    }
-
-    public MongoSource forSchema(Class<? extends StreamableWithSchema> schema){
         this.schema = schema;
         bsonSchema = BsonSchema.getRegisteredSchema(schema);
-        return this;
+    }
+
+    public static class Builder extends MongoBuilder<Builder>{
+
+        public MongoSource build() throws Exception {
+            MongoSource source = InstanceFactory.get(MongoSource.class);
+            source.cursor = getCursor(RawBsonDocument.class);
+            source.schema = getSchema();
+            source.bsonSchema = getBsonSchema();
+            saveConnection(source);
+            return source;
+        }
+    }
+
+    public static Builder builder() {
+        return InstanceFactory.get(Builder.class);
     }
 
     @Override
@@ -62,6 +59,7 @@ public class MongoSource implements Source<StreamableWithSchema>,  Iterator<Stre
             cursor.close();
             cursor = null;
         }
+        super.close();
     }
 
     @Override

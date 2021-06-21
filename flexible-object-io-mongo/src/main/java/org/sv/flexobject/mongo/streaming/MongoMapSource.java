@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class MongoMapSource<SELF extends MongoMapSource> implements Source<Map<String, Object>>,  Iterator<Map<String, Object>>, Iterable<Map<String, Object>>, AutoCloseable {
+public class MongoMapSource extends MongoConnectionOwner implements Source<Map<String, Object>>,  Iterator<Map<String, Object>>, Iterable<Map<String, Object>>, AutoCloseable {
     MongoCursor cursor;
 
     public MongoMapSource() {
@@ -16,12 +16,6 @@ public class MongoMapSource<SELF extends MongoMapSource> implements Source<Map<S
 
     public MongoMapSource(MongoCursor cursor) {
         this.cursor = cursor;
-    }
-
-    public SELF forCursor(MongoCursor cursor){
-        close();
-        this.cursor = cursor;
-        return (SELF) this;
     }
 
     @Override
@@ -40,6 +34,7 @@ public class MongoMapSource<SELF extends MongoMapSource> implements Source<Map<S
             cursor.close();
             cursor = null;
         }
+        super.close();
     }
 
     @Override

@@ -20,8 +20,8 @@ public class MongoSourceTest extends EmbeddedMongoTest {
         ObjectWithObjectId data = ObjectWithObjectId.random();
         collection.insertOne(BsonSchema.serialize(data));
 
-        try(MongoSource source = new MongoSource(ObjectWithObjectId.class)
-                .forCursor(collectionRaw.find(Filters.eq("_id", new ObjectId(data.objectId))))) {
+        try(MongoSource source = new MongoSource(ObjectWithObjectId.class,
+                collectionRaw.find(Filters.eq("_id", new ObjectId(data.objectId))).cursor())) {
 
             assertEquals(data, source.get());
         }
@@ -37,8 +37,7 @@ public class MongoSourceTest extends EmbeddedMongoTest {
         }
 
         List<TestDataWithSubSchema> listOfConvertedData = new ArrayList<>();
-        try(MongoSource source = new MongoSource(TestDataWithSubSchema.class)
-                .forCursor(collectionRaw.find())) {
+        try(MongoSource source = new MongoSource(TestDataWithSubSchema.class, collectionRaw.find().cursor())) {
 
             while (source.hasNext())
                 listOfConvertedData.add(source.get());

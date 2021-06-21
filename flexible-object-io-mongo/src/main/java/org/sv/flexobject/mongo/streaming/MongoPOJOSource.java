@@ -2,12 +2,13 @@ package org.sv.flexobject.mongo.streaming;
 
 import com.mongodb.client.MongoCursor;
 import org.sv.flexobject.stream.Source;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.util.Iterator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class MongoPOJOSource<POJO> implements Source<POJO>,  Iterator<POJO>, Iterable<POJO>, AutoCloseable {
+public class MongoPOJOSource<POJO>  extends MongoConnectionOwner implements Source<POJO>,  Iterator<POJO>, Iterable<POJO>, AutoCloseable {
     MongoCursor<POJO> cursor;
 
     public MongoPOJOSource() {
@@ -17,10 +18,18 @@ public class MongoPOJOSource<POJO> implements Source<POJO>,  Iterator<POJO>, Ite
         this.cursor = cursor;
     }
 
-    public MongoPOJOSource forCursor(MongoCursor<POJO> cursor){
-        close();
-        this.cursor = cursor;
-        return this;
+    public static class Builder extends MongoBuilder<Builder>{
+
+        public MongoPOJOSource build() throws Exception {
+            MongoPOJOSource source = InstanceFactory.get(MongoPOJOSource.class);
+            source.cursor = getCursor(getDocumentClass());
+            saveConnection(source);
+            return source;
+        }
+    }
+
+    public static Builder builder() {
+        return InstanceFactory.get(Builder.class);
     }
 
     @Override
@@ -39,6 +48,7 @@ public class MongoPOJOSource<POJO> implements Source<POJO>,  Iterator<POJO>, Ite
             cursor.close();
             cursor = null;
         }
+        super.close();
     }
 
     @Override

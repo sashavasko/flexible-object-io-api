@@ -48,8 +48,7 @@ public class MongoSinkTest extends EmbeddedMongoTest {
         assertEquals(10, insertedIds.size());
 
         List<TestDataWithSubSchema> listOfConvertedData = new ArrayList<>();
-        try (MongoSource source = new MongoSource(TestDataWithSubSchema.class)
-                .forCursor(collectionRaw.find())) {
+        try (MongoSource source = new MongoSource(TestDataWithSubSchema.class, collectionRaw.find().cursor())) {
 
             while (source.hasNext())
                 listOfConvertedData.add(source.get());
