@@ -5,6 +5,8 @@ import org.sv.flexobject.adapter.DynamicInAdapter;
 import org.sv.flexobject.adapter.GenericInAdapter;
 import org.sv.flexobject.stream.sources.SingleValueSource;
 
+import java.util.NoSuchElementException;
+
 public class SparkConfInAdapter extends GenericInAdapter<SparkConf> implements DynamicInAdapter {
 
     public SparkConfInAdapter() {
@@ -17,9 +19,12 @@ public class SparkConfInAdapter extends GenericInAdapter<SparkConf> implements D
 
     @Override
     public Object get(Object translatedFieldName) {
-        return getCurrent().get((String) translatedFieldName);
+        try {
+            return getCurrent().get((String) translatedFieldName);
+        }catch (NoSuchElementException e){
+            return null;
+        }
     }
-
     public static SparkConfInAdapter forValue(SparkConf configuration, String namespace) throws Exception {
         if (configuration != null) {
             SingleValueSource<SparkConf> source = new SingleValueSource<>(configuration);
