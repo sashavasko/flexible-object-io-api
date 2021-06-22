@@ -1,6 +1,9 @@
-package org.sv.flexobject.hadoop.mapreduce.util;
+package org.sv.flexobject.hadoop.mapreduce.input;
 
+
+import org.sv.flexobject.hadoop.mapreduce.util.MRDao;
 import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
+import org.sv.flexobject.util.InstanceFactory;
 
 public class DaoRecordReaderConf extends HadoopPropertiesWrapper<DaoRecordReaderConf> {
     public static final String SUBNAMESPACE = "record.reader";
@@ -31,13 +34,12 @@ public class DaoRecordReaderConf extends HadoopPropertiesWrapper<DaoRecordReader
         return SUBNAMESPACE;
     }
 
-
     public boolean isDaoConfigured(){
         return daoClass != null;
     }
 
     public MRDao createDao() throws IllegalAccessException, InstantiationException {
-        return daoClass.newInstance();
+        return InstanceFactory.get(daoClass);
     }
 
     public String getKeyFieldName() {

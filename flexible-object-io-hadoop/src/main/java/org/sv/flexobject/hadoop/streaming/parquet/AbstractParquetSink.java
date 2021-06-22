@@ -110,6 +110,15 @@ public class AbstractParquetSink<T> implements Sink<T>, AutoCloseable {
         protected abstract SchemedParquetWriterBuilder<T, ?> makeBuilder(Path filePath);
         protected abstract SchemedParquetWriterBuilder<T, ?> makeBuilder(OutputFile file);
 
+        protected void doOverwrite(Path filePath){
+            if (overwrite) {
+                try {
+                    filePath.getFileSystem(conf).delete(filePath, true);
+                } catch (IOException e) {
+                }
+            }
+        }
+
         public SINK build() throws IOException {
             ParquetSinkConf parquetConf  = null;
             ParquetWriter<T> writer = null;
@@ -128,17 +137,15 @@ public class AbstractParquetSink<T> implements Sink<T>, AutoCloseable {
             if (file != null)
                 parquetBuilder = makeBuilder(file);
             else {
-                if (filePath == null && parquetConf.filePathIsSet())
+                if (filePath == null && parquetConf.filePathIsSet()){
+                    doOverwrite(parquetConf.getFilePath());
                     parquetBuilder = makeBuilder(parquetConf.getFilePath());
-                if (filePath == null)
-                    throw new IllegalArgumentException("Output is not set");
-
-                if (overwrite) {
-                    try {
-                        filePath.getFileSystem(conf).delete(filePath, true);
-                    }catch(IOException e){}
+                }else {
+                    if (filePath == null)
+                        throw new IllegalArgumentException("Output is not set");
+                    doOverwrite(filePath);
+                    parquetBuilder = makeBuilder(filePath);
                 }
-                parquetBuilder = makeBuilder(filePath);
             }
 
             if(schema == null){

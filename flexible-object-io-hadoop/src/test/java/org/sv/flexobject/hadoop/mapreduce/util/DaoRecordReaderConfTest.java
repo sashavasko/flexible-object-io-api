@@ -1,6 +1,7 @@
 package org.sv.flexobject.hadoop.mapreduce.util;
 
 import org.junit.Test;
+import org.sv.flexobject.hadoop.mapreduce.input.DaoRecordReaderConf;
 import org.sv.flexobject.schema.Schema;
 import org.sv.flexobject.schema.SchemaElement;
 

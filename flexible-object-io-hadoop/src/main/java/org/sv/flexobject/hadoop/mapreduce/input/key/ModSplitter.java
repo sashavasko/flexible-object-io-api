@@ -4,11 +4,12 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.MRJobConfig;
+import org.sv.flexobject.hadoop.mapreduce.input.Splitter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ModSplitter implements KeySplitter {
+public class ModSplitter implements Splitter {
 
     @Override
     public List<InputSplit> split(Configuration conf) {

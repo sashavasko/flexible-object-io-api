@@ -1,8 +1,10 @@
 package org.sv.flexobject.hadoop.mapreduce.input.batch;
 
+import org.sv.flexobject.hadoop.mapreduce.input.InputConf;
 import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
+import org.sv.flexobject.util.InstanceFactory;
 
-public class BatchInputConf extends HadoopPropertiesWrapper<BatchInputConf> {
+public class BatchInputConf extends InputConf<BatchInputConf> {
 
     public static final String SUBNAMESPACE = "input.batch";
 
@@ -30,6 +32,7 @@ public class BatchInputConf extends HadoopPropertiesWrapper<BatchInputConf> {
         batchesPerSplit = 200; //conf.getInt(BatchInputSplit.CFX_BATCHES_PER_SPLIT, 200);
         batchesNum = 15000; //conf.getInt(CFX_BATCHES_NUM, 15000);
         splitClass = BatchInputSplit.class; // conf.getClass(CFX_BATCH_SPLIT_CLASS, BatchInputSplit.class, BatchInputSplit.class);
+        splitterClass = BatchSplitter.class;
         readerClass = BatchRecordReader.Long.class;
         keyMaxCalculator = ParquetMaxKeyCalculator.class;
         keyManager = BatchKeyManager.class;
@@ -80,14 +83,13 @@ public class BatchInputConf extends HadoopPropertiesWrapper<BatchInputConf> {
         return batchesNum == null ? 1500 : batchesNum;
     }
 
+    public Class<? extends BatchInputSplit> getSplitClass() {
+        return splitClass == null ? BatchInputSplit.class : splitClass;
+    }
     public BatchInputSplit getSplit() throws IllegalAccessException, InstantiationException {
-        BatchInputSplit splitInstance = splitClass == null ? new BatchInputSplit() : splitClass.newInstance();
+        BatchInputSplit splitInstance = InstanceFactory.get(getSplitClass());
         splitInstance.setConf(getConf());
         return splitInstance;
-    }
-
-    public BatchRecordReader getReader() throws IllegalAccessException, InstantiationException {
-        return readerClass == null ? new BatchRecordReader.Long() : readerClass.newInstance();
     }
 
     public String getKeyMaxDatasetPath() {
@@ -98,14 +100,22 @@ public class BatchInputConf extends HadoopPropertiesWrapper<BatchInputConf> {
         return keyMaxDatasetColumnName;
     }
 
+    public Class<? extends MaxKeyCalculator> getKeyMaxCalculatorClass() {
+        return keyMaxCalculator == null ? ParquetMaxKeyCalculator.class : keyMaxCalculator;
+    }
+
     public MaxKeyCalculator getKeyMaxCalculator() throws IllegalAccessException, InstantiationException {
-        MaxKeyCalculator maxKeyCalculatorInstance = keyMaxCalculator == null ? new ParquetMaxKeyCalculator() : keyMaxCalculator.newInstance();
+        MaxKeyCalculator maxKeyCalculatorInstance = InstanceFactory.get(getKeyMaxCalculatorClass());
         maxKeyCalculatorInstance.setConf(getConf());
         return maxKeyCalculatorInstance;
     }
 
+    public Class<? extends BatchKeyManager> getKeyManagerClass() throws IllegalAccessException, InstantiationException {
+        return keyManager == null ? BatchKeyManager.class : keyManager;
+    }
+
     public BatchKeyManager getKeyManager() throws IllegalAccessException, InstantiationException {
-        BatchKeyManager batchKeyManagerInstance = keyManager == null ? new BatchKeyManager() : keyManager.newInstance();
+        BatchKeyManager batchKeyManagerInstance = InstanceFactory.get(getKeyManagerClass());
         batchKeyManagerInstance.setConf(getConf());
         return batchKeyManagerInstance;
     }

@@ -1,14 +1,15 @@
 package org.sv.flexobject.hadoop.mapreduce.input.batch;
 
 import org.apache.log4j.Logger;
-import org.sv.flexobject.hadoop.mapreduce.util.DaoRecordReader;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.sv.flexobject.InAdapter;
+import org.sv.flexobject.hadoop.mapreduce.input.DaoRecordReader;
 
 import java.io.IOException;
 
-abstract public class BatchRecordReader<VT> extends DaoRecordReader<LongWritable, VT> {
+abstract public class BatchRecordReader<VT>  extends DaoRecordReader<LongWritable, VT> {
     Logger logger = Logger.getLogger(BatchRecordReader.class);
 
     long recordsRead = 0;
@@ -40,10 +41,21 @@ abstract public class BatchRecordReader<VT> extends DaoRecordReader<LongWritable
     }
 
     @Override
+    protected InAdapter createAdapter(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException {
+        return null;
+    }
+
+    @Override
     public void initialize(InputSplit split, TaskAttemptContext context) throws IOException, InterruptedException {
         super.initialize(split,context);
         nextBatchStartKey = ((BatchInputSplit)split).getStartKey();
         hasData = nextBatch();
+        progressReporter.setSize(((BatchInputSplit)split).getBatchPerSplit());
+    }
+
+    protected void incrementBatch(){
+        batchNo++;
+        progressReporter.increment();
     }
 
     protected boolean nextBatch(){
@@ -56,7 +68,7 @@ abstract public class BatchRecordReader<VT> extends DaoRecordReader<LongWritable
                 logger.info("Empty batch encountered - checking if we need to skip a few ...");
                 long adjustedKey = inputDao.adjustStartKey(nextBatchStartKey, nextBatchStartKey + ((batchesPerSplit - batchNo) * batchSize));
                 while (adjustedKey > nextBatchStartKey + batchSize && batchNo < batchesPerSplit) {
-                    batchNo++;
+                    incrementBatch();
                     logger.info("Skipping batch " + batchNo);
                     nextBatchStartKey += batchSize;
                 }
@@ -65,7 +77,7 @@ abstract public class BatchRecordReader<VT> extends DaoRecordReader<LongWritable
                 }
             }
 
-            batchNo++;
+            incrementBatch();
             lastBatchRecordsRead = recordsRead;
             logger.info("Starting batch " + batchNo + " of " + batchesPerSplit + " with start key " + nextBatchStartKey + " records read so far " + recordsRead);
 
@@ -105,11 +117,5 @@ abstract public class BatchRecordReader<VT> extends DaoRecordReader<LongWritable
             logger.error("Failed to get new record :", e);
             return false;
         }
-    }
-
-    @Override
-    public float getProgress() throws IOException, InterruptedException {
-        float progress = batchNo;
-        return progress / ((BatchInputSplit)split).getBatchPerSplit();
     }
 }

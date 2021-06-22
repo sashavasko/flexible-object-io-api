@@ -1,12 +1,9 @@
 package org.sv.flexobject.hadoop.mapreduce.input.key;
 
-import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
+import org.sv.flexobject.hadoop.mapreduce.input.InputConf;
 
-public class KeyInputConf extends HadoopPropertiesWrapper<KeyInputConf> {
+public class KeyInputConf extends InputConf<KeyInputConf> {
     public static final String SUBNAMESPACE = "input.key";
-
-    private Class<? extends KeySplitter> splitterClass;
-    private Class<? extends KeyRecordReader> readerClass;
 
     public KeyInputConf() {
         super();
@@ -26,13 +23,5 @@ public class KeyInputConf extends HadoopPropertiesWrapper<KeyInputConf> {
     @Override
     public String getSubNamespace() {
         return SUBNAMESPACE;
-    }
-
-    public KeySplitter getSplitter() throws IllegalAccessException, InstantiationException {
-        return splitterClass == null ? new ModSplitter() : splitterClass.newInstance();
-    }
-
-    public KeyRecordReader getReader() throws IllegalAccessException, InstantiationException {
-        return readerClass == null ? new KeyRecordReader.LongText() : readerClass.newInstance();
     }
 }

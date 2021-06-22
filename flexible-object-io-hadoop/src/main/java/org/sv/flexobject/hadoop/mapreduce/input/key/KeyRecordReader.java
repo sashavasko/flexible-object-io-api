@@ -1,7 +1,10 @@
 package org.sv.flexobject.hadoop.mapreduce.input.key;
 
+import org.apache.hadoop.mapreduce.InputSplit;
+import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.log4j.Logger;
-import org.sv.flexobject.hadoop.mapreduce.util.DaoRecordReader;
+import org.sv.flexobject.InAdapter;
+import org.sv.flexobject.hadoop.mapreduce.input.DaoRecordReader;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 
@@ -9,8 +12,6 @@ import java.io.IOException;
 
 abstract public class KeyRecordReader<KT, VT> extends DaoRecordReader<KT, VT> {
     Logger logger = Logger.getLogger(KeyRecordReader.class);
-    long recordsRead = 0;
-    long estimatedMaxRecords = 1000;
 
     public static class LongLong extends KeyRecordReader<LongWritable, LongWritable> {
         DaoRecordReader.LongField key = new LongField();
@@ -22,7 +23,9 @@ abstract public class KeyRecordReader<KT, VT> extends DaoRecordReader<KT, VT> {
         }
 
         @Override
-        protected LongWritable convertCurrentValue() throws Exception { return value.convert(valueFieldName); }
+        protected LongWritable convertCurrentValue() throws Exception {
+            return value.convert(valueFieldName);
+        }
     }
 
     public static class LongText extends KeyRecordReader<LongWritable, Text> {
@@ -30,19 +33,32 @@ abstract public class KeyRecordReader<KT, VT> extends DaoRecordReader<KT, VT> {
         DaoRecordReader.TextField value = new TextField();
 
         @Override
-        protected LongWritable convertCurrentKey() throws Exception { return key.convert(keyFieldName); }
+        protected LongWritable convertCurrentKey() throws Exception {
+            return key.convert(keyFieldName);
+        }
 
         @Override
-        protected Text convertCurrentValue() throws Exception { return value.convert(valueFieldName); }
+        protected Text convertCurrentValue() throws Exception {
+            return value.convert(valueFieldName);
+        }
+    }
+
+    @Override
+    protected InAdapter createAdapter(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException {
+        try {
+            return ((KeyInputDao) dao).start(((KeyInputSplit) split).getKey());
+        } catch (Exception e) {
+            if (e instanceof IOException)
+                throw (IOException) e;
+            throw new IOException("Failed to query DAO by the key", e);
+        }
     }
 
     @Override
     public boolean nextKeyValue() throws IOException, InterruptedException {
         try {
-            if (input == null)
-                setInput(((KeyInputDao)dao).start(((KeyInputSplit)split).getKey()));
             if (input.next()) {
-                recordsRead++;
+                progressReporter.increment();
                 return true;
             }
             return false;
@@ -50,12 +66,5 @@ abstract public class KeyRecordReader<KT, VT> extends DaoRecordReader<KT, VT> {
             logger.error("Failed to get next record", e);
             return false;
         }
-    }
-
-    @Override
-    public float getProgress() throws IOException, InterruptedException {
-        if (recordsRead >= estimatedMaxRecords*3/4)
-            estimatedMaxRecords *= 2;
-        return ((float)recordsRead)/((float)estimatedMaxRecords);
     }
 }
