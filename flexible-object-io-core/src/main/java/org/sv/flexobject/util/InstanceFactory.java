@@ -23,5 +23,7 @@ public class InstanceFactory {
         return instance;
     }
 
-
+    public static void reset(){
+        map.clear();
+    }
 }

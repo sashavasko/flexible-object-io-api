@@ -17,6 +17,11 @@ public class SimpleProgressReporter implements ProgressReporter{
     }
 
     @Override
+    public long getSize() {
+        return size;
+    }
+
+    @Override
     public float getProgress() {
         if ((size == 0 && current + current / 4  > sizeEstimated)
             || current > sizeEstimated){

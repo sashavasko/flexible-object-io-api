@@ -14,6 +14,7 @@ public interface ProgressReporter {
     }
 
     void setSize(long size);
+    long getSize();
     float getProgress();
     void increment(long count);
 
