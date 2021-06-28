@@ -11,7 +11,7 @@ import org.apache.hadoop.io.Text;
 import java.io.IOException;
 
 abstract public class KeyRecordReader<KT, VT> extends DaoRecordReader<KT, VT> {
-    Logger logger = Logger.getLogger(KeyRecordReader.class);
+    static Logger logger = Logger.getLogger(KeyRecordReader.class);
 
     public static class LongLong extends KeyRecordReader<LongWritable, LongWritable> {
         DaoRecordReader.LongField key = new LongField();
@@ -46,7 +46,7 @@ abstract public class KeyRecordReader<KT, VT> extends DaoRecordReader<KT, VT> {
     @Override
     protected InAdapter createAdapter(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException {
         try {
-            return ((KeyInputDao) dao).start(((KeyInputSplit) split).getKey());
+            return ((KeyInputDao) dao).start(((KeyInputSplit) getSplit()).getKey());
         } catch (Exception e) {
             if (e instanceof IOException)
                 throw (IOException) e;
@@ -57,8 +57,8 @@ abstract public class KeyRecordReader<KT, VT> extends DaoRecordReader<KT, VT> {
     @Override
     public boolean nextKeyValue() throws IOException, InterruptedException {
         try {
-            if (input.next()) {
-                progressReporter.increment();
+            if (getInput().next()) {
+                getProgressReporter().increment();
                 return true;
             }
             return false;

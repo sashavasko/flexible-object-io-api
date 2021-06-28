@@ -28,7 +28,7 @@ public abstract class SourceRecordReader<K,V> extends HadoopTaskRecordReader<K,V
     @Override
     protected void setupInput(InputSplit split, TaskAttemptContext context) throws IOException {
         source = createSource(split, context);
-        progressReporter.setSize(source);
+        getProgressReporter().setSize(source);
     }
 
     @Override
@@ -38,7 +38,7 @@ public abstract class SourceRecordReader<K,V> extends HadoopTaskRecordReader<K,V
 
         try {
             currentValue = source.get();
-            progressReporter.increment();
+            getProgressReporter().increment();
             return true;
         } catch (Exception e) {
             throw new IOException("Failed to get next Value", e);
@@ -46,18 +46,18 @@ public abstract class SourceRecordReader<K,V> extends HadoopTaskRecordReader<K,V
     }
 
     @Override
-    public K getCurrentKey() throws IOException, InterruptedException {
+    protected K convertCurrentKey() throws Exception {
         return keyExtractor.apply(currentValue);
     }
 
     @Override
-    public V getCurrentValue() throws IOException, InterruptedException {
+    protected V convertCurrentValue() throws Exception {
         return currentValue;
     }
 
     @Override
     public float getProgress() throws IOException, InterruptedException {
-        return progressReporter.getProgress();
+        return getProgressReporter().getProgress();
     }
 
     @Override

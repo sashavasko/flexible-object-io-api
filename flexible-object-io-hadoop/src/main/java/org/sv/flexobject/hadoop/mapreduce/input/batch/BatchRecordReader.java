@@ -5,12 +5,13 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.sv.flexobject.InAdapter;
+import org.sv.flexobject.hadoop.mapreduce.input.AdapterRecordReader;
 import org.sv.flexobject.hadoop.mapreduce.input.DaoRecordReader;
 
 import java.io.IOException;
 
 abstract public class BatchRecordReader<VT>  extends DaoRecordReader<LongWritable, VT> {
-    Logger logger = Logger.getLogger(BatchRecordReader.class);
+    static Logger logger = Logger.getLogger(BatchRecordReader.class);
 
     long recordsRead = 0;
     long lastBatchRecordsRead = -1;// don't do the check for empty last batch on the first batch
@@ -20,7 +21,7 @@ abstract public class BatchRecordReader<VT>  extends DaoRecordReader<LongWritabl
     boolean hasData = false;
 
     public static class Long extends BatchRecordReader<LongWritable> {
-        DaoRecordReader.LongField value = new LongField();
+        AdapterRecordReader.LongField value = new LongField();
         @Override
         protected LongWritable convertCurrentValue() throws Exception {
             return value.convert(valueFieldName);
@@ -28,7 +29,7 @@ abstract public class BatchRecordReader<VT>  extends DaoRecordReader<LongWritabl
     }
 
     public static class Text extends BatchRecordReader<org.apache.hadoop.io.Text> {
-        DaoRecordReader.TextField value = new TextField();
+        AdapterRecordReader.TextField value = new TextField();
         @Override
         protected org.apache.hadoop.io.Text convertCurrentValue() throws Exception {
             return value.convert(valueFieldName);
@@ -50,17 +51,17 @@ abstract public class BatchRecordReader<VT>  extends DaoRecordReader<LongWritabl
         super.initialize(split,context);
         nextBatchStartKey = ((BatchInputSplit)split).getStartKey();
         hasData = nextBatch();
-        progressReporter.setSize(((BatchInputSplit)split).getBatchPerSplit());
+        getProgressReporter().setSize(((BatchInputSplit)split).getBatchPerSplit());
     }
 
     protected void incrementBatch(){
         batchNo++;
-        progressReporter.increment();
+        getProgressReporter().increment();
     }
 
     protected boolean nextBatch(){
-        long batchSize = ((BatchInputSplit)split).getBatchSize();
-        long batchesPerSplit = ((BatchInputSplit)split).getBatchPerSplit();
+        long batchSize = ((BatchInputSplit)getSplit()).getBatchSize();
+        long batchesPerSplit = ((BatchInputSplit)getSplit()).getBatchPerSplit();
         BatchInputDao inputDao = (BatchInputDao) dao;
         try {
 
@@ -97,12 +98,12 @@ abstract public class BatchRecordReader<VT>  extends DaoRecordReader<LongWritabl
         if (!hasData)
             return false;
         try {
-            if (input.next()) {
+            if (getInput().next()) {
                 recordsRead++;
                 return true;
             }
             do {
-                if (batchNo >= ((BatchInputSplit)split).getBatchPerSplit())
+                if (batchNo >= ((BatchInputSplit)getSplit()).getBatchPerSplit())
                     return false;
 
                 if (!nextBatch()){
@@ -110,7 +111,7 @@ abstract public class BatchRecordReader<VT>  extends DaoRecordReader<LongWritabl
                     return false;
                 }
 
-            }while (!input.next());
+            }while (!getInput().next());
             ++recordsRead;
             return true;
         } catch (Exception e) {

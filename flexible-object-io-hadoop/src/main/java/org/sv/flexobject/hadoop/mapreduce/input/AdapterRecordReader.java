@@ -10,9 +10,9 @@ import org.sv.flexobject.InAdapter;
 import java.io.IOException;
 
 public abstract class AdapterRecordReader<KT,VT> extends HadoopTaskRecordReader<KT,VT> {
-    Logger logger = Logger.getLogger(AdapterRecordReader.class);
+    protected static Logger logger = Logger.getLogger(AdapterRecordReader.class);
 
-    protected InAdapter input;
+    private InAdapter input;
 
     public InAdapter getInput() {
         return input;
@@ -27,6 +27,10 @@ public abstract class AdapterRecordReader<KT,VT> extends HadoopTaskRecordReader<
         }
     }
 
+    public LongField longField(){
+        return new LongField();
+    }
+
     public class TextField {
         Text v = new Text();
 
@@ -36,14 +40,22 @@ public abstract class AdapterRecordReader<KT,VT> extends HadoopTaskRecordReader<
         }
     }
 
+    public TextField textField(){
+        return new TextField();
+    }
+
     abstract protected InAdapter createAdapter(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException;
 
-    protected void setInput(InAdapter input) throws Exception {
+    protected void setInput(InAdapter input) {
         if (this.input != null) {
-            this.input.close();
+            try {
+                this.input.close();
+            } catch (Exception e) {
+                logger.error("Failed to close previous Input Adapter", e);
+            }
         }
         this.input = input;
-        progressReporter.setSize(input);
+        getProgressReporter().setSize(input);
     }
 
     @Override

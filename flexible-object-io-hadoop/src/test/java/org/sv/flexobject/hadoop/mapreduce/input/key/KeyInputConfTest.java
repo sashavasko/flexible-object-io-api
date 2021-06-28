@@ -17,7 +17,8 @@ public class KeyInputConfTest {
         KeyInputConf conf = new KeyInputConf();
         List<String> expectedSettings = Arrays.asList(
                 "org.sv.flexobject.input.key.splitter.class",
-                "org.sv.flexobject.input.key.reader.class");
+                "org.sv.flexobject.input.key.reader.class",
+                "org.sv.flexobject.input.key.source.builder.class");
         List<String> actualSettings = new ArrayList<>();
 
         for (SchemaElement e : Schema.getRegisteredSchema(conf.getClass()).getFields()){

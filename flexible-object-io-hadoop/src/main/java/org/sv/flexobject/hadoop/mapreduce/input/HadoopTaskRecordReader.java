@@ -5,16 +5,27 @@ import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.log4j.Logger;
 import org.sv.flexobject.hadoop.HadoopTask;
+import org.sv.flexobject.stream.report.ProgressReporter;
 import org.sv.flexobject.stream.report.SimpleProgressReporter;
 import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.IOException;
 
 public abstract class HadoopTaskRecordReader<KT,VT> extends RecordReader<KT,VT> {
-    Logger logger = Logger.getLogger(HadoopTaskRecordReader.class);
+    static Logger logger = Logger.getLogger(HadoopTaskRecordReader.class);
 
-    protected InputSplit split;
-    protected SimpleProgressReporter progressReporter = InstanceFactory.get(SimpleProgressReporter.class);
+    private InputSplit split;
+    private ProgressReporter progressReporter = InstanceFactory.get(SimpleProgressReporter.class);
+
+    public void setProgressReporter(ProgressReporter progressReporter) {
+        this.progressReporter = progressReporter;
+    }
+
+    public ProgressReporter getProgressReporter(){
+        if (progressReporter == null)
+            progressReporter = InstanceFactory.get(SimpleProgressReporter.class);
+        return progressReporter;
+    }
 
     @Override
     public float getProgress() throws IOException, InterruptedException {
@@ -32,6 +43,8 @@ public abstract class HadoopTaskRecordReader<KT,VT> extends RecordReader<KT,VT> 
         try {
             HadoopTask.configure(context.getConfiguration());
         } catch (Exception e) {
+            if (e instanceof RuntimeException)
+                throw (RuntimeException) e;
             throw new RuntimeException("Failed to initialize HadoopTask", e);
         }
         this.split = split;

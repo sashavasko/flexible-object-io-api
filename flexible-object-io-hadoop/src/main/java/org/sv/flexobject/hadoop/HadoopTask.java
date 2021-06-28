@@ -8,13 +8,8 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.MRJobConfig;
 import org.apache.log4j.Logger;
-import org.apache.parquet.filter2.predicate.FilterPredicate;
-import org.apache.parquet.hadoop.ParquetInputFormat;
 import org.sv.flexobject.connections.ConnectionManager;
-import org.sv.flexobject.hadoop.properties.HadoopPropertiesProvider;
-import org.sv.flexobject.hadoop.properties.HadoopSecretProvider;
-import org.sv.flexobject.hadoop.streaming.parquet.ParquetSchemaConf;
-import org.sv.flexobject.sql.providers.UnPooledConnectionProvider;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.IOException;
 
@@ -24,7 +19,7 @@ public class HadoopTask extends Configured {
 
     private static HadoopTask instance = null;
 
-    private HadoopTaskConf taskConf = new HadoopTaskConf();
+    private HadoopTaskConf taskConf = InstanceFactory.get(HadoopTaskConf.class);
 
     private HadoopTask(){}
 
