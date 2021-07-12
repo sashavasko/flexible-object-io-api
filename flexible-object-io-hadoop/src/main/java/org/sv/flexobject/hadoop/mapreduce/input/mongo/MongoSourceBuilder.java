@@ -39,7 +39,7 @@ public class MongoSourceBuilder implements SourceBuilder {
         try {
             return builder.build();
         } catch (Exception e) {
-            throw new IOException("Failed to query Mongo", e);
+            throw new IOException(conf.addDiagnostics("Failed to query Mongo"), e);
         }
     }
 }

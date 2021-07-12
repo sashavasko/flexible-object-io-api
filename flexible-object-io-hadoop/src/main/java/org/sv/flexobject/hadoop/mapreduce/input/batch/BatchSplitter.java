@@ -30,7 +30,7 @@ public class BatchSplitter implements Splitter {
             } catch (Exception e) {
                 if (e instanceof IOException)
                     throw (IOException)e;
-                throw new IOException("Failed to instantiate split", e);
+                throw new IOException(conf.addDiagnostics("Failed to instantiate split"), e);
             }
             startKey += conf.getSize() * batchesInSplit;
         }

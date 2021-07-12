@@ -48,9 +48,11 @@ abstract public class KeyRecordReader<KT, VT> extends DaoRecordReader<KT, VT> {
         try {
             return ((KeyInputDao) dao).start(((KeyInputSplit) getSplit()).getKey());
         } catch (Exception e) {
-            if (e instanceof IOException)
+            if (e instanceof IOException) {
+                logger.error(getConf().addDiagnostics("Failed to query DAO by the key"), e);
                 throw (IOException) e;
-            throw new IOException("Failed to query DAO by the key", e);
+            }
+            throw new IOException(getConf().addDiagnostics("Failed to query DAO by the key"), e);
         }
     }
 

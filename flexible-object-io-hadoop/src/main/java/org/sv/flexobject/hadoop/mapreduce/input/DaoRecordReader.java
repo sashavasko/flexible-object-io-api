@@ -19,6 +19,7 @@ public abstract class DaoRecordReader<KT,VT> extends AdapterRecordReader<KT,VT> 
     protected MRDao dao;
     protected String keyFieldName;
     protected String valueFieldName;
+    DaoRecordReaderConf conf;
 
     public MRDao getDao() {
         return dao;
@@ -32,14 +33,18 @@ public abstract class DaoRecordReader<KT,VT> extends AdapterRecordReader<KT,VT> 
         return valueFieldName;
     }
 
+    public DaoRecordReaderConf getConf() {
+        return conf;
+    }
+
     @Override
     protected void setupInput(InputSplit split, TaskAttemptContext context) {
-        DaoRecordReaderConf conf = InstanceFactory.get(DaoRecordReaderConf.class);
+        conf = InstanceFactory.get(DaoRecordReaderConf.class);
         conf.from(context.getConfiguration());
 
         Exception ee = null;
         if (!conf.isDaoConfigured())
-            throw new RuntimeException("Must specify a DAO class extending MRDao using property " + conf.getSettingName("daoClass"));
+            throw conf.runtimeException(logger, "Must specify a DAO class extending MRDao using property " + conf.getSettingName("daoClass"), null);
         keyFieldName = conf.getKeyFieldName();
         valueFieldName = conf.getValueFieldName();
         for (int i = 0; i < conf.getMaxRetries() ; i++){
@@ -57,7 +62,7 @@ public abstract class DaoRecordReader<KT,VT> extends AdapterRecordReader<KT,VT> 
             } catch (InterruptedException e) {
             }
         }
-        throw new RuntimeException("Failed to create DAO", ee);
+        throw conf.runtimeException(logger, "Failed to create DAO", ee);
     }
 
     @Override

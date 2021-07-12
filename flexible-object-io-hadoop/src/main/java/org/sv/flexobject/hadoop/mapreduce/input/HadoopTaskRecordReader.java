@@ -43,9 +43,7 @@ public abstract class HadoopTaskRecordReader<KT,VT> extends RecordReader<KT,VT> 
         try {
             HadoopTask.configure(context.getConfiguration());
         } catch (Exception e) {
-            if (e instanceof RuntimeException)
-                throw (RuntimeException) e;
-            throw new RuntimeException("Failed to initialize HadoopTask", e);
+            throw HadoopTask.getTaskConf().runtimeException(logger, "Failed to initialize HadoopTask", e);
         }
         this.split = split;
         setupInput(split, context);
