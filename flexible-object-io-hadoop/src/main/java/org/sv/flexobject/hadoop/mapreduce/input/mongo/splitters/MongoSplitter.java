@@ -1,15 +1,15 @@
 package org.sv.flexobject.hadoop.mapreduce.input.mongo.splitters;
 
-import com.carfax.hadoop.mapreduce.input.Splitter;
-import com.carfax.hadoop.mapreduce.input.mongo.MongoInputConf;
-import com.carfax.hadoop.mapreduce.input.mongo.MongoSplit;
-import com.carfax.mongo.connection.MongoConnection;
-import com.carfax.utility.InstanceFactory;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.CountOptions;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.mapreduce.InputSplit;
+import org.sv.flexobject.hadoop.mapreduce.input.Splitter;
+import org.sv.flexobject.hadoop.mapreduce.input.mongo.MongoInputConf;
+import org.sv.flexobject.hadoop.mapreduce.input.mongo.MongoSplit;
+import org.sv.flexobject.mongo.connection.MongoConnection;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.util.ArrayList;
 import java.util.List;

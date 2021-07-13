@@ -34,7 +34,7 @@ dependencies {
         exclude group: 'com.fasterxml.jackson.core', module:'jackson-core'
         exclude group: 'org.apache.avro', module:'avro'
     }
-    compileOnly (group: 'org.apache.spark', name: 'spark-core_2.12', version: "${sparkVersion}"){
+    compile (group: 'org.apache.spark', name: 'spark-core_2.12', version: "${sparkVersion}"){
         exclude group: 'org.apache.avro', module:'avro-mapred'
     }
     // https://mvnrepository.com/artifact/org.apache.avro/avro

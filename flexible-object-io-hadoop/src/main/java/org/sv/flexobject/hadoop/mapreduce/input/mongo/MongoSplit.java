@@ -1,6 +1,6 @@
 package org.sv.flexobject.hadoop.mapreduce.input.mongo;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.bson.Document;

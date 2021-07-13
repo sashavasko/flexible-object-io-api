@@ -16,12 +16,14 @@ public class BatchInputConfTest {
     public void listSettings() {
         BatchInputConf conf = new BatchInputConf();
         List<String> expectedSettings = Arrays.asList(
+                "org.sv.flexobject.input.batch.splitter.class",
+                "org.sv.flexobject.input.batch.reader.class",
+                "org.sv.flexobject.input.batch.source.builder.class",
                 "org.sv.flexobject.input.batch.key.start",
                 "org.sv.flexobject.input.batch.size",
                 "org.sv.flexobject.input.batch.batches.per.split",
                 "org.sv.flexobject.input.batch.batches.num",
                 "org.sv.flexobject.input.batch.split.class",
-                "org.sv.flexobject.input.batch.reader.class",
                 "org.sv.flexobject.input.batch.key.max.dataset.path",
                 "org.sv.flexobject.input.batch.key.max.dataset.column.name",
                 "org.sv.flexobject.input.batch.key.max.calculator",

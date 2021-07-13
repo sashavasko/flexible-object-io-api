@@ -82,7 +82,7 @@ public class HadoopTaskRecordReaderTest {
         try {
             reader.initialize(mockSplit, mockContext);
         }catch(RuntimeException e){
-            assertEquals("Failed to initialize HadoopTask", e.getMessage());
+            assertTrue(e.getMessage().startsWith("Failed to initialize HadoopTask"));
             assertNotNull(e.getCause());
         }
     }

@@ -6,7 +6,7 @@ import org.sv.flexobject.hadoop.mapreduce.input.key.ModSplitter;
 import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
 import org.sv.flexobject.util.InstanceFactory;
 
-public abstract class InputConf<SELF extends HadoopPropertiesWrapper> extends HadoopPropertiesWrapper<SELF> {
+public class InputConf<SELF extends HadoopPropertiesWrapper> extends HadoopPropertiesWrapper<SELF> {
     public static final String SUBNAMESPACE = "input";
 
     protected Class<? extends Splitter> splitterClass;
@@ -22,26 +22,31 @@ public abstract class InputConf<SELF extends HadoopPropertiesWrapper> extends Ha
     }
 
     @Override
+    public SELF setDefaults() {
+        return (SELF)this;
+    }
+
+    @Override
     public String getSubNamespace() {
         return SUBNAMESPACE;
     }
 
-    public Class<? extends Splitter> getSplitterClass() throws IllegalAccessException, InstantiationException {
+    public Class<? extends Splitter> getSplitterClass() {
         return splitterClass == null ? ModSplitter.class : splitterClass;
     }
-    public Splitter getSplitter() throws IllegalAccessException, InstantiationException {
+    public Splitter getSplitter() {
         return InstanceFactory.get(getSplitterClass());
     }
 
-    public Class<? extends RecordReader> getReaderClass() throws IllegalAccessException, InstantiationException {
+    public Class<? extends RecordReader> getReaderClass() {
         return readerClass == null ? KeyRecordReader.LongText.class : readerClass;
     }
 
-    public RecordReader getReader() throws IllegalAccessException, InstantiationException {
+    public RecordReader getReader() {
         return InstanceFactory.get(getReaderClass());
     }
 
-    public SourceBuilder getSourceBuilder() throws IllegalAccessException, InstantiationException, IllegalArgumentException {
+    public SourceBuilder getSourceBuilder() throws IllegalArgumentException {
         if (sourceBuilderClass == null)
             throw new IllegalArgumentException("Missing Source Builder class");
         return InstanceFactory.get(sourceBuilderClass);

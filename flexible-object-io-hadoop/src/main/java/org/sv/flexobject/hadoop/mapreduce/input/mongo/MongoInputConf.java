@@ -1,8 +1,9 @@
 package org.sv.flexobject.hadoop.mapreduce.input.mongo;
 
-import com.carfax.dt.streaming.StreamableWithSchema;
-import com.carfax.hadoop.properties.HadoopPropertiesWrapper;
-import com.carfax.mongo.connection.MongoConnection;
+
+import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
+import org.sv.flexobject.mongo.connection.MongoConnection;
 
 public class MongoInputConf<SELF extends HadoopPropertiesWrapper> extends HadoopPropertiesWrapper<SELF> {
     public static final String SUBNAMESPACE = "input.mongo";

@@ -15,7 +15,7 @@ public abstract class SourceRecordReader<K,V> extends HadoopTaskRecordReader<K,V
     V currentValue;
 
     protected Source<V> createSource(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException{
-        SourceConf conf = InstanceFactory.get(SourceConf.class);
+        InputConf conf = InstanceFactory.get(InputConf.class);
         conf.from(taskAttemptContext.getConfiguration());
 
         try {
@@ -32,7 +32,7 @@ public abstract class SourceRecordReader<K,V> extends HadoopTaskRecordReader<K,V
     }
 
     @Override
-    public boolean nextKeyValue() throws IOException, InterruptedException {
+    public boolean nextKeyValue() throws IOException {
         if (source.isEOF())
             return false;
 
@@ -46,18 +46,13 @@ public abstract class SourceRecordReader<K,V> extends HadoopTaskRecordReader<K,V
     }
 
     @Override
-    protected K convertCurrentKey() throws Exception {
+    protected K convertCurrentKey() {
         return keyExtractor.apply(currentValue);
     }
 
     @Override
-    protected V convertCurrentValue() throws Exception {
+    protected V convertCurrentValue() {
         return currentValue;
-    }
-
-    @Override
-    public float getProgress() throws IOException, InterruptedException {
-        return getProgressReporter().getProgress();
     }
 
     @Override

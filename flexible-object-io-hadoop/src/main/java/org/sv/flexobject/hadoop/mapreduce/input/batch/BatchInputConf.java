@@ -13,7 +13,6 @@ public class BatchInputConf extends InputConf<BatchInputConf> {
     private Integer batchesPerSplit;
     private Integer batchesNum;
     private Class<? extends BatchInputSplit> splitClass;
-    private Class<? extends BatchRecordReader> readerClass;
     private String keyMaxDatasetPath;
     private String keyMaxDatasetColumnName;
     private Class<? extends MaxKeyCalculator> keyMaxCalculator;

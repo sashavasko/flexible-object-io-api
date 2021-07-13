@@ -1,10 +1,10 @@
 package org.sv.flexobject.hadoop.mapreduce.input.mongo;
 
-import com.carfax.dt.streaming.stream.Source;
-import com.carfax.hadoop.mapreduce.input.SourceBuilder;
-import com.carfax.mongo.streaming.MongoSource;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.sv.flexobject.hadoop.mapreduce.input.SourceBuilder;
+import org.sv.flexobject.mongo.streaming.MongoSource;
+import org.sv.flexobject.stream.Source;
 
 import java.io.IOException;
 

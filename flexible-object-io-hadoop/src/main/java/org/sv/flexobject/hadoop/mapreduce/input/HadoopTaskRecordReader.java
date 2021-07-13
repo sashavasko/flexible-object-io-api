@@ -29,7 +29,7 @@ public abstract class HadoopTaskRecordReader<KT,VT> extends RecordReader<KT,VT> 
 
     @Override
     public float getProgress() throws IOException, InterruptedException {
-        return progressReporter.getProgress();
+        return getProgressReporter().getProgress();
     }
 
     public InputSplit getSplit() {
