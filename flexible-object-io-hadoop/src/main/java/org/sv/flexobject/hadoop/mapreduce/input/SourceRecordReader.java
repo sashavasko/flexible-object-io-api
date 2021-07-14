@@ -10,7 +10,6 @@ import java.util.function.Function;
 
 public abstract class SourceRecordReader<K,V> extends HadoopTaskRecordReader<K,V> {
     protected Source<V> source;
-    protected Function<V,K> keyExtractor;
 
     V currentValue;
 
@@ -21,8 +20,12 @@ public abstract class SourceRecordReader<K,V> extends HadoopTaskRecordReader<K,V
         try {
             return conf.getSourceBuilder().build(inputSplit, taskAttemptContext);
         } catch (IllegalAccessException | InstantiationException e) {
-            throw new IOException("Failed to build source", e);
+            throw new IOException(conf.addDiagnostics("Failed to build source"), e);
         }
+    }
+
+    public Source<V> getSource() {
+        return source;
     }
 
     @Override
@@ -45,9 +48,11 @@ public abstract class SourceRecordReader<K,V> extends HadoopTaskRecordReader<K,V
         }
     }
 
+    protected abstract K extractKeyFromValue(V value);
+
     @Override
     protected K convertCurrentKey() {
-        return keyExtractor.apply(currentValue);
+        return extractKeyFromValue(currentValue);
     }
 
     @Override
@@ -57,15 +62,12 @@ public abstract class SourceRecordReader<K,V> extends HadoopTaskRecordReader<K,V
 
     @Override
     public void close() throws IOException {
-        if (source instanceof AutoCloseable) {
-            try {
-                ((AutoCloseable) source).close();
-            } catch (Exception e) {
-                if (e instanceof IOException)
-                    throw (IOException) e;
-                throw new IOException("Failed to close source", e);
-            }
-        } else
-            source.setEOF();
+        try {
+            source.close();
+        } catch (Exception e) {
+            if (e instanceof IOException)
+                throw (IOException) e;
+            throw new IOException("Failed to close source", e);
+        }
     }
 }

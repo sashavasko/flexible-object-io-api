@@ -10,7 +10,7 @@ import org.sv.flexobject.util.InstanceFactory;
 import java.io.IOException;
 
 public abstract class DaoRecordReader<KT,VT> extends AdapterRecordReader<KT,VT> {
-    static Logger logger = Logger.getLogger(DaoRecordReader.class);
+    protected static Logger logger = Logger.getLogger(DaoRecordReader.class);
 
     public static final String CURRENT_KEY_FIELD_NAME = "CURRENT_KEY";
     public static final String CURRENT_VALUE_FIELD_NAME = "CURRENT_VALUE";
@@ -60,6 +60,7 @@ public abstract class DaoRecordReader<KT,VT> extends AdapterRecordReader<KT,VT> 
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
+                throw conf.runtimeException(logger, "Interrupted while creating DAO", e);
             }
         }
         throw conf.runtimeException(logger, "Failed to create DAO", ee);
