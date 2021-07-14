@@ -8,7 +8,7 @@ import java.util.stream.Stream;
  *
  * Source can use InAdapter to convert flat-structured data, such as cvs file or a SQL RecordSet to a complex objects using Readers or load method of Streamablke or StreamableWithSchema.
  */
-public interface Source<T>{
+public interface Source<T> extends AutoCloseable{
 
     <O extends T> O get() throws Exception;
 
@@ -18,7 +18,8 @@ public interface Source<T>{
 
     default void ack(){}
 
-    default void close() throws Exception {}
+    @Override
+    default void close() throws Exception {setEOF();}
 
     Stream<T> stream();
 }
