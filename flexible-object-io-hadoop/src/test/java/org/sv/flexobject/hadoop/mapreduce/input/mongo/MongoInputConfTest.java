@@ -1,0 +1,114 @@
+package org.sv.flexobject.hadoop.mapreduce.input.mongo;
+
+import org.apache.hadoop.conf.Configuration;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.mongo.connection.MongoConnection;
+import org.sv.flexobject.testdata.TestDataWithSubSchema;
+import org.sv.flexobject.util.InstanceFactory;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+
+@RunWith(MockitoJUnitRunner.class)
+public class MongoInputConfTest {
+
+    @Mock
+    MongoConnection.Builder mockBuilder;
+
+    @Mock
+    MongoConnection mockConnection;
+
+    MongoInputConf conf;
+    Configuration rawConf;
+
+    @Before
+    public void setUp() throws Exception {
+        InstanceFactory.set(MongoConnection.Builder.class, mockBuilder);
+        rawConf = new Configuration(false);
+        conf = new MongoInputConf("test");
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        InstanceFactory.reset();
+    }
+
+    @Test
+    public void setDefaults() {
+        assertSame(conf, conf.setDefaults());
+    }
+
+    @Test
+    public void namespace() {
+        assertEquals("input.mongo", conf.getSubNamespace());
+
+        conf = new MongoInputConf("foo.bar");
+
+        assertEquals("foo.bar.input.mongo", conf.getNamespace());
+    }
+
+    @Test
+    public void getConnectionName() {
+        assertNull(conf.getConnectionName());
+
+        rawConf.set("test.input.mongo.connection.name", "mongodb");
+        conf.from(rawConf);
+
+        assertEquals("mongodb", conf.getConnectionName());
+    }
+
+    @Test
+    public void getDbName() {
+        assertNull(conf.getDbName());
+
+        rawConf.set("test.input.mongo.db.name", "mydb");
+        conf.from(rawConf);
+
+        assertEquals("mydb", conf.getDbName());
+    }
+
+    @Test
+    public void getCollectionName() {
+        assertNull(conf.getCollectionName());
+
+        rawConf.set("test.input.mongo.collection.name", "mycollection");
+        conf.from(rawConf);
+
+        assertEquals("mycollection", conf.getCollectionName());
+    }
+
+    @Test
+    public void getInputSchema() {
+        assertNull(conf.getInputSchema());
+        assertFalse(conf.hasSchema());
+
+        rawConf.setClass("test.input.mongo.schema", TestDataWithSubSchema.class, StreamableWithSchema.class);
+        conf.from(rawConf);
+
+        assertSame(TestDataWithSubSchema.class, conf.getInputSchema());
+        assertTrue(conf.hasSchema());
+    }
+
+    @Test
+    public void getMongo() throws Exception {
+        rawConf.set("test.input.mongo.connection.name", "mongodb");
+        rawConf.set("test.input.mongo.db.name", "mydb");
+        conf.from(rawConf);
+
+        doReturn(mockBuilder).when(mockBuilder).forName("mongodb");
+        doReturn(mockBuilder).when(mockBuilder).db("mydb");
+        doReturn(mockConnection).when(mockBuilder).build();
+
+        assertSame(mockConnection, conf.getMongo());
+
+        verify(mockBuilder).forName("mongodb");
+        verify(mockBuilder).db("mydb");
+    }
+}

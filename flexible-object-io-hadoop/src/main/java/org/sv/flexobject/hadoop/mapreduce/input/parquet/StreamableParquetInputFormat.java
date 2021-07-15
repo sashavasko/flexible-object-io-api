@@ -12,22 +12,8 @@ import org.sv.flexobject.hadoop.streaming.parquet.read.streamable.ParquetReadSup
 
 import java.io.IOException;
 
-public class StreamableParquetInputFormat extends ParquetInputFormat<StreamableWithSchema> {
-    static Logger logger = Logger.getLogger(StreamableParquetInputFormat.class);
-
+public class StreamableParquetInputFormat extends FilteredParquetInputFormat<StreamableWithSchema> {
     public StreamableParquetInputFormat() {
         super(ParquetReadSupport.class);
-    }
-
-    @Override
-    public RecordReader<Void, StreamableWithSchema> createRecordReader(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException, InterruptedException {
-        ParquetSchemaConf parquetConf = new ParquetSchemaConf().from(taskAttemptContext.getConfiguration());
-        if (parquetConf.hasFilterPredicate()) {
-            FilterPredicate predicate = parquetConf.getFilterPredicate();
-            logger.info("Using Parquet predicate filter:" + predicate.toString());
-            ParquetInputFormat.setFilterPredicate(taskAttemptContext.getConfiguration(), predicate);
-        }
-
-        return super.createRecordReader(inputSplit, taskAttemptContext);
     }
 }
