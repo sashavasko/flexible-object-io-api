@@ -41,6 +41,9 @@ public class ProbabilityBasedThrottlingStrategy implements LoadBalanceStrategy {
         protected long firstAvailableSlaveThresholdMicros;
         protected double useRunningAverageThreshold;
 
+        public Configuration() {
+            this(Namespace.getDefaultNamespace());
+        }
         public Configuration(Namespace parent) {
             super(parent, "strategy");
         }
@@ -125,7 +128,7 @@ public class ProbabilityBasedThrottlingStrategy implements LoadBalanceStrategy {
         return cluster.isMasterOnline() ? cluster.getMaster() : null;
     }
 
-    private ClusterMember selectOnlineSlaveRandomly(Cluster cluster, double slaveProbabilityIncrement) {
+    synchronized private ClusterMember selectOnlineSlaveRandomly(Cluster cluster, double slaveProbabilityIncrement) {
         double slaveProbability = slaveProbabilityIncrement;
 
         ClusterMember lastOnlineSlave = null;
