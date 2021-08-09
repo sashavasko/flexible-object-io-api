@@ -38,7 +38,7 @@ public abstract class DaoRecordReader<KT,VT> extends AdapterRecordReader<KT,VT> 
     }
 
     @Override
-    protected void setupInput(InputSplit split, TaskAttemptContext context) {
+    public void setupInput(InputSplit split, TaskAttemptContext context) {
         conf = InstanceFactory.get(DaoRecordReaderConf.class);
         conf.from(context.getConfiguration());
 

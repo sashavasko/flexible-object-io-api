@@ -170,7 +170,7 @@ public class BatchKeyManager extends Configured implements Tool {
                 logger.debug("Checking " + lfs + (lfs.isDirectory() ? " is dir" : " not dir") + (StringUtils.isNumeric(lfs.getPath().getName()) ? " is numeric" : " is not numeric"));
                 if (lfs.isDirectory() && StringUtils.isNumeric(lfs.getPath().getName())) {
                     logger.debug(" checking if has _SUCCESS file in it");
-                    if (fs.isFile(new Path(lfs.getPath(), "_SUCCESS"))) {
+                    if (fs.getFileStatus(new Path(lfs.getPath(), "_SUCCESS")).isFile()) {
                         long startKey = Long.valueOf(lfs.getPath().getName());
                         extractFolders.put(startKey, new Extract(lfs.getPath()));
                     } else {

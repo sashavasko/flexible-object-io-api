@@ -46,7 +46,7 @@ public abstract class AdapterRecordReader<KT,VT> extends HadoopTaskRecordReader<
 
     abstract protected InAdapter createAdapter(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException;
 
-    protected void setInput(InAdapter input) {
+    public void setInput(InAdapter input) {
         if (this.input != null) {
             try {
                 this.input.close();

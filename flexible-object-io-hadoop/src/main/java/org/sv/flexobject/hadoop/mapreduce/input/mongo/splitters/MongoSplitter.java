@@ -16,21 +16,25 @@ import java.util.List;
 
 public abstract class MongoSplitter extends Configured implements Splitter {
 
-    protected MongoInputConf conf;
-
-    public MongoSplitter() {
-        conf = makeConf();
-    }
+    private MongoInputConf conf;
 
     public MongoInputConf makeConf(){
         return InstanceFactory.get(MongoInputConf.class);
+    }
+
+    protected MongoInputConf getInputConf(){
+        if (conf == null) {
+            conf = makeConf();
+        }
+
+        return conf;
     }
 
     @Override
     public void setConf(Configuration conf) {
         super.setConf(conf);
         if (conf != null)
-            this.conf.from(conf);
+            getInputConf().from(conf);
     }
 
     /**
@@ -41,14 +45,17 @@ public abstract class MongoSplitter extends Configured implements Splitter {
      */
     public List<InputSplit> filterEmptySplits(
             final List<InputSplit> splits) throws Exception {
-        List<InputSplit> results = new ArrayList<InputSplit>(splits.size());
+        List<InputSplit> results = new ArrayList<InputSplit>();
 
-        try(MongoConnection connection = conf.getMongo()) {
+        try(MongoConnection connection = getInputConf().getMongo()) {
             MongoCollection collection = connection.getCollection(conf.getCollectionName());
-            CountOptions countOptions = new CountOptions().limit(1);
             for (InputSplit split : splits) {
                 MongoSplit mis = (MongoSplit) split;
-                if (collection.countDocuments(mis.getQuery(), countOptions) > 0) {
+                long estimatedSize = mis.getLength(collection, conf.getEstimateSizeLimit(), conf.getEstimateTimeLimitMicros());
+                if (estimatedSize == 0)
+                    estimatedSize = mis.getLength(collection, 1);
+                if (estimatedSize > 0) {
+                    mis.setEstimatedLength(estimatedSize);
                     results.add(mis);
                 }
             }

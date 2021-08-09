@@ -26,6 +26,7 @@ public class BatchInputConf extends InputConf<BatchInputConf> {
 
     @Override
     public BatchInputConf setDefaults() {
+        super.setDefaults();
         keyStart = 0l; //conf.getLong(CFX_BATCH_KEY_START, 0l);
         size = 1000; //conf.getInt(BatchInputSplit.CFX_BATCH_SIZE, 1000);
         batchesPerSplit = 200; //conf.getInt(BatchInputSplit.CFX_BATCHES_PER_SPLIT, 200);
@@ -66,6 +67,10 @@ public class BatchInputConf extends InputConf<BatchInputConf> {
         this.size = size;
     }
 
+    public void setBatchesNum(int batchesNum) {
+        this.batchesNum = batchesNum;
+    }
+
     public long getKeyStart() {
         return keyStart == null ? 0l : keyStart;
     }
@@ -85,7 +90,7 @@ public class BatchInputConf extends InputConf<BatchInputConf> {
     public Class<? extends BatchInputSplit> getSplitClass() {
         return splitClass == null ? BatchInputSplit.class : splitClass;
     }
-    public BatchInputSplit getSplit() throws IllegalAccessException, InstantiationException {
+    public BatchInputSplit getSplit() {
         BatchInputSplit splitInstance = InstanceFactory.get(getSplitClass());
         splitInstance.setConf(getConf());
         return splitInstance;
@@ -103,17 +108,17 @@ public class BatchInputConf extends InputConf<BatchInputConf> {
         return keyMaxCalculator == null ? ParquetMaxKeyCalculator.class : keyMaxCalculator;
     }
 
-    public MaxKeyCalculator getKeyMaxCalculator() throws IllegalAccessException, InstantiationException {
+    public MaxKeyCalculator getKeyMaxCalculator() {
         MaxKeyCalculator maxKeyCalculatorInstance = InstanceFactory.get(getKeyMaxCalculatorClass());
         maxKeyCalculatorInstance.setConf(getConf());
         return maxKeyCalculatorInstance;
     }
 
-    public Class<? extends BatchKeyManager> getKeyManagerClass() throws IllegalAccessException, InstantiationException {
+    public Class<? extends BatchKeyManager> getKeyManagerClass() {
         return keyManager == null ? BatchKeyManager.class : keyManager;
     }
 
-    public BatchKeyManager getKeyManager() throws IllegalAccessException, InstantiationException {
+    public BatchKeyManager getKeyManager() {
         BatchKeyManager batchKeyManagerInstance = InstanceFactory.get(getKeyManagerClass());
         batchKeyManagerInstance.setConf(getConf());
         return batchKeyManagerInstance;
@@ -127,7 +132,11 @@ public class BatchInputConf extends InputConf<BatchInputConf> {
         return reduceMaxKeys == null ? 16000000l : reduceMaxKeys;
     }
 
-    public void setBatchesNum(int batchesNum) {
-        this.batchesNum = batchesNum;
+    public long getSplitsCount(){
+        return (getBatchesNum() + getBatchesPerSplit() - 1)/getBatchesPerSplit();
+    }
+
+    public long getMaxKey(){
+        return getKeyStart() + getBatchesNum() * getSize();
     }
 }

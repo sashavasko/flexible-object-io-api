@@ -10,35 +10,43 @@ import org.sv.flexobject.hadoop.mapreduce.input.DaoRecordReader;
 
 import java.io.IOException;
 
-abstract public class BatchRecordReader<VT>  extends DaoRecordReader<LongWritable, VT> {
+abstract public class BatchRecordReader<VT> extends DaoRecordReader<LongWritable, VT> {
     static Logger logger = Logger.getLogger(BatchRecordReader.class);
 
     long recordsRead = 0;
     long lastBatchRecordsRead = -1;// don't do the check for empty last batch on the first batch
     int batchNo = 0;
     long nextBatchStartKey = 0l;
-    LongField key = new LongField();
+    LongField key;
     boolean hasData = false;
 
     public static class Long extends BatchRecordReader<LongWritable> {
-        AdapterRecordReader.LongField value = new LongField();
+        AdapterRecordReader.LongField value;
+
         @Override
         protected LongWritable convertCurrentValue() throws Exception {
-            return value.convert(valueFieldName);
+            if (value == null)
+                value = longField();
+            return value.convert(getValueFieldName());
         }
     }
 
     public static class Text extends BatchRecordReader<org.apache.hadoop.io.Text> {
-        AdapterRecordReader.TextField value = new TextField();
+        AdapterRecordReader.TextField value;
+
         @Override
         protected org.apache.hadoop.io.Text convertCurrentValue() throws Exception {
-            return value.convert(valueFieldName);
+            if (value == null)
+                value = textField();
+            return value.convert(getValueFieldName());
         }
     }
 
     @Override
     protected LongWritable convertCurrentKey() throws Exception {
-        return key.convert(keyFieldName);
+        if (key == null)
+            key = longField();
+        return key.convert(getKeyFieldName());
     }
 
     @Override
@@ -46,9 +54,13 @@ abstract public class BatchRecordReader<VT>  extends DaoRecordReader<LongWritabl
         return null;
     }
 
+    protected void initializeSuper(InputSplit split, TaskAttemptContext context) throws IOException, InterruptedException {
+        super.initialize(split,context);
+    }
+
     @Override
     public void initialize(InputSplit split, TaskAttemptContext context) throws IOException, InterruptedException {
-        super.initialize(split,context);
+        initializeSuper(split, context);
         nextBatchStartKey = ((BatchInputSplit)split).getStartKey();
         hasData = nextBatch();
         getProgressReporter().setSize(((BatchInputSplit)split).getBatchPerSplit());
@@ -59,21 +71,30 @@ abstract public class BatchRecordReader<VT>  extends DaoRecordReader<LongWritabl
         getProgressReporter().increment();
     }
 
+    protected boolean isEmptyBatch(){
+        return lastBatchRecordsRead == recordsRead;
+    }
+
+    protected boolean hasMoreBatches(){
+        return batchNo < ((BatchInputSplit)getSplit()).getBatchPerSplit();
+    }
+
     protected boolean nextBatch(){
         long batchSize = ((BatchInputSplit)getSplit()).getBatchSize();
         long batchesPerSplit = ((BatchInputSplit)getSplit()).getBatchPerSplit();
-        BatchInputDao inputDao = (BatchInputDao) dao;
+        BatchInputDao inputDao = (BatchInputDao) getDao();
         try {
 
-            if (lastBatchRecordsRead == recordsRead) {
+            if (isEmptyBatch()) {
                 logger.info("Empty batch encountered - checking if we need to skip a few ...");
                 long adjustedKey = inputDao.adjustStartKey(nextBatchStartKey, nextBatchStartKey + ((batchesPerSplit - batchNo) * batchSize));
+                logger.info("Edjusted start key to " + adjustedKey);
                 while (adjustedKey > nextBatchStartKey + batchSize && batchNo < batchesPerSplit) {
                     incrementBatch();
                     logger.info("Skipping batch " + batchNo);
                     nextBatchStartKey += batchSize;
                 }
-                if (batchNo >= batchesPerSplit) {
+                if (!hasMoreBatches()) {
                     return false;
                 }
             }
@@ -95,28 +116,46 @@ abstract public class BatchRecordReader<VT>  extends DaoRecordReader<LongWritabl
 
     @Override
     public boolean nextKeyValue() throws IOException, InterruptedException {
-        if (!hasData)
+        if (!hasData())
             return false;
         try {
-            if (getInput().next()) {
-                recordsRead++;
-                return true;
-            }
+            if (getInput().next())
+                return nextRecordFound();
+
             do {
-                if (batchNo >= ((BatchInputSplit)getSplit()).getBatchPerSplit())
+                if (!hasMoreBatches())
                     return false;
 
-                if (!nextBatch()){
-                    hasData = false;
-                    return false;
-                }
+                if (!nextBatch())
+                    return noMoreData();
 
             }while (!getInput().next());
-            ++recordsRead;
-            return true;
+            return nextRecordFound();
         } catch (Exception e) {
             logger.error("Failed to get new record :", e);
             return false;
         }
+    }
+
+    public long getNextBatchStartKey() {
+        return nextBatchStartKey;
+    }
+
+    protected boolean nextRecordFound(){
+        ++recordsRead;
+        return true;
+    }
+
+    protected boolean noMoreData(){
+        hasData = false;
+        return false;
+    }
+
+    public boolean hasData() {
+        return hasData;
+    }
+
+    public int getBatchNo() {
+        return batchNo;
     }
 }

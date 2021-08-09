@@ -5,6 +5,7 @@ import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.sv.flexobject.hadoop.mapreduce.input.SourceBuilder;
 import org.sv.flexobject.mongo.streaming.MongoSource;
 import org.sv.flexobject.stream.Source;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.IOException;
 
@@ -12,7 +13,7 @@ public class MongoSourceBuilder implements SourceBuilder {
 
     @Override
     public Source build(InputSplit split, TaskAttemptContext context) throws InstantiationException, IllegalAccessException, IOException {
-        MongoInputConf conf = new MongoInputConf();
+        MongoInputConf conf = InstanceFactory.get(MongoInputConf.class);
         conf.from(context.getConfiguration());
 
         MongoSource.Builder builder = MongoSource.builder()

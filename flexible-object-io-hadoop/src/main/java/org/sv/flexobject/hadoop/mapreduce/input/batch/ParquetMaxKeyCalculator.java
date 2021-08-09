@@ -3,6 +3,7 @@ package org.sv.flexobject.hadoop.mapreduce.input.batch;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.sv.flexobject.hadoop.streaming.parquet.ParquetUtils;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.IOException;
 
@@ -10,7 +11,7 @@ public class ParquetMaxKeyCalculator implements MaxKeyCalculator {
 
     Logger logger = Logger.getLogger(ParquetMaxKeyCalculator.class);
 
-    BatchInputConf inputConf = new BatchInputConf();
+    BatchInputConf inputConf = InstanceFactory.get(BatchInputConf.class);
 
     public ParquetMaxKeyCalculator() {
     }

@@ -43,6 +43,9 @@ public class MongoInputConfTest {
     @Test
     public void setDefaults() {
         assertSame(conf, conf.setDefaults());
+
+        assertEquals(100000, conf.getEstimateSizeLimit());
+        assertEquals(1000, conf.getEstimateTimeLimitMicros());
     }
 
     @Test
@@ -62,6 +65,16 @@ public class MongoInputConfTest {
         conf.from(rawConf);
 
         assertEquals("mongodb", conf.getConnectionName());
+    }
+
+    @Test
+    public void estimateLimits() {
+        rawConf.setInt("test.input.mongo.estimate.size.limit", 700000);
+        rawConf.setInt("test.input.mongo.estimate.time.limit.micros", 7000);
+        conf.from(rawConf);
+
+        assertEquals(700000, conf.getEstimateSizeLimit());
+        assertEquals(7000, conf.getEstimateTimeLimitMicros());
     }
 
     @Test

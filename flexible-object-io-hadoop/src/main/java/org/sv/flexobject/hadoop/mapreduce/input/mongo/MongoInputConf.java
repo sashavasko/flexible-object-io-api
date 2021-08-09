@@ -11,6 +11,8 @@ public class MongoInputConf<SELF extends HadoopPropertiesWrapper> extends Hadoop
     protected String connectionName;
     protected String dbName;
     protected String collectionName;
+    protected int estimateSizeLimit;
+    protected int estimateTimeLimitMicros;
 
     protected Class<? extends StreamableWithSchema> schema;
 
@@ -20,6 +22,8 @@ public class MongoInputConf<SELF extends HadoopPropertiesWrapper> extends Hadoop
 
     @Override
     public SELF setDefaults() {
+        estimateSizeLimit = 100000;
+        estimateTimeLimitMicros = 1000;
         return (SELF)this;
     }
 
@@ -56,4 +60,11 @@ public class MongoInputConf<SELF extends HadoopPropertiesWrapper> extends Hadoop
         return MongoConnection.builder().forName(getConnectionName()).db(getDbName()).build();
     }
 
+    public int getEstimateSizeLimit() {
+        return estimateSizeLimit;
+    }
+
+    public int getEstimateTimeLimitMicros() {
+        return estimateTimeLimitMicros;
+    }
 }
