@@ -10,7 +10,7 @@ import org.sv.flexobject.hadoop.mapreduce.input.DaoRecordReader;
 
 import java.io.IOException;
 
-abstract public class BatchRecordReader<VT> extends DaoRecordReader<LongWritable, VT> {
+abstract public class BatchRecordReader<VT> extends DaoRecordReader<LongWritable, VT, BatchInputDao, BatchInputSplit> {
     static Logger logger = Logger.getLogger(BatchRecordReader.class);
 
     long recordsRead = 0;
@@ -61,9 +61,9 @@ abstract public class BatchRecordReader<VT> extends DaoRecordReader<LongWritable
     @Override
     public void initialize(InputSplit split, TaskAttemptContext context) throws IOException, InterruptedException {
         initializeSuper(split, context);
-        nextBatchStartKey = ((BatchInputSplit)split).getStartKey();
+        nextBatchStartKey = getSplit().getStartKey();
         hasData = nextBatch();
-        getProgressReporter().setSize(((BatchInputSplit)split).getBatchPerSplit());
+        getProgressReporter().setSize(getSplit().getBatchPerSplit());
     }
 
     protected void incrementBatch(){
@@ -76,18 +76,17 @@ abstract public class BatchRecordReader<VT> extends DaoRecordReader<LongWritable
     }
 
     protected boolean hasMoreBatches(){
-        return batchNo < ((BatchInputSplit)getSplit()).getBatchPerSplit();
+        return batchNo < getSplit().getBatchPerSplit();
     }
 
     protected boolean nextBatch(){
-        long batchSize = ((BatchInputSplit)getSplit()).getBatchSize();
-        long batchesPerSplit = ((BatchInputSplit)getSplit()).getBatchPerSplit();
-        BatchInputDao inputDao = (BatchInputDao) getDao();
+        long batchSize = getSplit().getBatchSize();
+        long batchesPerSplit = getSplit().getBatchPerSplit();
         try {
 
             if (isEmptyBatch()) {
                 logger.info("Empty batch encountered - checking if we need to skip a few ...");
-                long adjustedKey = inputDao.adjustStartKey(nextBatchStartKey, nextBatchStartKey + ((batchesPerSplit - batchNo) * batchSize));
+                long adjustedKey = getDao().adjustStartKey(nextBatchStartKey, nextBatchStartKey + ((batchesPerSplit - batchNo) * batchSize));
                 logger.info("Edjusted start key to " + adjustedKey);
                 while (adjustedKey > nextBatchStartKey + batchSize && batchNo < batchesPerSplit) {
                     incrementBatch();
@@ -103,7 +102,7 @@ abstract public class BatchRecordReader<VT> extends DaoRecordReader<LongWritable
             lastBatchRecordsRead = recordsRead;
             logger.info("Starting batch " + batchNo + " of " + batchesPerSplit + " with start key " + nextBatchStartKey + " records read so far " + recordsRead);
 
-            setInput(inputDao.startBatch(nextBatchStartKey, batchSize));
+            setInput(getDao().startBatch(nextBatchStartKey, batchSize));
 
             nextBatchStartKey += batchSize;
             logger.info("Got input from DAO. Next Batch start key incremented to " + nextBatchStartKey);

@@ -93,6 +93,7 @@ public class BatchRecordReaderTest {
         doReturn(true).when(reader).nextBatch();
         doReturn(777l).when(split).getStartKey();
         doReturn(10l).when(split).getBatchPerSplit();
+        doReturn(split).when(reader).getSplit();
 
         reader.initialize(split, context);
 

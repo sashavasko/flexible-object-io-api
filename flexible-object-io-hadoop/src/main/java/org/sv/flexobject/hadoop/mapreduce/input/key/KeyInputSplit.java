@@ -8,6 +8,7 @@ import org.apache.hadoop.mapreduce.InputSplit;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Objects;
 
 public class KeyInputSplit<KT extends Writable> extends InputSplit implements Writable {
 
@@ -57,5 +58,18 @@ public class KeyInputSplit<KT extends Writable> extends InputSplit implements Wr
     @Override
     public void readFields(DataInput in) throws IOException {
         key.readFields(in);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        KeyInputSplit<?> that = (KeyInputSplit<?>) o;
+        return Objects.equals(key, that.key);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(key);
     }
 }

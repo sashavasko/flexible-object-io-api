@@ -15,8 +15,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BatchSplitterTest {
@@ -42,9 +41,10 @@ public class BatchSplitterTest {
 
     @Test
     public void splitUsesConf() throws IOException {
+        doReturn(1l).when(conf).getSplitsCount();
         splitter.split(rawConf);
 
-        verify(conf).from(rawConf);
+        verify(conf, times(2)).from(rawConf);
     }
 
     @Test

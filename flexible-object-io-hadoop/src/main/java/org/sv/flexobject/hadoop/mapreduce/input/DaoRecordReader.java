@@ -9,19 +9,19 @@ import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.IOException;
 
-public abstract class DaoRecordReader<KT,VT> extends AdapterRecordReader<KT,VT> {
+public abstract class DaoRecordReader<KT,VT,DAO extends MRDao,SPLIT extends InputSplit> extends AdapterRecordReader<KT,VT,SPLIT> {
     protected static Logger logger = Logger.getLogger(DaoRecordReader.class);
 
     public static final String CURRENT_KEY_FIELD_NAME = "CURRENT_KEY";
     public static final String CURRENT_VALUE_FIELD_NAME = "CURRENT_VALUE";
     public static final int DEFAULT_MAX_RETRIES_VALUE = 3;
 
-    protected MRDao dao;
+    protected DAO dao;
     protected String keyFieldName;
     protected String valueFieldName;
     DaoRecordReaderConf conf;
 
-    public MRDao getDao() {
+    public DAO getDao() {
         return dao;
     }
 
@@ -49,7 +49,7 @@ public abstract class DaoRecordReader<KT,VT> extends AdapterRecordReader<KT,VT> 
         valueFieldName = conf.getValueFieldName();
         for (int i = 0; i < conf.getMaxRetries() ; i++){
             try {
-                dao = conf.createDao();
+                dao = (DAO) conf.createDao();
                 if (dao instanceof Configurable)
                     ((Configurable)dao).setConf(context.getConfiguration());
                 setInput(createAdapter(split, context));

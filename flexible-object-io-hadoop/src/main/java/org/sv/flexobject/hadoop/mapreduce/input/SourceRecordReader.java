@@ -6,9 +6,8 @@ import org.sv.flexobject.stream.Source;
 import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.IOException;
-import java.util.function.Function;
 
-public abstract class SourceRecordReader<K,V> extends HadoopTaskRecordReader<K,V> {
+public abstract class SourceRecordReader<K,V,SPLIT extends InputSplit> extends HadoopTaskRecordReader<K,V,SPLIT> {
     protected Source<V> source;
 
     V currentValue;

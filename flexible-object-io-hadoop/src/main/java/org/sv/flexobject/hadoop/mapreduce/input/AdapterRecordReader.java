@@ -9,7 +9,7 @@ import org.sv.flexobject.InAdapter;
 
 import java.io.IOException;
 
-public abstract class AdapterRecordReader<KT,VT> extends HadoopTaskRecordReader<KT,VT> {
+public abstract class AdapterRecordReader<KT,VT,SPLIT extends InputSplit> extends HadoopTaskRecordReader<KT,VT,SPLIT> {
     protected static Logger logger = Logger.getLogger(AdapterRecordReader.class);
 
     private InAdapter input;

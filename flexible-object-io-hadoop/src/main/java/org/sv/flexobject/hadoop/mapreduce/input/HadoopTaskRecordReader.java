@@ -11,11 +11,11 @@ import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.IOException;
 
-public abstract class HadoopTaskRecordReader<KT,VT> extends RecordReader<KT,VT> {
+public abstract class HadoopTaskRecordReader<KT,VT,SPLIT extends InputSplit> extends RecordReader<KT,VT> {
     static Logger logger = Logger.getLogger(HadoopTaskRecordReader.class);
 
-    private InputSplit split;
-    private ProgressReporter progressReporter = InstanceFactory.get(SimpleProgressReporter.class);
+    private SPLIT split;
+    private ProgressReporter progressReporter;
 
     public void setProgressReporter(ProgressReporter progressReporter) {
         this.progressReporter = progressReporter;
@@ -32,11 +32,11 @@ public abstract class HadoopTaskRecordReader<KT,VT> extends RecordReader<KT,VT> 
         return getProgressReporter().getProgress();
     }
 
-    public InputSplit getSplit() {
+    public SPLIT getSplit() {
         return split;
     }
 
-    abstract protected void setupInput(InputSplit split, TaskAttemptContext context) throws IOException;
+    abstract protected void setupInput(SPLIT split, TaskAttemptContext context) throws IOException;
 
     @Override
     public void initialize(InputSplit split, TaskAttemptContext context) throws IOException, InterruptedException {
@@ -45,8 +45,8 @@ public abstract class HadoopTaskRecordReader<KT,VT> extends RecordReader<KT,VT> 
         } catch (Exception e) {
             throw HadoopTask.getTaskConf().runtimeException(logger, "Failed to initialize HadoopTask", e);
         }
-        this.split = split;
-        setupInput(split, context);
+        this.split = (SPLIT) split;
+        setupInput(this.split, context);
     }
 
     protected abstract KT convertCurrentKey() throws Exception;

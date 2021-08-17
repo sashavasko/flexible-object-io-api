@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 public class KeyInputConfTest {
 
@@ -28,5 +29,20 @@ public class KeyInputConfTest {
         assertEquals(expectedSettings, actualSettings);
     }
 
+    @Test
+    public void setDefaults() {
+        KeyInputConf conf = new KeyInputConf();
 
+        conf.setDefaults();
+
+        assertSame(ModSplitter.class, conf.getSplitterClass());
+        assertSame(KeyRecordReader.LongText.class, conf.getReaderClass());
+    }
+
+    @Test
+    public void customNameSpace() {
+        KeyInputConf conf = new KeyInputConf("foobar");
+
+        assertEquals("foobar.input.key", conf.getNamespace());
+    }
 }

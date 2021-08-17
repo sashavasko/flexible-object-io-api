@@ -1,6 +1,5 @@
 package org.sv.flexobject.hadoop.mapreduce.input.mongo;
 
-import com.carfax.utility.InstanceFactory;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.CountOptions;
 import org.bson.Document;
@@ -11,6 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.*;
 import java.util.concurrent.TimeUnit;

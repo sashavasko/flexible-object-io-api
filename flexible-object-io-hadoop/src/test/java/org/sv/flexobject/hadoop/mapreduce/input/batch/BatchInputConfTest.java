@@ -46,20 +46,20 @@ public class BatchInputConfTest {
     @Test
     public void listSettings() {
         List<String> expectedSettings = Arrays.asList(
-                "cfx.input.batch.splitter.class",
-                "cfx.input.batch.reader.class",
-                "cfx.input.batch.source.builder.class",
-                "cfx.input.batch.key.start",
-                "cfx.input.batch.size",
-                "cfx.input.batch.batches.per.split",
-                "cfx.input.batch.batches.num",
-                "cfx.input.batch.split.class",
-                "cfx.input.batch.key.max.dataset.path",
-                "cfx.input.batch.key.max.dataset.column.name",
-                "cfx.input.batch.key.max.calculator",
-                "cfx.input.batch.key.manager",
-                "cfx.input.batch.key.column.name",
-                "cfx.input.batch.reduce.max.keys");
+                "org.sv.flexobject.input.batch.splitter.class",
+                "org.sv.flexobject.input.batch.reader.class",
+                "org.sv.flexobject.input.batch.source.builder.class",
+                "org.sv.flexobject.input.batch.key.start",
+                "org.sv.flexobject.input.batch.size",
+                "org.sv.flexobject.input.batch.batches.per.split",
+                "org.sv.flexobject.input.batch.batches.num",
+                "org.sv.flexobject.input.batch.split.class",
+                "org.sv.flexobject.input.batch.key.max.dataset.path",
+                "org.sv.flexobject.input.batch.key.max.dataset.column.name",
+                "org.sv.flexobject.input.batch.key.max.calculator",
+                "org.sv.flexobject.input.batch.key.manager",
+                "org.sv.flexobject.input.batch.key.column.name",
+                "org.sv.flexobject.input.batch.reduce.max.keys");
         List<String> actualSettings = new ArrayList<>();
 
         for (SchemaElement e : Schema.getRegisteredSchema(conf.getClass()).getFields()){
