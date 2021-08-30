@@ -387,4 +387,19 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
         assertEquals(777, testData.get("intFieldOptional"));
 
     }
+
+    @Test
+    public void mapWithLongKey() throws Exception {
+        MapWithTypedKey testData = new MapWithTypedKey();
+        MapWithTypedKey reloaded = new MapWithTypedKey();
+
+        testData.mapWithLongKey.put(12345l, 6789l);
+
+        JsonNode json = testData.toJson();
+        System.out.println(json);
+
+        reloaded.fromJson(json);
+
+        assertEquals(testData, reloaded);
+    }
 }

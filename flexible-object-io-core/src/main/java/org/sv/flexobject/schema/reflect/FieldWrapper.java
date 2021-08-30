@@ -163,7 +163,7 @@ public class FieldWrapper {
                         if (elem != null)
                             ((StreamableWithSchema)elem).clear();
                     }
-                }else
+                }else if(array != null)
                     Arrays.fill(array, null);
             }catch (ClassCastException e){
                 throw new SchemaException(getQualifiedName() + ": Only arrays of non-primitive types are allowed in data objects with Schema.", e);

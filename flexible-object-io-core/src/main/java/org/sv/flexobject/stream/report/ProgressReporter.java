@@ -2,7 +2,7 @@ package org.sv.flexobject.stream.report;
 
 import java.util.Collection;
 
-public interface ProgressReporter {
+public interface ProgressReporter extends SizeReporter{
     default void setSize(Object optionalSizeReporter){
         if (optionalSizeReporter instanceof SizeReporter) {
             setSize(((SizeReporter) optionalSizeReporter).getSize());
@@ -14,7 +14,6 @@ public interface ProgressReporter {
     }
 
     void setSize(long size);
-    long getSize();
     float getProgress();
     void increment(long count);
 

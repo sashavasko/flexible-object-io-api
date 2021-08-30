@@ -200,6 +200,8 @@ public class ProbabilityBasedThrottlingStrategy implements LoadBalanceStrategy {
 
     @Override
     public NamespacePropertiesWrapper getConfiguration() {
+        if (config == null)
+            config = new Configuration();
         return config;
     }
 

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.json.JsonInputAdapter;
+import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.schema.SchemaException;
 import org.sv.flexobject.util.BiConsumerWithException;
 
@@ -167,7 +168,11 @@ public class ScalarSetter extends FieldWrapper implements BiConsumerWithExceptio
                         convertedValue = getType().convert(node);
                     }
 
-                    map.put(key, convertedValue);
+                    if (keyType != null && keyType != DataTypes.string){
+                        Object convertedKey = keyType.convert(key);
+                        map.put(convertedKey, convertedValue);
+                    } else
+                        map.put(key, convertedValue);
                 }
             }
         } else if (getValueClass() != null && getValueClass().isAssignableFrom(value.getClass())) {
