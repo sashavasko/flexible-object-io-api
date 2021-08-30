@@ -9,10 +9,14 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.mongo.connection.MongoConnection;
+import org.sv.flexobject.mongo.streaming.MongoBuilder;
+import org.sv.flexobject.mongo.streaming.MongoDocumentSource;
+import org.sv.flexobject.testdata.MapWithTypedKey;
 import org.sv.flexobject.testdata.TestDataWithSubSchema;
 import org.sv.flexobject.util.InstanceFactory;
 
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
@@ -24,6 +28,9 @@ public class MongoInputConfTest {
 
     @Mock
     MongoConnection mockConnection;
+
+    @Mock
+    MongoBuilder mockSourceBuilder;
 
     MongoInputConf conf;
     Configuration rawConf;
@@ -46,6 +53,7 @@ public class MongoInputConfTest {
 
         assertEquals(100000, conf.getEstimateSizeLimit());
         assertEquals(1000, conf.getEstimateTimeLimitMicros());
+        assertTrue(conf.getSourceBuilder() instanceof MongoDocumentSource.Builder);
     }
 
     @Test
@@ -123,5 +131,29 @@ public class MongoInputConfTest {
 
         verify(mockBuilder).forName("mongodb");
         verify(mockBuilder).db("mydb");
+    }
+
+    @Test
+    public void getSourceMongoBuilder() {
+        rawConf.set("test.input.mongo.source.builder.class", String.class.getName());
+        rawConf.set("test.input.mongo.connection.name", "mongodb");
+        rawConf.set("test.input.mongo.collection.name", "mycollection");
+        rawConf.set("test.input.mongo.db.name", "mydb");
+        rawConf.setClass("test.input.mongo.schema", MapWithTypedKey.class, StreamableWithSchema.class);
+        conf.from(rawConf);
+
+        InstanceFactory.set(String.class, mockSourceBuilder);
+
+        doReturn(mockSourceBuilder).when(mockSourceBuilder).connection(anyString());
+        doReturn(mockSourceBuilder).when(mockSourceBuilder).db(anyString());
+        doReturn(mockSourceBuilder).when(mockSourceBuilder).collection(anyString());
+
+        MongoBuilder actualBuilder = conf.getSourceBuilder();
+
+        assertEquals(mockSourceBuilder, actualBuilder);
+        verify(mockSourceBuilder).connection("mongodb");
+        verify(mockSourceBuilder).db("mydb");
+        verify(mockSourceBuilder).collection("mycollection");
+        verify(mockSourceBuilder).schema(MapWithTypedKey.class);
     }
 }

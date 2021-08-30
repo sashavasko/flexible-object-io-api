@@ -5,6 +5,7 @@ import org.sv.flexobject.connections.ConnectionManager;
 import org.sv.flexobject.hadoop.properties.HadoopPropertiesProvider;
 import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
 import org.sv.flexobject.hadoop.properties.HadoopSecretProvider;
+import org.sv.flexobject.mongo.MongoClientProvider;
 import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.schema.annotations.ValueType;
 import org.sv.flexobject.sql.providers.UnPooledConnectionProvider;
@@ -18,7 +19,8 @@ public class HadoopTaskConf extends HadoopPropertiesWrapper<HadoopTaskConf> {
     public static final List<Class> DEFAULT_PROVIDERS = Arrays.asList(
             HadoopSecretProvider.class,
             HadoopPropertiesProvider.class,
-            UnPooledConnectionProvider.class
+            UnPooledConnectionProvider.class,
+            MongoClientProvider.class
     );
 
     public static final String DEFAULT_ENVIRONMENT = "hadoop";

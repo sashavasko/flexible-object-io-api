@@ -3,6 +3,7 @@ package org.sv.flexobject.hadoop.mapreduce.input.mongo;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.sv.flexobject.hadoop.mapreduce.input.SourceBuilder;
+import org.sv.flexobject.mongo.streaming.MongoBuilder;
 import org.sv.flexobject.mongo.streaming.MongoSource;
 import org.sv.flexobject.stream.Source;
 import org.sv.flexobject.util.InstanceFactory;
@@ -16,10 +17,7 @@ public class MongoSourceBuilder implements SourceBuilder {
         MongoInputConf conf = InstanceFactory.get(MongoInputConf.class);
         conf.from(context.getConfiguration());
 
-        MongoSource.Builder builder = MongoSource.builder()
-                .connection(conf.getConnectionName())
-                .db(conf.getDbName())
-                .collection(conf.getCollectionName());
+        MongoBuilder builder = conf.getSourceBuilder();
         MongoSplit mongoSplit = (MongoSplit) split;
         if (mongoSplit.hasQuery())
             builder.filter(mongoSplit.getQuery());

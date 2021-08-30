@@ -57,9 +57,7 @@ public class MongoSourceBuilderTest {
 
         doReturn(rawConf).when(context).getConfiguration();
         doReturn(result).when(mongoBuilder).build();
-        doReturn(mongoBuilder).when(mongoBuilder).connection(Mockito.anyString());
-        doReturn(mongoBuilder).when(mongoBuilder).collection(Mockito.anyString());
-        doReturn(mongoBuilder).when(mongoBuilder).db(Mockito.anyString());
+        doReturn(mongoBuilder).when(conf).getSourceBuilder();
     }
 
     @After
@@ -81,26 +79,17 @@ public class MongoSourceBuilderTest {
         doReturn(true).when(split).hasSort();
         doReturn(true).when(split).isNotimeout();
 
-        doReturn(TestDataWithSubSchema.class).when(conf).getInputSchema();
         doReturn(true).when(conf).hasSchema();
-
-        doReturn("connName").when(conf).getConnectionName();
-        doReturn("collName").when(conf).getCollectionName();
-        doReturn("dbName").when(conf).getDbName();
 
         assertSame(result, builder.build(split, context));
 
         verify(conf).from(rawConf);
-        verify(mongoBuilder).connection("connName");
-        verify(mongoBuilder).db("dbName");
-        verify(mongoBuilder).collection("collName");
         verify(mongoBuilder).filter(query);
         verify(mongoBuilder).limit(10);
         verify(mongoBuilder).skip(5);
         verify(mongoBuilder).projection(projection);
         verify(mongoBuilder).sort(sort);
         verify(mongoBuilder).noTimeout();
-        verify(mongoBuilder).schema(TestDataWithSubSchema.class);
         verify(mongoBuilder).build();
     }
 
@@ -116,16 +105,9 @@ public class MongoSourceBuilderTest {
 
         doReturn(false).when(conf).hasSchema();
 
-        doReturn("connName").when(conf).getConnectionName();
-        doReturn("collName").when(conf).getCollectionName();
-        doReturn("dbName").when(conf).getDbName();
-
         assertSame(result, builder.build(split, context));
 
         verify(conf).from(rawConf);
-        verify(mongoBuilder).connection("connName");
-        verify(mongoBuilder).db("dbName");
-        verify(mongoBuilder).collection("collName");
         verify(mongoBuilder).build();
         verifyNoMoreInteractions(mongoBuilder);
     }
