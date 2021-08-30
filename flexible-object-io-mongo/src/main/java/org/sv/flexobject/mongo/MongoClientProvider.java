@@ -59,6 +59,19 @@ public class MongoClientProvider implements ConnectionProvider {
 
         builder.readPreference(readPreference);
 
+        String compressors = connectionProperties.getProperty("compressorList");
+        if (StringUtils.isNotBlank(compressors)) {
+            List<MongoCompressor> compressorList = new ArrayList<>();
+            for(String compressor : compressors.split(",")){
+                switch(compressor.toLowerCase()){
+                    case "snappy" : compressorList.add(MongoCompressor.createSnappyCompressor()); break;
+                    case "zlib" : compressorList.add(MongoCompressor.createZlibCompressor()); break;
+                    case "zstd" : compressorList.add(MongoCompressor.createZstdCompressor()); break;
+                }
+            }
+            builder.compressorList(compressorList);
+        }
+
         String timeout = connectionProperties.getProperty("timeout", "60000");
         int connectTimeout = Integer.valueOf(connectionProperties.getProperty("connectTimeout", timeout));
         int readTimeout = Integer.valueOf(connectionProperties.getProperty("readTimeout", timeout));

@@ -7,8 +7,9 @@ import org.bson.conversions.Bson;
 import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.mongo.connection.MongoConnection;
 import org.sv.flexobject.mongo.schema.BsonSchema;
+import org.sv.flexobject.stream.Source;
 
-public class MongoBuilder<SELF extends MongoBuilder> {
+public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Source> {
     protected String connectionName;
     protected String dbName;
     private MongoConnection connection;
@@ -144,4 +145,6 @@ public class MongoBuilder<SELF extends MongoBuilder> {
         if (isOwnConnection())
             owner.setConnection(getConnection());
     }
+
+    abstract public SOURCE build() throws Exception;
 }

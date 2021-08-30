@@ -1,20 +1,12 @@
 package org.sv.flexobject.mongo.streaming;
 
-import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCursor;
 import org.bson.RawBsonDocument;
 import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.mongo.schema.BsonSchema;
-import org.sv.flexobject.stream.Source;
 import org.sv.flexobject.util.InstanceFactory;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
-public class MongoSource extends MongoConnectionOwner implements Source<StreamableWithSchema>,  Iterator<StreamableWithSchema>, Iterable<StreamableWithSchema>, AutoCloseable {
-    MongoCursor<RawBsonDocument> cursor;
+public class MongoSource extends MongoCursorSource<StreamableWithSchema,RawBsonDocument> {
     Class<? extends StreamableWithSchema> schema;
     BsonSchema bsonSchema;
 
@@ -22,16 +14,17 @@ public class MongoSource extends MongoConnectionOwner implements Source<Streamab
     }
 
     public MongoSource(Class<? extends StreamableWithSchema> schema, MongoCursor<RawBsonDocument> cursor) {
-        this.cursor = cursor;
+        super(cursor);
         this.schema = schema;
         bsonSchema = BsonSchema.getRegisteredSchema(schema);
     }
 
-    public static class Builder extends MongoBuilder<Builder>{
+    public static class Builder extends MongoBuilder<Builder, MongoSource>{
 
+        @Override
         public MongoSource build() throws Exception {
             MongoSource source = InstanceFactory.get(MongoSource.class);
-            source.cursor = getCursor(RawBsonDocument.class);
+            source.setCursor(getCursor(RawBsonDocument.class));
             source.schema = getSchema();
             source.bsonSchema = getBsonSchema();
             saveConnection(source);
@@ -46,35 +39,6 @@ public class MongoSource extends MongoConnectionOwner implements Source<Streamab
     @Override
     public <T extends StreamableWithSchema> T get() throws Exception {
         return (T) schema.cast(bsonSchema.fromBson(cursor.next()));
-    }
-
-    @Override
-    public boolean isEOF() {
-        return cursor.hasNext();
-    }
-
-    @Override
-    public void close() {
-        if (cursor != null) {
-            cursor.close();
-            cursor = null;
-        }
-        super.close();
-    }
-
-    @Override
-    public Stream stream() {
-        return StreamSupport.stream(spliterator(), false);
-    }
-
-    @Override
-    public Iterator iterator() {
-        return cursor;
-    }
-
-    @Override
-    public boolean hasNext() {
-        return cursor.hasNext();
     }
 
     @Override

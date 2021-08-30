@@ -4,9 +4,7 @@ import com.mongodb.client.MongoCursor;
 import org.bson.Document;
 import org.sv.flexobject.util.InstanceFactory;
 
-import java.util.Iterator;
-
-public class MongoDocumentSource extends MongoMapSource {
+public class MongoDocumentSource extends MongoMapSource<Document> {
     public MongoDocumentSource() {
     }
 
@@ -14,11 +12,12 @@ public class MongoDocumentSource extends MongoMapSource {
         super(cursor);
     }
 
-    public static class Builder extends MongoBuilder<Builder>{
+    public static class Builder extends MongoBuilder<Builder, MongoDocumentSource>{
 
+        @Override
         public MongoDocumentSource build() throws Exception {
             MongoDocumentSource source = InstanceFactory.get(MongoDocumentSource.class);
-            source.cursor = getCursor(Document.class);
+            source.setCursor(getCursor(Document.class));
             saveConnection(source);
             return source;
         }
@@ -28,20 +27,11 @@ public class MongoDocumentSource extends MongoMapSource {
         return InstanceFactory.get(Builder.class);
     }
 
-    @Override
-    public Document get() throws Exception {
-        return (Document) super.get();
-    }
 
 //    @Override
 //    public Iterator<Document> iterator() {
-//        return cursor;
+//// TODO :
+////        return cursor;
+//        return null;
 //    }
-
-    @Override
-    public Document next() {
-        return (Document) super.next();
-    }
-
-
 }
