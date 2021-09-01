@@ -3,6 +3,7 @@ package org.sv.flexobject.mongo.streaming;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
+import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.mongo.connection.MongoConnection;
@@ -22,7 +23,7 @@ public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Sou
     protected Integer skip;
     protected Boolean notimeout = false;
     private MongoCursor cursor;
-    private Class documentClass;
+    private Class documentClass = Document.class;
 
     public SELF connection(String connectionName) {
         this.connectionName = connectionName;
@@ -102,9 +103,13 @@ public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Sou
         return connection;
     }
 
+    public MongoCollection getCollection() throws Exception {
+        return getConnection().getCollection(collectionName, documentClass);
+    }
+
     public <TDocument> MongoCursor<TDocument> getCursor(Class<TDocument> documentClass) throws Exception {
         if (cursor == null){
-            MongoCollection<TDocument> collection = getConnection().getCollection(collectionName, documentClass);
+            MongoCollection<TDocument> collection = getCollection();
             FindIterable<TDocument> findIterable = collection.find();
             if (filter != null)
                 findIterable = findIterable.filter(filter);
