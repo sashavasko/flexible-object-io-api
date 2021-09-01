@@ -1,6 +1,7 @@
 package org.sv.flexobject.hadoop.mapreduce.input.mongo;
 
 
+import com.mongodb.client.MongoCollection;
 import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
 import org.sv.flexobject.mongo.connection.MongoConnection;
@@ -85,4 +86,11 @@ public class MongoInputConf<SELF extends HadoopPropertiesWrapper> extends Hadoop
         return builder;
     }
 
+    public MongoCollection getCollection() throws Exception {
+        MongoBuilder builder = InstanceFactory.get(sourceBuilderClass);
+        builder.connection(getConnectionName())
+                .db(getDbName())
+                .collection(getCollectionName());
+        return builder.getCollection();
+    }
 }
