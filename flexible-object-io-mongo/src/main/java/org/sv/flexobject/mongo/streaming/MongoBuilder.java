@@ -109,6 +109,7 @@ public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Sou
 
     public <TDocument> MongoCursor<TDocument> getCursor(Class<TDocument> documentClass) throws Exception {
         if (cursor == null){
+            forDocumentClass(documentClass);
             MongoCollection<TDocument> collection = getCollection();
             FindIterable<TDocument> findIterable = collection.find();
             if (filter != null)
