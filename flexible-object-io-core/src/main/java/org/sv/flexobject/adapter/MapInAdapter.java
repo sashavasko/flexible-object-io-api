@@ -3,6 +3,7 @@ package org.sv.flexobject.adapter;
 import org.sv.flexobject.stream.Source;
 import org.sv.flexobject.stream.sources.SingleValueSource;
 import org.sv.flexobject.translate.Translator;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.util.Map;
 
@@ -41,7 +42,7 @@ public class MapInAdapter extends GenericInAdapter<Map> implements DynamicInAdap
         }
 
         public MapInAdapter build(){
-            MapInAdapter adapter = new MapInAdapter();
+            MapInAdapter adapter = InstanceFactory.get(MapInAdapter.class);
             if (fieldNameTranslator != null)
                 adapter.setParam(GenericInAdapter.PARAMS.fieldNameTranslator, fieldNameTranslator);
             if (map != null)

@@ -6,6 +6,7 @@ import org.sv.flexobject.adapter.MapInAdapter;
 import org.sv.flexobject.adapter.MapOutAdapter;
 import org.sv.flexobject.schema.annotations.NonStreamableField;
 import org.sv.flexobject.translate.Translator;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,12 +18,26 @@ public abstract class NamespacePropertiesWrapper<T extends NamespacePropertiesWr
     @NonStreamableField
     private Namespace namespace;
 
-    public NamespacePropertiesWrapper(String namespace) {
-        this.namespace = new Namespace(Namespace.getDefaultNamespace(), namespace);
+    protected static Namespace getParentNamespace(Class<? extends NamespacePropertiesWrapper> clazz){
+        Class superclass = clazz.getSuperclass();
+        if (superclass == NamespacePropertiesWrapper.class)
+            return Namespace.getDefaultNamespace();
+        else {
+            NamespacePropertiesWrapper parent = (NamespacePropertiesWrapper) InstanceFactory.get(superclass);
+            return parent.getNamespace();
+        }
     }
 
-    public NamespacePropertiesWrapper(Namespace parent, String namespace) {
-        this.namespace = new Namespace(parent, namespace);
+    protected static Namespace makeMyNamespace(Namespace parent, String subNamespace){
+        return new Namespace(parent, subNamespace);
+    }
+
+    public NamespacePropertiesWrapper(String subNamespace) {
+        namespace = new Namespace(Namespace.getDefaultNamespace(), subNamespace);
+    }
+
+    public NamespacePropertiesWrapper(Namespace parent, String subNamespace) {
+        this.namespace = makeMyNamespace(parent, subNamespace);
     }
 
     public Namespace getNamespace() {

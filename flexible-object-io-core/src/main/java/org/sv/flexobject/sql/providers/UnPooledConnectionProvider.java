@@ -22,7 +22,11 @@ public class UnPooledConnectionProvider implements ConnectionProvider {
     @Override
     public AutoCloseable getConnection(String name, Properties connectionProperties, Object secret) throws Exception {
 
-        Class.forName(connectionProperties.getProperty("driverClassName"));
+        String driverClassName = connectionProperties.getProperty("driverClassName");
+        if (StringUtils.isNotBlank(driverClassName))
+            Class.forName(connectionProperties.getProperty("driverClassName"));
+        // otherwise DriverManager will load driver from
+        // those listed in jdbc.drivers system property
 
         Properties amendedProps = new Properties();
         amendedProps.putAll(connectionProperties);

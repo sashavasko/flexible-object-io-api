@@ -94,6 +94,11 @@ public class Namespace {
         return parent == null ? name : parent.getNamespace() + separator + name;
     }
 
+    @Override
+    public String toString() {
+        return getNamespace();
+    }
+
     public static Translator getTranslator(String namespace, String separator) {
         return new SeparatorTranslator(separator).andThen(new NamespaceTranslator(namespace));
     }
