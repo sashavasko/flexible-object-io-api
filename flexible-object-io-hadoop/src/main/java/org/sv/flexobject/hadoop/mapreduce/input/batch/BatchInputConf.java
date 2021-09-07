@@ -1,12 +1,12 @@
 package org.sv.flexobject.hadoop.mapreduce.input.batch;
 
 import org.sv.flexobject.hadoop.mapreduce.input.InputConf;
-import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
+import org.sv.flexobject.properties.Namespace;
 import org.sv.flexobject.util.InstanceFactory;
 
-public class BatchInputConf extends InputConf<BatchInputConf> {
+public final class BatchInputConf extends InputConf<BatchInputConf> {
 
-    public static final String SUBNAMESPACE = "input.batch";
+    public static final String SUBNAMESPACE = "batch";
 
     private Long keyStart;
     private Integer size;
@@ -21,7 +21,7 @@ public class BatchInputConf extends InputConf<BatchInputConf> {
     private Long reduceMaxKeys;
 
     public BatchInputConf() {
-        super();
+        super(SUBNAMESPACE);
     }
 
     @Override
@@ -41,13 +41,8 @@ public class BatchInputConf extends InputConf<BatchInputConf> {
         return this;
     }
 
-    public BatchInputConf(String namespace) {
-        super(namespace);
-    }
-
-    @Override
-    public String getSubNamespace() {
-        return SUBNAMESPACE;
+    public BatchInputConf(Namespace parent) {
+        super(parent, SUBNAMESPACE);
     }
 
     public void configureMaxKeyDataset(String maxKeyDatasetPath, String keyColumnName) {

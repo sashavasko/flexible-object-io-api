@@ -17,7 +17,7 @@ public class MongoSourceBuilder implements SourceBuilder {
         MongoInputConf conf = InstanceFactory.get(MongoInputConf.class);
         conf.from(context.getConfiguration());
 
-        MongoBuilder builder = conf.getSourceBuilder();
+        MongoBuilder builder = conf.getMongoBuilder();
         MongoSplit mongoSplit = (MongoSplit) split;
         if (mongoSplit.hasQuery())
             builder.filter(mongoSplit.getQuery());

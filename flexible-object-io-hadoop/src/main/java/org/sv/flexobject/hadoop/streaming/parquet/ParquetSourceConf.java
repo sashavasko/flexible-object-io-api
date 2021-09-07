@@ -8,7 +8,7 @@ import org.apache.parquet.schema.MessageType;
 import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
 
-public class ParquetSourceConf extends HadoopPropertiesWrapper<ParquetSourceConf> {
+public final class ParquetSourceConf extends HadoopPropertiesWrapper<ParquetSourceConf> {
     public static final String SUBNAMESPACE = "input.streaming.parquet";
 
     public String filePath;
@@ -16,7 +16,7 @@ public class ParquetSourceConf extends HadoopPropertiesWrapper<ParquetSourceConf
     public Class<? extends StreamableWithSchema> dataClass;
 
     public ParquetSourceConf() {
-        super();
+        super(SUBNAMESPACE);
     }
 
     @Override
@@ -26,11 +26,6 @@ public class ParquetSourceConf extends HadoopPropertiesWrapper<ParquetSourceConf
 
     public ParquetSourceConf(String namespace) {
         super(namespace);
-    }
-
-    @Override
-    public String getSubNamespace() {
-        return SUBNAMESPACE;
     }
 
     public boolean filePathIsSet(){

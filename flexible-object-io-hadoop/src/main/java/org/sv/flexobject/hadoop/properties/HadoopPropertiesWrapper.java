@@ -9,31 +9,22 @@ import org.sv.flexobject.hadoop.adapter.ConfigurationInAdapter;
 import org.sv.flexobject.hadoop.adapter.ConfigurationOutAdapter;
 import org.sv.flexobject.hadoop.adapter.SparkConfInAdapter;
 import org.sv.flexobject.hadoop.adapter.SparkConfOutAdapter;
+import org.sv.flexobject.properties.Namespace;
+import org.sv.flexobject.properties.NamespacePropertiesWrapper;
 import org.sv.flexobject.properties.PropertiesWrapper;
 import org.sv.flexobject.schema.annotations.NonStreamableField;
 
-public abstract class HadoopPropertiesWrapper<T extends HadoopPropertiesWrapper> extends PropertiesWrapper<T> implements Configurable {
-
-    @NonStreamableField
-    private String namespace;
+public abstract class HadoopPropertiesWrapper<T extends HadoopPropertiesWrapper> extends NamespacePropertiesWrapper<T> implements Configurable {
 
     @NonStreamableField
     private Configuration configuration;
 
-    public HadoopPropertiesWrapper() {
-        this(getDefaultNamespace());
+    public HadoopPropertiesWrapper(String subNamespace) {
+        super(subNamespace);
     }
 
-    public HadoopPropertiesWrapper(String namespace) {
-        this.namespace = namespace;
-    }
-
-    public String getSubNamespace(){
-        return null;
-    }
-
-    public String getNamespace() {
-        return getSubNamespace() == null ? namespace : namespace + "." + getSubNamespace();
+    public HadoopPropertiesWrapper(Namespace parent, String subNamespace) {
+        super(parent, subNamespace);
     }
 
     protected String diagnostics(){
@@ -64,7 +55,7 @@ public abstract class HadoopPropertiesWrapper<T extends HadoopPropertiesWrapper>
         if (configuration != null) {
             this.configuration = configuration;
             try {
-                return from(ConfigurationInAdapter.forValue(configuration, getNamespace()));
+                ConfigurationInAdapter.builder().from(configuration).translator(getTranslator()).build().consume(this::load);
             } catch (Exception e) {
                 if (e instanceof RuntimeException)
                     throw (RuntimeException)e;
@@ -77,7 +68,7 @@ public abstract class HadoopPropertiesWrapper<T extends HadoopPropertiesWrapper>
     public T from (SparkConf configuration) {
         if (configuration != null) {
             try {
-                return from(SparkConfInAdapter.forValue(configuration, getNamespace()));
+                SparkConfInAdapter.builder().from(configuration).translator(getTranslator()).build().consume(this::load);
             } catch (Exception e) {
                 if (e instanceof RuntimeException)
                     throw (RuntimeException)e;
@@ -95,14 +86,6 @@ public abstract class HadoopPropertiesWrapper<T extends HadoopPropertiesWrapper>
     public boolean update(SparkConf configuration) throws Exception {
         SparkConfOutAdapter.update(configuration, getNamespace(), this::save);
         return true;
-    }
-
-    public String getSettingName(String fieldName){
-        return ConfigurationInAdapter.getTranslator(getNamespace()).apply(fieldName);
-    }
-
-    public static String getDefaultNamespace(){
-        return HadoopTask.DEFAULT_NAMESPACE;
     }
 
     @Override

@@ -3,9 +3,10 @@ package org.sv.flexobject.hadoop.mapreduce.input;
 
 import org.sv.flexobject.hadoop.mapreduce.util.MRDao;
 import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
+import org.sv.flexobject.properties.Namespace;
 import org.sv.flexobject.util.InstanceFactory;
 
-public class DaoRecordReaderConf extends HadoopPropertiesWrapper<DaoRecordReaderConf> {
+public final class DaoRecordReaderConf extends HadoopPropertiesWrapper<DaoRecordReaderConf> {
     public static final String SUBNAMESPACE = "record.reader";
 
     protected String keyFieldName;
@@ -14,7 +15,7 @@ public class DaoRecordReaderConf extends HadoopPropertiesWrapper<DaoRecordReader
     Class<? extends MRDao> daoClass;
 
     public DaoRecordReaderConf() {
-        super();
+        super(SUBNAMESPACE);
     }
 
     @Override
@@ -25,13 +26,8 @@ public class DaoRecordReaderConf extends HadoopPropertiesWrapper<DaoRecordReader
         return this;
     }
 
-    public DaoRecordReaderConf(String namespace) {
-        super(namespace);
-    }
-
-    @Override
-    public String getSubNamespace() {
-        return SUBNAMESPACE;
+    public DaoRecordReaderConf(Namespace parent) {
+        super(parent, SUBNAMESPACE);
     }
 
     public boolean isDaoConfigured(){

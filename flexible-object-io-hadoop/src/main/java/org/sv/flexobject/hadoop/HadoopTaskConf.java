@@ -6,6 +6,7 @@ import org.sv.flexobject.hadoop.properties.HadoopPropertiesProvider;
 import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
 import org.sv.flexobject.hadoop.properties.HadoopSecretProvider;
 import org.sv.flexobject.mongo.MongoClientProvider;
+import org.sv.flexobject.properties.Namespace;
 import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.schema.annotations.ValueType;
 import org.sv.flexobject.sql.providers.UnPooledConnectionProvider;
@@ -33,7 +34,7 @@ public class HadoopTaskConf extends HadoopPropertiesWrapper<HadoopTaskConf> {
     private String connectionManagerEnvironment;
 
     public HadoopTaskConf() {
-        super();
+        super(SUBNAMESPACE);
     }
 
     @Override
@@ -41,13 +42,8 @@ public class HadoopTaskConf extends HadoopPropertiesWrapper<HadoopTaskConf> {
         return this;
     }
 
-    public HadoopTaskConf(String namespace) {
-        super(namespace);
-    }
-
-    @Override
-    public String getSubNamespace() {
-        return SUBNAMESPACE;
+    public HadoopTaskConf(Namespace parent) {
+        super(parent, SUBNAMESPACE);
     }
 
     public ConnectionManager.DeploymentLevel getDeploymentLevel() {

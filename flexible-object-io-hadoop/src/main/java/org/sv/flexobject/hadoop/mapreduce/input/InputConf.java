@@ -4,6 +4,7 @@ import org.apache.hadoop.mapreduce.RecordReader;
 import org.sv.flexobject.hadoop.mapreduce.input.key.KeyRecordReader;
 import org.sv.flexobject.hadoop.mapreduce.input.key.ModSplitter;
 import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
+import org.sv.flexobject.properties.Namespace;
 import org.sv.flexobject.util.InstanceFactory;
 
 public class InputConf<SELF extends HadoopPropertiesWrapper> extends HadoopPropertiesWrapper<SELF> {
@@ -14,21 +15,24 @@ public class InputConf<SELF extends HadoopPropertiesWrapper> extends HadoopPrope
     protected Class<? extends SourceBuilder> sourceBuilderClass;
 
     public InputConf() {
-        super();
+        super(SUBNAMESPACE);
     }
 
-    public InputConf(String namespace) {
-        super(namespace);
+    public InputConf(String child) {
+        super(makeMyNamespace(getParentNamespace(InputConf.class), SUBNAMESPACE), child);
+    }
+
+    public InputConf(Namespace parent) {
+        super(parent, SUBNAMESPACE);
+    }
+
+    public InputConf(Namespace parent, String child) {
+        super(parent, child);
     }
 
     @Override
     public SELF setDefaults() {
         return (SELF)this;
-    }
-
-    @Override
-    public String getSubNamespace() {
-        return SUBNAMESPACE;
     }
 
     public Class<? extends Splitter> getSplitterClass() {

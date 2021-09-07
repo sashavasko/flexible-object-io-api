@@ -3,13 +3,17 @@ package org.sv.flexobject.hadoop.mapreduce.input;
 
 import org.apache.hadoop.mapreduce.*;
 import org.apache.log4j.Logger;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.IOException;
 import java.util.List;
 
-public abstract class ConfiguredInputFormat<K,V> extends InputFormat<K,V> {
+public class ConfiguredInputFormat<K,V> extends InputFormat<K,V> {
     protected static Logger logger = Logger.getLogger(ConfiguredInputFormat.class);
-    protected abstract InputConf<InputConf> makeInputConf();
+
+    protected InputConf<InputConf> makeInputConf(){
+        return InstanceFactory.get(InputConf.class);
+    }
 
     @Override
     public List<InputSplit> getSplits(JobContext context) {

@@ -1,12 +1,13 @@
 package org.sv.flexobject.hadoop.mapreduce.input.key;
 
 import org.sv.flexobject.hadoop.mapreduce.input.InputConf;
+import org.sv.flexobject.properties.Namespace;
 
-public class KeyInputConf extends InputConf<KeyInputConf> {
-    public static final String SUBNAMESPACE = "input.key";
+public final class KeyInputConf extends InputConf<KeyInputConf> {
+    public static final String SUBNAMESPACE = "key";
 
     public KeyInputConf() {
-        super();
+        super(SUBNAMESPACE);
     }
 
     @Override
@@ -16,12 +17,7 @@ public class KeyInputConf extends InputConf<KeyInputConf> {
         return this;
     }
 
-    public KeyInputConf(String namespace) {
-        super(namespace);
-    }
-
-    @Override
-    public String getSubNamespace() {
-        return SUBNAMESPACE;
+    public KeyInputConf(Namespace parent) {
+        super(parent, SUBNAMESPACE);
     }
 }

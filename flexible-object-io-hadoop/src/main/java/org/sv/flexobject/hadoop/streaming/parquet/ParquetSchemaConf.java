@@ -22,7 +22,7 @@ import org.sv.flexobject.json.MapperFactory;
 import java.io.IOException;
 import java.util.List;
 
-public class ParquetSchemaConf extends HadoopPropertiesWrapper<ParquetSchemaConf> {
+public final class ParquetSchemaConf extends HadoopPropertiesWrapper<ParquetSchemaConf> {
     public static final String SUBNAMESPACE = "parquet";
 
     Class<? extends StreamableWithSchema> inputSchemaClass;
@@ -32,7 +32,7 @@ public class ParquetSchemaConf extends HadoopPropertiesWrapper<ParquetSchemaConf
     JsonNode filterPredicateJson;
 
     public ParquetSchemaConf() {
-        super();
+        super(SUBNAMESPACE);
     }
 
     @Override
@@ -42,11 +42,6 @@ public class ParquetSchemaConf extends HadoopPropertiesWrapper<ParquetSchemaConf
 
     public ParquetSchemaConf(String namespace) {
         super(namespace);
-    }
-
-    @Override
-    public String getSubNamespace() {
-        return SUBNAMESPACE;
     }
 
     public MessageType getInputSchema(){
