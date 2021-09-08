@@ -32,6 +32,10 @@ public abstract class NamespacePropertiesWrapper<T extends NamespacePropertiesWr
         return new Namespace(parent, subNamespace);
     }
 
+    public NamespacePropertiesWrapper() {
+        namespace = Namespace.getDefaultNamespace();
+    }
+
     public NamespacePropertiesWrapper(String subNamespace) {
         namespace = new Namespace(Namespace.getDefaultNamespace(), subNamespace);
     }
