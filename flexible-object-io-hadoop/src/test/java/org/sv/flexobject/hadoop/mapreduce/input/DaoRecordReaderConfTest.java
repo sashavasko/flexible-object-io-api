@@ -6,8 +6,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.sv.flexobject.hadoop.mapreduce.input.DaoRecordReaderConf;
 import org.sv.flexobject.hadoop.mapreduce.util.MRDao;
+import org.sv.flexobject.properties.Namespace;
 import org.sv.flexobject.schema.Schema;
 import org.sv.flexobject.schema.SchemaElement;
 import org.sv.flexobject.util.InstanceFactory;
@@ -17,7 +17,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertSame;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DaoRecordReaderConfTest {
@@ -37,10 +36,10 @@ public class DaoRecordReaderConfTest {
     public void listSettings() {
         DaoRecordReaderConf conf = new DaoRecordReaderConf();
         List<String> expectedSettings = Arrays.asList(
-                "org.sv.flexobject.record.reader.key.field.name",
-                "org.sv.flexobject.record.reader.value.field.name",
-                "org.sv.flexobject.record.reader.max.retries",
-                "org.sv.flexobject.record.reader.dao.class");
+                "sv.record.reader.key.field.name",
+                "sv.record.reader.value.field.name",
+                "sv.record.reader.max.retries",
+                "sv.record.reader.dao.class");
         List<String> actualSettings = new ArrayList<>();
 
         for (SchemaElement e : Schema.getRegisteredSchema(conf.getClass()).getFields()){
@@ -52,9 +51,9 @@ public class DaoRecordReaderConfTest {
 
     @Test
     public void customNamespace() {
-        DaoRecordReaderConf conf = new DaoRecordReaderConf("foo.bar");
+        DaoRecordReaderConf conf = new DaoRecordReaderConf(Namespace.forPath(".", "foo", "bar"));
 
-        assertEquals("foo.bar.record.reader", conf.getNamespace());
+        assertEquals("foo.bar.record.reader", conf.getNamespace().toString());
     }
 
     @Test
@@ -68,7 +67,7 @@ public class DaoRecordReaderConfTest {
     public void isDaoConfigured() {
         assertFalse(conf.isDaoConfigured());
 
-        rawConf.set("org.sv.flexobject.record.reader.dao.class", String.class.getName());
+        rawConf.set("sv.record.reader.dao.class", String.class.getName());
 
         conf.from(rawConf);
         assertTrue(conf.isDaoConfigured());
@@ -76,7 +75,7 @@ public class DaoRecordReaderConfTest {
 
     @Test
     public void createDao() throws InstantiationException, IllegalAccessException {
-        rawConf.set("org.sv.flexobject.record.reader.dao.class", String.class.getName());
+        rawConf.set("sv.record.reader.dao.class", String.class.getName());
         conf.from(rawConf);
         InstanceFactory.set(String.class, mockMRDao);
 

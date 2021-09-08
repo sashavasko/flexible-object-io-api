@@ -50,11 +50,11 @@ public class ParquetSchemaConfTest {
 
         conf.writeXml(System.out);
 
-        assertEquals(TestDataWithSubSchema.class.getName(), conf.get("org.sv.flexobject.parquet.input.schema.class"));
-        assertEquals(TestDataWithSubSchemaInCollection.class.getName(), conf.get("org.sv.flexobject.parquet.output.schema.class"));
-        assertNull(conf.get("org.sv.flexobject.parquet.input.schema.json"));
-        assertNull(conf.get("org.sv.flexobject.parquet.output.schema.json"));
-        assertEquals("{\"eq\":{\"binary\":\"text\",\"value\":\"foobar\"}}", conf.get("org.sv.flexobject.parquet.filter.predicate.json"));
+        assertEquals(TestDataWithSubSchema.class.getName(), conf.get("sv.parquet.input.schema.class"));
+        assertEquals(TestDataWithSubSchemaInCollection.class.getName(), conf.get("sv.parquet.output.schema.class"));
+        assertNull(conf.get("sv.parquet.input.schema.json"));
+        assertNull(conf.get("sv.parquet.output.schema.json"));
+        assertEquals("{\"eq\":{\"binary\":\"text\",\"value\":\"foobar\"}}", conf.get("sv.parquet.filter.predicate.json"));
 
         ParquetSchemaConf parquetConf2 = new ParquetSchemaConf().from(conf);
 
@@ -103,10 +103,10 @@ public class ParquetSchemaConfTest {
 
         conf.writeXml(System.out);
 
-        assertNull(conf.get("org.sv.flexobject.parquet.input.schema.class"));
-        assertNull(conf.get("org.sv.flexobject.parquet.output.schema.class"));
-        assertEquals(inputSchemaJson.toString(), conf.get("org.sv.flexobject.parquet.input.schema.json"));
-        assertEquals(outputSchemaJson.toString(), conf.get("org.sv.flexobject.parquet.output.schema.json"));
+        assertNull(conf.get("sv.parquet.input.schema.class"));
+        assertNull(conf.get("sv.parquet.output.schema.class"));
+        assertEquals(inputSchemaJson.toString(), conf.get("sv.parquet.input.schema.json"));
+        assertEquals(outputSchemaJson.toString(), conf.get("sv.parquet.output.schema.json"));
 
         ParquetSchemaConf parquetConf2 = new ParquetSchemaConf().from(conf);
 
@@ -146,10 +146,10 @@ public class ParquetSchemaConfTest {
 
         conf.writeXml(System.out);
 
-        assertEquals(TestDataWithSubSchema.class.getName(), conf.get("org.sv.flexobject.parquet.input.schema.class"));
-        assertEquals(TestDataWithSubSchemaInCollection.class.getName(), conf.get("org.sv.flexobject.parquet.output.schema.class"));
-        assertNull(conf.get("org.sv.flexobject.parquet.input.schema.json"));
-        assertNull(conf.get("org.sv.flexobject.parquet.output.schema.json"));
+        assertEquals(TestDataWithSubSchema.class.getName(), conf.get("sv.parquet.input.schema.class"));
+        assertEquals(TestDataWithSubSchemaInCollection.class.getName(), conf.get("sv.parquet.output.schema.class"));
+        assertNull(conf.get("sv.parquet.input.schema.json"));
+        assertNull(conf.get("sv.parquet.output.schema.json"));
 
         assertEquals("foobar", conf.get("dont.touch.that"));
     }

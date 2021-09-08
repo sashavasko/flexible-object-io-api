@@ -57,7 +57,7 @@ public class MongoSourceBuilderTest {
 
         doReturn(rawConf).when(context).getConfiguration();
         doReturn(result).when(mongoBuilder).build();
-        doReturn(mongoBuilder).when(conf).getSourceBuilder();
+        doReturn(mongoBuilder).when(conf).getMongoBuilder();
     }
 
     @After

@@ -18,6 +18,7 @@ import org.sv.flexobject.hadoop.mapreduce.output.parquet.JsonParquetOutputFormat
 import org.sv.flexobject.hadoop.mapreduce.output.parquet.StreamableParquetOutputFormat;
 import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
 import org.sv.flexobject.json.MapperFactory;
+import org.sv.flexobject.properties.Namespace;
 
 import java.io.IOException;
 import java.util.List;
@@ -40,8 +41,8 @@ public final class ParquetSchemaConf extends HadoopPropertiesWrapper<ParquetSche
         return this;
     }
 
-    public ParquetSchemaConf(String namespace) {
-        super(namespace);
+    public ParquetSchemaConf(Namespace namespace) {
+        super(namespace, SUBNAMESPACE);
     }
 
     public MessageType getInputSchema(){

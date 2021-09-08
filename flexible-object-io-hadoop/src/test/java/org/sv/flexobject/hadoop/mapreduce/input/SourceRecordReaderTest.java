@@ -57,7 +57,7 @@ public class SourceRecordReaderTest {
         doReturn(mockSource).when(mockSourceBuilder).build(mockSplit, mockContext);
 
         InstanceFactory.set(String.class, mockSourceBuilder);
-        rawConf.set("org.sv.flexobject.input.source.builder.class", String.class.getName());
+        rawConf.set("sv.input.source.builder.class", String.class.getName());
 
         reader = Mockito.mock(SourceRecordReader.class, Mockito.CALLS_REAL_METHODS);
     }

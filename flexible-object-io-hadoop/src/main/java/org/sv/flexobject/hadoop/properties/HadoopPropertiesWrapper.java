@@ -14,10 +14,19 @@ import org.sv.flexobject.properties.NamespacePropertiesWrapper;
 import org.sv.flexobject.properties.PropertiesWrapper;
 import org.sv.flexobject.schema.annotations.NonStreamableField;
 
-public abstract class HadoopPropertiesWrapper<T extends HadoopPropertiesWrapper> extends NamespacePropertiesWrapper<T> implements Configurable {
+public class HadoopPropertiesWrapper<T extends HadoopPropertiesWrapper> extends NamespacePropertiesWrapper<T> implements Configurable {
 
     @NonStreamableField
     private Configuration configuration;
+
+    public HadoopPropertiesWrapper() {
+        super();
+    }
+
+    @Override
+    public T setDefaults() {
+        return (T) this;
+    }
 
     public HadoopPropertiesWrapper(String subNamespace) {
         super(subNamespace);

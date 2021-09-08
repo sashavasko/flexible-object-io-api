@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sv.flexobject.hadoop.mapreduce.input.key.KeyRecordReader;
 import org.sv.flexobject.hadoop.mapreduce.input.key.ModSplitter;
+import org.sv.flexobject.properties.Namespace;
 import org.sv.flexobject.util.InstanceFactory;
 
 import static org.junit.Assert.assertEquals;
@@ -41,9 +42,9 @@ public class InputConfTest {
 
     @Test
     public void constructor() {
-        conf = new InputConf("foo.bar");
+        conf = new InputConf(Namespace.forPath(".", "foo", "bar"));
 
-        assertEquals("foo.bar.input", conf.getNamespace());
+        assertEquals("foo.bar.input", conf.getNamespace().toString());
     }
 
     @Test
@@ -53,14 +54,14 @@ public class InputConfTest {
 
     @Test
     public void getSubNamespace() {
-        assertEquals("input", new InputConf<>().getSubNamespace());
+        assertEquals("sv.input", new InputConf<>().getNamespace().getNamespace());
     }
 
     @Test
     public void getSplitterClass() {
         assertSame(ModSplitter.class, conf.getSplitterClass());
 
-        rawConf.set("org.sv.flexobject.input.splitter.class", String.class.getName());
+        rawConf.set("sv.input.splitter.class", String.class.getName());
         conf.from(rawConf);
         assertSame(String.class, conf.getSplitterClass());
     }
@@ -71,7 +72,7 @@ public class InputConfTest {
         assertSame(mockSplitter, conf.getSplitter());
 
         InstanceFactory.set(String.class, mockSplitter);
-        rawConf.set("org.sv.flexobject.input.splitter.class", String.class.getName());
+        rawConf.set("sv.input.splitter.class", String.class.getName());
         conf.from(rawConf);
         assertSame(mockSplitter, conf.getSplitter());
     }
@@ -80,7 +81,7 @@ public class InputConfTest {
     public void getReaderClass() {
         assertSame(KeyRecordReader.LongText.class, conf.getReaderClass());
 
-        rawConf.set("org.sv.flexobject.input.reader.class", String.class.getName());
+        rawConf.set("sv.input.reader.class", String.class.getName());
         conf.from(rawConf);
         assertSame(String.class, conf.getReaderClass());
     }
@@ -91,7 +92,7 @@ public class InputConfTest {
         assertSame(mockReader, conf.getReader());
 
         InstanceFactory.set(String.class, mockReader);
-        rawConf.set("org.sv.flexobject.input.reader.class", String.class.getName());
+        rawConf.set("sv.input.reader.class", String.class.getName());
         conf.from(rawConf);
         assertSame(mockReader, conf.getReader());
     }
@@ -104,7 +105,7 @@ public class InputConfTest {
         }catch (IllegalArgumentException e){
             assertEquals("Missing Source Builder class", e.getMessage());
         }
-        rawConf.set("org.sv.flexobject.input.source.builder.class", String.class.getName());
+        rawConf.set("sv.input.source.builder.class", String.class.getName());
         InstanceFactory.set(String.class, mockBuilder);
         conf.from(rawConf);
 

@@ -1,6 +1,7 @@
 package org.sv.flexobject.hadoop.mapreduce.input.key;
 
 import org.junit.Test;
+import org.sv.flexobject.properties.Namespace;
 import org.sv.flexobject.schema.Schema;
 import org.sv.flexobject.schema.SchemaElement;
 
@@ -17,9 +18,9 @@ public class KeyInputConfTest {
     public void listSettings() {
         KeyInputConf conf = new KeyInputConf();
         List<String> expectedSettings = Arrays.asList(
-                "org.sv.flexobject.input.key.splitter.class",
-                "org.sv.flexobject.input.key.reader.class",
-                "org.sv.flexobject.input.key.source.builder.class");
+                "sv.input.key.splitter.class",
+                "sv.input.key.reader.class",
+                "sv.input.key.source.builder.class");
         List<String> actualSettings = new ArrayList<>();
 
         for (SchemaElement e : Schema.getRegisteredSchema(conf.getClass()).getFields()){
@@ -41,8 +42,8 @@ public class KeyInputConfTest {
 
     @Test
     public void customNameSpace() {
-        KeyInputConf conf = new KeyInputConf("foobar");
+        KeyInputConf conf = new KeyInputConf(new Namespace("foobar", "."));
 
-        assertEquals("foobar.input.key", conf.getNamespace());
+        assertEquals("foobar.key", conf.getNamespace().toString());
     }
 }

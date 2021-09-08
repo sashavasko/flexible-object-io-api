@@ -66,7 +66,6 @@ public class KeyRecordReaderTest {
 
     SQLException sqlException;
 
-    @Mock
     DaoRecordReaderConf conf;
 
     KeyRecordReader reader;
@@ -74,6 +73,7 @@ public class KeyRecordReaderTest {
     @Before
     public void setUp() throws Exception {
         reader = Mockito.mock(KeyRecordReader.class, Mockito.CALLS_REAL_METHODS);
+        conf = new DaoRecordReaderConf();
         doReturn(dao).when(reader).getDao();
         doReturn(split).when(reader).getSplit();
         doReturn(conf).when(reader).getConf();
@@ -106,7 +106,7 @@ public class KeyRecordReaderTest {
             throw new RuntimeException("Should re-throw IOException");
         }catch (IOException actualException) {
             assertSame(ioException, actualException);
-            verify(conf).addDiagnostics("Failed to query DAO by the key");
+            assertEquals("io is bad", actualException.getMessage());
         }
     }
 
@@ -114,15 +114,13 @@ public class KeyRecordReaderTest {
     public void createAdapterWithNonIOException() throws Exception {
         doReturn(key).when(split).getKey();
         doThrow(sqlException).when(dao).start(key);
-        doReturn("foobar").when(conf).addDiagnostics("Failed to query DAO by the key");
 
         try {
             reader.createAdapter(split, context);
             throw new RuntimeException("Should wrap exception into IOException");
         }catch (IOException actualException) {
             assertSame(sqlException, actualException.getCause());
-            assertEquals("foobar", actualException.getMessage());
-            verify(conf).addDiagnostics("Failed to query DAO by the key");
+            assertEquals("Failed to query DAO by the key in Configuration org.sv.flexobject.hadoop.mapreduce.input.DaoRecordReaderConf{{\"keyFieldName\":\"CURRENT_KEY\",\"valueFieldName\":\"CURRENT_VALUE\",\"maxRetries\":3}}", actualException.getMessage());
         }
     }
 

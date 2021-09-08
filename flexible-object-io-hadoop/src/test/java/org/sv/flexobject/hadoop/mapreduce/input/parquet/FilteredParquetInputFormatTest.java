@@ -1,28 +1,32 @@
 package org.sv.flexobject.hadoop.mapreduce.input.parquet;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.parquet.filter2.predicate.FilterPredicate;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.sv.flexobject.hadoop.streaming.parquet.ParquetFilterParser;
+import org.sv.flexobject.hadoop.streaming.parquet.ParquetSchema;
 import org.sv.flexobject.hadoop.streaming.parquet.ParquetSchemaConf;
+import org.sv.flexobject.json.MapperFactory;
+import org.sv.flexobject.properties.Namespace;
+import org.sv.flexobject.testdata.TestDataWithSubSchema;
 import org.sv.flexobject.util.InstanceFactory;
 
 import static org.apache.parquet.filter2.predicate.FilterApi.eq;
 import static org.apache.parquet.filter2.predicate.FilterApi.intColumn;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FilteredParquetInputFormatTest {
 
-    @Mock
     ParquetSchemaConf parquetConf;
-    @Mock
+
     Configuration rawConf;
 
     FilterPredicate predicate = eq(intColumn("columnName"), 1);
@@ -31,6 +35,9 @@ public class FilteredParquetInputFormatTest {
 
     @Before
     public void setUp() throws Exception {
+        parquetConf = new ParquetSchemaConf(new Namespace("test", "."));
+        rawConf = new Configuration(false);
+
         InstanceFactory.set(ParquetSchemaConf.class, parquetConf);
 
         format = Mockito.mock(FilteredParquetInputFormat.class, Mockito.CALLS_REAL_METHODS);
@@ -43,24 +50,24 @@ public class FilteredParquetInputFormatTest {
     }
 
     @Test
-    public void createRecordReader() {
-
+    public void createRecordReader() throws JsonProcessingException {
+        rawConf.set("test.parquet.input.schema.class", TestDataWithSubSchema.class.getName());
+        String predicateJson = "{'eq':{'string':'foo','value':'bar'}}".replace("'", "\"");
+        rawConf.set("test.parquet.filter.predicate.json", predicateJson);
         format.checkConfiguredFilter(rawConf);
 
-        verify(parquetConf).from(rawConf);
-        verify(parquetConf).hasFilterPredicate();
+        assertEquals(ParquetSchema.forClass(TestDataWithSubSchema.class), parquetConf.getInputSchema());
+        assertTrue(parquetConf.hasFilterPredicate());
+        assertEquals(ParquetFilterParser.json2FilterPredicate(MapperFactory.getObjectReader().readTree(predicateJson)), parquetConf.getFilterPredicate());
     }
 
     @Test
     public void createRecordReaderWithFilter() {
-        doReturn(predicate).when(parquetConf).getFilterPredicate();
-        doReturn(true).when(parquetConf).hasFilterPredicate();
+        String predicateJson = "{'eq':{'int':'columnName','value':1}}".replace("'", "\"");
+        rawConf.set("test.parquet.filter.predicate.json", predicateJson);
 
         format.checkConfiguredFilter(rawConf);
 
-        verify(parquetConf).from(rawConf);
-        verify(parquetConf).hasFilterPredicate();
-
-        verify(rawConf).set("parquet.private.read.filter.predicate.human.readable", predicate.toString());
+        assertEquals(predicate.toString(), rawConf.get("parquet.private.read.filter.predicate.human.readable"));
     }
 }

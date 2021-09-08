@@ -11,6 +11,7 @@ import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.mongo.connection.MongoConnection;
 import org.sv.flexobject.mongo.streaming.MongoBuilder;
 import org.sv.flexobject.mongo.streaming.MongoDocumentSource;
+import org.sv.flexobject.properties.Namespace;
 import org.sv.flexobject.testdata.MapWithTypedKey;
 import org.sv.flexobject.testdata.TestDataWithSubSchema;
 import org.sv.flexobject.util.InstanceFactory;
@@ -30,7 +31,7 @@ public class MongoInputConfTest {
     MongoConnection mockConnection;
 
     @Mock
-    MongoBuilder mockSourceBuilder;
+    MongoBuilder mongoBuilder;
 
     MongoInputConf conf;
     Configuration rawConf;
@@ -39,7 +40,7 @@ public class MongoInputConfTest {
     public void setUp() throws Exception {
         InstanceFactory.set(MongoConnection.Builder.class, mockBuilder);
         rawConf = new Configuration(false);
-        conf = new MongoInputConf("test");
+        conf = new MongoInputConf(Namespace.forPath(".", "test","input"));
     }
 
     @After
@@ -53,16 +54,16 @@ public class MongoInputConfTest {
 
         assertEquals(100000, conf.getEstimateSizeLimit());
         assertEquals(1000, conf.getEstimateTimeLimitMicros());
-        assertTrue(conf.getSourceBuilder() instanceof MongoDocumentSource.Builder);
+        assertTrue(conf.getMongoBuilder() instanceof MongoDocumentSource.Builder);
     }
 
     @Test
     public void namespace() {
-        assertEquals("input.mongo", conf.getSubNamespace());
+        assertEquals("test.input.mongo", conf.getNamespace().toString());
 
-        conf = new MongoInputConf("foo.bar");
+        conf = new MongoInputConf(Namespace.forPath(".", "foo", "bar"));
 
-        assertEquals("foo.bar.input.mongo", conf.getNamespace());
+        assertEquals("foo.bar.mongo", conf.getNamespace().toString());
     }
 
     @Test
@@ -135,25 +136,25 @@ public class MongoInputConfTest {
 
     @Test
     public void getSourceMongoBuilder() {
-        rawConf.set("test.input.mongo.source.builder.class", String.class.getName());
+        rawConf.set("test.input.mongo.builder.class", String.class.getName());
         rawConf.set("test.input.mongo.connection.name", "mongodb");
         rawConf.set("test.input.mongo.collection.name", "mycollection");
         rawConf.set("test.input.mongo.db.name", "mydb");
         rawConf.setClass("test.input.mongo.schema", MapWithTypedKey.class, StreamableWithSchema.class);
         conf.from(rawConf);
 
-        InstanceFactory.set(String.class, mockSourceBuilder);
+        InstanceFactory.set(String.class, mongoBuilder);
 
-        doReturn(mockSourceBuilder).when(mockSourceBuilder).connection(anyString());
-        doReturn(mockSourceBuilder).when(mockSourceBuilder).db(anyString());
-        doReturn(mockSourceBuilder).when(mockSourceBuilder).collection(anyString());
+        doReturn(mongoBuilder).when(mongoBuilder).connection(anyString());
+        doReturn(mongoBuilder).when(mongoBuilder).db(anyString());
+        doReturn(mongoBuilder).when(mongoBuilder).collection(anyString());
 
-        MongoBuilder actualBuilder = conf.getSourceBuilder();
+        MongoBuilder actualBuilder = conf.getMongoBuilder();
 
-        assertEquals(mockSourceBuilder, actualBuilder);
-        verify(mockSourceBuilder).connection("mongodb");
-        verify(mockSourceBuilder).db("mydb");
-        verify(mockSourceBuilder).collection("mycollection");
-        verify(mockSourceBuilder).schema(MapWithTypedKey.class);
+        assertEquals(mongoBuilder, actualBuilder);
+        verify(mongoBuilder).connection("mongodb");
+        verify(mongoBuilder).db("mydb");
+        verify(mongoBuilder).collection("mycollection");
+        verify(mongoBuilder).schema(MapWithTypedKey.class);
     }
 }

@@ -19,10 +19,10 @@ public class HadoopTaskConfTest {
     public void listSettings() {
         HadoopTaskConf conf = new HadoopTaskConf();
         List<String> expectedSettings = Arrays.asList(
-                "org.sv.flexobject.hadoop.db.environment",
-                "org.sv.flexobject.hadoop.deployment.level",
-                "org.sv.flexobject.hadoop.connection.manager.providers",
-                "org.sv.flexobject.hadoop.connection.manager.environment");
+                "sv.hadoop.db.environment",
+                "sv.hadoop.deployment.level",
+                "sv.hadoop.connection.manager.providers",
+                "sv.hadoop.connection.manager.environment");
         List<String> actualSettings = new ArrayList<>();
 
         for (SchemaElement e : Schema.getRegisteredSchema(conf.getClass()).getFields()){
@@ -35,7 +35,7 @@ public class HadoopTaskConfTest {
     @Test
     public void providerClasses() {
         Configuration configuration = new Configuration(false);
-        configuration.set("org.sv.flexobject.hadoop.connection.manager.providers", HadoopSecretProvider.class.getName() + "," + HadoopPropertiesProvider.class.getName());
+        configuration.set("sv.hadoop.connection.manager.providers", HadoopSecretProvider.class.getName() + "," + HadoopPropertiesProvider.class.getName());
         HadoopTaskConf conf = new HadoopTaskConf();
 
         conf.from(configuration);

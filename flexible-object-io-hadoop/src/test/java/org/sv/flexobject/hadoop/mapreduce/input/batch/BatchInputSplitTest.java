@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.sv.flexobject.properties.Namespace;
 import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.*;
@@ -19,17 +20,15 @@ import static org.mockito.Mockito.verify;
 @RunWith(MockitoJUnitRunner.class)
 public class BatchInputSplitTest {
 
-    @Mock
     Configuration rawConf;
-
-    @Mock
     BatchInputConf conf;
-
 
     BatchInputSplit split;
 
     @Before
     public void setUp() throws Exception {
+        rawConf = new Configuration(false);
+        conf = new BatchInputConf(Namespace.forPath(".", "test"));
         split = new BatchInputSplit();
         InstanceFactory.set(BatchInputConf.class, conf);
     }
@@ -41,12 +40,10 @@ public class BatchInputSplitTest {
 
     @Test
     public void reconfigure() {
-        doReturn(12345).when(conf).getSize();
-        doReturn(789).when(conf).getBatchesPerSplit();
+        rawConf.setInt("test.batch.size", 12345);
+        rawConf.setInt("test.batch.batches.per.split", 789);
 
         split.setConf(rawConf);
-
-        verify(conf).from(rawConf);
 
         assertEquals(12345, split.getBatchSize());
         assertEquals(789, split.getBatchPerSplit());
@@ -67,8 +64,8 @@ public class BatchInputSplitTest {
 
     @Test
     public void writeRead() throws IOException {
-        doReturn(345).when(conf).getSize();
-        doReturn(89).when(conf).getBatchesPerSplit();
+        rawConf.setInt("test.batch.size", 345);
+        rawConf.setInt("test.batch.batches.per.split", 89);
 
         split.setConf(rawConf);
         split.setStartKey(676767l);
@@ -84,5 +81,4 @@ public class BatchInputSplitTest {
 
         assertEquals(split, converted);
     }
-
 }

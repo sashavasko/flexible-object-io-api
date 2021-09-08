@@ -14,6 +14,7 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sv.flexobject.InAdapter;
 import org.sv.flexobject.hadoop.mapreduce.util.MRDao;
+import org.sv.flexobject.properties.Namespace;
 import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.IOException;
@@ -49,7 +50,7 @@ public class DaoRecordReaderTest {
 
     @Before
     public void setUp() throws Exception {
-        conf = new DaoRecordReaderConf("test");
+        conf = new DaoRecordReaderConf(Namespace.forPath(".", "test"));
         rawConf = new Configuration(false);
         rawConf.set("test.record.reader.key.field.name", "keyField");
         rawConf.set("test.record.reader.value.field.name", "valueField");

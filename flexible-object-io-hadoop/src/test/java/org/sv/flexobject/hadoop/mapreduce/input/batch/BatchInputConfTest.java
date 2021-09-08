@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.sv.flexobject.properties.Namespace;
 import org.sv.flexobject.schema.Schema;
 import org.sv.flexobject.schema.SchemaElement;
 import org.sv.flexobject.util.InstanceFactory;
@@ -46,20 +47,20 @@ public class BatchInputConfTest {
     @Test
     public void listSettings() {
         List<String> expectedSettings = Arrays.asList(
-                "org.sv.flexobject.input.batch.splitter.class",
-                "org.sv.flexobject.input.batch.reader.class",
-                "org.sv.flexobject.input.batch.source.builder.class",
-                "org.sv.flexobject.input.batch.key.start",
-                "org.sv.flexobject.input.batch.size",
-                "org.sv.flexobject.input.batch.batches.per.split",
-                "org.sv.flexobject.input.batch.batches.num",
-                "org.sv.flexobject.input.batch.split.class",
-                "org.sv.flexobject.input.batch.key.max.dataset.path",
-                "org.sv.flexobject.input.batch.key.max.dataset.column.name",
-                "org.sv.flexobject.input.batch.key.max.calculator",
-                "org.sv.flexobject.input.batch.key.manager",
-                "org.sv.flexobject.input.batch.key.column.name",
-                "org.sv.flexobject.input.batch.reduce.max.keys");
+                "sv.input.batch.splitter.class",
+                "sv.input.batch.reader.class",
+                "sv.input.batch.source.builder.class",
+                "sv.input.batch.key.start",
+                "sv.input.batch.size",
+                "sv.input.batch.batches.per.split",
+                "sv.input.batch.batches.num",
+                "sv.input.batch.split.class",
+                "sv.input.batch.key.max.dataset.path",
+                "sv.input.batch.key.max.dataset.column.name",
+                "sv.input.batch.key.max.calculator",
+                "sv.input.batch.key.manager",
+                "sv.input.batch.key.column.name",
+                "sv.input.batch.reduce.max.keys");
         List<String> actualSettings = new ArrayList<>();
 
         for (SchemaElement e : Schema.getRegisteredSchema(conf.getClass()).getFields()){
@@ -86,7 +87,7 @@ public class BatchInputConfTest {
 
     @Test
     public void namespace() {
-        conf = new BatchInputConf("test");
+        conf = new BatchInputConf(Namespace.forPath(".", "test", "input"));
         Configuration rawConf = new Configuration(false);
         rawConf.setInt("test.input.batch.size", 12345);
 
@@ -97,7 +98,7 @@ public class BatchInputConfTest {
 
     @Test
     public void subnamespace() {
-        assertEquals("input.batch", conf.getSubNamespace());
+        assertEquals("sv.input.batch", conf.getNamespace().toString());
     }
 
     @Test
@@ -156,23 +157,26 @@ public class BatchInputConfTest {
 
     @Test
     public void getSplitsCount() {
-        conf =  Mockito.mock(BatchInputConf.class, Mockito.CALLS_REAL_METHODS);
+        conf = new BatchInputConf(Namespace.forPath(".", "test"));
+        Configuration rawConf = new Configuration(false);
+        rawConf.setInt("test.batch.batches.num", 60);
+        rawConf.setInt("test.batch.batches.per.split", 11);
 
-        doReturn(60).when(conf).getBatchesNum();
-        doReturn(11).when(conf).getBatchesPerSplit();
+        conf.from(rawConf);
 
         assertEquals(70/11, conf.getSplitsCount());
     }
 
     @Test
     public void getMaxKey() {
-        conf =  Mockito.mock(BatchInputConf.class, Mockito.CALLS_REAL_METHODS);
+        conf = new BatchInputConf(Namespace.forPath(".", "test"));
+        Configuration rawConf = new Configuration(false);
+        rawConf.setLong("test.batch.key.start", 17l);
+        rawConf.setInt("test.batch.batches.num", 60);
+        rawConf.setInt("test.batch.size", 11);
 
-        doReturn(17l).when(conf).getKeyStart();
-        doReturn(60).when(conf).getBatchesNum();
-        doReturn(11).when(conf).getSize();
+        conf.from(rawConf);
 
         assertEquals(17l + 660l, conf.getMaxKey());
     }
-
 }

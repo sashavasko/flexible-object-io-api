@@ -5,6 +5,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.parquet.schema.MessageType;
 import org.joda.time.DateTime;
 import org.joda.time.MutableDateTime;
+import org.junit.After;
 import org.junit.Test;
 import org.sv.flexobject.hadoop.streaming.parquet.json.ParquetJsonSink;
 import org.sv.flexobject.json.MapperFactory;
@@ -13,6 +14,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 public class ParquetUtilsTest {
+
+    Path testFilepath = new Path("test.parquet");
+    Path testDataPath = new Path("testData/");;
+
+
+    @After
+    public void tearDown() throws Exception {
+        Configuration conf = new Configuration();
+        testDataPath.getFileSystem(conf).delete(testDataPath, true);
+        testFilepath.getFileSystem(conf).delete(testFilepath, false);
+    }
 
     @Test
     public void testTranDateAsNumberOfDaysSinceEpoch() throws Exception {
@@ -37,7 +49,6 @@ public class ParquetUtilsTest {
     @Test
     public void getMaxLongValueInFile() throws Exception {
         Configuration conf = new Configuration();
-        Path testFilepath = new Path("test.parquet");
         writeTestFile(conf, testFilepath, 1234567890l, 98765432);
 
         assertEquals(98765432, ParquetUtils.getMaxValueInFile(conf, testFilepath, "int32Field"));
@@ -49,7 +60,6 @@ public class ParquetUtilsTest {
     @Test
     public void getMaxLongValueInEmptyFile() throws Exception {
         Configuration conf = new Configuration();
-        Path testFilepath = new Path("test.parquet");
         writeEmptyFile(conf, testFilepath);
 
         assertNull(ParquetUtils.getMaxValueInFile(conf, testFilepath, "int64Field"));
@@ -84,9 +94,9 @@ public class ParquetUtilsTest {
     @Test
     public void getMaxLongValueInFiles() throws Exception {
         Configuration conf = new Configuration();
-        Path testFilepath = new Path("test1.parquet");
-        Path test2Filepath = new Path("test2.parquet");
-        Path wildcardPath = new Path("./");
+        Path testFilepath = new Path(testDataPath, "test1.parquet");
+        Path test2Filepath = new Path(testDataPath, "test2.parquet");
+        Path wildcardPath = testDataPath;
         writeTestFile(conf, testFilepath, 111l, 1111);
         writeTestFile(conf, test2Filepath, 222l, 2222);
 

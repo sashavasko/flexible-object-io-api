@@ -6,24 +6,20 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.sv.flexobject.properties.Namespace;
 import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.IOException;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BatchSplitterTest {
 
-    @Spy
     BatchInputConf conf;
 
-    @Mock
     Configuration rawConf;
 
     BatchSplitter splitter;
@@ -31,6 +27,8 @@ public class BatchSplitterTest {
     @Before
     public void setUp() throws Exception {
         splitter = new BatchSplitter();
+        conf = new BatchInputConf(new Namespace("test", "."));
+        rawConf = new Configuration(false);
         InstanceFactory.set(BatchInputConf.class, conf);
     }
 
@@ -41,37 +39,34 @@ public class BatchSplitterTest {
 
     @Test
     public void splitUsesConf() throws IOException {
-        doReturn(1l).when(conf).getSplitsCount();
+        rawConf.setLong("test.batch.batches.num", 5l);
+        rawConf.setInt("test.batch.batches.per.split", 5);
+
         splitter.split(rawConf);
 
-        verify(conf, times(2)).from(rawConf);
+        assertEquals(1l, conf.getSplitsCount());
     }
 
     @Test
     public void split() throws IOException {
-        doReturn(1000l).when(conf).getMaxKey();
-        doReturn(5l).when(conf).getKeyStart();
-        doReturn(10).when(conf).getSize();
-        doReturn(15).when(conf).getBatchesPerSplit();
-        doReturn(7l).when(conf).getSplitsCount();
-
+        rawConf.setLong("test.batch.key.start", 100l);
+        rawConf.setInt("test.batch.batches.num", 9);
+        rawConf.setInt("test.batch.size", 100);
+        rawConf.setInt("test.batch.batches.per.split", 4);
 
         List<InputSplit> splits = splitter.split(rawConf);
 
-        assertEquals(7, splits.size());
-        assertEquals(10, ((BatchInputSplit)splits.get(6)).getBatchPerSplit());
-        for (int i = 0 ; i < 6 ; ++i )
-            assertEquals(15, ((BatchInputSplit)splits.get(i)).getBatchPerSplit());
-        for (int i = 0 ; i < 7 ; ++i )
-            assertEquals(10, ((BatchInputSplit)splits.get(i)).getBatchSize());
+        assertEquals(3, splits.size());
+        assertEquals(4, ((BatchInputSplit)splits.get(0)).getBatchPerSplit());
+        assertEquals(4, ((BatchInputSplit)splits.get(1)).getBatchPerSplit());
+        assertEquals(1, ((BatchInputSplit)splits.get(2)).getBatchPerSplit());
 
-        assertEquals(5l, ((BatchInputSplit)splits.get(0)).getStartKey());
-        assertEquals(155l, ((BatchInputSplit)splits.get(1)).getStartKey());
-        assertEquals(305l, ((BatchInputSplit)splits.get(2)).getStartKey());
-        assertEquals(455l, ((BatchInputSplit)splits.get(3)).getStartKey());
-        assertEquals(605l, ((BatchInputSplit)splits.get(4)).getStartKey());
-        assertEquals(755l, ((BatchInputSplit)splits.get(5)).getStartKey());
-        assertEquals(905l, ((BatchInputSplit)splits.get(6)).getStartKey());
+        assertEquals(100, ((BatchInputSplit)splits.get(0)).getBatchSize());
+        assertEquals(100, ((BatchInputSplit)splits.get(1)).getBatchSize());
+        assertEquals(100, ((BatchInputSplit)splits.get(2)).getBatchSize());
+
+        assertEquals(100l, ((BatchInputSplit)splits.get(0)).getStartKey());
+        assertEquals(500l, ((BatchInputSplit)splits.get(1)).getStartKey());
+        assertEquals(900l, ((BatchInputSplit)splits.get(2)).getStartKey());
     }
-
 }

@@ -14,8 +14,7 @@ import static org.junit.Assert.*;
 @RunWith(MockitoJUnitRunner.class)
 public class BatchInputFormatTest {
 
-    @Mock
-    BatchInputConf mockConf;
+    BatchInputConf mockConf = new BatchInputConf();
 
     BatchInputFormat format;
     @Before
