@@ -9,9 +9,15 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.MRJobConfig;
 import org.apache.log4j.Logger;
 import org.sv.flexobject.connections.ConnectionManager;
+import org.sv.flexobject.connections.ConnectionProvider;
 import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 public class HadoopTask extends Configured {
     static Logger logger = Logger.getLogger(HadoopTask.class);
@@ -103,5 +109,104 @@ public class HadoopTask extends Configured {
 
         ConnectionManager.getInstance().setDeploymentLevel(getTaskConf().getDeploymentLevel());
         ConnectionManager.getInstance().setEnvironment(getTaskConf().getConnectionManagerEnvironment());
+    }
+
+    public static class Builder{
+        private ConnectionManager.DeploymentLevel deploymentLevel;
+        private String connectionManagerEnvironment;
+        private List<Class> connectionManagerProviders = new ArrayList<>();
+        private List<ConnectionProvider> connectionProviders = new ArrayList<>();
+        private List<URL> configurationResources = new ArrayList<>();
+
+        protected Builder(){}
+
+        public Builder deploymentLevel(ConnectionManager.DeploymentLevel deploymentLevel){
+            this.deploymentLevel = deploymentLevel;
+            return this;
+        }
+
+        public Builder environment(String connectionManagerEnvironment){
+            this.connectionManagerEnvironment = connectionManagerEnvironment;
+            return this;
+        }
+
+        public Builder addProvider(Class providerClass){
+            this.connectionManagerProviders.add(providerClass);
+            return this;
+        }
+
+        public Builder addProviders(Class ... providerClasses){
+            this.connectionManagerProviders.addAll(Arrays.asList(providerClasses));
+            return this;
+        }
+
+        public Builder addProviders(Collection<Class> providerClasses){
+            this.connectionManagerProviders.addAll(providerClasses);
+            return this;
+        }
+
+        public Builder addProvider(ConnectionProvider connectionProvider){
+            this.connectionProviders.add(connectionProvider);
+            return this;
+        }
+
+        public Builder addProviders(ConnectionProvider ... connectionProviders){
+            this.connectionProviders.addAll(Arrays.asList(connectionProviders));
+            return this;
+        }
+
+        public Builder addResource(URL resource){
+            this.configurationResources.add(resource);
+            return this;
+        }
+
+        public Builder addResources(URL ... resources){
+            this.configurationResources.addAll(Arrays.asList(resources));
+            return this;
+        }
+
+        public Builder addResource(String resource){
+            addResource(getClass().getClassLoader().getResource(resource));
+            return this;
+        }
+
+        public Builder addResources(String ... resources){
+            ClassLoader classLoader = getClass().getClassLoader();
+            for (String resource : resources)
+                addResource(classLoader.getResource(resource));
+            return this;
+        }
+
+        public Configuration buildConfiguration() throws Exception {
+            HadoopTaskConf conf = InstanceFactory.get(HadoopTaskConf.class);
+            if(deploymentLevel != null)
+                conf.setDeploymentLevel(deploymentLevel);
+            if(connectionManagerEnvironment != null)
+                conf.setConnectionManagerEnvironment(connectionManagerEnvironment);
+            if (!connectionManagerProviders.isEmpty())
+                conf.setConnectionManagerProviders(connectionManagerProviders);
+
+            Configuration rawConf = InstanceFactory.get(Configuration.class);
+            for (URL resource: configurationResources)
+                rawConf.addResource(resource);
+            conf.update(rawConf);
+
+            return rawConf;
+        }
+
+        public void build() throws Exception {
+            Configuration rawConf = buildConfiguration();
+            HadoopTask.configure(rawConf);
+
+            for (ConnectionProvider provider : connectionProviders){
+                if (provider instanceof Configurable)
+                    ((Configurable) provider).setConf(rawConf);
+                ConnectionManager.getInstance().registerProvider(provider);
+            }
+        }
+    }
+
+    public static Builder builder(){
+        return InstanceFactory.get(Builder.class);
     }
 }

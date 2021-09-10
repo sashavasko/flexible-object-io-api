@@ -61,4 +61,16 @@ public class HadoopTaskConf extends HadoopPropertiesWrapper<HadoopTaskConf> {
         return StringUtils.isNotBlank(connectionManagerEnvironment) ? connectionManagerEnvironment
                 : DEFAULT_ENVIRONMENT;
     }
+
+    public void setDeploymentLevel(ConnectionManager.DeploymentLevel deploymentLevel) {
+        this.deploymentLevel = deploymentLevel.name();
+    }
+
+    public void setConnectionManagerEnvironment(String connectionManagerEnvironment) {
+        this.connectionManagerEnvironment = connectionManagerEnvironment;
+    }
+
+    public void setConnectionManagerProviders(List<Class> connectionManagerProviders) {
+        this.connectionManagerProviders = connectionManagerProviders;
+    }
 }
