@@ -207,6 +207,6 @@ public class HadoopTask extends Configured {
     }
 
     public static Builder builder(){
-        return InstanceFactory.get(Builder.class);
+        return new Builder();
     }
 }
