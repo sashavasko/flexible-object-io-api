@@ -109,6 +109,8 @@ public class HadoopTask extends Configured {
 
         ConnectionManager.getInstance().setDeploymentLevel(getTaskConf().getDeploymentLevel());
         ConnectionManager.getInstance().setEnvironment(getTaskConf().getConnectionManagerEnvironment());
+
+        logger.info("Hadoop Task is configured with " + getTaskConf().toString());
     }
 
     public static class Builder{

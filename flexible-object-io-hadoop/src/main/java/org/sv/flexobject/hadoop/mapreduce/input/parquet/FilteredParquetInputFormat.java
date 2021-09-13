@@ -27,7 +27,7 @@ public class FilteredParquetInputFormat<T> extends ParquetInputFormat<T> {
         return readSupportClass;
     }
 
-    protected void checkConfiguredFilter(Configuration configuration){
+    protected ParquetSchemaConf checkConfiguredFilter(Configuration configuration){
         ParquetSchemaConf parquetConf = InstanceFactory.get(ParquetSchemaConf.class);
         parquetConf.from(configuration);
         if (parquetConf.hasFilterPredicate()) {
@@ -35,11 +35,13 @@ public class FilteredParquetInputFormat<T> extends ParquetInputFormat<T> {
             logger.info("Using Parquet predicate filter:" + predicate.toString());
             ParquetInputFormat.setFilterPredicate(configuration, predicate);
         }
+        return parquetConf;
     }
 
     @Override
     public RecordReader<Void, T> createRecordReader(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException, InterruptedException {
-        checkConfiguredFilter(taskAttemptContext.getConfiguration());
+        ParquetSchemaConf conf = checkConfiguredFilter(taskAttemptContext.getConfiguration());
+        logger.info("Reading Parquet from " + inputSplit.toString() + " using configuration: " + conf.toString());
         return super.createRecordReader(inputSplit, taskAttemptContext);
     }
 }

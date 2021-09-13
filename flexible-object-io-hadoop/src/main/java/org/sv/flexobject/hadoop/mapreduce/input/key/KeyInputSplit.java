@@ -72,4 +72,11 @@ public class KeyInputSplit<KT extends Writable> extends InputSplit implements Wr
     public int hashCode() {
         return Objects.hash(key);
     }
+
+    @Override
+    public String toString() {
+        return "LongKeySplit{" +
+                "key=" + key.toString() +
+                '}';
+    }
 }

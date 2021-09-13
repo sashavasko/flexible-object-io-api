@@ -53,6 +53,7 @@ public abstract class DaoRecordReader<KT,VT,DAO extends MRDao,SPLIT extends Inpu
                 if (dao instanceof Configurable)
                     ((Configurable)dao).setConf(context.getConfiguration());
                 setInput(createAdapter(split, context));
+                logger.info("Created record reader for split: " + split.toString() + " using configuration: " + conf.toString());
                 return;
             } catch (Exception e) {
                 ee = e;

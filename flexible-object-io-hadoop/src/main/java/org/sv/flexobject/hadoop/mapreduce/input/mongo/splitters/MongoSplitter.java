@@ -5,6 +5,7 @@ import com.mongodb.client.model.CountOptions;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.mapreduce.InputSplit;
+import org.sv.flexobject.hadoop.mapreduce.input.ConfiguredInputFormat;
 import org.sv.flexobject.hadoop.mapreduce.input.Splitter;
 import org.sv.flexobject.hadoop.mapreduce.input.mongo.MongoInputConf;
 import org.sv.flexobject.hadoop.mapreduce.input.mongo.MongoSplit;
@@ -56,8 +57,10 @@ public abstract class MongoSplitter extends Configured implements Splitter {
                     estimatedSize = mis.getLength(collection, 1);
                 if (estimatedSize > 0) {
                     mis.setEstimatedLength(estimatedSize);
+                    ConfiguredInputFormat.logger.debug("Added non-empty split: " + mis.toString());
                     results.add(mis);
-                }
+                } else
+                    ConfiguredInputFormat.logger.debug("Dropped empty split: " + mis.toString());
             }
         }
         return results;

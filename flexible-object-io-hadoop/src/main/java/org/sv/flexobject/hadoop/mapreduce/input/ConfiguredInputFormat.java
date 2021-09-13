@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class ConfiguredInputFormat<K,V> extends InputFormat<K,V> {
-    protected static Logger logger = Logger.getLogger(ConfiguredInputFormat.class);
+    public static final Logger logger = Logger.getLogger(ConfiguredInputFormat.class);
 
     protected InputConf<InputConf> makeInputConf(){
         return InstanceFactory.get(InputConf.class);
@@ -19,6 +19,7 @@ public class ConfiguredInputFormat<K,V> extends InputFormat<K,V> {
     public List<InputSplit> getSplits(JobContext context) {
         InputConf conf = makeInputConf().from(context.getConfiguration());
         try {
+            logger.info("Creating splits using configuration: " + conf.toString());
             return conf.getSplitter().split(context.getConfiguration());
         } catch (Exception e) {
             throw conf.runtimeException(logger, "Failed to instantiate splitter", e);

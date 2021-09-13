@@ -2,6 +2,7 @@ package org.sv.flexobject.hadoop.mapreduce.input.batch;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputSplit;
+import org.sv.flexobject.hadoop.mapreduce.input.ConfiguredInputFormat;
 import org.sv.flexobject.hadoop.mapreduce.input.Splitter;
 import org.sv.flexobject.util.InstanceFactory;
 
@@ -30,6 +31,7 @@ public class BatchSplitter implements Splitter {
                 split.setStartKey(startKey);
                 split.setBatchPerSplit(batchesInSplit);
                 splits.add(split);
+                ConfiguredInputFormat.logger.debug("Created split " + split);
             } catch (Exception e) {
                 if (e instanceof IOException)
                     throw (IOException)e;
