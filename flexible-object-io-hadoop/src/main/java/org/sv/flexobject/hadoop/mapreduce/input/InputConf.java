@@ -47,13 +47,20 @@ public class InputConf<SELF extends HadoopPropertiesWrapper> extends HadoopPrope
     }
 
     public RecordReader getReader() {
-        return InstanceFactory.get(getReaderClass());
+        RecordReader reader = InstanceFactory.get(getReaderClass());
+        if (reader instanceof InputConfOwner)
+            ((InputConfOwner) reader).setInputConf(this);
+        return reader;
     }
 
     public SourceBuilder getSourceBuilder() throws IllegalArgumentException {
         if (sourceBuilderClass == null)
             throw new IllegalArgumentException("Missing Source Builder class");
-        return InstanceFactory.get(sourceBuilderClass);
+        SourceBuilder sourceBuilder = InstanceFactory.get(sourceBuilderClass);
+        if (sourceBuilder instanceof InputConfOwner)
+            ((InputConfOwner) sourceBuilder).setInputConf(this);
+
+        return sourceBuilder;
     }
 
 }

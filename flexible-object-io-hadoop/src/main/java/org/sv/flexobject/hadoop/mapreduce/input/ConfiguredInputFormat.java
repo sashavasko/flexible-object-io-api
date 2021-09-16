@@ -31,8 +31,7 @@ public class ConfiguredInputFormat<K,V> extends InputFormat<K,V> {
         InputConf conf = makeInputConf().from(context.getConfiguration());
         RecordReader reader = conf.getReader();
 
-        if (reader instanceof InputConfOwner)
-            ((InputConfOwner) reader).setInputConf(conf);
+        logger.info(getClass().getName() + " created new RecordReader " + reader.getClass().getName() + " using configuration " + conf.getClass().getName() + " " + conf.toString());
 
         return reader;
     }

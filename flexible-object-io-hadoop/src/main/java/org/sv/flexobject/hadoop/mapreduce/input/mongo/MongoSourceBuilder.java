@@ -2,6 +2,8 @@ package org.sv.flexobject.hadoop.mapreduce.input.mongo;
 
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.sv.flexobject.hadoop.mapreduce.input.InputConf;
+import org.sv.flexobject.hadoop.mapreduce.input.InputConfOwner;
 import org.sv.flexobject.hadoop.mapreduce.input.SourceBuilder;
 import org.sv.flexobject.mongo.streaming.MongoBuilder;
 import org.sv.flexobject.mongo.streaming.MongoSource;
@@ -10,12 +12,16 @@ import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.IOException;
 
-public class MongoSourceBuilder implements SourceBuilder {
+public class MongoSourceBuilder implements SourceBuilder, InputConfOwner {
+
+    MongoInputConf conf;
 
     @Override
     public Source build(InputSplit split, TaskAttemptContext context) throws InstantiationException, IllegalAccessException, IOException {
-        MongoInputConf conf = InstanceFactory.get(MongoInputConf.class);
-        conf.from(context.getConfiguration());
+        if (conf == null) {
+            conf = InstanceFactory.get(MongoInputConf.class);
+            conf.from(context.getConfiguration());
+        }
 
         MongoBuilder builder = conf.getMongoBuilder();
         MongoSplit mongoSplit = (MongoSplit) split;
@@ -40,5 +46,15 @@ public class MongoSourceBuilder implements SourceBuilder {
         } catch (Exception e) {
             throw new IOException(conf.addDiagnostics("Failed to query Mongo"), e);
         }
+    }
+
+    @Override
+    public void setInputConf(InputConf conf) {
+        this.conf = (MongoInputConf) conf;
+    }
+
+    @Override
+    public InputConf getInputConf() {
+        return conf;
     }
 }
