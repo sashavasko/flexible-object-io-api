@@ -207,8 +207,8 @@ public class MongoSplit extends InputSplit implements Writable {
         dataOutput.writeUTF(queryJson);
         dataOutput.writeUTF(projectionJson);
         dataOutput.writeUTF(sortJson);
-        dataOutput.writeInt(limit);
-        dataOutput.writeInt(skip);
+        dataOutput.writeInt(limit == null ? -1 : limit);
+        dataOutput.writeInt(skip == null ? -1 : skip);
         dataOutput.writeBoolean(noTimeout);
         dataOutput.writeLong(estimatedLength);
     }
@@ -219,7 +219,11 @@ public class MongoSplit extends InputSplit implements Writable {
         projectionJson = dataInput.readUTF();
         sortJson = dataInput.readUTF();
         limit = dataInput.readInt();
+        if (limit <= 0)
+            limit = null;
         skip = dataInput.readInt();
+        if (skip <= 0)
+            skip = null;
         noTimeout = dataInput.readBoolean();
         estimatedLength = dataInput.readLong();
     }

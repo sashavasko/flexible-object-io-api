@@ -29,6 +29,11 @@ public class ConfiguredInputFormat<K,V> extends InputFormat<K,V> {
     @Override
     public RecordReader<K, V> createRecordReader(InputSplit split, TaskAttemptContext context) {
         InputConf conf = makeInputConf().from(context.getConfiguration());
-        return conf.getReader();
+        RecordReader reader = conf.getReader();
+
+        if (reader instanceof InputConfOwner)
+            ((InputConfOwner) reader).setInputConf(conf);
+
+        return reader;
     }
 }

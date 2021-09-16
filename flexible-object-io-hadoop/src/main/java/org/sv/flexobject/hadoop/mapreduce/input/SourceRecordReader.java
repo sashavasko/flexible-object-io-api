@@ -7,14 +7,27 @@ import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.IOException;
 
-public abstract class SourceRecordReader<K,V,SPLIT extends InputSplit> extends HadoopTaskRecordReader<K,V,SPLIT> {
+public abstract class SourceRecordReader<K,V,SPLIT extends InputSplit> extends HadoopTaskRecordReader<K,V,SPLIT> implements InputConfOwner {
     protected Source<V> source;
 
     V currentValue;
+    InputConf conf = null;
+
+    @Override
+    public void setInputConf(InputConf conf) {
+        this.conf = conf;
+    }
+
+    @Override
+    public InputConf getInputConf() {
+        return conf;
+    }
 
     protected Source<V> createSource(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException{
-        InputConf conf = InstanceFactory.get(InputConf.class);
-        conf.from(taskAttemptContext.getConfiguration());
+        if (conf == null) {
+            conf = InstanceFactory.get(InputConf.class);
+            conf.from(taskAttemptContext.getConfiguration());
+        }
 
         try {
             return conf.getSourceBuilder().build(inputSplit, taskAttemptContext);
