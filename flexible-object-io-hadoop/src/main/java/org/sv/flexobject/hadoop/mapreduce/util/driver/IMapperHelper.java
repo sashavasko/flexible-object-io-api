@@ -11,6 +11,6 @@ public interface IMapperHelper {
     String MAPPER_HELPER_CONFIG = "mapreduce.map.helper.class";
 
     default void setupMapper(Mapper.Context context)  throws IOException, InterruptedException  {};
-    void map(WritableComparable keyIn, Writable valueIn, Mapper.Context context) throws IOException, InterruptedException;
+    void map(Object keyIn, Object valueIn, Mapper.Context context) throws IOException, InterruptedException;
     default void cleanupMapper(Mapper.Context context) throws IOException, InterruptedException {};
 }

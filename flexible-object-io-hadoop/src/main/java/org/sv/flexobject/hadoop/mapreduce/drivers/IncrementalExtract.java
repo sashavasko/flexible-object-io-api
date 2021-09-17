@@ -146,7 +146,7 @@ public abstract class IncrementalExtract extends ParquetMapReduceDriver {
     }
 
     @Override
-    public void map(WritableComparable keyIn, Writable valueIn, Mapper.Context context) throws IOException, InterruptedException {
+    public void map(Object keyIn, Object valueIn, Mapper.Context context) throws IOException, InterruptedException {
     }
 
     @Override

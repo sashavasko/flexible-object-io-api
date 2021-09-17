@@ -8,7 +8,7 @@ import org.sv.flexobject.hadoop.HadoopTask;
 
 import java.io.IOException;
 
-public class MapperProxy extends Mapper<WritableComparable, Writable, WritableComparable, Writable> {
+public class MapperProxy extends Mapper<Object, Object, WritableComparable, Writable> {
 
     IMapperHelper helper;
 
@@ -24,7 +24,7 @@ public class MapperProxy extends Mapper<WritableComparable, Writable, WritableCo
     }
 
     @Override
-    protected void map(WritableComparable key, Writable value, Context context) throws IOException, InterruptedException {
+    protected void map(Object key, Object value, Context context) throws IOException, InterruptedException {
         helper.map(key, value, context);
     }
 
