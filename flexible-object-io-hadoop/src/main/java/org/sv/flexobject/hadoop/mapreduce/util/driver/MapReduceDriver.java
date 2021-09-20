@@ -7,12 +7,17 @@ import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.LazyOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.log4j.Logger;
+import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.hadoop.HadoopTask;
+import org.sv.flexobject.hadoop.mapreduce.output.parquet.StreamableParquetOutputFormat;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends ConfiguredDriver<SELF> implements IMapperHelper, IReducerHelper {
 
@@ -21,9 +26,44 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
     Class<? extends InputFormat> inputFormatClass = TextInputFormat.class;
     Class<? extends WritableComparable> keyMapOutClass;
     Class<? extends Writable> valueMapOutClass;
-    Class keyOutClass;
-    Class<? extends Writable> valueOutClass;
-    Class<? extends OutputFormat> outputFormatClass;
+
+    public static class FullyDefinedOutputFormat extends StreamableWithSchema {
+        String name;
+        Class keyClass;
+        Class valueClass;
+        Class<? extends OutputFormat> formatClass;
+
+        public FullyDefinedOutputFormat(Class keyClass, Class valueClass, Class<? extends OutputFormat> formatClass) {
+            this.keyClass = keyClass;
+            this.valueClass = valueClass;
+            this.formatClass = formatClass;
+        }
+
+        public FullyDefinedOutputFormat(String name, Class keyClass, Class valueClass, Class<? extends OutputFormat> formatClass) {
+            this.name = name;
+            this.keyClass = keyClass;
+            this.valueClass = valueClass;
+            this.formatClass = formatClass;
+        }
+
+        public Class getKeyClass() {
+            return keyClass;
+        }
+
+        public Class<? extends Writable> getValueClass() {
+            return valueClass;
+        }
+
+        public Class<? extends OutputFormat> getFormatClass() {
+            return formatClass;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
+
+    List<FullyDefinedOutputFormat> outputs = new ArrayList<>();
 
     Class<? extends Mapper> mapperClass = MapperProxy.class;
     Class<? extends Reducer> combinerClass = null;
@@ -102,9 +142,18 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
     }
 
     public SELF setOutput(Class<? extends OutputFormat> outputFormatClass, Class keyOutClass, Class<? extends Writable> valueOutClass) {
-        this.keyOutClass = keyOutClass;
-        this.valueOutClass = valueOutClass;
-        this.outputFormatClass = outputFormatClass;
+        outputs.clear();
+        outputs.add(new FullyDefinedOutputFormat(keyOutClass, valueOutClass, outputFormatClass));
+        return (SELF) this;
+    }
+
+    public SELF addOutput(String name, Class<? extends OutputFormat> outputFormatClass, Class keyOutClass, Class valueOutClass) {
+        outputs.add(new FullyDefinedOutputFormat(name, keyOutClass, valueOutClass, outputFormatClass));
+        return (SELF) this;
+    }
+
+    public SELF addParquetOutput(String name, Class<? extends StreamableWithSchema> valueOutClass) {
+        outputs.add(new FullyDefinedOutputFormat(name, Void.class, valueOutClass, StreamableParquetOutputFormat.class));
         return (SELF) this;
     }
 
@@ -200,36 +249,46 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
             logger.info("Disabled reduce phase");
         }
 
-        if (isUnconfigured(conf, Job.OUTPUT_KEY_CLASS)){
-            if (keyOutClass != null) {
-                job.setOutputKeyClass(keyOutClass);
-                logger.info( "Set job output key to " + keyOutClass);
-            } else {
-                logger.warn( "Job output key class is not set. Disabling job Output...");
-                setOutputToNoOutput();
+        if (outputs.size() > 1) {
+            LazyOutputFormat.setOutputFormatClass(job, TextOutputFormat.class);
+            for (FullyDefinedOutputFormat output : outputs) {
+                MultipleOutputs.addNamedOutput(job, output.getName(), output.getFormatClass(), output.getKeyClass(), output.getValueClass());
             }
-        }
-
-        if (isUnconfigured(conf, Job.OUTPUT_VALUE_CLASS)){
-            if (valueOutClass != null) {
-                job.setOutputValueClass(valueOutClass);
-                logger.info( "Set job output value to " + valueOutClass);
-            }else {
-                logger.warn( "Job output value class is not set. Disabling job Output...");
-                setOutputToNoOutput();
+            MultipleOutputs.setCountersEnabled(job, true);
+        } else {
+            if (isUnconfigured(conf, Job.OUTPUT_KEY_CLASS)) {
+                if (outputs.size() == 1) {
+                    job.setOutputKeyClass(outputs.get(0).getKeyClass());
+                    logger.info("Set job output key to " + outputs.get(0).getKeyClass());
+                } else {
+                    logger.warn("Job output key class is not set. Disabling job Output...");
+                    setOutputToNoOutput();
+                }
             }
-        }
 
-        if (isUnconfigured(conf, Job.OUTPUT_FORMAT_CLASS_ATTR)) {
-            if (outputFormatClass == null) {
-                logger.warn( "Job output format class is not set. Disabling job output...");
-                setOutputToNoOutput();
-            }else if (outputFormatClass == TextOutputFormat.class) {
-                LazyOutputFormat.setOutputFormatClass(job, TextOutputFormat.class);
-                logger.info("Set output format to " + outputFormatClass + " (lazy)");
-            }else{
-                job.setOutputFormatClass(outputFormatClass);
-                logger.info("Set output format to " + outputFormatClass);
+            if (isUnconfigured(conf, Job.OUTPUT_VALUE_CLASS)) {
+                if (outputs.size() == 1) {
+                    job.setOutputValueClass(outputs.get(0).getValueClass());
+                    logger.info("Set job output value to " + outputs.get(0).getValueClass());
+                } else {
+                    logger.warn("Job output value class is not set. Disabling job Output...");
+                    setOutputToNoOutput();
+                }
+            }
+
+            if (isUnconfigured(conf, Job.OUTPUT_FORMAT_CLASS_ATTR)) {
+                if (outputs.size() == 0) {
+                    logger.warn("Job output format class is not set. Disabling output...");
+                    setOutputToNoOutput();
+                } else {
+                    if (outputs.get(1).getFormatClass() == TextOutputFormat.class) {
+                        LazyOutputFormat.setOutputFormatClass(job, TextOutputFormat.class);
+                        logger.info("Set output format to " + outputs.get(1).getFormatClass() + " (lazy)");
+                    } else {
+                        logger.info("Set output format to " + outputs.get(1).getFormatClass());
+                    }
+                    job.setOutputFormatClass(outputs.get(1).getFormatClass());
+                }
             }
         }
 
@@ -267,15 +326,21 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
                 : getClass().getSimpleName();
     }
 
+    public List<FullyDefinedOutputFormat> getOutputs() {
+        return outputs;
+    }
+
+    public boolean hasMultipleOutputs(){
+        return outputs.size() > 1;
+    }
+
     @Override
     public String toString() {
         return "MapReduceDriver{" +
                 "inputFormatClass=" + inputFormatClass +
                 ", keyMapOutClass=" + keyMapOutClass +
                 ", valueMapOutClass=" + valueMapOutClass +
-                ", keyOutClass=" + keyOutClass +
-                ", valueOutClass=" + valueOutClass +
-                ", outputFormatClass=" + outputFormatClass +
+                ", outputs=" + outputs.toString() +
                 ", mapperClass=" + mapperClass +
                 ", combinerClass=" + combinerClass +
                 ", reducerClass=" + reducerClass +
