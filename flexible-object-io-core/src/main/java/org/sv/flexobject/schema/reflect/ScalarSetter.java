@@ -71,25 +71,30 @@ public class ScalarSetter extends FieldWrapper implements BiConsumerWithExceptio
             } else
                 setValue(dataObject, valueMap);
         } else if (value.getClass().isArray()) {
-            Object[] valueArray = (Object[]) value;
-            if (getStructure() == STRUCT.array) {
-                Object[] objectArray = (Object[]) getValue(dataObject);
-                int i = 0;
-                for (; i < objectArray.length && i < valueArray.length; ++i) {
-                    Object item = valueArray[i];
-                    if (item == null)
-                        objectArray[i] = null;
-                    else if (getValueClass() != null && getValueClass().isAssignableFrom(item.getClass())) {
-                        objectArray[i] = item;
-                    } else {
-                        objectArray[i] = getType().convert(item);
+            if (getType() == DataTypes.binary){
+                byte[] bytes = DataTypes.binaryConverter(value);
+                setValue(dataObject, bytes);
+            } else {
+                Object[] valueArray = (Object[]) value;
+                if (getStructure() == STRUCT.array) {
+                    Object[] objectArray = (Object[]) getValue(dataObject);
+                    int i = 0;
+                    for (; i < objectArray.length && i < valueArray.length; ++i) {
+                        Object item = valueArray[i];
+                        if (item == null)
+                            objectArray[i] = null;
+                        else if (getValueClass() != null && getValueClass().isAssignableFrom(item.getClass())) {
+                            objectArray[i] = item;
+                        } else {
+                            objectArray[i] = getType().convert(item);
+                        }
                     }
+                    for (; i < objectArray.length; ++i) {
+                        objectArray[i] = null;
+                    }
+                } else if (getStructure() == STRUCT.list) {
+                    setValue(dataObject, Arrays.asList(valueArray));
                 }
-                for (; i < objectArray.length; ++i) {
-                    objectArray[i] = null;
-                }
-            } else if (getStructure() == STRUCT.list) {
-                setValue(dataObject, Arrays.asList(valueArray));
             }
         } else if (value instanceof ArrayNode && !JsonNode.class.isAssignableFrom(getFieldClass())) {
             ArrayNode arrayNode = (ArrayNode) value;
