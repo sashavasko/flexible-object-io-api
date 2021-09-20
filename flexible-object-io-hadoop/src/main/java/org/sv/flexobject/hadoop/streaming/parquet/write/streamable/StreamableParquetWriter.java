@@ -11,7 +11,6 @@ import org.sv.flexobject.hadoop.streaming.parquet.write.SchemedWriter;
 import org.sv.flexobject.schema.DataTypes;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 public class StreamableParquetWriter extends SchemedWriter<StreamableWithSchema, Object> {
@@ -36,8 +35,13 @@ public class StreamableParquetWriter extends SchemedWriter<StreamableWithSchema,
                 throw new ParquetWriteException("Can only write object node into BINARY primitive field", fieldType.getName());
             }
         } else if (value.getClass().isArray()){
+            try {
+                switch (fieldType.getPrimitiveTypeName()) {
+                    case BINARY:
+                        getRecordConsumer().addBinary(Binary.fromConstantByteArray(DataTypes.binaryConverter(value)));
+                        break;
 // TODO
-            //            ArrayNode array = (ArrayNode) value;
+//            ArrayNode array = (ArrayNode) value;
 //
 //            if (fieldType.getRepetition() != Type.Repetition.REPEATED && array.size() > 1)
 //                throw new ParquetWriteException("Attempting to write array node into non REPEATED primitive field", fieldType.getName());
@@ -45,6 +49,12 @@ public class StreamableParquetWriter extends SchemedWriter<StreamableWithSchema,
 //            for (JsonNode node : array){
 //                writeValue(node, fieldType);
 //            }
+
+
+                }
+            } catch (Exception e) {
+                throw new ParquetWriteException("Failed to convert value of class " + value.getClass() + " to output type " + fieldType.getPrimitiveTypeName(), e, fieldType.getName());
+            }
         } else {
             try {
                 switch(fieldType.getPrimitiveTypeName()) {

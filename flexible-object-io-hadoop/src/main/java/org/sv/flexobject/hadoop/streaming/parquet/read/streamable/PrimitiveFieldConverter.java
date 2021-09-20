@@ -26,20 +26,25 @@ public class PrimitiveFieldConverter extends SchemedPrimitiveConverter<Streamabl
 
     @Override
     public void addBinary(Binary value) {
-        switch(getOriginalType()){
-            case UTF8:
-            case ENUM:
-                set(value.toStringUsingUTF8());
-                break;
-            case JSON:
-                try {
-                    set(MapperFactory.getObjectReader().readTree(value.toStringUsingUTF8()));
-                } catch (IOException e) {
+        OriginalType originalType = getOriginalType();
+        if (originalType == null) {
+            set(value.getBytes());
+        } else {
+            switch (getOriginalType()) {
+                case UTF8:
+                case ENUM:
                     set(value.toStringUsingUTF8());
-                }
-                break;
-            default:
-                set(value.getBytes());
+                    break;
+                case JSON:
+                    try {
+                        set(MapperFactory.getObjectReader().readTree(value.toStringUsingUTF8()));
+                    } catch (IOException e) {
+                        set(value.toStringUsingUTF8());
+                    }
+                    break;
+                default:
+                    set(value.getBytes());
+            }
         }
     }
 
