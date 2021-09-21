@@ -157,6 +157,11 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
         return (SELF) this;
     }
 
+    public SELF addParquetOutput(String name, Class<? extends OutputFormat> outputFormatClass, Class<? extends StreamableWithSchema> valueOutClass) {
+        outputs.add(new FullyDefinedOutputFormat(name, Void.class, valueOutClass, outputFormatClass));
+        return (SELF) this;
+    }
+
     public SELF setDriver(MapReduceDriver driver) {
         this.driverClass = driver.getClass();
         return (SELF) this;
