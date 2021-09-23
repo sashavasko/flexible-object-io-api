@@ -182,7 +182,7 @@ public class ProbabilityBasedThrottlingStrategy implements LoadBalanceStrategy {
     public void adjustMasterProbability(Cluster cluster, ClusterMember member) {
         double newMasterProbability = adjustMasterProbabilityBasedOnLastQueryTime(member);
         if ((int)(newMasterProbability*10) != (int)(currentMasterProbability *10)) {
-            logger.info("Adjusted master probability to :" + newMasterProbability);
+            logger.debug("Adjusted master probability to :" + newMasterProbability);
         }
         currentMasterProbability = newMasterProbability;
 
