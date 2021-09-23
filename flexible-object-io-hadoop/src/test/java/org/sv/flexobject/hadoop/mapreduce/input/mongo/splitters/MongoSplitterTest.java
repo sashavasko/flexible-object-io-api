@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sv.flexobject.hadoop.mapreduce.input.mongo.MongoInputConf;
 import org.sv.flexobject.hadoop.mapreduce.input.mongo.MongoSplit;
+import org.sv.flexobject.hadoop.mapreduce.input.split.ProxyInputSplit;
 import org.sv.flexobject.mongo.connection.MongoConnection;
 import org.sv.flexobject.util.InstanceFactory;
 
@@ -90,24 +91,24 @@ public class MongoSplitterTest {
         doReturn(1l).when(split1).getLength(collection, 1, 1);
         doReturn(0l).when(split2).getLength(collection, 1, 1);
 
-        List<InputSplit> filtered = splitter.filterEmptySplits(Arrays.asList(split1, split2));
+        List<InputSplit> filtered = splitter.filterEmptySplits(Arrays.asList(new ProxyInputSplit(split1), new ProxyInputSplit(split2)));
 
         assertEquals(1, filtered.size());
-        assertSame(split1, filtered.get(0));
+        assertSame(split1, ((ProxyInputSplit)filtered.get(0)).getData());
 
         doReturn(1l).when(split1).getLength(collection, 1, 1);
         doReturn(1l).when(split2).getLength(collection, 1, 1);
 
-        filtered = splitter.filterEmptySplits(Arrays.asList(split1, split2));
+        filtered = splitter.filterEmptySplits(Arrays.asList(new ProxyInputSplit(split1), new ProxyInputSplit(split2)));
 
         assertEquals(2, filtered.size());
-        assertSame(split1, filtered.get(0));
-        assertSame(split2, filtered.get(1));
+        assertSame(split1, ((ProxyInputSplit)filtered.get(0)).getData());
+        assertSame(split2, ((ProxyInputSplit)filtered.get(1)).getData());
 
         doReturn(0l).when(split1).getLength(collection, 1, 1);
         doReturn(0l).when(split2).getLength(collection, 1, 1);
 
-        filtered = splitter.filterEmptySplits(Arrays.asList(split1, split2));
+        filtered = splitter.filterEmptySplits(Arrays.asList(new ProxyInputSplit(split1), new ProxyInputSplit(split2)));
 
         assertTrue(filtered.isEmpty());
 

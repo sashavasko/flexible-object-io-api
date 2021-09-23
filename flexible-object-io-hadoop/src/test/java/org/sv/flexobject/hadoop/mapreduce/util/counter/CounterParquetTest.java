@@ -85,7 +85,7 @@ public class CounterParquetTest {
 
         counter.close();
 
-        Mockito.verify(configuration).get("org.sv.flexobject.hadoop.parquet.counters");
+        Mockito.verify(configuration).get("sv.hadoop.parquet.counters");
     }
 
     @Test
@@ -94,6 +94,6 @@ public class CounterParquetTest {
 
         counter.close();
 
-        Mockito.verify(configuration).get("org.sv.flexobject.hadoop.parquet.counters");
+        Mockito.verify(configuration).get("sv.hadoop.parquet.counters");
     }
 }

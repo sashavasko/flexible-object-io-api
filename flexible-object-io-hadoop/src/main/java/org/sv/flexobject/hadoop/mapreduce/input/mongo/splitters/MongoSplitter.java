@@ -9,6 +9,7 @@ import org.sv.flexobject.hadoop.mapreduce.input.ConfiguredInputFormat;
 import org.sv.flexobject.hadoop.mapreduce.input.Splitter;
 import org.sv.flexobject.hadoop.mapreduce.input.mongo.MongoInputConf;
 import org.sv.flexobject.hadoop.mapreduce.input.mongo.MongoSplit;
+import org.sv.flexobject.hadoop.mapreduce.input.split.ProxyInputSplit;
 import org.sv.flexobject.mongo.connection.MongoConnection;
 import org.sv.flexobject.util.InstanceFactory;
 
@@ -51,14 +52,14 @@ public abstract class MongoSplitter extends Configured implements Splitter {
         try(MongoConnection connection = getInputConf().getMongo()) {
             MongoCollection collection = connection.getCollection(conf.getCollectionName());
             for (InputSplit split : splits) {
-                MongoSplit mis = (MongoSplit) split;
+                MongoSplit mis = ((ProxyInputSplit) split).getData();
                 long estimatedSize = mis.getLength(collection, conf.getEstimateSizeLimit(), conf.getEstimateTimeLimitMicros());
                 if (estimatedSize == 0)
                     estimatedSize = mis.getLength(collection, 1);
                 if (estimatedSize > 0) {
                     mis.setEstimatedLength(estimatedSize);
                     ConfiguredInputFormat.logger.debug("Added non-empty split: " + mis.toString());
-                    results.add(mis);
+                    results.add(split);
                 } else
                     ConfiguredInputFormat.logger.debug("Dropped empty split: " + mis.toString());
             }

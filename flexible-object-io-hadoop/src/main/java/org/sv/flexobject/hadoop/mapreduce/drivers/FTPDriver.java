@@ -1,6 +1,5 @@
 package org.sv.flexobject.hadoop.mapreduce.drivers;
 
-import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPClientConfig;
 import org.apache.commons.net.ftp.FTPReply;
@@ -8,6 +7,7 @@ import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.util.Tool;
 import org.apache.log4j.Logger;
 
+import javax.mail.MessagingException;
 import java.io.IOException;
 
 abstract public class FTPDriver extends Configured implements Tool{

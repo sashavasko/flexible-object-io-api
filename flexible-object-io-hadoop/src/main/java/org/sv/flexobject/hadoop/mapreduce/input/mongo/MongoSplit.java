@@ -9,6 +9,9 @@ import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.log4j.Logger;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.sv.flexobject.hadoop.StreamableAndWritableWithSchema;
+import org.sv.flexobject.hadoop.mapreduce.input.split.InputSplitImpl;
+import org.sv.flexobject.schema.annotations.NonStreamableField;
 import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.DataInput;
@@ -17,15 +20,21 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-public class MongoSplit extends InputSplit implements Writable {
+public class MongoSplit extends StreamableAndWritableWithSchema implements InputSplitImpl {
     public static final Logger logger = Logger.getLogger(MongoSplit.class);
 
     protected String queryJson = "";
+    @NonStreamableField
     private Bson query;
+
     protected String projectionJson = "";
+    @NonStreamableField
     private Bson projection;
+
     protected String sortJson = "";
+    @NonStreamableField
     private Bson sort;
+
     protected Integer limit;
     protected Integer skip;
     protected Boolean noTimeout = false;
@@ -203,54 +212,7 @@ public class MongoSplit extends InputSplit implements Writable {
     }
 
     @Override
-    public void write(DataOutput dataOutput) throws IOException {
-        dataOutput.writeUTF(queryJson);
-        dataOutput.writeUTF(projectionJson);
-        dataOutput.writeUTF(sortJson);
-        dataOutput.writeInt(limit == null ? -1 : limit);
-        dataOutput.writeInt(skip == null ? -1 : skip);
-        dataOutput.writeBoolean(noTimeout);
-        dataOutput.writeLong(estimatedLength);
-    }
-
-    @Override
-    public void readFields(DataInput dataInput) throws IOException {
-        queryJson = dataInput.readUTF();
-        projectionJson = dataInput.readUTF();
-        sortJson = dataInput.readUTF();
-        limit = dataInput.readInt();
-        if (limit <= 0)
-            limit = null;
-        skip = dataInput.readInt();
-        if (skip <= 0)
-            skip = null;
-        noTimeout = dataInput.readBoolean();
-        estimatedLength = dataInput.readLong();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        MongoSplit that = (MongoSplit) o;
-        return queryJson.equals(that.queryJson) && projectionJson.equals(that.projectionJson) && sortJson.equals(that.sortJson) && Objects.equals(limit, that.limit) && Objects.equals(skip, that.skip) && Objects.equals(noTimeout, that.noTimeout) && estimatedLength.equals(that.estimatedLength);
-    }
-
-    @Override
     public int hashCode() {
         return queryJson.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return "MongoSplit{" +
-                "query='" + queryJson + '\'' +
-                ", projection='" + projectionJson + '\'' +
-                ", sort='" + sortJson + '\'' +
-                ", limit=" + limit +
-                ", skip=" + skip +
-                ", noTimeout=" + noTimeout +
-                ", estimatedLength=" + estimatedLength +
-                '}';
     }
 }

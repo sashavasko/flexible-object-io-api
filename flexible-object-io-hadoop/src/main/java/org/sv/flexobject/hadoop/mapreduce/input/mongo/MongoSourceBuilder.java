@@ -5,6 +5,7 @@ import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.sv.flexobject.hadoop.mapreduce.input.InputConf;
 import org.sv.flexobject.hadoop.mapreduce.input.InputConfOwner;
 import org.sv.flexobject.hadoop.mapreduce.input.SourceBuilder;
+import org.sv.flexobject.hadoop.mapreduce.input.split.ProxyInputSplit;
 import org.sv.flexobject.mongo.streaming.MongoBuilder;
 import org.sv.flexobject.mongo.streaming.MongoSource;
 import org.sv.flexobject.stream.Source;
@@ -24,7 +25,7 @@ public class MongoSourceBuilder implements SourceBuilder, InputConfOwner {
         }
 
         MongoBuilder builder = conf.getMongoBuilder();
-        MongoSplit mongoSplit = (MongoSplit) split;
+        MongoSplit mongoSplit = ((ProxyInputSplit) split).getData();
         if (mongoSplit.hasQuery())
             builder.filter(mongoSplit.getQuery());
         if (mongoSplit.hasLimit())

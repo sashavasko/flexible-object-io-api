@@ -106,16 +106,13 @@ public class MongoSplitTest {
     }
 
     @Test
-    public void write() throws IOException {
+    public void write() throws Exception {
         split.write(output);
 
-        verify(output).writeUTF(queryJson);
-        verify(output).writeUTF(projectionJson);
-        verify(output).writeUTF(sortJson);
-        verify(output).writeInt(limit);
-        verify(output).writeInt(skip);
-        verify(output).writeBoolean(noTimeout);
-        verify(output).writeLong(estimatedLength);
+        byte[] jsonBytes = split.toJsonBytes();
+
+        verify(output).writeInt(jsonBytes.length);
+        verify(output).write(jsonBytes);
     }
 
     @Test

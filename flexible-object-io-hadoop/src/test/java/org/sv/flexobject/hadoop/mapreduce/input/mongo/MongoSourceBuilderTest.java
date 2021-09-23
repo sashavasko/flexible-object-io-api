@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.sv.flexobject.hadoop.mapreduce.input.split.ProxyInputSplit;
 import org.sv.flexobject.mongo.streaming.MongoSource;
 import org.sv.flexobject.testdata.TestDataWithSubSchema;
 import org.sv.flexobject.util.InstanceFactory;
@@ -81,7 +82,7 @@ public class MongoSourceBuilderTest {
 
         doReturn(true).when(conf).hasSchema();
 
-        assertSame(result, builder.build(split, context));
+        assertSame(result, builder.build(new ProxyInputSplit(split), context));
 
         verify(conf).from(rawConf);
         verify(mongoBuilder).filter(query);
@@ -105,7 +106,7 @@ public class MongoSourceBuilderTest {
 
         doReturn(false).when(conf).hasSchema();
 
-        assertSame(result, builder.build(split, context));
+        assertSame(result, builder.build(new ProxyInputSplit(split), context));
 
         verify(conf).from(rawConf);
         verify(mongoBuilder).build();
@@ -118,7 +119,7 @@ public class MongoSourceBuilderTest {
         doThrow(toThrow).when(mongoBuilder).build();
 
         try{
-            builder.build(split, context);
+            builder.build(new ProxyInputSplit(split), context);
             throw new RuntimeException("should have thrown");
         }catch (IOException e){
             assertSame(toThrow, e.getCause());
