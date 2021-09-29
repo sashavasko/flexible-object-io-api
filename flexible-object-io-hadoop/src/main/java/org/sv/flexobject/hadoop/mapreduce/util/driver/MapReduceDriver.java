@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.apache.hadoop.mapreduce.MRJobConfig.JOB_RUNNING_MAP_LIMIT;
+
 abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends ConfiguredDriver<SELF> implements IMapperHelper, IReducerHelper {
 
     Logger logger = Logger.getLogger(MapReduceDriver.class);
@@ -201,9 +203,9 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
                 throw new RuntimeException("Mapper class must be set");
             }
             job.setMapperClass(mapperClass);
-            if (isUnconfigured(conf, "mapreduce.job.running.map.limit")
-                    || conf.getInt("mapreduce.job.running.map.limit", 0) == 0) {
-                conf.setInt("mapreduce.job.running.map.limit", maxConcurrentMaps);
+            if (isUnconfigured(conf, JOB_RUNNING_MAP_LIMIT)
+                    || conf.getInt(JOB_RUNNING_MAP_LIMIT, 0) == 0) {
+                conf.setInt(JOB_RUNNING_MAP_LIMIT, maxConcurrentMaps);
                 logger.info("Set Mapper to " + mapperClass.getName() + " and running map limit to " + maxConcurrentMaps);
             }else {
                 logger.info("Set Mapper to " + mapperClass.getName());
