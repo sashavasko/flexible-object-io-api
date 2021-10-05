@@ -11,6 +11,9 @@ public class TimeRangeSplit extends StreamableAndWritableWithSchema implements I
     long endTimeMillis;
     long millisPerRecord;
 
+    public TimeRangeSplit() {
+    }
+
     public TimeRangeSplit(int startTimeSeconds, int endTimeSeconds, int secondsPerSplit) {
         this(startTimeSeconds*1000l, endTimeSeconds*1000l, secondsPerSplit*1000l);
     }

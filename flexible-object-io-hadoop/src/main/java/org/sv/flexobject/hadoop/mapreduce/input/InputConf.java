@@ -38,8 +38,12 @@ public class InputConf<SELF extends HadoopPropertiesWrapper> extends HadoopPrope
     public Class<? extends Splitter> getSplitterClass() {
         return splitterClass == null ? ModSplitter.class : splitterClass;
     }
+
     public Splitter getSplitter() {
-        return InstanceFactory.get(getSplitterClass());
+        Splitter splitter = InstanceFactory.get(getSplitterClass());
+        if (splitter instanceof InputConfOwner)
+            ((InputConfOwner) splitter).setInputConf(this);
+        return splitter;
     }
 
     public Class<? extends RecordReader> getReaderClass() {

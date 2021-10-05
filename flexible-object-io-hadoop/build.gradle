@@ -38,14 +38,14 @@ dependencies {
         exclude group: 'org.apache.avro', module:'avro-mapred'
     }
     // https://mvnrepository.com/artifact/org.apache.avro/avro
-    implementation group: 'org.apache.avro', name: 'avro', version: '1.10.1'
+    implementation group: 'org.apache.avro', name: 'avro', version: '1.10.2'
 
-    compile ('org.apache.parquet:parquet-hadoop:1.10.1'){
+    compile ('org.apache.parquet:parquet-hadoop:1.12.1'){
         exclude group: 'com.fasterxml.jackson.core', module:'jackson-databind'
         exclude group: 'com.fasterxml.jackson.core', module:'jackson-core'
         exclude module: 'httpcomponents'
     }
-    compile ('org.apache.parquet:parquet-avro:1.10.1'){
+    compile ('org.apache.parquet:parquet-avro:1.12.1'){
         exclude group: 'com.fasterxml.jackson.core', module:'jackson-databind'
         exclude group: 'com.fasterxml.jackson.core', module:'jackson-core'
         exclude group: 'org.apache.avro', module:'avro'

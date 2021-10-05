@@ -288,13 +288,13 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
                     logger.warn("Job output format class is not set. Disabling output...");
                     setOutputToNoOutput();
                 } else {
-                    if (outputs.get(1).getFormatClass() == TextOutputFormat.class) {
+                    if (outputs.get(0).getFormatClass() == TextOutputFormat.class) {
                         LazyOutputFormat.setOutputFormatClass(job, TextOutputFormat.class);
-                        logger.info("Set output format to " + outputs.get(1).getFormatClass() + " (lazy)");
+                        logger.info("Set output format to " + outputs.get(0).getFormatClass() + " (lazy)");
                     } else {
-                        logger.info("Set output format to " + outputs.get(1).getFormatClass());
+                        logger.info("Set output format to " + outputs.get(0).getFormatClass());
                     }
-                    job.setOutputFormatClass(outputs.get(1).getFormatClass());
+                    job.setOutputFormatClass(outputs.get(0).getFormatClass());
                 }
             }
         }
@@ -313,13 +313,15 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
     }
 
     public static boolean isUnconfigured(Configuration conf, String attr) {
-        return StringUtils.isEmpty(conf.get(attr));
+        if (StringUtils.isEmpty(conf.get(attr)))
+            return true;
+        String[] sources = conf.getPropertySources(attr);
+        return (sources[0].contains("-site.xml") || sources[0].contains("-default.xml"));
     }
 
     public static boolean isConfigured(Configuration conf, String attr) {
-        return StringUtils.isNotEmpty(conf.get(attr));
+        return !isUnconfigured(conf, attr);
     }
-
 
     @Override
     protected String getJobName() {

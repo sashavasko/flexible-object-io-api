@@ -1,5 +1,8 @@
 package org.sv.flexobject.hadoop.mapreduce.input.mongo;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.CountOptions;
 import org.bson.Document;
@@ -10,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.sv.flexobject.hadoop.streaming.parquet.ParquetSchema;
 import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.*;
@@ -206,8 +210,22 @@ public class MongoSplitTest {
     }
 
     @Test
-    public void hashCodeOnlyQuery() {
-        assertEquals("foobar".hashCode(), new MongoSplit("foobar").hashCode());
-        assertEquals(queryJson.hashCode(), split.hashCode());
+    public void hashCodeOnlyQuery() throws JsonProcessingException {
+        ObjectNode query = JsonNodeFactory.instance.objectNode();
+        query.put("_id", 1);
+        assertEquals(query.hashCode(), new MongoSplit(query).hashCode());
+    }
+
+    @Test
+    public void parquetSchema() {
+        assertEquals("message org.sv.flexobject.hadoop.mapreduce.input.mongo.MongoSplit {\n" +
+                "  optional binary queryJson (JSON);\n" +
+                "  optional binary projectionJson (JSON);\n" +
+                "  optional binary sortJson (JSON);\n" +
+                "  optional int32 limit;\n" +
+                "  optional int32 skip;\n" +
+                "  optional boolean noTimeout;\n" +
+                "  optional int64 estimatedLength;\n" +
+                "}\n", ParquetSchema.forClass(MongoSplit.class).toString());
     }
 }

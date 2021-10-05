@@ -18,7 +18,7 @@ public class TimeRangeConf<SELF extends InputConf> extends InputConf<SELF> {
     }
 
     public TimeRangeConf(String child) {
-        super(makeMyNamespace(getParentNamespace(InputConf.class), SUBNAMESPACE), child);
+        super(makeMyNamespace(getParentNamespace(TimeRangeConf.class), SUBNAMESPACE), child);
     }
 
     public TimeRangeConf(Namespace parent) {
@@ -45,7 +45,6 @@ public class TimeRangeConf<SELF extends InputConf> extends InputConf<SELF> {
     public void validate(){}
 
     public int getSecondsPerSplit() {
-        validate();
         return (int) (millisPerRecord /1000);
     }
 
@@ -55,7 +54,6 @@ public class TimeRangeConf<SELF extends InputConf> extends InputConf<SELF> {
     }
 
     public long getMillisPerRecord() {
-        validate();
         return millisPerRecord;
     }
 
@@ -65,7 +63,8 @@ public class TimeRangeConf<SELF extends InputConf> extends InputConf<SELF> {
     }
 
     public int getStartSeconds(){
-        validate();
+        if (startdate == null)
+            throw new RuntimeException("Startdate cannot be null. Please set " +getSettingName("startdate"));
         return (int) (startdate.getTime()/1000);
     }
 
@@ -75,7 +74,8 @@ public class TimeRangeConf<SELF extends InputConf> extends InputConf<SELF> {
     }
 
     public int getEndSeconds(){
-        validate();
+        if (enddate == null)
+            throw new RuntimeException("Enddate cannot be null. Please set " +getSettingName("enddate"));
         return (int) (enddate.getTime()/1000);
     }
 
@@ -85,7 +85,6 @@ public class TimeRangeConf<SELF extends InputConf> extends InputConf<SELF> {
     }
 
     public Timestamp getStart(){
-        validate();
         return startdate;
     }
 
@@ -95,7 +94,6 @@ public class TimeRangeConf<SELF extends InputConf> extends InputConf<SELF> {
     }
 
     public Timestamp getEnd(){
-        validate();
         return enddate;
     }
 

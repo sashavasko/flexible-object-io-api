@@ -1,37 +1,35 @@
 package org.sv.flexobject.hadoop.mapreduce.input.mongo;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.mongodb.MongoExecutionTimeoutException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.CountOptions;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.log4j.Logger;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.sv.flexobject.hadoop.StreamableAndWritableWithSchema;
 import org.sv.flexobject.hadoop.mapreduce.input.split.InputSplitImpl;
+import org.sv.flexobject.json.MapperFactory;
+import org.sv.flexobject.mongo.json.BsonObjectToJsonConverter;
 import org.sv.flexobject.schema.annotations.NonStreamableField;
 import org.sv.flexobject.util.InstanceFactory;
 
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class MongoSplit extends StreamableAndWritableWithSchema implements InputSplitImpl {
     public static final Logger logger = Logger.getLogger(MongoSplit.class);
 
-    protected String queryJson = "";
+    protected JsonNode queryJson;
     @NonStreamableField
     private Bson query;
 
-    protected String projectionJson = "";
+    protected JsonNode projectionJson;
     @NonStreamableField
     private Bson projection;
 
-    protected String sortJson = "";
+    protected JsonNode sortJson;
     @NonStreamableField
     private Bson sort;
 
@@ -39,6 +37,24 @@ public class MongoSplit extends StreamableAndWritableWithSchema implements Input
     protected Integer skip;
     protected Boolean noTimeout = false;
     protected Long estimatedLength = 1l;
+
+    public static Bson json2bson(JsonNode json){
+        if (json != null){
+            return Document.parse(json.toString());
+        }
+        return null;
+    }
+
+    public static JsonNode bson2json(Bson bson){
+        if (bson != null) {
+            try {
+                return BsonObjectToJsonConverter.getInstance().convert(bson);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to convert bson to json :" + bson.toBsonDocument().toString(), e);
+            }
+        }
+        return null;
+    }
 
     public static class Builder{
         private Bson query;
@@ -81,16 +97,13 @@ public class MongoSplit extends StreamableAndWritableWithSchema implements Input
         public MongoSplit build(MongoCollection collection, int estimateLimit, int maxTimeMicros){
             MongoSplit split = InstanceFactory.get(MongoSplit.class);
             split.query = query;
-            if (query != null)
-                split.queryJson = query.toBsonDocument().toJson();
+            split.queryJson = bson2json(query);
 
             split.projection = projection;
-            if(projection != null)
-                split.projectionJson = projection.toBsonDocument().toJson();
+            split.projectionJson = bson2json(projection);
 
             split.sort = sort;
-            if (sort != null)
-                split.sortJson = sort.toBsonDocument().toJson();
+            split.sortJson = bson2json(sort);
 
             split.limit = limit;
             split.skip = skip;
@@ -109,22 +122,26 @@ public class MongoSplit extends StreamableAndWritableWithSchema implements Input
     public MongoSplit() {
     }
 
-    public MongoSplit(String queryJson, String projectionJson, String sortJson, Integer limit, Integer skip, Boolean noTimeout) {
-        this.queryJson = queryJson;
-        this.projectionJson = projectionJson;
-        this.sortJson = sortJson;
+    public MongoSplit(String queryJson, String projectionJson, String sortJson, Integer limit, Integer skip, Boolean noTimeout) throws JsonProcessingException {
+        this.queryJson = MapperFactory.getObjectReader().readTree(queryJson);
+        this.projectionJson = MapperFactory.getObjectReader().readTree(projectionJson);
+        this.sortJson = MapperFactory.getObjectReader().readTree(sortJson);
         this.limit = limit;
         this.skip = skip;
         this.noTimeout = noTimeout;
     }
 
-    public MongoSplit(String queryJson) {
+    public MongoSplit(String queryJson) throws JsonProcessingException {
+        this.queryJson = MapperFactory.getObjectReader().readTree(queryJson);
+    }
+
+    public MongoSplit(JsonNode queryJson) {
         this.queryJson = queryJson;
     }
 
     public Bson getQuery(){
         if (query == null && hasQuery())
-            query = Document.parse(queryJson);
+            query = json2bson(queryJson);
         return query;
     }
 
@@ -168,15 +185,15 @@ public class MongoSplit extends StreamableAndWritableWithSchema implements Input
     }
 
     public boolean hasQuery() {
-        return query != null || StringUtils.isNotBlank(queryJson);
+        return query != null || queryJson != null;
     }
 
     public boolean hasProjection() {
-        return projection != null || StringUtils.isNotBlank(projectionJson);
+        return projection != null || projectionJson != null;
     }
 
     public boolean hasSort() {
-        return sort != null || StringUtils.isNotBlank(sortJson);
+        return sort != null || sortJson != null;
     }
 
     public boolean hasLimit() {
@@ -185,7 +202,7 @@ public class MongoSplit extends StreamableAndWritableWithSchema implements Input
 
     public Bson getSort() {
         if (sort == null && hasSort())
-            sort = Document.parse(sortJson);
+            sort = json2bson(sortJson);
         return sort;
     }
 
@@ -207,7 +224,7 @@ public class MongoSplit extends StreamableAndWritableWithSchema implements Input
 
     public Bson getProjection() {
         if (projection == null && hasProjection())
-            projection = Document.parse(projectionJson);
+            projection = json2bson(projectionJson);
         return projection;
     }
 
