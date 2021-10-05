@@ -6,6 +6,7 @@ import org.bson.Document;
 import org.bson.RawBsonDocument;
 import org.bson.codecs.Encoder;
 import org.bson.codecs.EncoderContext;
+import org.bson.conversions.Bson;
 import org.bson.json.JsonWriterSettings;
 
 import java.io.IOException;
@@ -36,6 +37,8 @@ public class BsonObjectToJsonConverter {
             encoder = getDefaultCodecRegistry().get(Document.class);
         else if (value instanceof RawBsonDocument)
             encoder = getDefaultCodecRegistry().get(RawBsonDocument.class);
+        else if (value instanceof Bson)
+            encoder = getDefaultCodecRegistry().get(Bson.class);
         else
             throw new IOException("Unknown BSON document type " + value.getClass());
 
