@@ -41,23 +41,31 @@ public class Cluster implements AutoCloseable, Configurable {
 
     public void addMember(ClusterMember member, boolean isMaster){
         if (member != null) {
-            if (isMaster)
-                master = member;
-            else
-                slaves.add(member);
+            synchronized (this) {
+                if (isMaster)
+                    master = member;
+                else
+                    slaves.add(member);
+            }
         }
     }
 
     @Override
     public void close() throws Exception {
-        if (master != null) {
-            logger.info("Shutting down master ...");
-            master.close();
+        synchronized (this) {
+            if (master != null) {
+                logger.info("Shutting down master ...");
+                master.close();
+                master = null;
+            }
+            logger.info("Shutting down slaves ...");
+            for (ClusterMember slave : slaves) {
+                if (slave != null)
+                    slave.close();
+            }
+            slaves.clear();
+            logger.info("Shutdown complete");
         }
-        logger.info("Shutting down slaves ...");
-        for (ClusterMember slave : slaves)
-            slave.close();
-        logger.info("Shutdown complete");
     }
 
 
@@ -82,6 +90,14 @@ public class Cluster implements AutoCloseable, Configurable {
         onlineSlaves.clear();
         for (int i = 0 ; i < slaves.size() ; ++i){
             ClusterMember slave = slaves.get(i);
+            if (slave == null){
+                if (master != null) {
+                    logger.fatal("Encountered a null slave. That should never happen!");
+                } else { // most likely shutdown in progress
+                }
+                onlineSlaves.clear();
+                return onlineSlaves;
+            }
             if (!slave.isOffline(config.offlineRetryMillis))
                 onlineSlaves.add(slave);
         }
@@ -91,6 +107,8 @@ public class Cluster implements AutoCloseable, Configurable {
     public int countOnlineSlaves() {
         int count = 0;
         for (ClusterMember slave : slaves) {
+            if (slave == null) // should never happen - probably shutdown in progress
+                return 0;
             if (!slave.isOffline(config.offlineRetryMillis))
                 count++;
         }
