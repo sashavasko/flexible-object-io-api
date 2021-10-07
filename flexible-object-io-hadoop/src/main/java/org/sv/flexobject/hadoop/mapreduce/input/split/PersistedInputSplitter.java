@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PersistentInputSplitter extends Configured implements Splitter {
+public class PersistedInputSplitter extends Configured implements Splitter {
     @Override
     public List<InputSplit> split(Configuration rawConf) throws IOException {
         setConf(rawConf);
