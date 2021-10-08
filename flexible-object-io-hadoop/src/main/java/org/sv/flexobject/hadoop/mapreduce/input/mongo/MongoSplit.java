@@ -172,7 +172,7 @@ public class MongoSplit extends StreamableAndWritableWithSchema implements Input
 
     @Override
     public long getLength() throws IOException, InterruptedException {
-        return estimatedLength;
+        return estimatedLength == null ? 0 : estimatedLength;
     }
 
     @Override

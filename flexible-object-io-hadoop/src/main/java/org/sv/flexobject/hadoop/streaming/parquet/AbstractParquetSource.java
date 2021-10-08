@@ -140,12 +140,14 @@ public class AbstractParquetSource<T> implements Source<T>, AutoCloseable {
                     schema = ParquetSchema.forClass(dataClass);
                 else if (parquetConf.hasParquetSchema())
                     schema = parquetConf.getParquetSchema();
-                else
-                    throw new IllegalArgumentException("Input Schema is not set");
+//                else
+//                    throw new IllegalArgumentException("Input Schema is not set");
             }
 
             parquetBuilder.withConf(conf);
-            parquetBuilder.withSchema(schema);
+            if (schema != null)
+                parquetBuilder.withSchema(schema);
+
             SOURCE source = (SOURCE) sourceClass.cast(InstanceFactory.get(sourceClass));
             source.conf = parquetConf;
             source.reader = parquetBuilder.build();

@@ -7,6 +7,7 @@ import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.mapreduce.InputSplit;
+import org.apache.log4j.Logger;
 import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.hadoop.mapreduce.input.Splitter;
 import org.sv.flexobject.hadoop.streaming.parquet.streamable.ParquetSource;
@@ -17,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PersistedInputSplitter extends Configured implements Splitter {
+    public static final Logger logger = Logger.getLogger(PersistedInputSplitter.class);
+
     @Override
     public List<InputSplit> split(Configuration rawConf) throws IOException {
         setConf(rawConf);
@@ -35,18 +38,23 @@ public class PersistedInputSplitter extends Configured implements Splitter {
                 loadSplitsFromFile(fileStatus.getPath(), splits);
             }
         }
+        logger.info(splits.size() + " total splits loaded");
 
         return splits;
     }
 
     protected void loadSplitsFromFile(Path path, List<InputSplit> splits) throws IOException {
+        logger.info("Loading splits from " + path);
         try(ParquetSource source = ParquetSource.builder()
                 .withConf(getConf())
                 .forInput(path)
                 .build()){
             while(!source.isEOF()){
                 StreamableWithSchema data = source.get();
-                splits.add(new ProxyInputSplit((InputSplitImpl) data));
+                if(data == null)
+                    logger.error("Unexpected null Input Split implementation");
+                else
+                    splits.add(new ProxyInputSplit((InputSplitImpl) data));
             }
         } catch (Exception e) {
             throw new IOException("Failed to load splits from file " + path, e);
