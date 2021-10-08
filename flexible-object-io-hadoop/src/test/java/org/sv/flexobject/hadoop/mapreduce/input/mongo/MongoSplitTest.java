@@ -1,12 +1,15 @@
 package org.sv.flexobject.hadoop.mapreduce.input.mongo;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.CountOptions;
+import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -227,5 +230,14 @@ public class MongoSplitTest {
                 "  optional boolean noTimeout;\n" +
                 "  optional int64 estimatedLength;\n" +
                 "}\n", ParquetSchema.forClass(MongoSplit.class).toString());
+    }
+
+    @Test
+    public void objectIdQuery() {
+        //"609285a90000000000000000"}}, {"_id": {"$lt": "6092868a0000000000000000
+        Bson query = Filters.and(Filters.gte("_id", new ObjectId("609285a90000000000000000")),Filters.lt("_id", new ObjectId("6092868a0000000000000000")));
+
+        JsonNode json = MongoSplit.bson2json(query);
+        assertEquals(query.toBsonDocument().toJson().replace(" ", ""), json.toString());
     }
 }

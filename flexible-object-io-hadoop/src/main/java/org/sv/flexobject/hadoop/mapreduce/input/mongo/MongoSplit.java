@@ -48,7 +48,8 @@ public class MongoSplit extends StreamableAndWritableWithSchema implements Input
     public static JsonNode bson2json(Bson bson){
         if (bson != null) {
             try {
-                return BsonObjectToJsonConverter.getInstance().convert(bson);
+//                return BsonObjectToJsonConverter.getInstance().convert(bson); // This does not handle ObjectIds properly TODO!!!
+                return MapperFactory.getObjectReader().readTree(bson.toBsonDocument().toJson());
             } catch (IOException e) {
                 throw new RuntimeException("Failed to convert bson to json :" + bson.toBsonDocument().toString(), e);
             }
