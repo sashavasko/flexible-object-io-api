@@ -57,52 +57,60 @@ public class FieldWrapper {
 
     public Field getField() throws NoSuchFieldException, SchemaException {
         if (field == null) {
-            field = clazz.getDeclaredField(fieldName);
-            field.setAccessible(true);
-            fieldClass = field.getType();
-            type = DataTypes.valueOf(fieldClass);
-            isEnum = Enum.class.isAssignableFrom(fieldClass);
-            if (Set.class.isAssignableFrom(fieldClass)){
-                EnumSetField enumSetField = field.getAnnotation(EnumSetField.class);
-                if (enumSetField != null){
-                    enumClass = enumSetField.enumClass();
-                    emptyValue = enumSetField.emptyValue();
-                } else {
+            synchronized (this) {
+                if (field != null)
+                    return field;
+
+                Field field;
+                field = clazz.getDeclaredField(fieldName);
+                field.setAccessible(true);
+                fieldClass = field.getType();
+                type = DataTypes.valueOf(fieldClass);
+                isEnum = Enum.class.isAssignableFrom(fieldClass);
+                if (Set.class.isAssignableFrom(fieldClass)) {
+                    EnumSetField enumSetField = field.getAnnotation(EnumSetField.class);
+                    if (enumSetField != null) {
+                        enumClass = enumSetField.enumClass();
+                        emptyValue = enumSetField.emptyValue();
+                    } else {
+                        ValueType vt = field.getAnnotation(ValueType.class);
+                        if (vt != null) {
+                            type = vt.type();
+                            structure = figureOutCollectionStructure();
+                            this.field = field;
+                            return field;
+                        } else
+                            throw new SchemaException(getQualifiedName() + ": Sets are supported only for Enumeration type (with EnumSetField annotation) or ValueType annotation must be used.");
+                    }
+                }
+
+                if (type == DataTypes.invalid) {
                     ValueType vt = field.getAnnotation(ValueType.class);
+                    ValueClass vc = field.getAnnotation(ValueClass.class);
                     if (vt != null) {
                         type = vt.type();
                         structure = figureOutCollectionStructure();
-                        return field;
-                    }else
-                        throw new SchemaException(getQualifiedName() + ": Sets are supported only for Enumeration type (with EnumSetField annotation) or ValueType annotation must be used.");
-                }
-            }
-
-            if (type == DataTypes.invalid){
-                ValueType vt = field.getAnnotation(ValueType.class);
-                ValueClass vc = field.getAnnotation(ValueClass.class);
-                if (vt != null){
-                    type = vt.type();
-                    structure = figureOutCollectionStructure();
-                    if (structure == STRUCT.map){
-                        KeyType kt = field.getAnnotation(KeyType.class);
-                        if (kt != null)
-                            keyType = kt.type();
+                        if (structure == STRUCT.map) {
+                            KeyType kt = field.getAnnotation(KeyType.class);
+                            if (kt != null)
+                                keyType = kt.type();
+                        }
+                    } else if (vc != null) {
+                        type = DataTypes.jsonNode;
+                        valueClass = vc.valueClass();
+                        structure = figureOutCollectionStructure();
+                    } else if (fieldClass.isArray() && StreamableWithSchema[].class.isAssignableFrom(fieldClass)) {
+                        type = DataTypes.jsonNode;
+                        structure = STRUCT.array;
                     }
-                }else if (vc != null) {
-                    type = DataTypes.jsonNode;
-                    valueClass = vc.valueClass();
-                    structure = figureOutCollectionStructure();
-                }else if (fieldClass.isArray() && StreamableWithSchema[].class.isAssignableFrom(fieldClass)){
-                    type = DataTypes.jsonNode;
+                } else if (fieldClass.isArray()) {
                     structure = STRUCT.array;
+                } else {
+                    structure = STRUCT.scalar;
+                    if (type == DataTypes.jsonNode && StreamableWithSchema.class.isAssignableFrom(fieldClass))
+                        valueClass = (Class<? extends StreamableWithSchema>) fieldClass;
                 }
-            } else if (fieldClass.isArray()) {
-                structure = STRUCT.array;
-            } else {
-                structure = STRUCT.scalar;
-                if (type == DataTypes.jsonNode && StreamableWithSchema.class.isAssignableFrom(fieldClass))
-                    valueClass = (Class<? extends StreamableWithSchema>) fieldClass;
+                this.field = field;
             }
         }
         return field;
@@ -150,12 +158,12 @@ public class FieldWrapper {
     public void clear(Object o) throws Exception {
         if (field == null)
             getField();
-        if (fieldClass.isPrimitive()){
+        if (getFieldClass().isPrimitive()){
             if (fieldClass == boolean.class)
                 setValue(o, false);
             else
                 setValue(o, 0);
-        } else if (fieldClass.isArray()){
+        } else if (getFieldClass().isArray()){
             try {
                 Object[] array = (Object[]) getValue(o);
                 if (valueClass != null){
@@ -186,10 +194,10 @@ public class FieldWrapper {
         if (field == null)
             getField();
 
-        if (fieldClass.isPrimitive()){
+        if (getFieldClass().isPrimitive()){
             Object value = getValue(o);
             return DataTypes.isEmptyPrimitive(value);
-        } else if (fieldClass.isArray()){
+        } else if (getFieldClass().isArray()){
             try {
                 Object[] array = (Object[]) getValue(o);
                 if (valueClass != null){
@@ -221,7 +229,7 @@ public class FieldWrapper {
     }
 
     public DataTypes getType() throws NoSuchFieldException, SchemaException {
-        if (field == null)
+        if (field == null || type == null)
             getField();
         return type;
     }
@@ -233,7 +241,7 @@ public class FieldWrapper {
     }
 
     public Class<?> getFieldClass() throws NoSuchFieldException, SchemaException {
-        if (field == null)
+        if (field == null || fieldClass == null)
             getField();
         return fieldClass;
     }
