@@ -84,8 +84,14 @@ public class Schema extends AbstractSchema{
 
     public static Schema getRegisteredSchema(Class<?> dataClass){
         String schemaName = dataClass.getName();
-        return SchemaRegistry.getInstance().hasSchema(schemaName) ?
-                SchemaRegistry.getInstance().getSchema(schemaName) : new Schema(dataClass);
+        if (SchemaRegistry.getInstance().hasSchema(schemaName))
+            return SchemaRegistry.getInstance().getSchema(schemaName);
+
+        synchronized (SchemaRegistry.getInstance()) {
+            if (SchemaRegistry.getInstance().hasSchema(schemaName))
+                return SchemaRegistry.getInstance().getSchema(schemaName);
+            return new Schema(dataClass);
+        }
     }
 
     public static Map<String, Integer> getParamNamesXref(Class<?> dataClass){
