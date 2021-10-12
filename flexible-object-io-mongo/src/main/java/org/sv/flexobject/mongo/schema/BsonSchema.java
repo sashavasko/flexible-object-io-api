@@ -1,17 +1,13 @@
 package org.sv.flexobject.mongo.schema;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.sv.flexobject.StreamableWithSchema;
-import org.sv.flexobject.json.MapperFactory;
-import org.sv.flexobject.mongo.json.BsonObjectToJsonConverter;
-import org.sv.flexobject.schema.*;
-import org.sv.flexobject.schema.reflect.FieldWrapper;
-import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.codec.binary.Hex;
 import org.bson.*;
 import org.bson.types.Binary;
 import org.bson.types.ObjectId;
+import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.mongo.json.BsonToJsonConverter;
+import org.sv.flexobject.schema.*;
+import org.sv.flexobject.schema.reflect.FieldWrapper;
 import org.sv.flexobject.util.FunctionWithException;
 
 import java.lang.reflect.Field;
@@ -265,13 +261,15 @@ public class BsonSchema extends AbstractSchema {
         if (value == null || value instanceof BsonNull)
             return null;
 
+        BsonToJsonConverter bsonConverter = new BsonToJsonConverter();
+
         if (value instanceof Map) {
             Map<String, ?> map = (Map<String, ?>) value;
             if (recordSchema != null)
                 return fromBson(map, recordSchema);
             else {// actual map of values
                 if (valueType == DataTypes.jsonNode){
-                    return BsonObjectToJsonConverter.getInstance().convert(value);
+                    return bsonConverter.convert(value);
                 }else {
                     Map<String, Object> convertedMap = new HashMap<>();
                     for (Map.Entry<String, ?> entry : map.entrySet()) {

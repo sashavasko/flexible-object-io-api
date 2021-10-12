@@ -6,7 +6,7 @@ import org.bson.Document;
 import org.bson.RawBsonDocument;
 import org.sv.flexobject.adapter.GenericInAdapter;
 import org.sv.flexobject.json.MapperFactory;
-import org.sv.flexobject.mongo.json.BsonObjectToJsonConverter;
+import org.sv.flexobject.mongo.json.BsonToJsonConverter;
 import org.sv.flexobject.stream.Source;
 import org.sv.flexobject.stream.sources.SingleValueSource;
 import org.sv.flexobject.util.ConsumerWithException;
@@ -19,7 +19,7 @@ import java.util.Map;
 
 public class MongoInAdapter extends GenericInAdapter<Map<String,Object>> {
 
-    BsonObjectToJsonConverter converter = InstanceFactory.get(BsonObjectToJsonConverter.class);
+    BsonToJsonConverter converter = InstanceFactory.get(BsonToJsonConverter.class);
 
     public MongoInAdapter() {
     }
