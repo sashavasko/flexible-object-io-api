@@ -11,7 +11,7 @@ import org.bson.conversions.Bson;
 import org.sv.flexobject.hadoop.StreamableAndWritableWithSchema;
 import org.sv.flexobject.hadoop.mapreduce.input.split.InputSplitImpl;
 import org.sv.flexobject.json.MapperFactory;
-import org.sv.flexobject.mongo.json.BsonObjectToJsonConverter;
+import org.sv.flexobject.mongo.json.BsonToJsonConverter;
 import org.sv.flexobject.schema.annotations.NonStreamableField;
 import org.sv.flexobject.util.InstanceFactory;
 
@@ -38,6 +38,9 @@ public class MongoSplit extends StreamableAndWritableWithSchema implements Input
     protected Boolean noTimeout = false;
     protected Long estimatedLength = 1l;
 
+    @NonStreamableField
+    protected static final BsonToJsonConverter bsonToJsonConverter = new BsonToJsonConverter();
+
     public static Bson json2bson(JsonNode json){
         if (json != null){
             return Document.parse(json.toString());
@@ -48,8 +51,7 @@ public class MongoSplit extends StreamableAndWritableWithSchema implements Input
     public static JsonNode bson2json(Bson bson){
         if (bson != null) {
             try {
-//                return BsonObjectToJsonConverter.getInstance().convert(bson); // This does not handle ObjectIds properly TODO!!!
-                return MapperFactory.getObjectReader().readTree(bson.toBsonDocument().toJson());
+                return bsonToJsonConverter.convert(bson);
             } catch (IOException e) {
                 throw new RuntimeException("Failed to convert bson to json :" + bson.toBsonDocument().toString(), e);
             }
@@ -123,8 +125,12 @@ public class MongoSplit extends StreamableAndWritableWithSchema implements Input
     public MongoSplit() {
     }
 
+    public MongoSplit(JsonNode queryJson) {
+        this.queryJson = queryJson;
+    }
+
     public MongoSplit(String queryJson, String projectionJson, String sortJson, Integer limit, Integer skip, Boolean noTimeout) throws JsonProcessingException {
-        this.queryJson = MapperFactory.getObjectReader().readTree(queryJson);
+        this(MapperFactory.getObjectReader().readTree(queryJson));
         this.projectionJson = MapperFactory.getObjectReader().readTree(projectionJson);
         this.sortJson = MapperFactory.getObjectReader().readTree(sortJson);
         this.limit = limit;
@@ -133,11 +139,7 @@ public class MongoSplit extends StreamableAndWritableWithSchema implements Input
     }
 
     public MongoSplit(String queryJson) throws JsonProcessingException {
-        this.queryJson = MapperFactory.getObjectReader().readTree(queryJson);
-    }
-
-    public MongoSplit(JsonNode queryJson) {
-        this.queryJson = queryJson;
+        this(MapperFactory.getObjectReader().readTree(queryJson));
     }
 
     public Bson getQuery(){

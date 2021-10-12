@@ -40,7 +40,7 @@ public class PersistedInputSplitterTest {
 
     @Test
     public void splitFromRealLocation() throws Exception {
-        rawConf.set("cfx.input.splits.path", "test-splits");
+        rawConf.set("sv.input.splits.path", testFileFolder.toString());
         writeTestFile(rawConf, new Path(testFileFolder, "file1.parquet"), 5l, 10l, 15l, 20l);
         PersistedInputSplitter splitter = new PersistedInputSplitter();
 

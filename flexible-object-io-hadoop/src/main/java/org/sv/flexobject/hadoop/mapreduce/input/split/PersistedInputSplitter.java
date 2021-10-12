@@ -49,12 +49,9 @@ public class PersistedInputSplitter extends Configured implements Splitter {
                 .withConf(getConf())
                 .forInput(path)
                 .build()){
-            while(!source.isEOF()){
-                StreamableWithSchema data = source.get();
-                if(data == null)
-                    logger.error("Unexpected null Input Split implementation");
-                else
-                    splits.add(new ProxyInputSplit((InputSplitImpl) data));
+            StreamableWithSchema data;
+            while((data = source.get()) != null){
+                splits.add(new ProxyInputSplit((InputSplitImpl) data));
             }
         } catch (Exception e) {
             throw new IOException("Failed to load splits from file " + path, e);
