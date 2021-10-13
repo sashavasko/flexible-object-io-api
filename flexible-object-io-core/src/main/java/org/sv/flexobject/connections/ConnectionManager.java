@@ -9,7 +9,7 @@ import java.util.*;
 public class ConnectionManager {
     // TODO add extensive Loggin for providers registration/unregistration
 
-    private static ConnectionManager instance = null;
+    private static ConnectionManager instance = new ConnectionManager();
     private final Object lock = new Object();
 
     public enum DeploymentLevel{
@@ -29,8 +29,6 @@ public class ConnectionManager {
     }
 
     public static ConnectionManager getInstance(){
-        if (instance == null)
-            instance = new ConnectionManager();
         return instance;
     }
 
@@ -62,7 +60,12 @@ public class ConnectionManager {
     }
 
     public static AutoCloseable getConnection(Class<? extends AutoCloseable> connectionType, String connectionName) throws Exception {
-        return getInstance().getConnectionImpl(connectionType, connectionName);
+        return getConnection(connectionType, connectionName, null);
+    }
+
+    public static AutoCloseable getConnection(Class<? extends AutoCloseable> connectionType, String connectionName, Properties overrides) throws Exception {
+
+        return getInstance().getConnectionImpl(connectionType, connectionName, overrides);
     }
 
     /*
@@ -225,7 +228,7 @@ public class ConnectionManager {
         }
     }
 
-    protected AutoCloseable getConnectionImpl(Class<? extends AutoCloseable> connectionType, String connectionName) throws Exception {
+    protected AutoCloseable getConnectionImpl(Class<? extends AutoCloseable> connectionType, String connectionName, Properties overrides) throws Exception {
         synchronized (lock) {
             ConnectionProvider connectionProvider = connectionProviders.get(connectionType);
             if (connectionProvider == null) {
@@ -238,6 +241,12 @@ public class ConnectionManager {
                 connectionProperties = provider.getProperties(connectionName, deploymentLevel, environment);
                 if (connectionProperties != null && !connectionProperties.isEmpty())
                     break;
+            }
+            if(overrides != null){
+                if (connectionProperties == null)
+                    connectionProperties = overrides;
+                else
+                    connectionProperties.putAll(overrides);
             }
 
             for (SecretProvider provider : secretProviders) {

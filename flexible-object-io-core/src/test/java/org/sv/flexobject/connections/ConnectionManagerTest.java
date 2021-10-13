@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Properties;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
@@ -136,6 +137,14 @@ public class ConnectionManagerTest {
     @Test
     public void getConnection() throws Exception {
         assertSame(mockConnection, ConnectionManager.getInstance().getConnection(FakeConnection.class, connectionName));
+    }
+
+    @Test
+    public void getConnectionWithOverrides() throws Exception {
+        Properties overrides =new Properties();
+
+        assertSame(mockConnection, ConnectionManager.getInstance().getConnection(FakeConnection.class, connectionName, overrides));
+        verify(mockProperties).putAll(overrides);
     }
 
     @Test(expected = IOException.class)
