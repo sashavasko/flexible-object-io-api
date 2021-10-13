@@ -24,11 +24,18 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 public class MongoClientProvider implements ConnectionProvider {
 
-    Logger logger = LogManager.getLogger(MongoClientProvider.class);
+    public static final Logger logger = LogManager.getLogger(MongoClientProvider.class);
+
+    public static final String MONGODB_PREFIX = "mongodb://";
+    public static final String MONGODB_SRV_PREFIX = "mongodb+srv://";
 
     @Override
     public AutoCloseable getConnection(String name, Properties connectionProperties, Object secret) throws Exception {
         String url = connectionProperties.getProperty("url");
+
+        if (connectionProperties.containsKey("hosts")){
+            url = replaceHosts(url, connectionProperties.getProperty("hosts"));
+        }
 
         ConnectionString connectionString = new ConnectionString(url);
 
@@ -119,6 +126,53 @@ public class MongoClientProvider implements ConnectionProvider {
         logger.info("connected to Mongo");
 
         return mongo;
+    }
+
+    protected String replaceHosts(String url, String hosts) {
+        String hostsPrefix = parseUrlHostsPrefix(url);
+        String hostsSuffix = parseUrlHostsSuffix(hostsPrefix.length(), url);
+
+        return hostsPrefix + hosts + hostsSuffix;
+    }
+
+    private String parseUrlHostsSuffix(int prefixLength, String url) {
+        String suffix = url.substring(prefixLength);
+        int idx = suffix.indexOf("/");
+        return idx == -1 ? "" : suffix.substring(idx);
+    }
+
+    private String parseUrlHostsPrefix(String url) {
+        String unprocessedConnectionString;
+        StringBuilder sb = new StringBuilder();
+        if (url.startsWith(MONGODB_SRV_PREFIX)) {
+            unprocessedConnectionString = url.substring(MONGODB_SRV_PREFIX.length());
+            sb.append(MONGODB_SRV_PREFIX);
+        } else {
+            unprocessedConnectionString = url.substring(MONGODB_PREFIX.length());
+            sb.append(MONGODB_PREFIX);
+        }
+
+        // Stolen from mongodb driver sources :
+        // Split out the user and host information
+        String userAndHostInformation;
+        int idx = unprocessedConnectionString.indexOf("/");
+        if (idx == -1) {
+            if (unprocessedConnectionString.contains("?")) {
+                throw new IllegalArgumentException("The connection string contains options without trailing slash");
+            }
+            userAndHostInformation = unprocessedConnectionString;
+        } else {
+            userAndHostInformation = unprocessedConnectionString.substring(0, idx);
+        }
+
+        idx = userAndHostInformation.lastIndexOf("@");
+        if (idx > 0) {
+            sb.append(userAndHostInformation, 0, idx+1);
+        } else if (idx == 0) {
+            throw new IllegalArgumentException("The connection string contains an at-sign (@) without a user name");
+        }
+
+        return sb.toString();
     }
 
     @Override
