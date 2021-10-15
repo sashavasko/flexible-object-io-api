@@ -8,6 +8,8 @@ import org.bson.RawBsonDocument;
 import org.sv.flexobject.connections.ConnectionManager;
 import org.sv.flexobject.util.InstanceFactory;
 
+import java.util.Properties;
+
 public class MongoConnection implements AutoCloseable{
     MongoClient client;
     MongoDatabase db;
@@ -20,6 +22,7 @@ public class MongoConnection implements AutoCloseable{
     public static class Builder<SELF extends Builder> {
         String connectionName;
         String dbName;
+        Properties overrides = new Properties();
 
         public SELF forName(String connectionName){
             this.connectionName = connectionName;
@@ -31,10 +34,20 @@ public class MongoConnection implements AutoCloseable{
             return (SELF) this;
         }
 
+        public SELF override(String propertyName, String propertyValue){
+            overrides.setProperty(propertyName, propertyValue);
+            return (SELF)this;
+        }
+
+        public SELF override(Properties overrides){
+            overrides.putAll(overrides);
+            return (SELF)this;
+        }
+
         public MongoConnection build() throws Exception {
             MongoConnection connection = InstanceFactory.get(MongoConnection.class);
 
-            connection.client = (MongoClient) ConnectionManager.getConnection(MongoClient.class, connectionName);
+            connection.client = (MongoClient) ConnectionManager.getConnection(MongoClient.class, connectionName, overrides);
             connection.db = connection.client.getDatabase(dbName);
             return connection;
         }

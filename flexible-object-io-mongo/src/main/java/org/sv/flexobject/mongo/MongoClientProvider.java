@@ -28,13 +28,14 @@ public class MongoClientProvider implements ConnectionProvider {
 
     public static final String MONGODB_PREFIX = "mongodb://";
     public static final String MONGODB_SRV_PREFIX = "mongodb+srv://";
+    public static final String HOSTS_OVERRIDE = "hosts";
 
     @Override
     public AutoCloseable getConnection(String name, Properties connectionProperties, Object secret) throws Exception {
         String url = connectionProperties.getProperty("url");
 
-        if (connectionProperties.containsKey("hosts")){
-            url = replaceHosts(url, connectionProperties.getProperty("hosts"));
+        if (connectionProperties.containsKey(HOSTS_OVERRIDE)){
+            url = replaceHosts(url, connectionProperties.getProperty(HOSTS_OVERRIDE));
         }
 
         ConnectionString connectionString = new ConnectionString(url);

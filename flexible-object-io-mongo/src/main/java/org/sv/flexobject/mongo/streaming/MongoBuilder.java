@@ -3,9 +3,11 @@ package org.sv.flexobject.mongo.streaming;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.mongo.MongoClientProvider;
 import org.sv.flexobject.mongo.connection.MongoConnection;
 import org.sv.flexobject.mongo.schema.BsonSchema;
 import org.sv.flexobject.stream.Source;
@@ -14,6 +16,7 @@ public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Sou
     protected String connectionName;
     protected String dbName;
     private MongoConnection connection;
+    protected String hosts;
     private boolean ownConnection = true;
     protected String collectionName;
     protected Bson filter;
@@ -33,6 +36,11 @@ public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Sou
     public SELF connection(MongoConnection connection) {
         this.connection = connection;
         ownConnection = false;
+        return (SELF) this;
+    }
+
+    public SELF hosts(String hosts) {
+        this.hosts = hosts;
         return (SELF) this;
     }
 
@@ -93,9 +101,13 @@ public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Sou
 
     public MongoConnection getConnection() throws Exception {
         if (connection == null){
-            connection = MongoConnection.builder()
+            MongoConnection.Builder builder = MongoConnection.builder()
                     .forName(connectionName)
-                    .db(dbName).build();
+                    .db(dbName);
+            if (StringUtils.isNotBlank(hosts))
+                builder.override(MongoClientProvider.HOSTS_OVERRIDE, hosts);
+
+            connection = builder.build();
             ownConnection = true;
         } else {
             ownConnection = false;
