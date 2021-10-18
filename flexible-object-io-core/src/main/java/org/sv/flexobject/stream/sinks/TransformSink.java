@@ -33,7 +33,7 @@ public class TransformSink<SELF,INPUT,OUTPUT> implements Sink<INPUT> {
     public void transformAll(Source<INPUT> source) throws Exception {
         INPUT data;
         while ((data = source.get()) != null) {
-            if (!put(data))
+            if (put(data))
                 break;
         }
         setEOF();
@@ -43,7 +43,7 @@ public class TransformSink<SELF,INPUT,OUTPUT> implements Sink<INPUT> {
     public boolean put(INPUT value) throws Exception {
         OUTPUT output = transform(value);
         if (output == null)
-            return false;
+            return true;
         return outputSink.put(output);
     }
 
