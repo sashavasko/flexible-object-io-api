@@ -1,5 +1,6 @@
 package org.sv.flexobject.mongo.streaming;
 
+import com.mongodb.CursorType;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
@@ -25,6 +26,7 @@ public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Sou
     protected Integer limit;
     protected Integer skip;
     protected Boolean notimeout = false;
+    protected CursorType cursorType;
     private MongoCursor cursor;
     private Class documentClass = Document.class;
 
@@ -84,6 +86,11 @@ public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Sou
         return (SELF) this;
     }
 
+    public SELF cursorType(CursorType cursorType) {
+        this.cursorType = cursorType;
+        return (SELF) this;
+    }
+
     public SELF schema(Class<? extends StreamableWithSchema> schema) {
         this.documentClass = schema;
         return (SELF) this;
@@ -124,19 +131,27 @@ public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Sou
             forDocumentClass(documentClass);
             MongoCollection<TDocument> collection = getCollection();
             FindIterable<TDocument> findIterable = collection.find();
-            if (filter != null)
+            if (filter != null) {
                 findIterable = findIterable.filter(filter);
+//                System.out.println("Using filter: " + filter.toBsonDocument().toJson());
+            }else {
+//                System.out.println("No filter specified");
+            }
             if (limit != null)
                 findIterable = findIterable.limit(limit);
             if (skip != null)
                 findIterable = findIterable.skip(skip);
             if (projection != null)
                 findIterable = findIterable.projection(projection);
-            if (sort != null)
+            if (sort != null) {
                 findIterable = findIterable.sort(sort);
+//                System.out.println("Using sort :" + sort.toBsonDocument().toJson());
+            }
             if (notimeout != null)
                 findIterable = findIterable.noCursorTimeout(true);
 
+            if (cursorType != null)
+                findIterable = findIterable.cursorType(CursorType.TailableAwait);
             cursor = findIterable.cursor();
         }
         return cursor;
@@ -148,7 +163,7 @@ public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Sou
 
     public BsonSchema getBsonSchema() {
         return getSchema() != null ?
-            BsonSchema.getRegisteredSchema(getSchema()) : null;
+                BsonSchema.getRegisteredSchema(getSchema()) : null;
     }
 
     public Class getDocumentClass() {
