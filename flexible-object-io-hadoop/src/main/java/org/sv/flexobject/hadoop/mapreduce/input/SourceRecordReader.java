@@ -1,5 +1,6 @@
 package org.sv.flexobject.hadoop.mapreduce.input;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.sv.flexobject.stream.Source;
@@ -12,6 +13,7 @@ public abstract class SourceRecordReader<K,V,SPLIT extends InputSplit> extends H
 
     V currentValue;
     InputConf conf = null;
+    Configuration rawConf;
 
     @Override
     public void setInputConf(InputConf conf) {
@@ -23,10 +25,15 @@ public abstract class SourceRecordReader<K,V,SPLIT extends InputSplit> extends H
         return conf;
     }
 
+    public Configuration getConf() {
+        return rawConf;
+    }
+
     protected Source<V> createSource(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException{
+        rawConf = taskAttemptContext.getConfiguration();
         if (conf == null) {
             conf = InstanceFactory.get(InputConf.class);
-            conf.from(taskAttemptContext.getConfiguration());
+            conf.from(rawConf);
         }
 
         try {
@@ -41,23 +48,31 @@ public abstract class SourceRecordReader<K,V,SPLIT extends InputSplit> extends H
     }
 
     @Override
-    protected void setupInput(InputSplit split, TaskAttemptContext context) throws IOException {
+    protected void setupInput(SPLIT split, TaskAttemptContext context) throws IOException {
         source = createSource(split, context);
         getProgressReporter().setSize(source);
     }
 
+    protected boolean isValidRecord(V record){
+        return record != null;
+    }
+
+    protected boolean hasMoreRecords(){
+        return !source.isEOF();
+    }
+
     @Override
     public boolean nextKeyValue() throws IOException {
-        if (source.isEOF())
-            return false;
-
-        try {
-            currentValue = source.get();
-            getProgressReporter().increment();
-            return true;
-        } catch (Exception e) {
-            throw new IOException("Failed to get next Value", e);
+        if (hasMoreRecords()) {
+            try {
+                currentValue = source.get();
+                getProgressReporter().increment();
+                return isValidRecord(currentValue);
+            } catch (Exception e) {
+                throw new IOException("Failed to get next Value", e);
+            }
         }
+        return false;
     }
 
     protected abstract K extractKeyFromValue(V value);

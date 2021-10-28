@@ -2,9 +2,11 @@ package org.sv.flexobject.hadoop.mapreduce.input.mongo;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.mongodb.MongoCommandException;
 import com.mongodb.MongoExecutionTimeoutException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.CountOptions;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -36,6 +38,11 @@ public class MongoSplit extends StreamableAndWritableWithSchema implements Input
     protected Integer limit;
     protected Integer skip;
     protected Boolean noTimeout = false;
+
+    protected String hosts;
+    protected String dbName;
+    protected String collectionName;
+
     protected Long estimatedLength = 1l;
 
     @NonStreamableField
@@ -60,12 +67,22 @@ public class MongoSplit extends StreamableAndWritableWithSchema implements Input
     }
 
     public static class Builder{
+        private Class<? extends MongoSplit> splitClass = MongoSplit.class;
         private Bson query;
         private Bson projection;
         private Bson sort;
         protected Integer limit;
         protected Integer skip;
         protected Boolean noTimeout = false;
+        protected String hosts;
+        protected String dbName;
+        protected String collectionName;
+        protected Long estimatedLength;
+
+        public Builder splitClass(Class<? extends MongoSplit> splitClass){
+            this.splitClass = splitClass;
+            return this;
+        }
 
         public Builder query(Bson query){
             this.query = query;
@@ -87,6 +104,11 @@ public class MongoSplit extends StreamableAndWritableWithSchema implements Input
             return this;
         }
 
+        public Builder length(long estimatedLength){
+            this.estimatedLength = estimatedLength;
+            return this;
+        }
+
         public Builder skip(int skip){
             this.skip = skip;
             return this;
@@ -97,8 +119,26 @@ public class MongoSplit extends StreamableAndWritableWithSchema implements Input
             return this;
         }
 
-        public MongoSplit build(MongoCollection collection, int estimateLimit, int maxTimeMicros){
-            MongoSplit split = InstanceFactory.get(MongoSplit.class);
+        public Builder hosts(String hosts){
+            this.hosts = hosts;
+            return this;
+        }
+
+        public Builder db(String dbName){
+            this.dbName = dbName;
+            return this;
+        }
+
+        public Builder collection(String collectionName){
+            this.collectionName = collectionName;
+            return this;
+        }
+
+        public <T extends MongoSplit> T build(){
+            return build(null, 0, 0);
+        }
+        public <T extends MongoSplit> T  build(MongoCollection collection, int estimateLimit, int maxTimeMicros){
+            MongoSplit split = InstanceFactory.get(splitClass);
             split.query = query;
             split.queryJson = bson2json(query);
 
@@ -112,9 +152,26 @@ public class MongoSplit extends StreamableAndWritableWithSchema implements Input
             split.skip = skip;
             split.noTimeout = noTimeout;
 
-            long estimatedLength = split.getLength(collection, estimateLimit, maxTimeMicros);
+            split.hosts = hosts;
+            split.dbName = dbName;
+            split.collectionName = collectionName;
+
+            if (estimatedLength == null) {
+                int retries = 5;
+                RuntimeException lastException = null;
+                estimatedLength = -1l;
+                while (estimatedLength < 0 && --retries >= 0) {
+                    try {
+                        estimatedLength = split.getLength(collection, estimateLimit, maxTimeMicros);
+                    } catch (MongoCommandException e) {
+                        lastException = e;
+                    }
+                }
+                if (estimatedLength < 0 && lastException != null)
+                    throw lastException;
+            }
             split.setEstimatedLength(estimatedLength);
-            return split;
+            return (T)split;
         }
     }
 
@@ -203,6 +260,18 @@ public class MongoSplit extends StreamableAndWritableWithSchema implements Input
         return limit != null && limit > 0;
     }
 
+    public boolean hasHosts() {
+        return StringUtils.isNotBlank(hosts);
+    }
+
+    public boolean hasDbName() {
+        return StringUtils.isNotBlank(dbName);
+    }
+
+    public boolean hasCollectionName() {
+        return StringUtils.isNotBlank(collectionName);
+    }
+
     public Bson getSort() {
         if (sort == null && hasSort())
             sort = json2bson(sortJson);
@@ -229,6 +298,18 @@ public class MongoSplit extends StreamableAndWritableWithSchema implements Input
         if (projection == null && hasProjection())
             projection = json2bson(projectionJson);
         return projection;
+    }
+
+    public String getHosts() {
+        return hosts;
+    }
+
+    public String getDbName() {
+        return dbName;
+    }
+
+    public String getCollectionName() {
+        return collectionName;
     }
 
     @Override

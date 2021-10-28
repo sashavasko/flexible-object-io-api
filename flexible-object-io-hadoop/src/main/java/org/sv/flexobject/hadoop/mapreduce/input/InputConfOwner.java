@@ -4,6 +4,6 @@ public interface InputConfOwner {
 
     void setInputConf(InputConf conf);
 
-    InputConf getInputConf();
+    <T extends InputConf> T getInputConf();
 
 }
