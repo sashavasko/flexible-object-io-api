@@ -22,7 +22,11 @@ public class Schema extends AbstractSchema{
         this.isInferred = true;
         List<SchemaElement> fieldList = new ArrayList<>();
 
-        addClassFields(dataClass.getSuperclass(), fieldList);
+        Class superclass = dataClass.getSuperclass();
+        while (superclass != StreamableWithSchema.class){
+            addClassFields(superclass, fieldList);
+            superclass = superclass.getSuperclass();
+        }
         addClassFields(dataClass, fieldList);
 
         setFields(fieldList);
