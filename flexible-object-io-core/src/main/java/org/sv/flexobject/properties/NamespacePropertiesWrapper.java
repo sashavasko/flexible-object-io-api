@@ -4,13 +4,13 @@ package org.sv.flexobject.properties;
 import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.adapter.MapInAdapter;
 import org.sv.flexobject.adapter.MapOutAdapter;
+import org.sv.flexobject.schema.Schema;
+import org.sv.flexobject.schema.SchemaElement;
 import org.sv.flexobject.schema.annotations.NonStreamableField;
 import org.sv.flexobject.translate.Translator;
 import org.sv.flexobject.util.InstanceFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.function.Supplier;
 
 public abstract class NamespacePropertiesWrapper<T extends NamespacePropertiesWrapper> extends PropertiesWrapper<T> {
@@ -54,6 +54,15 @@ public abstract class NamespacePropertiesWrapper<T extends NamespacePropertiesWr
 
     public String getSettingName(String fieldName){
         return getTranslator().apply(fieldName);
+    }
+
+    public List<String> listSettings() {
+        List<String> settings = new ArrayList<>();
+
+        for (SchemaElement e : Schema.getRegisteredSchema(getClass()).getFields()) {
+            settings.add(getSettingName(e.getDescriptor().getName()));
+        }
+        return settings;
     }
 
     @Override
