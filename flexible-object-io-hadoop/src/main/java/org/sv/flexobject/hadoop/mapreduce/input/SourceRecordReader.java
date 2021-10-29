@@ -21,8 +21,8 @@ public abstract class SourceRecordReader<K,V,SPLIT extends InputSplit> extends H
     }
 
     @Override
-    public InputConf getInputConf() {
-        return conf;
+    public <T extends InputConf> T getInputConf() {
+        return (T)conf.getClass().cast(conf);
     }
 
     public Configuration getConf() {

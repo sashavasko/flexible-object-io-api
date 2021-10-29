@@ -22,15 +22,7 @@ public abstract class MongoSplitter extends Configured implements Splitter, Inpu
 
     private MongoInputConf conf;
 
-    public MongoInputConf makeConf(){
-        return InstanceFactory.get(MongoInputConf.class);
-    }
-
     public <T extends InputConf> T getInputConf(){
-        if (conf == null) {
-            conf = makeConf();
-        }
-
         return (T)conf.getClass().cast(conf);
     }
 
