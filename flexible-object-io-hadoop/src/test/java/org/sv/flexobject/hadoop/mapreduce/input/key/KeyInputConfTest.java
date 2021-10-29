@@ -21,11 +21,7 @@ public class KeyInputConfTest {
                 "sv.input.key.splitter.class",
                 "sv.input.key.reader.class",
                 "sv.input.key.source.builder.class");
-        List<String> actualSettings = new ArrayList<>();
-
-        for (SchemaElement e : Schema.getRegisteredSchema(conf.getClass()).getFields()){
-            actualSettings.add(conf.getSettingName(e.getDescriptor().getName()));
-        }
+        List<String> actualSettings = conf.listSettings();
 
         assertEquals(expectedSettings, actualSettings);
     }

@@ -23,11 +23,7 @@ public class HadoopTaskConfTest {
                 "sv.hadoop.deployment.level",
                 "sv.hadoop.connection.manager.providers",
                 "sv.hadoop.connection.manager.environment");
-        List<String> actualSettings = new ArrayList<>();
-
-        for (SchemaElement e : Schema.getRegisteredSchema(conf.getClass()).getFields()){
-            actualSettings.add(conf.getSettingName(e.getDescriptor().getName()));
-        }
+        List<String> actualSettings = conf.listSettings();
 
         assertEquals(expectedSettings, actualSettings);
     }

@@ -40,11 +40,7 @@ public class DaoRecordReaderConfTest {
                 "sv.record.reader.value.field.name",
                 "sv.record.reader.max.retries",
                 "sv.record.reader.dao.class");
-        List<String> actualSettings = new ArrayList<>();
-
-        for (SchemaElement e : Schema.getRegisteredSchema(conf.getClass()).getFields()){
-            actualSettings.add(conf.getSettingName(e.getDescriptor().getName()));
-        }
+        List<String> actualSettings = conf.listSettings();
 
         assertEquals(expectedSettings, actualSettings);
     }
