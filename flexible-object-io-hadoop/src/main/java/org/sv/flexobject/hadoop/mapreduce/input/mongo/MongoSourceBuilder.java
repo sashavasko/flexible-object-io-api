@@ -43,7 +43,7 @@ public class MongoSourceBuilder implements SourceBuilder, InputConfOwner {
         if (mongoSplit.hasDbName())
             builder.db(mongoSplit.getDbName());
         if (mongoSplit.hasCollectionName())
-            builder.db(mongoSplit.getCollectionName());
+            builder.collection(mongoSplit.getCollectionName());
 
         if (conf.hasSchema())
             builder.schema(conf.getInputSchema());

@@ -33,6 +33,11 @@ public abstract class MongoSplitter extends Configured implements Splitter, Inpu
             getInputConf().from(conf);
     }
 
+    @Override
+    public void setInputConf(InputConf conf) {
+        this.conf = (MongoInputConf) conf;
+    }
+
     /**
      * Get a list of nonempty input splits only.
      *

@@ -29,7 +29,7 @@ public abstract class SourceRecordReader<K,V,SPLIT extends InputSplit> extends H
         return rawConf;
     }
 
-    protected Source<V> createSource(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException{
+    public Source<V> createSource(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException{
         rawConf = taskAttemptContext.getConfiguration();
         if (conf == null) {
             conf = InstanceFactory.get(InputConf.class);
