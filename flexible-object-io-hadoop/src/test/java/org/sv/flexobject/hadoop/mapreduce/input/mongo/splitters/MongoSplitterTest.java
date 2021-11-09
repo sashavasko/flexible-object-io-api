@@ -69,11 +69,6 @@ public class MongoSplitterTest {
     }
 
     @Test
-    public void makeConf() {
-        assertSame(conf, splitter.makeConf());
-    }
-
-    @Test
     public void setConf() {
         splitter.setConf(null);
         assertNull(splitter.getConf());

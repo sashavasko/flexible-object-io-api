@@ -16,6 +16,8 @@ import org.sv.flexobject.schema.annotations.NonStreamableField;
 
 public class HadoopPropertiesWrapper<T extends HadoopPropertiesWrapper> extends NamespacePropertiesWrapper<T> implements Configurable {
 
+    public static final Namespace SPARK_NAMESPACE = Namespace.forPath(".", "spark");
+
     @NonStreamableField
     private Configuration configuration;
 
