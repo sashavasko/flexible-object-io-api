@@ -30,6 +30,11 @@ public class TimeRangeConf<SELF extends InputConf> extends InputConf<SELF> {
     }
 
     @Override
+    protected String getSubNamespace() {
+        return SUBNAMESPACE;
+    }
+
+    @Override
     public SELF setDefaults() {
         super.setDefaults();
         enddate = new Timestamp(System.currentTimeMillis());

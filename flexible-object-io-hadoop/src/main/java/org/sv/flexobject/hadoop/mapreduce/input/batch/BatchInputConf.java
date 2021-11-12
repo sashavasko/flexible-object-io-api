@@ -41,6 +41,11 @@ public final class BatchInputConf extends InputConf<BatchInputConf> {
         return this;
     }
 
+    @Override
+    protected String getSubNamespace() {
+        return SUBNAMESPACE;
+    }
+
     public BatchInputConf(Namespace parent) {
         super(parent, SUBNAMESPACE);
     }

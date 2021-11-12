@@ -49,6 +49,11 @@ public class MongoInputConf<SELF extends HadoopPropertiesWrapper> extends InputC
         return (SELF)this;
     }
 
+    @Override
+    protected String getSubNamespace() {
+        return SUBNAMESPACE;
+    }
+
     public String getConnectionName() {
         return connectionName;
     }

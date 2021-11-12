@@ -37,6 +37,9 @@ dependencies {
     compile (group: 'org.apache.spark', name: 'spark-core_2.12', version: "${sparkVersion}"){
         exclude group: 'org.apache.avro', module:'avro-mapred'
     }
+    compileOnly ("org.apache.spark:spark-sql_2.12:${sparkVersion}"){
+        exclude group: 'org.apache.avro', module:'avro-mapred'
+    }
     // https://mvnrepository.com/artifact/org.apache.avro/avro
     implementation group: 'org.apache.avro', name: 'avro', version: '1.10.2'
 

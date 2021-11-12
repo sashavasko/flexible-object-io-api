@@ -22,7 +22,9 @@ public class HadoopTaskConfTest {
                 "sv.hadoop.db.environment",
                 "sv.hadoop.deployment.level",
                 "sv.hadoop.connection.manager.providers",
-                "sv.hadoop.connection.manager.environment");
+                "sv.hadoop.connection.manager.environment",
+                "sv.hadoop.tool.class",
+                "sv.hadoop.conf.class");
         List<String> actualSettings = conf.listSettings();
 
         assertEquals(expectedSettings, actualSettings);

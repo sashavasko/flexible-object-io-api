@@ -1,6 +1,7 @@
 package org.sv.flexobject.hadoop;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.util.Tool;
 import org.sv.flexobject.connections.ConnectionManager;
 import org.sv.flexobject.hadoop.properties.HadoopPropertiesProvider;
 import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
@@ -10,6 +11,7 @@ import org.sv.flexobject.properties.Namespace;
 import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.schema.annotations.ValueType;
 import org.sv.flexobject.sql.providers.UnPooledConnectionProvider;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,9 +34,20 @@ public class HadoopTaskConf extends HadoopPropertiesWrapper<HadoopTaskConf> {
     @ValueType(type= DataTypes.classObject)
     private List<Class> connectionManagerProviders;
     private String connectionManagerEnvironment;
+    private Class<? extends Tool> toolClass;
+    private Class<? extends HadoopPropertiesWrapper> confClass;
+
+    @Override
+    protected String getSubNamespace() {
+        return SUBNAMESPACE;
+    }
 
     public HadoopTaskConf() {
         super(SUBNAMESPACE);
+    }
+
+    public HadoopTaskConf(Namespace parent, String subNamespace) {
+        super(parent, subNamespace);
     }
 
     @Override
@@ -72,5 +85,24 @@ public class HadoopTaskConf extends HadoopPropertiesWrapper<HadoopTaskConf> {
 
     public void setConnectionManagerProviders(List<Class> connectionManagerProviders) {
         this.connectionManagerProviders = connectionManagerProviders;
+    }
+
+
+    public Class<? extends Tool> getToolClass() {
+        return toolClass;
+    }
+
+    public <T extends Tool> T getTool() {
+        Tool tool = InstanceFactory.get(getToolClass());
+        return (T)tool.getClass().cast(tool);
+    }
+
+    public Class<? extends HadoopPropertiesWrapper> getConfClass(){
+        return confClass;
+    }
+
+    public <T extends HadoopPropertiesWrapper> T instantiateConfig(){
+        HadoopPropertiesWrapper conf = InstanceFactory.get(getConfClass());
+        return (T)conf.getClass().cast(conf);
     }
 }

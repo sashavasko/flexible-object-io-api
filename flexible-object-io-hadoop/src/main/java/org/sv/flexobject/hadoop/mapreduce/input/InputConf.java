@@ -14,6 +14,11 @@ public class InputConf<SELF extends HadoopPropertiesWrapper> extends HadoopPrope
     protected Class<? extends RecordReader> readerClass;
     protected Class<? extends SourceBuilder> sourceBuilderClass;
 
+    @Override
+    protected String getSubNamespace() {
+        return SUBNAMESPACE;
+    }
+
     public InputConf() {
         super(SUBNAMESPACE);
     }

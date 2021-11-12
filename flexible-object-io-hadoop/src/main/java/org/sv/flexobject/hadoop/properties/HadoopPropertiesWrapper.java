@@ -4,14 +4,12 @@ import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
-import org.sv.flexobject.hadoop.HadoopTask;
 import org.sv.flexobject.hadoop.adapter.ConfigurationInAdapter;
 import org.sv.flexobject.hadoop.adapter.ConfigurationOutAdapter;
 import org.sv.flexobject.hadoop.adapter.SparkConfInAdapter;
 import org.sv.flexobject.hadoop.adapter.SparkConfOutAdapter;
 import org.sv.flexobject.properties.Namespace;
 import org.sv.flexobject.properties.NamespacePropertiesWrapper;
-import org.sv.flexobject.properties.PropertiesWrapper;
 import org.sv.flexobject.schema.annotations.NonStreamableField;
 
 public class HadoopPropertiesWrapper<T extends HadoopPropertiesWrapper> extends NamespacePropertiesWrapper<T> implements Configurable {

@@ -36,6 +36,10 @@ public class OplogInputConf<SELF extends HadoopPropertiesWrapper> extends MongoI
         super(parent, child);
     }
 
+    @Override
+    protected String getSubNamespace() {
+        return SUBNAMESPACE;
+    }
 
     public Map<String, String> getShards(){
         return shards;

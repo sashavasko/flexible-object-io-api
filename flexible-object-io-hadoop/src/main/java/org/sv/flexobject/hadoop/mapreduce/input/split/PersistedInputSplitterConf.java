@@ -9,6 +9,11 @@ public class PersistedInputSplitterConf extends HadoopPropertiesWrapper<Persiste
 
     public String path;
 
+    @Override
+    protected String getSubNamespace() {
+        return SUBNAMESPACE;
+    }
+
     public PersistedInputSplitterConf() {
         super(SUBNAMESPACE);
     }

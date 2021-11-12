@@ -11,6 +11,11 @@ public final class KeyInputConf extends InputConf<KeyInputConf> {
     }
 
     @Override
+    protected String getSubNamespace() {
+        return SUBNAMESPACE;
+    }
+
+    @Override
     public KeyInputConf setDefaults() {
         splitterClass = ModSplitter.class;
         readerClass = KeyRecordReader.LongText.class;

@@ -37,6 +37,11 @@ public final class ParquetSchemaConf extends HadoopPropertiesWrapper<ParquetSche
     }
 
     @Override
+    protected String getSubNamespace() {
+        return SUBNAMESPACE;
+    }
+
+    @Override
     public ParquetSchemaConf setDefaults() {
         return this;
     }

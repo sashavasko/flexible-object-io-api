@@ -26,6 +26,11 @@ public final class DaoRecordReaderConf extends HadoopPropertiesWrapper<DaoRecord
         return this;
     }
 
+    @Override
+    protected String getSubNamespace() {
+        return SUBNAMESPACE;
+    }
+
     public DaoRecordReaderConf(Namespace parent) {
         super(parent, SUBNAMESPACE);
     }

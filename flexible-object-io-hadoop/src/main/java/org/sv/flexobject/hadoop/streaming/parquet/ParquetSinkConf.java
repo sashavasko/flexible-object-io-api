@@ -15,6 +15,11 @@ public final class ParquetSinkConf extends HadoopPropertiesWrapper<ParquetSinkCo
     public JsonNode schemaJson;
     public Class<? extends StreamableWithSchema> dataClass;
 
+    @Override
+    protected String getSubNamespace() {
+        return SUBNAMESPACE;
+    }
+
     public ParquetSinkConf() {
         super(SUBNAMESPACE);
     }

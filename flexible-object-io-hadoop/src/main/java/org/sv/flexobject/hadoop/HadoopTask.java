@@ -8,8 +8,10 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.MRJobConfig;
 import org.apache.log4j.Logger;
+import org.apache.spark.SparkContext;
 import org.sv.flexobject.connections.ConnectionManager;
 import org.sv.flexobject.connections.ConnectionProvider;
+import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
 import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.IOException;
@@ -21,11 +23,11 @@ import java.util.List;
 
 public class HadoopTask extends Configured {
     static Logger logger = Logger.getLogger(HadoopTask.class);
-    public static final String DEFAULT_NAMESPACE = "org.sv.flexobject";
 
     private static HadoopTask instance = null;
 
     private HadoopTaskConf taskConf = InstanceFactory.get(HadoopTaskConf.class);
+    private String userName;
 
     private HadoopTask(){}
 
@@ -40,7 +42,18 @@ public class HadoopTask extends Configured {
         super.setConf(conf);
         if (conf != null){
             taskConf.from(conf);
+            userName = conf.get(MRJobConfig.USER_NAME, System.getProperty("user.name"));
         }
+    }
+
+    public void setConf(SparkContext sc){
+        super.setConf(sc.hadoopConfiguration());
+        taskConf = new HadoopTaskConf(HadoopPropertiesWrapper.SPARK_NAMESPACE);
+        taskConf.from(sc.getConf());
+        userName = sc.sparkUser();
+//    sparkConf.get("spark.job.user.name");
+//        if (StringUtils.isBlank(userName))
+//            logger.warn("Unknown job user name. Please set property 'spark.job.user.name'");
     }
 
     public String getNameNodeRPC(int order){
@@ -89,23 +102,38 @@ public class HadoopTask extends Configured {
     }
 
     public static String getUserName(Configuration conf){
-        return conf.get(MRJobConfig.USER_NAME, System.getProperty("user.name"));
+        return getInstance().getUserName();
     }
 
     public String getUserName(){
-        return getUserName(getConf());
+        return userName;
     }
+
 
     public static HadoopTaskConf getTaskConf(){
         return getInstance().taskConf;
     }
 
+    public static void configure (SparkContext sc) throws Exception {
+        // TODO: not sure if that makes any sense :
+        //        Configuration hadoopConf = new Configuration();
+//        for (Tuple2<String, String> t : conf.getAll()){
+//            hadoopConf.set();
+//        }
+//        HadoopInstanceFactory.setConf(conf);
+        getInstance().setConf(sc);
+        getInstance().postConfigure();
+    }
+
     public static void configure (Configuration conf) throws Exception {
         HadoopInstanceFactory.setConf(conf);
         getInstance().setConf(conf);
+        getInstance().postConfigure();
+    }
 
+    protected void postConfigure() throws Exception {
         ConnectionManager.addProviders(getTaskConf().getConnectionManagerProviders());
-        ConnectionManager.forEachProvider(Configurable.class, (p)->((Configurable)p).setConf(conf));
+        ConnectionManager.forEachProvider(Configurable.class, (p)->((Configurable)p).setConf(getConf()));
 
         ConnectionManager.getInstance().setDeploymentLevel(getTaskConf().getDeploymentLevel());
         ConnectionManager.getInstance().setEnvironment(getTaskConf().getConnectionManagerEnvironment());

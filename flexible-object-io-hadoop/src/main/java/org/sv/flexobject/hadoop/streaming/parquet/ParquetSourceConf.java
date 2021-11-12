@@ -15,6 +15,11 @@ public final class ParquetSourceConf extends HadoopPropertiesWrapper<ParquetSour
     public JsonNode schemaJson;
     public Class<? extends StreamableWithSchema> dataClass;
 
+    @Override
+    protected String getSubNamespace() {
+        return SUBNAMESPACE;
+    }
+
     public ParquetSourceConf() {
         super(SUBNAMESPACE);
     }
