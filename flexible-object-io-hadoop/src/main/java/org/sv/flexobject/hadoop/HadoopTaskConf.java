@@ -93,7 +93,11 @@ public class HadoopTaskConf extends HadoopPropertiesWrapper<HadoopTaskConf> {
     }
 
     public <T extends Tool> T getTool() {
-        Tool tool = InstanceFactory.get(getToolClass());
+        Class<? extends Tool> toolClass = getToolClass();
+        if (toolClass == null)
+            return null;
+
+        Tool tool = InstanceFactory.get(toolClass);
         return (T)tool.getClass().cast(tool);
     }
 
@@ -102,7 +106,11 @@ public class HadoopTaskConf extends HadoopPropertiesWrapper<HadoopTaskConf> {
     }
 
     public <T extends HadoopPropertiesWrapper> T instantiateConfig(){
-        HadoopPropertiesWrapper conf = InstanceFactory.get(getConfClass());
+        Class<? extends HadoopPropertiesWrapper> configClass = getConfClass();
+        if (configClass == null)
+            return null;
+
+        HadoopPropertiesWrapper conf = InstanceFactory.get(configClass);
         return (T)conf.getClass().cast(conf);
     }
 }

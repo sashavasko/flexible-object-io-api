@@ -16,6 +16,9 @@ public class SparkMain {
         }
 
         SparkTool tool = HadoopTask.getTaskConf().getTool();
+        if (tool == null)
+            throw new RuntimeException("Must specify SparkTool implementation using spark.hadoop.tool.class property");
+
         tool.setSession(spark);
 
         try {
