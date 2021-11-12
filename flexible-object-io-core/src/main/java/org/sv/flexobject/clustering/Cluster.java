@@ -4,7 +4,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.sv.flexobject.properties.Configurable;
 import org.sv.flexobject.properties.NamespacePropertiesWrapper;
-import org.sv.flexobject.properties.PropertiesWrapper;
 
 import java.util.ArrayList;
 import java.util.List;

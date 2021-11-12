@@ -18,6 +18,10 @@ public abstract class NamespacePropertiesWrapper<T extends NamespacePropertiesWr
     @NonStreamableField
     private Namespace namespace;
 
+    protected String getSubNamespace(){
+        throw new RuntimeException("Attempt to instantiate Configuration object of class: " + getClass().getName() + " without specifying sub-namespace. Please override getSubnamespace()");
+    };
+
     protected static Namespace getParentNamespace(Class<? extends NamespacePropertiesWrapper> clazz){
         Class superclass = clazz.getSuperclass();
         if (superclass == NamespacePropertiesWrapper.class)
@@ -44,8 +48,21 @@ public abstract class NamespacePropertiesWrapper<T extends NamespacePropertiesWr
         this.namespace = makeMyNamespace(parent, subNamespace);
     }
 
+    public NamespacePropertiesWrapper(Namespace parent) {
+        super();
+        this.namespace = makeMyNamespace(parent, getSubNamespace());
+    }
+
     public Namespace getNamespace() {
         return namespace;
+    }
+
+    public void setNamespace(Namespace parent, String subNamespace){
+        this.namespace = makeMyNamespace(parent == null ? Namespace.getDefaultNamespace() : parent, subNamespace);
+    }
+
+    public void setNamespace(Namespace parent){
+        this.namespace = makeMyNamespace(parent == null ? Namespace.getDefaultNamespace() : parent, getSubNamespace());
     }
 
     public Translator getTranslator() {
