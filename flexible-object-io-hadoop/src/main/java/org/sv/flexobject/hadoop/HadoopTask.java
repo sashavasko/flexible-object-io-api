@@ -28,6 +28,7 @@ public class HadoopTask extends Configured {
 
     private HadoopTaskConf taskConf = InstanceFactory.get(HadoopTaskConf.class);
     private String userName;
+    private boolean configured = false;
 
     private HadoopTask(){}
 
@@ -138,7 +139,12 @@ public class HadoopTask extends Configured {
         ConnectionManager.getInstance().setDeploymentLevel(getTaskConf().getDeploymentLevel());
         ConnectionManager.getInstance().setEnvironment(getTaskConf().getConnectionManagerEnvironment());
 
+        configured = true;
         logger.info("Hadoop Task is configured with " + getTaskConf().toString());
+    }
+
+    public static boolean isConfigured(){
+        return getInstance().configured;
     }
 
     public static class Builder{

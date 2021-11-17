@@ -14,7 +14,7 @@ public abstract class SparkTool<SELF extends SparkTool> extends Configured imple
     }
 
     public void makeConf(){
-        conf = HadoopTask.getTaskConf().instantiateConfig();
+        conf = HadoopTask.getTaskConf().instantiateConf();
         if (conf != null)
             conf.setNamespace(HadoopPropertiesWrapper.SPARK_NAMESPACE);
     }

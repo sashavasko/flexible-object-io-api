@@ -40,10 +40,12 @@ public abstract class HadoopTaskRecordReader<KT,VT,SPLIT extends InputSplit> ext
 
     @Override
     public void initialize(InputSplit split, TaskAttemptContext context) throws IOException, InterruptedException {
-        try {
-            HadoopTask.configure(context.getConfiguration());
-        } catch (Exception e) {
-            throw HadoopTask.getTaskConf().runtimeException(logger, "Failed to initialize HadoopTask", e);
+        if (!HadoopTask.isConfigured()) {
+            try {
+                HadoopTask.configure(context.getConfiguration());
+            } catch (Exception e) {
+                throw HadoopTask.getTaskConf().runtimeException(logger, "Failed to initialize HadoopTask", e);
+            }
         }
         this.split = (SPLIT) split;
         setupInput(this.split, context);

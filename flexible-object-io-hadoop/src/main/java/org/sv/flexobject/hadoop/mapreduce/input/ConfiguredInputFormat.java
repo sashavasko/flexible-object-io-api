@@ -3,6 +3,7 @@ package org.sv.flexobject.hadoop.mapreduce.input;
 
 import org.apache.hadoop.mapreduce.*;
 import org.apache.log4j.Logger;
+import org.sv.flexobject.hadoop.HadoopTask;
 import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.IOException;
@@ -12,7 +13,7 @@ public class ConfiguredInputFormat<K,V> extends InputFormat<K,V> {
     public static final Logger logger = Logger.getLogger(ConfiguredInputFormat.class);
 
     protected InputConf<InputConf> makeInputConf(){
-        return InstanceFactory.get(InputConf.class);
+        return HadoopTask.getTaskConf().instantiateConf(InputConf.class);
     }
 
     @Override
@@ -28,6 +29,13 @@ public class ConfiguredInputFormat<K,V> extends InputFormat<K,V> {
 
     @Override
     public RecordReader<K, V> createRecordReader(InputSplit split, TaskAttemptContext context) {
+        if (!HadoopTask.isConfigured()) {
+            try {
+                HadoopTask.configure(context.getConfiguration());
+            } catch (Exception e) {
+                throw HadoopTask.getTaskConf().runtimeException(logger, "Failed to initialize HadoopTask", e);
+            }
+        }
         InputConf conf = makeInputConf().from(context.getConfiguration());
         RecordReader reader = conf.getReader();
 

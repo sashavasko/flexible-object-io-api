@@ -105,12 +105,16 @@ public class HadoopTaskConf extends HadoopPropertiesWrapper<HadoopTaskConf> {
         return confClass;
     }
 
-    public <T extends HadoopPropertiesWrapper> T instantiateConfig(){
-        Class<? extends HadoopPropertiesWrapper> configClass = getConfClass();
-        if (configClass == null)
+    public <T extends HadoopPropertiesWrapper> T instantiateConf(Class<? extends HadoopPropertiesWrapper> defaultConfClass){
+        Class<? extends HadoopPropertiesWrapper> confClass = this.confClass == null ? defaultConfClass : this.confClass;
+        if (confClass == null)
             return null;
 
-        HadoopPropertiesWrapper conf = InstanceFactory.get(configClass);
+        HadoopPropertiesWrapper conf = InstanceFactory.get(confClass);
         return (T)conf.getClass().cast(conf);
+
+    }
+    public <T extends HadoopPropertiesWrapper> T instantiateConf(){
+        return instantiateConf(null);
     }
 }
