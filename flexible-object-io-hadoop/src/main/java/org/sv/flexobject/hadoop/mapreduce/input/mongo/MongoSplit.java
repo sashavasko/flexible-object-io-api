@@ -134,6 +134,21 @@ public class MongoSplit extends StreamableAndWritableWithSchema implements Input
             return this;
         }
 
+        public Builder clone(MongoSplit other){
+            splitClass = other.getClass();
+            query = other.query;
+            projection = other.projection;
+            sort = other.sort;
+            limit = other.limit;
+            skip = other.skip;
+            noTimeout = other.noTimeout;
+            hosts = other.hosts;
+            dbName = other.dbName;
+            collectionName = other.collectionName;
+            estimatedLength = other.estimatedLength;
+            return this;
+        }
+
         public <T extends MongoSplit> T build(){
             return build(null, 0, 0);
         }

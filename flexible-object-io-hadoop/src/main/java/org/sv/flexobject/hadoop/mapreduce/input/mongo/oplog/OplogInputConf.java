@@ -50,6 +50,12 @@ public class OplogInputConf<SELF extends HadoopPropertiesWrapper> extends MongoI
         return (SELF) this;
     }
 
+    public SELF setShards(Map<String, String> shards){
+        this.shards.clear();
+        this.shards.putAll(shards);
+        return (SELF) this;
+    }
+
     @Override
     public SELF setDefaults() {
         super.setDefaults();
