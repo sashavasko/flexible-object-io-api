@@ -241,7 +241,7 @@ public class ParquetSchema {
     }
 
     public static ArrayNode toJson(List<Type> fields) {
-        ArrayNode fieldsNode = JsonNodeFactory.instance.arrayNode(fields.size());
+        ArrayNode fieldsNode = DataTypes.jsonArrayNode(fields.size());
         for (Type field : fields) {
             fieldsNode.add(toJson(field));
         }

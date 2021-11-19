@@ -9,6 +9,7 @@ import org.apache.parquet.schema.PrimitiveType;
 import org.sv.flexobject.hadoop.streaming.parquet.read.SchemedGroupConverter;
 import org.sv.flexobject.hadoop.streaming.parquet.read.SchemedPrimitiveConverter;
 import org.sv.flexobject.hadoop.streaming.parquet.read.SchemedRepeatedConverter;
+import org.sv.flexobject.schema.DataTypes;
 
 public class ObjectNodeConverter extends SchemedGroupConverter<ObjectNode> {
 
@@ -48,7 +49,7 @@ public class ObjectNodeConverter extends SchemedGroupConverter<ObjectNode> {
             if (current.isArray()) {
                 array = (ArrayNode) current;
             } else {
-                array = JsonNodeFactory.instance.arrayNode();
+                array = DataTypes.jsonArrayNode();
                 array.add(current);
                 parent.set(name, array);
             }

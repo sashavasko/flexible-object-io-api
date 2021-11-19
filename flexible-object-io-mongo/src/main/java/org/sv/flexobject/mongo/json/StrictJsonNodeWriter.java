@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.bson.json.StrictJsonWriter;
+import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.stream.Sink;
 
 import java.util.Stack;
@@ -188,7 +189,7 @@ public class StrictJsonNodeWriter implements StrictJsonWriter {
     public void writeStartArray(String name) {
         JsonNode node;
         if (currentDocument == null){
-            node = JsonNodeFactory.instance.arrayNode();
+            node = DataTypes.jsonArrayNode();
         } else if (currentDocument instanceof ObjectNode) {
             node = ((ObjectNode)currentDocument).putArray(name);
         } else if (currentDocument instanceof ArrayNode) {

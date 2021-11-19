@@ -111,6 +111,18 @@ public enum DataTypes {
         adapter.setString(fieldName, stringConverter(value));
     }
 
+    public static ArrayNode jsonArrayNode(){
+        return jsonArrayNode(0);
+    }
+    public static ArrayNode jsonArrayNode(int capacity){
+        try {
+            return capacity <= 0 ? JsonNodeFactory.instance.arrayNode() : JsonNodeFactory.instance.arrayNode(capacity);
+        }catch(NoSuchMethodError e){
+            // workaround for jackson-databind prior to 2.8
+            return capacity <= 0 ? new ArrayNode(JsonNodeFactory.instance) : new ArrayNode(JsonNodeFactory.instance, capacity);
+        }
+    }
+
     public static JsonNode jsonConverter(Object value) throws Exception {
         if (value == null || value instanceof JsonNode)
             return (JsonNode) value;
@@ -120,7 +132,7 @@ public enum DataTypes {
                 return MapperFactory.getObjectReader().readTree(string);
             else {
                 String[] parts = string.split(",");
-                ArrayNode jsonArray = JsonNodeFactory.instance.arrayNode(parts.length);
+                ArrayNode jsonArray = jsonArrayNode(parts.length);
                 for (String part : parts)
                     jsonArray.add(part);
                 return jsonArray;
@@ -133,7 +145,7 @@ public enum DataTypes {
             return ((StreamableWithSchema)value).toJson();
         if (value.getClass().isArray()){
             Object[] array = (Object[]) value;
-            ArrayNode json = JsonNodeFactory.instance.arrayNode(array.length);
+            ArrayNode json = jsonArrayNode(array.length);
             for (Object o : array) {
                 if (o instanceof String)
                     json.add((String)o);
@@ -144,7 +156,8 @@ public enum DataTypes {
         }
         if (value instanceof List){
             List list = (List) value;
-            ArrayNode json = JsonNodeFactory.instance.arrayNode(list.size());
+            ArrayNode json = jsonArrayNode(list.size());
+
             for (Object o : list) {
                 if (o instanceof String)
                     json.add((String)o);

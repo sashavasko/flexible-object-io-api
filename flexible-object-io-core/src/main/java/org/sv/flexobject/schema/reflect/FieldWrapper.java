@@ -132,7 +132,7 @@ public class FieldWrapper {
                 fieldValue = new HashMap<>();
                 setValue(o, fieldValue);
             }else if (ArrayNode.class.isAssignableFrom(getFieldClass())){
-                fieldValue = JsonNodeFactory.instance.arrayNode();
+                fieldValue = DataTypes.jsonArrayNode();
                 setValue(o, fieldValue);
             }else if (ObjectNode.class.isAssignableFrom(getFieldClass())){
                 fieldValue = JsonNodeFactory.instance.objectNode();
