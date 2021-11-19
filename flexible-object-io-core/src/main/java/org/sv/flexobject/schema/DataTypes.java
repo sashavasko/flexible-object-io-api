@@ -119,7 +119,7 @@ public enum DataTypes {
             return capacity <= 0 ? JsonNodeFactory.instance.arrayNode() : JsonNodeFactory.instance.arrayNode(capacity);
         }catch(NoSuchMethodError e){
             // workaround for jackson-databind prior to 2.8
-            return capacity <= 0 ? new ArrayNode(JsonNodeFactory.instance) : new ArrayNode(JsonNodeFactory.instance, capacity);
+            return new ArrayNode(JsonNodeFactory.instance);
         }
     }
 
