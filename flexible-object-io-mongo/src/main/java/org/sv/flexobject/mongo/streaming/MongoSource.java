@@ -6,6 +6,8 @@ import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.mongo.schema.BsonSchema;
 import org.sv.flexobject.util.InstanceFactory;
 
+import java.util.NoSuchElementException;
+
 public class MongoSource extends MongoCursorSource<StreamableWithSchema,RawBsonDocument> {
     Class<? extends StreamableWithSchema> schema;
     BsonSchema bsonSchema;
@@ -38,7 +40,11 @@ public class MongoSource extends MongoCursorSource<StreamableWithSchema,RawBsonD
 
     @Override
     public <T extends StreamableWithSchema> T get() throws Exception {
-        return (T) schema.cast(bsonSchema.fromBson(cursor.next()));
+        try {
+            return (T) schema.cast(bsonSchema.fromBson(cursor.next()));
+        }catch (NoSuchElementException e){
+            return null;
+        }
     }
 
     @Override

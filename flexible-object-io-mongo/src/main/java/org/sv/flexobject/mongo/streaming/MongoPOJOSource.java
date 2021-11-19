@@ -3,6 +3,8 @@ package org.sv.flexobject.mongo.streaming;
 import com.mongodb.client.MongoCursor;
 import org.sv.flexobject.util.InstanceFactory;
 
+import java.util.NoSuchElementException;
+
 public class MongoPOJOSource<POJO> extends MongoCursorSource<POJO,POJO> {
     public MongoPOJOSource() {
     }
@@ -28,6 +30,10 @@ public class MongoPOJOSource<POJO> extends MongoCursorSource<POJO,POJO> {
 
     @Override
     public POJO get() throws Exception {
-        return getCursor().next();
+        try {
+            return getCursor().next();
+        }catch (NoSuchElementException e){
+            return null;
+        }
     }
 }

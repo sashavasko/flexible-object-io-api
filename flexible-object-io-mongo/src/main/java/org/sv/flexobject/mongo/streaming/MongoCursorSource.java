@@ -4,6 +4,7 @@ import com.mongodb.client.MongoCursor;
 import org.sv.flexobject.stream.Source;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -57,7 +58,10 @@ public abstract class MongoCursorSource<T,BSON> extends MongoConnectionOwner imp
 
     @Override
     public T next() {
-        return (T) cursor.next();
+        try {
+            return (T) cursor.next();
+        }catch (NoSuchElementException e){
+            return null;
+        }
     }
-
 }
