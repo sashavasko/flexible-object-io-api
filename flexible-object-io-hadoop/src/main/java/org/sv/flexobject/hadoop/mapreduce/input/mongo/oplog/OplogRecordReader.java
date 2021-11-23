@@ -60,7 +60,7 @@ public abstract class OplogRecordReader<K> extends SourceRecordReader<K, Documen
             lastTimestamp = inputConf.limitTimestamp(loadTimestamp());
         long time = lastTimestamp.getTime();
         Timestamp ts = new Timestamp(time*1000l);
-        logger.info("Limiting extract to timestamp " + ts.toString());
+        logger.info(inputConf.addDiagnostics("Limiting extract to timestamp " + ts.toString()));
     }
 
     public BsonTimestamp getLastTimestamp() {
@@ -87,7 +87,7 @@ public abstract class OplogRecordReader<K> extends SourceRecordReader<K, Documen
         if (lastTimestamp != null) {
             String formattedTs = lastTimestamp.getTime() + "-" + lastTimestamp.getInc();
             OplogInputConf inputConf = getInputConf();
-            Path tsPath = new Path(inputConf.getSplitTimestampFolder(),  formattedTs);
+            Path tsPath = new Path(new Path(inputConf.getSplitTimestampFolder(), getShardName()), formattedTs);
             FileSystem.get(getConf()).createNewFile(tsPath);
         }
 
