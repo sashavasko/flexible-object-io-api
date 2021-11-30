@@ -13,7 +13,7 @@ import org.sv.flexobject.mongo.connection.MongoConnection;
 import org.sv.flexobject.mongo.schema.BsonSchema;
 import org.sv.flexobject.stream.Source;
 
-public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Source> {
+public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Source> implements AutoCloseable{
     protected String connectionName;
     protected String dbName;
     private MongoConnection connection;
@@ -180,4 +180,12 @@ public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Sou
     }
 
     abstract public SOURCE build() throws Exception;
+
+    @Override
+    public void close() throws Exception {
+        if (connection != null && isOwnConnection()){
+            connection.close();
+            connection = null;
+        }
+    }
 }
