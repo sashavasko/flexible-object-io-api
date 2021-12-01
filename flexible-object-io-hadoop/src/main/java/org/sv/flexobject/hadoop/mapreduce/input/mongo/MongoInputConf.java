@@ -54,6 +54,14 @@ public class MongoInputConf<SELF extends HadoopPropertiesWrapper> extends InputC
         return SUBNAMESPACE;
     }
 
+    public void setBuilderClass(Class<? extends MongoBuilder> builderClass) {
+        this.builderClass = builderClass;
+    }
+
+    public void setSchema(Class<? extends StreamableWithSchema> schema) {
+        this.schema = schema;
+    }
+
     public String getConnectionName() {
         return connectionName;
     }
