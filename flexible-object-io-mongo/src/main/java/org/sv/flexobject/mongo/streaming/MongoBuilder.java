@@ -11,6 +11,7 @@ import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.mongo.MongoClientProvider;
 import org.sv.flexobject.mongo.connection.MongoConnection;
 import org.sv.flexobject.mongo.schema.BsonSchema;
+import org.sv.flexobject.schema.SchemaException;
 import org.sv.flexobject.stream.Source;
 
 public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Source> implements AutoCloseable{
@@ -29,6 +30,7 @@ public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Sou
     protected CursorType cursorType;
     private MongoCursor cursor;
     private Class documentClass = Document.class;
+    private Class<? extends StreamableWithSchema> schema;
 
     public SELF connection(String connectionName) {
         this.connectionName = connectionName;
@@ -92,7 +94,7 @@ public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Sou
     }
 
     public SELF schema(Class<? extends StreamableWithSchema> schema) {
-        this.documentClass = schema;
+        this.schema = schema;
         return (SELF) this;
     }
 
@@ -133,10 +135,9 @@ public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Sou
             FindIterable<TDocument> findIterable = collection.find();
             if (filter != null) {
                 findIterable = findIterable.filter(filter);
-//                System.out.println("Using filter: " + filter.toBsonDocument().toJson());
-            }else {
-//                System.out.println("No filter specified");
-            }
+                System.out.println("Using filter: " + filter.toBsonDocument().toJson());
+            }else
+                System.out.println("No filter specified");
             if (limit != null)
                 findIterable = findIterable.limit(limit);
             if (skip != null)
@@ -145,7 +146,7 @@ public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Sou
                 findIterable = findIterable.projection(projection);
             if (sort != null) {
                 findIterable = findIterable.sort(sort);
-//                System.out.println("Using sort :" + sort.toBsonDocument().toJson());
+                System.out.println("Using sort :" + sort.toBsonDocument().toJson());
             }
             if (notimeout != null)
                 findIterable = findIterable.noCursorTimeout(true);
@@ -157,11 +158,15 @@ public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Sou
         return cursor;
     }
 
-    public Class<? extends StreamableWithSchema> getSchema() {
-        return StreamableWithSchema.class.isAssignableFrom(documentClass) ? documentClass : null;
+    public Class<? extends StreamableWithSchema> getSchema() throws SchemaException {
+        if (schema == null)
+            return null;
+        if (!StreamableWithSchema.class.isAssignableFrom(schema))
+            throw new SchemaException("Schema is not available for classes not derived from StreamableWithSchema. Requested class is " + schema.getName());
+        return schema;
     }
 
-    public BsonSchema getBsonSchema() {
+    public BsonSchema getBsonSchema() throws SchemaException {
         return getSchema() != null ?
                 BsonSchema.getRegisteredSchema(getSchema()) : null;
     }
