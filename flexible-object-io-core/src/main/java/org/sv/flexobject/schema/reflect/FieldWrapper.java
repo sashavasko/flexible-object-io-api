@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ContainerNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.schema.SchemaException;
 import org.sv.flexobject.schema.annotations.EnumSetField;
@@ -35,7 +35,7 @@ public class FieldWrapper {
 
     protected String fieldName;
     protected Class<?> clazz;
-    protected Class<? extends StreamableWithSchema> valueClass; // For Collections
+    protected Class<? extends Streamable> valueClass; // For Collections
     protected DataTypes keyType = DataTypes.string; // for Maps
 
     public FieldWrapper(Class<?> clazz, String fieldName) {
@@ -99,7 +99,7 @@ public class FieldWrapper {
                         type = DataTypes.jsonNode;
                         valueClass = vc.valueClass();
                         structure = figureOutCollectionStructure();
-                    } else if (fieldClass.isArray() && StreamableWithSchema[].class.isAssignableFrom(fieldClass)) {
+                    } else if (fieldClass.isArray() && Streamable[].class.isAssignableFrom(fieldClass)) {
                         type = DataTypes.jsonNode;
                         structure = STRUCT.array;
                     }
@@ -107,8 +107,8 @@ public class FieldWrapper {
                     structure = STRUCT.array;
                 } else {
                     structure = STRUCT.scalar;
-                    if (type == DataTypes.jsonNode && StreamableWithSchema.class.isAssignableFrom(fieldClass))
-                        valueClass = (Class<? extends StreamableWithSchema>) fieldClass;
+                    if (type == DataTypes.jsonNode && Streamable.class.isAssignableFrom(fieldClass))
+                        valueClass = (Class<? extends Streamable>) fieldClass;
                 }
                 this.field = field;
             }
@@ -169,7 +169,7 @@ public class FieldWrapper {
                 if (valueClass != null){
                     for (Object elem : array){
                         if (elem != null)
-                            ((StreamableWithSchema)elem).clear();
+                            ((Streamable)elem).clear();
                     }
                 }else if(array != null)
                     Arrays.fill(array, null);
@@ -185,12 +185,12 @@ public class FieldWrapper {
         }else if (valueClass != null){
             Object value = getField().get(o);
             if (value != null)
-                ((StreamableWithSchema)value).clear();
+                ((Streamable)value).clear();
         }else
             getField().set(o, null);
     }
 
-    public boolean isEmpty(StreamableWithSchema o) throws Exception {
+    public boolean isEmpty(Streamable o) throws Exception {
         if (field == null)
             getField();
 
@@ -202,7 +202,7 @@ public class FieldWrapper {
                 Object[] array = (Object[]) getValue(o);
                 if (valueClass != null){
                     for (Object elem : array){
-                        if (elem != null && !((StreamableWithSchema)elem).isEmpty())
+                        if (elem != null && !((Streamable)elem).isEmpty())
                             return false;
                     }
                 }else {
@@ -222,7 +222,7 @@ public class FieldWrapper {
             return !(((ContainerNode)getValue(o)).fields().hasNext());
         }else if (valueClass != null){
             Object value = getField().get(o);
-            return (value == null || ((StreamableWithSchema)value).isEmpty());
+            return (value == null || ((Streamable)value).isEmpty());
         }
 
         return getField().get(o) == null;
@@ -246,7 +246,7 @@ public class FieldWrapper {
         return fieldClass;
     }
 
-    public Class<? extends StreamableWithSchema> getValueClass() throws NoSuchFieldException, SchemaException {
+    public Class<? extends Streamable> getValueClass() throws NoSuchFieldException, SchemaException {
         if (field == null)
             getField();
         return valueClass;

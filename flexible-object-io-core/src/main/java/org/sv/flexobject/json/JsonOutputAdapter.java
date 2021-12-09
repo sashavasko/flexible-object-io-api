@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.adapter.GenericOutAdapter;
 import org.sv.flexobject.stream.Sink;
 import org.sv.flexobject.stream.sinks.SingleValueSink;
@@ -103,7 +103,7 @@ public class JsonOutputAdapter extends GenericOutAdapter<ObjectNode> {
         return (JsonOutputAdapter) super.save();
     }
 
-    public static ObjectNode produce(StreamableWithSchema data) throws Exception {
+    public static ObjectNode produce(Streamable data) throws Exception {
         return produce(data::save);
     }
 

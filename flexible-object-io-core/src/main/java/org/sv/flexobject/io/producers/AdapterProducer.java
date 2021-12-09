@@ -31,7 +31,7 @@ public class AdapterProducer extends CloseableProducer {
         this(source, adapterClass, Schema.getRegisteredSchema(dataClass).getReader());
     }
 
-    public AdapterProducer(InAdapter adapter, Class<? extends StreamableWithSchema> dataClass) {
+    public AdapterProducer(InAdapter adapter, Class dataClass) {
         this(adapter, Schema.getRegisteredSchema(dataClass).getReader());
     }
 

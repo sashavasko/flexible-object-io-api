@@ -1,11 +1,11 @@
 package org.sv.flexobject.stream.sinks;
 
 
-import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.Streamable;
 
 import java.io.OutputStream;
 
-public class JsonSink extends OutputStreamSink<StreamableWithSchema> {
+public class JsonSink extends OutputStreamSink<Streamable>  {
 
     public JsonSink() {
         super(System.out);
@@ -16,7 +16,7 @@ public class JsonSink extends OutputStreamSink<StreamableWithSchema> {
     }
 
     @Override
-    protected byte[] convert(StreamableWithSchema value) {
+    protected byte[] convert(Streamable value) {
         try {
             return value.toJsonBytes();
         } catch (RuntimeException e) {

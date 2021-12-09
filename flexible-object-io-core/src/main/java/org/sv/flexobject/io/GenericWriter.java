@@ -2,7 +2,6 @@ package org.sv.flexobject.io;
 
 import org.sv.flexobject.OutAdapter;
 import org.sv.flexobject.Savable;
-import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.schema.Schema;
 
 import java.util.HashMap;
@@ -33,7 +32,7 @@ public class GenericWriter implements Writer {
     /*
      * This method will return schema specific instance and does not require save() method
      */
-    public static GenericWriter getInstance(Class<? extends StreamableWithSchema> datumClass) {
+    public static GenericWriter getInstance(Class datumClass) {
         GenericWriter instance = instances.get(datumClass.getName());
         if (instance == null) {
             instance = new GenericWriter(Schema.getRegisteredSchema(datumClass));

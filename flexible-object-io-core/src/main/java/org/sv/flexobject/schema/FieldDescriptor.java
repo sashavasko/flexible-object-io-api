@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
 import org.sv.flexobject.InAdapter;
 import org.sv.flexobject.OutAdapter;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.schema.annotations.*;
 import org.sv.flexobject.schema.reflect.*;
@@ -304,7 +305,7 @@ public class FieldDescriptor extends AbstractFieldDescriptor{
     }
 
     @Override
-    public boolean isEmpty(StreamableWithSchema o) {
+    public boolean isEmpty(Streamable o) {
         try {
             if (getter instanceof FieldWrapper) {
                 return ((FieldWrapper) getter).isEmpty(o);
@@ -330,7 +331,7 @@ public class FieldDescriptor extends AbstractFieldDescriptor{
 
     }
 
-    public Class<? extends StreamableWithSchema> getSubschema() throws NoSuchFieldException, SchemaException {
+    public Class<? extends Streamable> getSubschema() throws NoSuchFieldException, SchemaException {
         if (type == DataTypes.jsonNode && setter instanceof FieldWrapper){
             return((FieldWrapper) setter).getValueClass();
         }

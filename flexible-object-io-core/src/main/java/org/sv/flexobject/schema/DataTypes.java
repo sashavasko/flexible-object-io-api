@@ -6,7 +6,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.sv.flexobject.InAdapter;
 import org.sv.flexobject.OutAdapter;
-import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.json.JsonInputAdapter;
 import org.sv.flexobject.json.MapperFactory;
 import org.sv.flexobject.util.BiFunctionWithException;
@@ -141,8 +141,8 @@ public enum DataTypes {
 //        if (value instanceof byte[])
 //            return JsonNodeFactory.instance.binaryNode((byte[])value);
 
-        if (value instanceof StreamableWithSchema)
-            return ((StreamableWithSchema)value).toJson();
+        if (value instanceof Streamable)
+            return ((Streamable)value).toJson();
         if (value.getClass().isArray()){
             Object[] array = (Object[]) value;
             ArrayNode json = jsonArrayNode(array.length);
@@ -537,7 +537,7 @@ public enum DataTypes {
         if (JsonNode.class.isAssignableFrom(clazz))
             return jsonNode;
 
-        if (StreamableWithSchema.class.isAssignableFrom(clazz))
+        if (Streamable.class.isAssignableFrom(clazz))
             return jsonNode;
 
         // These are tricky since we need to know which Enum they belong to

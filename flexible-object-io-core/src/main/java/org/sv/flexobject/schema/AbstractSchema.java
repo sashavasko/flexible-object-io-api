@@ -2,7 +2,7 @@ package org.sv.flexobject.schema;
 
 import org.sv.flexobject.InAdapter;
 import org.sv.flexobject.OutAdapter;
-import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.Streamable;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -122,7 +122,7 @@ public class AbstractSchema {
         return true;
     }
 
-    public boolean isEmpty(StreamableWithSchema o) throws SchemaException {
+    public boolean isEmpty(Streamable o) throws SchemaException {
         for (SchemaElement field : fields) {
             AbstractFieldDescriptor descriptor = field.getDescriptor();
             if (!descriptor.isEmpty(o))

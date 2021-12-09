@@ -2,7 +2,7 @@ package org.sv.flexobject.io.consumers;
 
 import org.sv.flexobject.OutAdapter;
 import org.sv.flexobject.Savable;
-import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.adapter.GenericOutAdapter;
 import org.sv.flexobject.io.CloseableConsumer;
 import org.sv.flexobject.io.Writer;
@@ -36,7 +36,7 @@ public class AdapterConsumer implements CloseableConsumer {
     }
 
     public boolean consume (Savable datum) throws Exception {
-        if (writer == null && datum instanceof StreamableWithSchema)
+        if (writer == null && datum instanceof Streamable)
             writer = Schema.getRegisteredSchema(datum.getClass()).getWriter();
 
         if (writer == null){

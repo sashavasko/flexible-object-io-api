@@ -2,7 +2,7 @@ package org.sv.flexobject.schema;
 
 import org.sv.flexobject.InAdapter;
 import org.sv.flexobject.OutAdapter;
-import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.Streamable;
 
 public class AbstractFieldDescriptor {
     protected String name;
@@ -46,7 +46,7 @@ public class AbstractFieldDescriptor {
         throw new SchemaException("Class " + getClass().getName() + " does not implements clear()");
     }
 
-    public boolean isEmpty(StreamableWithSchema o){
+    public boolean isEmpty(Streamable o){
         return false;
     }
 }
