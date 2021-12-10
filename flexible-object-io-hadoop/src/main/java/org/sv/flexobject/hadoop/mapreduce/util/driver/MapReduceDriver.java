@@ -10,6 +10,7 @@ import org.apache.hadoop.mapreduce.lib.output.LazyOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.log4j.Logger;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.hadoop.HadoopTask;
 import org.sv.flexobject.hadoop.mapreduce.output.parquet.StreamableParquetOutputFormat;
@@ -154,12 +155,12 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
         return (SELF) this;
     }
 
-    public SELF addParquetOutput(String name, Class<? extends StreamableWithSchema> valueOutClass) {
+    public SELF addParquetOutput(String name, Class<? extends Streamable> valueOutClass) {
         outputs.add(new FullyDefinedOutputFormat(name, Void.class, valueOutClass, StreamableParquetOutputFormat.class));
         return (SELF) this;
     }
 
-    public SELF addParquetOutput(String name, Class<? extends OutputFormat> outputFormatClass, Class<? extends StreamableWithSchema> valueOutClass) {
+    public SELF addParquetOutput(String name, Class<? extends OutputFormat> outputFormatClass, Class<? extends Streamable> valueOutClass) {
         outputs.add(new FullyDefinedOutputFormat(name, Void.class, valueOutClass, outputFormatClass));
         return (SELF) this;
     }

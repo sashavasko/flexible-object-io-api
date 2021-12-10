@@ -3,14 +3,14 @@ package org.sv.flexobject.hadoop.streaming.parquet.read.streamable;
 import org.apache.log4j.Logger;
 import org.apache.parquet.schema.GroupType;
 import org.apache.parquet.schema.PrimitiveType;
-import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.hadoop.streaming.parquet.ParquetSchema;
 import org.sv.flexobject.hadoop.streaming.parquet.read.SchemedGroupConverter;
 import org.sv.flexobject.hadoop.streaming.parquet.read.SchemedPrimitiveConverter;
 import org.sv.flexobject.hadoop.streaming.parquet.read.SchemedRepeatedConverter;
 import org.sv.flexobject.schema.Schema;
 
-public class RepeatedConverter<CT> extends SchemedRepeatedConverter<StreamableWithSchema, CT> {
+public class RepeatedConverter<CT> extends SchemedRepeatedConverter<Streamable, CT> {
     static Logger logger = Logger.getLogger(RepeatedConverter.class);
 
     public RepeatedConverter(GroupType schema, GroupType fileSchema, Class instanceClass) {
@@ -22,7 +22,7 @@ public class RepeatedConverter<CT> extends SchemedRepeatedConverter<StreamableWi
     }
 
     @Override
-    protected SchemedPrimitiveConverter<StreamableWithSchema> newPrimitiveConverter(PrimitiveType type) {
+    protected SchemedPrimitiveConverter<Streamable> newPrimitiveConverter(PrimitiveType type) {
         return new PrimitiveFieldConverter(type) {
             @Override
             protected void set(Object value) {
@@ -32,7 +32,7 @@ public class RepeatedConverter<CT> extends SchemedRepeatedConverter<StreamableWi
     }
 
     @Override
-    protected SchemedGroupConverter<StreamableWithSchema> newGroupConverter(String parentName, GroupType type, GroupType fileSchema) {
+    protected SchemedGroupConverter<Streamable> newGroupConverter(String parentName, GroupType type, GroupType fileSchema) {
         Class elementClass;
         try {
             elementClass = Schema.getRegisteredSchema(getInstanceClass()).getDescriptor(parentName).getSubschema();
@@ -52,7 +52,7 @@ public class RepeatedConverter<CT> extends SchemedRepeatedConverter<StreamableWi
     @Override
     public void commit(CT values) {
         try {
-            ((StreamableWithSchema)getParent().getCurrentRecord()).set(getParentName(), values);
+            ((Streamable)getParent().getCurrentRecord()).set(getParentName(), values);
         } catch (Exception e) {
             logger.error("Failed to set repeated for " + getParentName() + " in " + getParent().getClass(), e);
             if (e instanceof RuntimeException)

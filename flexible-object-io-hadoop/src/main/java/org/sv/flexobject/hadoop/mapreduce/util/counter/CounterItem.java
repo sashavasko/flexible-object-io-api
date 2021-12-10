@@ -1,10 +1,10 @@
 package org.sv.flexobject.hadoop.mapreduce.util.counter;
 
-import org.sv.flexobject.hadoop.StreamableAndWritableWithSchema;
+import org.sv.flexobject.hadoop.StreamableWritableImpl;
 
 import java.sql.Timestamp;
 
-public class CounterItem extends StreamableAndWritableWithSchema {
+public class CounterItem extends StreamableWritableImpl {
     String groupName;
     String counterName;
     Long counterValue;

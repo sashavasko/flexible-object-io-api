@@ -3,23 +3,23 @@ package org.sv.flexobject.hadoop.streaming.avro;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.util.Utf8;
-import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.schema.FieldDescriptor;
 import org.sv.flexobject.schema.SchemaException;
 
 public class StreamableAvroRecord implements GenericRecord {
 
-    StreamableWithSchema wrappedObject;
+    Streamable wrappedObject;
     Schema schema;
 
     public StreamableAvroRecord() {
     }
 
-    public StreamableAvroRecord(StreamableWithSchema wrappedObject, Schema avroSchema) {
+    public StreamableAvroRecord(Streamable wrappedObject, Schema avroSchema) {
         set(wrappedObject, avroSchema);
     }
 
-    public void set(StreamableWithSchema wrappedObject, Schema avroSchema) {
+    public void set(Streamable wrappedObject, Schema avroSchema) {
         this.wrappedObject = wrappedObject;
         schema = avroSchema;
     }

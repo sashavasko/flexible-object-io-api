@@ -2,10 +2,11 @@ package org.sv.flexobject.hadoop.mapreduce.util.counter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.mapreduce.TaskInputOutputContext;
+import org.sv.flexobject.hadoop.StreamableWritableImpl;
 
 import java.sql.Timestamp;
 
-public class Counter implements ICounter{
+public class Counter extends StreamableWritableImpl implements ICounter{
     protected String groupName;
     protected String mainTitle = "";
     protected Timestamp startTimestamp = new Timestamp(System.currentTimeMillis());

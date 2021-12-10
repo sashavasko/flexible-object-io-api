@@ -1,14 +1,11 @@
 package org.sv.flexobject.hadoop.streaming.parquet;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.hadoop.ParquetWriter;
 import org.apache.parquet.io.OutputFile;
 import org.apache.parquet.schema.MessageType;
-import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.hadoop.streaming.parquet.write.SchemedParquetWriterBuilder;
-import org.sv.flexobject.hadoop.streaming.parquet.write.streamable.ParquetWriterBuilder;
 import org.sv.flexobject.stream.Sink;
 import org.sv.flexobject.util.InstanceFactory;
 
@@ -58,7 +55,7 @@ public class AbstractParquetSink<T> implements Sink<T>, AutoCloseable {
         String namespace;
         Configuration conf;
         MessageType schema;
-        Class<? extends StreamableWithSchema> dataClass;
+        Class<?> dataClass;
         Path filePath;
         boolean overwrite = false;
         OutputFile file;
@@ -78,7 +75,7 @@ public class AbstractParquetSink<T> implements Sink<T>, AutoCloseable {
             return this;
         }
 
-        public Builder<T,SINK> withSchema(Class<? extends StreamableWithSchema> dataClass){
+        public Builder<T,SINK> withSchema(Class<?> dataClass){
             this.dataClass = dataClass;
             return this;
         }

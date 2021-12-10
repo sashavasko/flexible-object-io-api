@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.sv.flexobject.hadoop.StreamableAndWritableWithSchema;
+import org.sv.flexobject.hadoop.StreamableWritableImpl;
 import org.sv.flexobject.hadoop.mapreduce.input.split.InputSplitImpl;
 import org.sv.flexobject.json.MapperFactory;
 import org.sv.flexobject.mongo.json.BsonToJsonConverter;
@@ -20,7 +20,7 @@ import org.sv.flexobject.util.InstanceFactory;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-public class MongoSplit extends StreamableAndWritableWithSchema implements InputSplitImpl {
+public class MongoSplit extends StreamableWritableImpl implements InputSplitImpl {
     public static final Logger logger = Logger.getLogger(MongoSplit.class);
 
     protected JsonNode queryJson;

@@ -26,8 +26,8 @@ import java.util.List;
 public final class ParquetSchemaConf extends HadoopPropertiesWrapper<ParquetSchemaConf> {
     public static final String SUBNAMESPACE = "parquet";
 
-    Class<? extends StreamableWithSchema> inputSchemaClass;
-    Class<? extends StreamableWithSchema> outputSchemaClass;
+    Class<?> inputSchemaClass;
+    Class<?> outputSchemaClass;
     JsonNode inputSchemaJson;
     JsonNode outputSchemaJson;
     JsonNode filterPredicateJson;
@@ -66,12 +66,12 @@ public final class ParquetSchemaConf extends HadoopPropertiesWrapper<ParquetSche
         return outputSchemaClass != null || outputSchemaJson != null;
     }
 
-    public ParquetSchemaConf setInputSchemaClass(Class<? extends StreamableWithSchema> inputSchemaClass) {
+    public ParquetSchemaConf setInputSchemaClass(Class<?> inputSchemaClass) {
         this.inputSchemaClass = inputSchemaClass;
         return this;
     }
 
-    public ParquetSchemaConf setOutputSchemaClass(Class<? extends StreamableWithSchema> outputSchemaClass) {
+    public ParquetSchemaConf setOutputSchemaClass(Class<?> outputSchemaClass) {
         this.outputSchemaClass = outputSchemaClass;
         return this;
     }
@@ -96,7 +96,7 @@ public final class ParquetSchemaConf extends HadoopPropertiesWrapper<ParquetSche
         return this;
     }
 
-    public static MessageType getSchema(Class<? extends StreamableWithSchema> schemaClass, JsonNode schemaJson){
+    public static MessageType getSchema(Class<?> schemaClass, JsonNode schemaJson){
         if (schemaClass != null) {
             return ParquetSchema.forClass(schemaClass);
         } else if (schemaJson != null) {

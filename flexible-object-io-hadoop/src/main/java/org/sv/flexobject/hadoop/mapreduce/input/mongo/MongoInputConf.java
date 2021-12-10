@@ -2,7 +2,7 @@ package org.sv.flexobject.hadoop.mapreduce.input.mongo;
 
 
 import com.mongodb.client.MongoCollection;
-import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.hadoop.mapreduce.input.InputConf;
 import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
 import org.sv.flexobject.mongo.connection.MongoConnection;
@@ -21,7 +21,7 @@ public class MongoInputConf<SELF extends HadoopPropertiesWrapper> extends InputC
     protected int estimateTimeLimitMicros;
     protected Class<? extends MongoBuilder> builderClass;
 
-    protected Class<? extends StreamableWithSchema> schema;
+    protected Class<? extends Streamable> schema;
 
     public MongoInputConf() {
         super(SUBNAMESPACE);
@@ -58,7 +58,7 @@ public class MongoInputConf<SELF extends HadoopPropertiesWrapper> extends InputC
         this.builderClass = builderClass;
     }
 
-    public void setSchema(Class<? extends StreamableWithSchema> schema) {
+    public void setSchema(Class<? extends Streamable> schema) {
         this.schema = schema;
     }
 
@@ -74,7 +74,7 @@ public class MongoInputConf<SELF extends HadoopPropertiesWrapper> extends InputC
         return collectionName;
     }
 
-    public Class<? extends StreamableWithSchema> getInputSchema() {
+    public Class<? extends Streamable> getInputSchema() {
         return schema;
     }
 

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.filter2.compat.FilterCompat;
 import org.apache.parquet.schema.MessageType;
-import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
 
 public final class ParquetSourceConf extends HadoopPropertiesWrapper<ParquetSourceConf> {
@@ -13,7 +12,7 @@ public final class ParquetSourceConf extends HadoopPropertiesWrapper<ParquetSour
 
     public String filePath;
     public JsonNode schemaJson;
-    public Class<? extends StreamableWithSchema> dataClass;
+    public Class<?> dataClass;
 
     @Override
     protected String getSubNamespace() {
@@ -41,7 +40,7 @@ public final class ParquetSourceConf extends HadoopPropertiesWrapper<ParquetSour
         return filePath == null ? null : new Path(filePath);
     }
 
-    public Class<? extends StreamableWithSchema> getDataClass() {
+    public Class<?> getDataClass() {
         return dataClass;
     }
 

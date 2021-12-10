@@ -10,7 +10,7 @@ import org.apache.avro.io.DatumReader;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.Path;
-import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.hadoop.streaming.avro.AvroSchema;
 
 import java.io.File;
@@ -20,7 +20,7 @@ public class InputBuilder<SELF extends InputBuilder, T> {
 
     protected Configuration configuration;
     protected Schema avroSchema;
-    protected Class<? extends StreamableWithSchema> dataClass;
+    protected Class<? extends Streamable> dataClass;
     protected File file;
     protected Path filePath;
     protected byte[] bytes;
@@ -34,7 +34,7 @@ public class InputBuilder<SELF extends InputBuilder, T> {
         return (SELF) this;
     }
 
-    public SELF withSchema(Class<? extends StreamableWithSchema> dataClass) {
+    public SELF withSchema(Class<? extends Streamable> dataClass) {
         this.dataClass = dataClass;
         return (SELF) this;
     }

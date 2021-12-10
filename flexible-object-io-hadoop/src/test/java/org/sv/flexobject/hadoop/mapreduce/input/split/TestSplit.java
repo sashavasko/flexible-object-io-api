@@ -1,11 +1,11 @@
 package org.sv.flexobject.hadoop.mapreduce.input.split;
 
 
-import org.sv.flexobject.hadoop.StreamableAndWritableWithSchema;
+import org.sv.flexobject.hadoop.StreamableWritable;
 
 import java.io.IOException;
 
-public class TestSplit extends StreamableAndWritableWithSchema implements InputSplitImpl {
+public class TestSplit extends StreamableWritable implements InputSplitImpl {
 
     Long length;
 

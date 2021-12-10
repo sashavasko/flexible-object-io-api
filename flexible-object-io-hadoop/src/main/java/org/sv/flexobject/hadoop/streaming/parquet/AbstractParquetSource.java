@@ -5,7 +5,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.parquet.hadoop.ParquetReader;
 import org.apache.parquet.io.InputFile;
 import org.apache.parquet.schema.MessageType;
-import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.hadoop.streaming.parquet.read.SchemedParquetReaderBuilder;
 import org.sv.flexobject.stream.Source;
 import org.sv.flexobject.util.InstanceFactory;
@@ -62,7 +61,7 @@ public class AbstractParquetSource<T> implements Source<T>, AutoCloseable {
         String namespace;
         Configuration conf;
         MessageType schema;
-        Class<? extends StreamableWithSchema> dataClass;
+        Class<?> dataClass;
         Path filePath;
         InputFile file;
         Class<? extends AbstractParquetSource> sourceClass;
@@ -81,7 +80,7 @@ public class AbstractParquetSource<T> implements Source<T>, AutoCloseable {
             return this;
         }
 
-        public Builder<T, SOURCE> withSchema(Class<? extends StreamableWithSchema> dataClass){
+        public Builder<T, SOURCE> withSchema(Class<?> dataClass){
             this.dataClass = dataClass;
             return this;
         }

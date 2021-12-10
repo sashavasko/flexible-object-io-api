@@ -3,18 +3,18 @@ package org.sv.flexobject.hadoop.mapreduce.util.cacheable;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.hadoop.ParquetReader;
-import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.hadoop.streaming.parquet.read.streamable.ParquetReaderBuilder;
 import org.sv.flexobject.schema.Schema;
 import org.sv.flexobject.schema.SchemaElement;
 
 import java.io.IOException;
 
-public abstract class HadoopCacheableParquet<T extends StreamableWithSchema> extends HadoopCacheable {
+public abstract class HadoopCacheableParquet<T extends Streamable> extends HadoopCacheable {
 
-    protected Class<? extends StreamableWithSchema> schema;
+    protected Class<? extends Streamable> schema;
 
-    public HadoopCacheableParquet(Path locationOnHDFS, String counterTitle, String tag, Class<? extends StreamableWithSchema> schema) {
+    public HadoopCacheableParquet(Path locationOnHDFS, String counterTitle, String tag, Class<? extends Streamable> schema) {
         super(locationOnHDFS, counterTitle, tag);
         this.schema = schema;
     }

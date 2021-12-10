@@ -8,7 +8,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.log4j.Logger;
-import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.hadoop.mapreduce.input.Splitter;
 import org.sv.flexobject.hadoop.streaming.parquet.streamable.ParquetSource;
 import org.sv.flexobject.util.InstanceFactory;
@@ -49,7 +49,7 @@ public class PersistedInputSplitter extends Configured implements Splitter {
                 .withConf(getConf())
                 .forInput(path)
                 .build()){
-            StreamableWithSchema data;
+            Streamable data;
             while((data = source.get()) != null){
                 splits.add(new ProxyInputSplit((InputSplitImpl) data));
             }

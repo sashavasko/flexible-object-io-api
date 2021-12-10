@@ -7,7 +7,7 @@ import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.util.Utf8;
 import org.apache.hadoop.conf.Configuration;
-import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.schema.FieldDescriptor;
 import org.sv.flexobject.schema.SchemaElement;
@@ -32,7 +32,7 @@ public class AvroSchema {
         return conf;
     }
 
-    public static Schema forClass(Class<? extends StreamableWithSchema> dataClass) {
+    public static Schema forClass(Class<? extends Streamable> dataClass) {
         try {
             return forSchema(org.sv.flexobject.schema.Schema.getRegisteredSchema(dataClass));
         } catch (Exception e) {
@@ -61,7 +61,7 @@ public class AvroSchema {
 
     public static Schema compileField(FieldDescriptor field) throws NoSuchFieldException, SchemaException {
         FieldWrapper.STRUCT structure = field.getStructure();
-        Class<? extends StreamableWithSchema> subSchema = field.getSubschema();
+        Class<? extends Streamable> subSchema = field.getSubschema();
         switch(structure){
             case array:
             case list:
@@ -73,7 +73,7 @@ public class AvroSchema {
         }
     }
 
-    private static Schema compileField(FieldDescriptor field, Class<? extends StreamableWithSchema> subSchema) throws NoSuchFieldException, SchemaException {
+    private static Schema compileField(FieldDescriptor field, Class<? extends Streamable> subSchema) throws NoSuchFieldException, SchemaException {
         if (subSchema != null)
             return forClass(subSchema);
 
@@ -127,9 +127,9 @@ public class AvroSchema {
         return null;
     }
 
-    public static <T extends StreamableWithSchema> T convertGenericRecord(GenericRecord src, Schema avroSchema) throws Exception {
-        Class<? extends StreamableWithSchema> dstClass = (Class<? extends StreamableWithSchema>) Class.forName(avroSchema.getFullName());
-        StreamableWithSchema dst = dstClass.newInstance();
+    public static <T extends Streamable> T convertGenericRecord(GenericRecord src, Schema avroSchema) throws Exception {
+        Class<? extends Streamable> dstClass = (Class<? extends Streamable>) Class.forName(avroSchema.getFullName());
+        Streamable dst = dstClass.newInstance();
         org.sv.flexobject.schema.Schema internalSchema = dst.getSchema();
         for (Schema.Field field : avroSchema.getFields()) {
             Schema recordSchema = AvroSchema.findRecordSchema(field);
@@ -202,7 +202,7 @@ public class AvroSchema {
 
         FieldWrapper.STRUCT structure = descriptor.getStructure();
 
-        Class<? extends StreamableWithSchema> subSchema = descriptor.getSubschema();
+        Class<? extends Streamable> subSchema = descriptor.getSubschema();
         Schema avroSubSchema = subSchema == null ? null : AvroSchema.forClass(subSchema);
 
         switch (structure) {
@@ -238,7 +238,7 @@ public class AvroSchema {
             return null;
 
         if (avroSubSchema != null)
-            return  new StreamableAvroRecord((StreamableWithSchema) value, avroSubSchema);
+            return  new StreamableAvroRecord((Streamable) value, avroSubSchema);
 
         switch (descriptor.getValueType()){
             case jsonNode :

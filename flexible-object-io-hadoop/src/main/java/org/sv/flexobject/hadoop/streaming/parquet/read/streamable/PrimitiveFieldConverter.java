@@ -3,18 +3,15 @@ package org.sv.flexobject.hadoop.streaming.parquet.read.streamable;
 import org.apache.parquet.io.api.Binary;
 import org.apache.parquet.schema.OriginalType;
 import org.apache.parquet.schema.Type;
-import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.hadoop.streaming.parquet.read.SchemedPrimitiveConverter;
 import org.sv.flexobject.json.MapperFactory;
 import org.sv.flexobject.schema.DataTypes;
-import org.sv.flexobject.schema.FieldDescriptor;
-import org.sv.flexobject.schema.reflect.FieldWrapper;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.Collection;
 
-public class PrimitiveFieldConverter extends SchemedPrimitiveConverter<StreamableWithSchema> {
+public class PrimitiveFieldConverter extends SchemedPrimitiveConverter<Streamable> {
 
     public PrimitiveFieldConverter(Type type) {
         super(type);

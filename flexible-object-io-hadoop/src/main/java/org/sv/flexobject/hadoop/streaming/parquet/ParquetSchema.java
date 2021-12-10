@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.parquet.avro.AvroSchemaConverter;
 import org.apache.parquet.schema.*;
-import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.schema.*;
 
 import java.lang.reflect.InvocationTargetException;
@@ -78,13 +78,13 @@ public class ParquetSchema {
         return null;
     }
 
-    public static Type makeScalarType(Class<? extends StreamableWithSchema> subSchema, String name) throws NoSuchFieldException, SchemaException {
+    public static Type makeScalarType(Class<?> subSchema, String name) throws NoSuchFieldException, SchemaException {
         List<Type> fields = parquetFieldsForClass(subSchema);
         return groupField(name, fields);
     }
 
     public static Type makeScalarType(FieldDescriptor descriptor, String name) throws NoSuchFieldException, SchemaException {
-        Class<? extends StreamableWithSchema> subSchema = descriptor.getSubschema();
+        Class<?> subSchema = descriptor.getSubschema();
         if (subSchema != null){
             return makeScalarType(subSchema, name);
         }
@@ -108,7 +108,7 @@ public class ParquetSchema {
     // Optional Name(LIST){ Repeated int32 element; }   (in this case - element is required and there must be at least one,
     // or the whole list has to be null
     private static Type makeListType(FieldDescriptor fieldDescriptor) throws NoSuchFieldException, SchemaException {
-        Class<? extends StreamableWithSchema> subSchema = fieldDescriptor.getSubschema();
+        Class<?> subSchema = fieldDescriptor.getSubschema();
         Type element;
         if (subSchema != null){
             element = makeScalarType(subSchema, ELEMENT_OBJECT_NAME);
@@ -124,7 +124,7 @@ public class ParquetSchema {
     }
 
     public static Type makeMapType(FieldDescriptor fieldDescriptor) throws NoSuchFieldException, SchemaException {
-        Class<? extends StreamableWithSchema> subSchema = fieldDescriptor.getSubschema();
+        Class<?> subSchema = fieldDescriptor.getSubschema();
         Type key = stringField(KEY_OBJECT_NAME, REQUIRED);
         Type value;
         if (subSchema != null){
@@ -136,7 +136,7 @@ public class ParquetSchema {
         return Types.buildGroup(OPTIONAL).as(OriginalType.MAP).addField(keyValue).named(fieldDescriptor.getName());
     }
 
-    public static List<Type> parquetFieldsForClass(Class<? extends StreamableWithSchema> dataClass){
+    public static List<Type> parquetFieldsForClass(Class<?> dataClass){
         Schema schema = Schema.getRegisteredSchema(dataClass);
         SchemaElement[] fields = schema.getFields();
         List<Type> parquetFields = new ArrayList<>(fields.length);
@@ -166,13 +166,13 @@ public class ParquetSchema {
         return parquetFields;
     }
 
-    public static MessageType forClass(Class<? extends StreamableWithSchema> dataClass){
+    public static MessageType forClass(Class<?> dataClass){
         return new MessageType(dataClass.getName(), parquetFieldsForClass(dataClass));
     }
 
-    public static Class<? extends StreamableWithSchema> forType(GroupType type){
+    public static Class<?> forType(GroupType type){
         try {
-            return (Class<? extends StreamableWithSchema>) Thread.currentThread().getContextClassLoader().loadClass(type.getName());
+            return Thread.currentThread().getContextClassLoader().loadClass(type.getName());
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Failed to load data class " + type.getName(), e);
         }
@@ -181,19 +181,7 @@ public class ParquetSchema {
     public static MessageType forClass(String className){
         try {
             Class<?> schemaClass = Thread.currentThread().getContextClassLoader().loadClass(className);
-            if (StreamableWithSchema.class.isAssignableFrom(schemaClass))
-                return forClass((Class<? extends StreamableWithSchema>)schemaClass);
-            else {
-                try {
-                    Method method = schemaClass.getMethod("getSchema");
-                    return (MessageType)method.invoke(schemaClass.newInstance());
-                } catch (NoSuchMethodException
-                        | IllegalAccessException
-                        | InstantiationException
-                        | InvocationTargetException e) {
-                    throw new RuntimeException("Requested class " + className +" must either implement StreamableWithSchema or define getSchema() method", e);
-                }
-            }
+            return forClass(schemaClass);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Failed to load data class " + className, e);
         }

@@ -1,38 +1,36 @@
 package org.sv.flexobject.hadoop.streaming.parquet.read.streamable;
 
 import org.apache.log4j.Logger;
-import org.apache.parquet.io.api.GroupConverter;
 import org.apache.parquet.schema.GroupType;
 import org.apache.parquet.schema.PrimitiveType;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.StreamableWithSchema;
-import org.sv.flexobject.hadoop.streaming.parquet.ParquetSchema;
 import org.sv.flexobject.hadoop.streaming.parquet.read.SchemedGroupConverter;
 import org.sv.flexobject.hadoop.streaming.parquet.read.SchemedPrimitiveConverter;
 import org.sv.flexobject.hadoop.streaming.parquet.read.SchemedRepeatedConverter;
 import org.sv.flexobject.schema.Schema;
-import org.sv.flexobject.schema.SchemaException;
 
-public class StreamableConverter extends SchemedGroupConverter<StreamableWithSchema> {
+public class StreamableConverter extends SchemedGroupConverter<Streamable> {
     static Logger logger = Logger.getLogger(StreamableConverter.class);
 
     Schema internalSchema;
 
-    public StreamableConverter(GroupType schema, GroupType fileSchema, Class <? extends StreamableWithSchema> dataClass) {
+    public StreamableConverter(GroupType schema, GroupType fileSchema, Class <? extends Streamable> dataClass) {
         super(schema, fileSchema, dataClass);
     }
 
-    public StreamableConverter(SchemedGroupConverter parent, String parentName, GroupType type, GroupType fileSchema, Class <? extends StreamableWithSchema> dataClass) {
+    public StreamableConverter(SchemedGroupConverter parent, String parentName, GroupType type, GroupType fileSchema, Class <? extends Streamable> dataClass) {
         super(parent, parentName, type, fileSchema, dataClass);
     }
 
     @Override
-    protected SchemedPrimitiveConverter<StreamableWithSchema> newPrimitiveConverter(PrimitiveType type) {
+    protected SchemedPrimitiveConverter<Streamable> newPrimitiveConverter(PrimitiveType type) {
         return new PrimitiveFieldConverter(type);
     }
 
     @Override
-    protected SchemedGroupConverter<StreamableWithSchema> newGroupConverter(String parentName, GroupType type, GroupType fileSchema) {
-        Class <? extends StreamableWithSchema> childClass;
+    protected SchemedGroupConverter<Streamable> newGroupConverter(String parentName, GroupType type, GroupType fileSchema) {
+        Class <? extends Streamable> childClass;
 
         if (type == null){
             throw new RuntimeException("Cannot create group converter for field " + parentName + ": message type is unknown.");
@@ -59,12 +57,12 @@ public class StreamableConverter extends SchemedGroupConverter<StreamableWithSch
     }
 
     @Override
-    protected void addChildGroup(String name, StreamableWithSchema child) {
+    protected void addChildGroup(String name, Streamable child) {
         ParquetReadSupport.setField(current, name, child);
     }
 
     @Override
-    public void setInstanceClass(Class<? extends StreamableWithSchema> instanceClass) {
+    public void setInstanceClass(Class<? extends Streamable> instanceClass) {
         super.setInstanceClass(instanceClass);
         if (instanceClass != null)
             internalSchema = Schema.getRegisteredSchema(instanceClass);

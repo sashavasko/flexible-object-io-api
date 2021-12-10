@@ -8,7 +8,7 @@ import org.apache.parquet.filter2.predicate.FilterPredicate;
 import org.apache.parquet.hadoop.ParquetInputFormat;
 import org.apache.parquet.hadoop.ParquetOutputFormat;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
-import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.hadoop.streaming.parquet.ParquetFilterParser;
 import org.sv.flexobject.hadoop.streaming.parquet.ParquetSchemaConf;
 
@@ -19,14 +19,14 @@ public abstract class ParquetMapReduceDriver<SELF extends ParquetMapReduceDriver
 
     public static final String PARQUET_FILTER_PREDICATE = "mapreduce.parquet.filter.predicate.json";
 
-    Class<? extends StreamableWithSchema> inputSchemaClass;
+    Class<? extends Streamable> inputSchemaClass;
     String inputSchemaJson;
     String parquetPredicateJson;
-    Class<? extends StreamableWithSchema> outputSchemaClass;
+    Class<? extends Streamable> outputSchemaClass;
     String outputSchemaJson;
     boolean useFileSchema = false;
 
-    public SELF setInputSchemaClass(Class<? extends StreamableWithSchema> inputSchemaClass) {
+    public SELF setInputSchemaClass(Class<? extends Streamable> inputSchemaClass) {
         this.inputSchemaClass = inputSchemaClass;
         return (SELF) this;
     }
@@ -36,7 +36,7 @@ public abstract class ParquetMapReduceDriver<SELF extends ParquetMapReduceDriver
         return (SELF) this;
     }
 
-    public SELF setOutputSchemaClass(Class<? extends StreamableWithSchema> outputSchema) {
+    public SELF setOutputSchemaClass(Class<? extends Streamable> outputSchema) {
         this.outputSchemaClass = outputSchema;
         return (SELF) this;
     }

@@ -5,7 +5,7 @@ import org.apache.parquet.io.api.RecordConsumer;
 import org.apache.parquet.schema.GroupType;
 import org.apache.parquet.schema.PrimitiveType;
 import org.apache.parquet.schema.Type;
-import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.hadoop.streaming.parquet.write.ParquetWriteException;
 import org.sv.flexobject.hadoop.streaming.parquet.write.SchemedWriter;
 import org.sv.flexobject.schema.DataTypes;
@@ -13,18 +13,18 @@ import org.sv.flexobject.schema.DataTypes;
 import java.util.Collection;
 import java.util.Map;
 
-public class StreamableParquetWriter extends SchemedWriter<StreamableWithSchema, Object> {
+public class StreamableParquetWriter extends SchemedWriter<Streamable, Object> {
     public StreamableParquetWriter(RecordConsumer recordConsumer, GroupType schema) {
         super(recordConsumer, schema);
     }
 
     @Override
-    public Object getGroupValue(StreamableWithSchema group, String fieldName) throws Exception {
+    public Object getGroupValue(Streamable group, String fieldName) throws Exception {
         return group.get(fieldName);
     }
 
     public void writeValue(Object value, PrimitiveType fieldType) throws ParquetWriteException {
-        if (value instanceof StreamableWithSchema){
+        if (value instanceof Streamable){
             if (fieldType.getPrimitiveTypeName() == PrimitiveType.PrimitiveTypeName.BINARY){
                 try {
                     getRecordConsumer().addBinary(Binary.fromString(DataTypes.stringConverter(value)));

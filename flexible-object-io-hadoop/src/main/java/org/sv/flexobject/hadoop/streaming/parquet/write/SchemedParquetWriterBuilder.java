@@ -4,10 +4,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.parquet.hadoop.ParquetWriter;
 import org.apache.parquet.io.OutputFile;
 import org.apache.parquet.schema.MessageType;
-import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.hadoop.streaming.parquet.ParquetSchema;
-import org.sv.flexobject.hadoop.streaming.parquet.read.input.ByteArrayInputFile;
-import org.sv.flexobject.hadoop.streaming.parquet.write.output.ByteArrayOutputFile;
 
 public abstract class SchemedParquetWriterBuilder<T,SELF extends ParquetWriter.Builder<T, SELF>> extends ParquetWriter.Builder<T, SELF> {
 
@@ -26,7 +23,7 @@ public abstract class SchemedParquetWriterBuilder<T,SELF extends ParquetWriter.B
         return self();
     }
 
-    public SELF withSchema(Class<? extends StreamableWithSchema> dataClass){
+    public SELF withSchema(Class<?> dataClass){
         this.schema = ParquetSchema.forClass(dataClass);
         return self();
     }

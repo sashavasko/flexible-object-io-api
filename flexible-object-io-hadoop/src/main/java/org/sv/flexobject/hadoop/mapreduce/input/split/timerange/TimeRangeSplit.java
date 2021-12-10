@@ -1,12 +1,12 @@
 package org.sv.flexobject.hadoop.mapreduce.input.split.timerange;
 
 
-import org.sv.flexobject.hadoop.StreamableAndWritableWithSchema;
+import org.sv.flexobject.hadoop.StreamableWritableImpl;
 import org.sv.flexobject.hadoop.mapreduce.input.split.InputSplitImpl;
 
 import java.io.IOException;
 
-public class TimeRangeSplit extends StreamableAndWritableWithSchema implements InputSplitImpl {
+public class TimeRangeSplit extends StreamableWritableImpl implements InputSplitImpl {
     long startTimeMillis;
     long endTimeMillis;
     long millisPerRecord;

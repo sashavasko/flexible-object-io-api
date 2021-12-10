@@ -5,13 +5,13 @@ import org.apache.hadoop.fs.Path;
 import org.apache.parquet.hadoop.api.ReadSupport;
 import org.apache.parquet.hadoop.util.HadoopInputFile;
 import org.apache.parquet.io.InputFile;
-import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.hadoop.streaming.parquet.read.SchemedParquetReaderBuilder;
 import org.sv.flexobject.hadoop.streaming.parquet.read.input.ByteArrayInputFile;
 
 import java.io.IOException;
 
-public class ParquetReaderBuilder extends SchemedParquetReaderBuilder<StreamableWithSchema, ParquetReaderBuilder> {
+public class ParquetReaderBuilder extends SchemedParquetReaderBuilder<Streamable, ParquetReaderBuilder> {
 
     public static SchemedParquetReaderBuilder forPath(Configuration conf, Path file) throws IOException {
         return new ParquetReaderBuilder (conf, file);
@@ -40,7 +40,7 @@ public class ParquetReaderBuilder extends SchemedParquetReaderBuilder<Streamable
     }
 
     @Override
-    protected ReadSupport<StreamableWithSchema> getReadSupport() {
+    protected ReadSupport<Streamable> getReadSupport() {
         return new ParquetReadSupport(getSchema());
     }
 }

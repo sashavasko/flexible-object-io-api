@@ -5,7 +5,7 @@ import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.io.DatumWriter;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
-import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.hadoop.streaming.avro.AvroSchema;
 
 import java.io.IOException;
@@ -14,7 +14,7 @@ import java.io.OutputStream;
 abstract public class OutputBuilder<SELF extends OutputBuilder, T> {
     protected Configuration configuration;
     protected Schema avroSchema;
-    protected Class<? extends StreamableWithSchema> dataClass;
+    protected Class<? extends Streamable> dataClass;
     protected Path filePath;
     protected Boolean overwrite;
     protected OutputStream outputStream;
@@ -27,7 +27,7 @@ abstract public class OutputBuilder<SELF extends OutputBuilder, T> {
         return (SELF)this;
     }
 
-    public SELF withSchema(Class<? extends StreamableWithSchema> dataClass){
+    public SELF withSchema(Class<? extends Streamable> dataClass){
         this.dataClass = dataClass;
         return (SELF)this;
     }
