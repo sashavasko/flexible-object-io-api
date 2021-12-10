@@ -7,7 +7,7 @@ import com.mongodb.client.MongoCursor;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.mongo.MongoClientProvider;
 import org.sv.flexobject.mongo.connection.MongoConnection;
 import org.sv.flexobject.mongo.schema.BsonSchema;
@@ -30,7 +30,7 @@ public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Sou
     protected CursorType cursorType;
     private MongoCursor cursor;
     private Class documentClass = Document.class;
-    private Class<? extends StreamableWithSchema> schema;
+    private Class<? extends Streamable> schema;
 
     public SELF connection(String connectionName) {
         this.connectionName = connectionName;
@@ -93,7 +93,7 @@ public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Sou
         return (SELF) this;
     }
 
-    public SELF schema(Class<? extends StreamableWithSchema> schema) {
+    public SELF schema(Class<? extends Streamable> schema) {
         this.schema = schema;
         return (SELF) this;
     }
@@ -158,11 +158,11 @@ public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Sou
         return cursor;
     }
 
-    public Class<? extends StreamableWithSchema> getSchema() throws SchemaException {
+    public Class<? extends Streamable> getSchema() throws SchemaException {
         if (schema == null)
             return null;
-        if (!StreamableWithSchema.class.isAssignableFrom(schema))
-            throw new SchemaException("Schema is not available for classes not derived from StreamableWithSchema. Requested class is " + schema.getName());
+        if (!Streamable.class.isAssignableFrom(schema))
+            throw new SchemaException("Schema is not available for classes not derived from Streamable. Requested class is " + schema.getName());
         return schema;
     }
 

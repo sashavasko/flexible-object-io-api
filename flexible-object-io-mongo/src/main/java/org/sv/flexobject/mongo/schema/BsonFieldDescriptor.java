@@ -1,17 +1,14 @@
 package org.sv.flexobject.mongo.schema;
 
-import org.bson.codecs.pojo.ClassModelBuilder;
-import org.bson.codecs.pojo.PropertyModel;
-import org.bson.codecs.pojo.PropertyModelBuilder;
+import org.bson.BsonType;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.codecs.pojo.annotations.BsonRepresentation;
-import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.mongo.schema.annotations.BsonName;
 import org.sv.flexobject.schema.AbstractFieldDescriptor;
 import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.schema.Schema;
 import org.sv.flexobject.schema.SchemaException;
-import org.bson.BsonType;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -38,7 +35,7 @@ public class BsonFieldDescriptor extends AbstractFieldDescriptor {
             if (fieldClass.isArray() || List.class.isAssignableFrom(fieldClass)) {
                 this.isArray = true;
                 dataType = Schema.getRegisteredSchema(dataClass).getDescriptor(order).getValueType();
-            } else if (StreamableWithSchema.class.isAssignableFrom(fieldClass) || Map.class.isAssignableFrom(fieldClass)) {
+            } else if (Streamable.class.isAssignableFrom(fieldClass) || Map.class.isAssignableFrom(fieldClass)) {
                 this.isDocument = true;
                 dataType = Schema.getRegisteredSchema(dataClass).getDescriptor(order).getValueType();
             }

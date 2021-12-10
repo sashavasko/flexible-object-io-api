@@ -4,6 +4,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.bson.*;
 import org.bson.types.Binary;
 import org.bson.types.ObjectId;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.mongo.json.BsonToJsonConverter;
 import org.sv.flexobject.schema.*;
@@ -17,7 +18,6 @@ import java.sql.Timestamp;
 import java.util.*;
 
 public class BsonSchema extends AbstractSchema {
-
     public static FunctionWithException bsonTimestampConverter = (v)-> {BsonTimestamp bson = (BsonTimestamp) v; return new Timestamp(bson.getTime()*1000L + bson.getInc()/1000000L);};
     public static FunctionWithException bsonDateConverter = (v)-> new Date(((BsonDateTime)v).getValue());
 
@@ -59,11 +59,11 @@ public class BsonSchema extends AbstractSchema {
         SchemaRegistry.getInstance().registerSchema(this);
     }
 
-    public static BsonSchema getRegisteredSchema(Class<? extends StreamableWithSchema> dataClass) {
+    public static BsonSchema getRegisteredSchema(Class<?> dataClass) {
         String schemaName = dataClass.getName();
         return SchemaRegistry.getInstance().hasSchema(schemaName, BsonSchema.class) ?
-            SchemaRegistry.getInstance().getSchema(dataClass.getName(), BsonSchema.class)
-            : new BsonSchema(dataClass);
+                SchemaRegistry.getInstance().getSchema(dataClass.getName(), BsonSchema.class)
+                : new BsonSchema(dataClass);
     }
 
     public BsonFieldDescriptor getFieldDescriptor(int i) {
@@ -88,14 +88,14 @@ public class BsonSchema extends AbstractSchema {
     }
 
     private String getBsonFieldName(String fieldName) {
-        return ((BsonFieldDescriptor)getFieldDescriptor(fieldName)).getBsonName();
+        return getFieldDescriptor(fieldName).getBsonName();
     }
 
-    public static Document serialize(StreamableWithSchema value) throws Exception {
+    public static Document serialize(Streamable value) throws Exception {
         return getRegisteredSchema(value.getClass()).toBson(value);
     }
 
-    public Document toBson(StreamableWithSchema value) throws Exception {
+    public Document toBson(Streamable value) throws Exception {
         Document bson = new Document();
         Schema schema = value.getSchema();
         for (int i = 0 ; i < fields.length ; ++i){
@@ -114,7 +114,7 @@ public class BsonSchema extends AbstractSchema {
 
         FieldWrapper.STRUCT structure = descriptor.getStructure();
 
-        Class<? extends StreamableWithSchema> subSchema = descriptor.getSubschema();
+        Class<? extends Streamable> subSchema = descriptor.getSubschema();
         BsonSchema bsonSubSchema = subSchema == null ? null : getRegisteredSchema(subSchema);
 
         switch (structure) {
@@ -197,7 +197,7 @@ public class BsonSchema extends AbstractSchema {
             return null;
 
         if (bsonSubSchema != null)
-            return bsonSubSchema.toBson((StreamableWithSchema) value);
+            return bsonSubSchema.toBson((Streamable) value);
 
         switch (descriptor.getValueType()){
             case jsonNode :
@@ -215,21 +215,21 @@ public class BsonSchema extends AbstractSchema {
         return toBson(descriptor.getValueType().convert(value), bsonSchemaElement);
     }
 
-    public <T extends StreamableWithSchema> T fromBson(Map<String, ?> src) throws Exception {
-        Class<? extends StreamableWithSchema> dstClass = (Class<? extends StreamableWithSchema>) Class.forName(getName());
+    public <T extends Streamable> T fromBson(Map<String, ?> src) throws Exception {
+        Class<? extends Streamable> dstClass = (Class<? extends Streamable>) Class.forName(getName());
         return (T) dstClass.cast(fromBson(src, dstClass, this));
     }
 
-    public static <T extends StreamableWithSchema> T fromBson(Map<String, ?> src, Class<? extends StreamableWithSchema> dstClass) throws Exception {
+    public static <T extends Streamable> T fromBson(Map<String, ?> src, Class<? extends Streamable> dstClass) throws Exception {
         BsonSchema bsonSchema = BsonSchema.getRegisteredSchema(dstClass);
         return (T) dstClass.cast(fromBson(src, dstClass, bsonSchema));
     }
-    public static StreamableWithSchema fromBson(Map<String, ?> src, Class<? extends StreamableWithSchema> dstClass, BsonSchema bsonSchema) throws Exception {
-        StreamableWithSchema dst = dstClass.newInstance();
+    public static Streamable fromBson(Map<String, ?> src, Class<? extends Streamable> dstClass, BsonSchema bsonSchema) throws Exception {
+        Streamable dst = dstClass.newInstance();
         for (SchemaElement field : dst.getSchema().getFields()) {
             String fieldName = field.getDescriptor().getName();
             FieldDescriptor descriptor = (FieldDescriptor) field.getDescriptor();
-            Class<? extends StreamableWithSchema> recordSchema = descriptor.getSubschema();
+            Class<? extends Streamable> recordSchema = descriptor.getSubschema();
             Object value = src.get(bsonSchema.getBsonFieldName(fieldName));
             DataTypes valueType = descriptor.getValueType();
             if (value == null){
@@ -246,18 +246,18 @@ public class BsonSchema extends AbstractSchema {
         return dst;
     }
 
-    public static List fromBsonList(List bsonList, Class<? extends StreamableWithSchema> recordSchema, DataTypes valueType) throws Exception {
+    public static List fromBsonList(List bsonList, Class<? extends Streamable> recordSchema, DataTypes valueType) throws Exception {
         List convertedList = new ArrayList(bsonList.size());
         for (Object item : bsonList)
             convertedList.add(fromBsonValue(item, recordSchema, valueType));
         return convertedList;
     }
 
-    public static Object fromBsonValue(Object value, Class<? extends StreamableWithSchema>  recordSchema) throws Exception {
+    public static Object fromBsonValue(Object value, Class<? extends Streamable>  recordSchema) throws Exception {
         return fromBsonValue(value, recordSchema, null);
     }
 
-    public static Object fromBsonValue(Object value, Class<? extends StreamableWithSchema>  recordSchema, DataTypes valueType) throws Exception {
+    public static Object fromBsonValue(Object value, Class<? extends Streamable>  recordSchema, DataTypes valueType) throws Exception {
         if (value == null || value instanceof BsonNull)
             return null;
 
@@ -282,5 +282,4 @@ public class BsonSchema extends AbstractSchema {
 
         return valueType == null ? value : valueType.convert(value);
     }
-
 }

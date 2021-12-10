@@ -2,20 +2,20 @@ package org.sv.flexobject.mongo.streaming;
 
 import com.mongodb.client.MongoCursor;
 import org.bson.RawBsonDocument;
-import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.mongo.schema.BsonSchema;
 import org.sv.flexobject.util.InstanceFactory;
 
 import java.util.NoSuchElementException;
 
-public class MongoSource extends MongoCursorSource<StreamableWithSchema,RawBsonDocument> {
-    Class<? extends StreamableWithSchema> schema;
+public class MongoSource extends MongoCursorSource<Streamable,RawBsonDocument> {
+    Class<? extends Streamable> schema;
     BsonSchema bsonSchema;
 
     public MongoSource() {
     }
 
-    public MongoSource(Class<? extends StreamableWithSchema> schema, MongoCursor<RawBsonDocument> cursor) {
+    public MongoSource(Class<? extends Streamable> schema, MongoCursor<RawBsonDocument> cursor) {
         super(cursor);
         this.schema = schema;
         bsonSchema = BsonSchema.getRegisteredSchema(schema);
@@ -39,16 +39,18 @@ public class MongoSource extends MongoCursorSource<StreamableWithSchema,RawBsonD
     }
 
     @Override
-    public <T extends StreamableWithSchema> T get() throws Exception {
+    public <T extends Streamable> T get() throws Exception {
         try {
-            return (T) schema.cast(bsonSchema.fromBson(cursor.next()));
+            RawBsonDocument bson = cursor.next();
+            Streamable record = bsonSchema.fromBson(bson);
+            return (T) schema.cast(record);
         }catch (NoSuchElementException e){
             return null;
         }
     }
 
     @Override
-    public StreamableWithSchema next() {
+    public Streamable next() {
         try {
             return get();
         } catch (Exception e) {

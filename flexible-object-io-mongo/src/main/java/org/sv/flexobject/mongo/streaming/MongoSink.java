@@ -2,10 +2,10 @@ package org.sv.flexobject.mongo.streaming;
 
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
-import org.sv.flexobject.StreamableWithSchema;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.mongo.schema.BsonSchema;
 
-public class MongoSink<SELF extends MongoSink> extends MongoAbstractSink<StreamableWithSchema> {
+public class MongoSink<SELF extends MongoSink> extends MongoAbstractSink<Streamable> {
 
     protected MongoCollection<Document> collection;
     protected BsonSchema bsonSchema;
@@ -13,7 +13,7 @@ public class MongoSink<SELF extends MongoSink> extends MongoAbstractSink<Streama
     public MongoSink() {
     }
 
-    public MongoSink(Class<? extends StreamableWithSchema> schema) {
+    public MongoSink(Class<? extends Streamable> schema) {
         forSchema(schema);
     }
 
@@ -22,13 +22,13 @@ public class MongoSink<SELF extends MongoSink> extends MongoAbstractSink<Streama
         return (SELF) this;
     }
 
-    public SELF forSchema(Class<? extends StreamableWithSchema> schema){
+    public SELF forSchema(Class<? extends Streamable> schema){
         bsonSchema = BsonSchema.getRegisteredSchema(schema);
         return (SELF) this;
     }
 
     @Override
-    public boolean put(StreamableWithSchema value) throws Exception {
+    public boolean put(Streamable value) throws Exception {
         if (bsonSchema == null)
             bsonSchema = BsonSchema.getRegisteredSchema(value.getClass());
         Document document = bsonSchema.toBson(value);
