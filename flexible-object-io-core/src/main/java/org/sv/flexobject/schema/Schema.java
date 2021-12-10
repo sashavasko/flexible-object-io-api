@@ -23,7 +23,7 @@ public class Schema extends AbstractSchema{
         List<SchemaElement> fieldList = new ArrayList<>();
 
         Class superclass = dataClass.getSuperclass();
-        while (superclass != StreamableWithSchema.class){
+        while (superclass != Object.class && superclass != StreamableWithSchema.class){
             addClassFields(superclass, fieldList);
             superclass = superclass.getSuperclass();
         }
