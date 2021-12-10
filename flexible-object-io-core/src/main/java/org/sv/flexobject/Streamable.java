@@ -112,4 +112,22 @@ public interface Streamable extends Savable, Loadable {
     default Streamable fromJson(JsonNode json) throws Exception {
         return JsonInputAdapter.forValue(json).consume(this) ? this : null;
     }
+
+    static boolean equals(Streamable o1, Object o2) {
+        if (o1 == o2) return true;
+        if (o2 == null || o1.getClass() != o2.getClass()) return false;
+        Streamable other = (Streamable) o2;
+        if (!o1.getSchema().equals(other.getSchema()))
+            return false;
+
+        return o1.getSchema().compareFields(o1, other);
+    }
+
+    static String toString(Streamable o) {
+        try {
+            return o.toJson().toString();
+        } catch (Exception e) {
+            return o.getClass().getName() + "@" + Integer.toHexString(o.hashCode());
+        }
+    }
 }
