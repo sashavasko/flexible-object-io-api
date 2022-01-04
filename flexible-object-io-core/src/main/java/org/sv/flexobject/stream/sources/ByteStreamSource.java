@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class ByteStreamSource<T extends ByteRepresentable>  implements Iterator<T>, Iterable<T>, Source<T>, AutoCloseable {
+public class ByteStreamSource<T extends ByteRepresentable>  implements Iterator<T>, Source<T>, AutoCloseable {
     InputStream inputStream;
     byte[] readBuffer = new byte[1024 * 10];
     Class<? extends ByteRepresentable> clazz;
