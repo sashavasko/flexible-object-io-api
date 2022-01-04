@@ -6,11 +6,11 @@ import java.util.Iterator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public abstract class Producer implements Iterable<Loadable> {
+public abstract class Producer<T extends Loadable> implements Iterable<T> {
 
     private IOException exception = null;
 
-    abstract public Loadable produce();
+    abstract public T produce();
 
     public void setException(Throwable e) {
         this.exception = e instanceof IOException ? (IOException) e : IOException.loadIOError(e);

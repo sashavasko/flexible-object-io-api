@@ -1,6 +1,8 @@
 package org.sv.flexobject.io;
 
-public abstract class CloseableProducer extends Producer implements  AutoCloseable {
+import org.sv.flexobject.Loadable;
+
+public abstract class CloseableProducer<T extends Loadable> extends Producer<T> implements  AutoCloseable {
 
     public abstract void unsafeClose() throws Exception;
 

@@ -1,16 +1,16 @@
 package org.sv.flexobject.kafka.streaming;
 
-import com.carfax.dt.streaming.stream.Source;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.sv.flexobject.stream.Source;
 
 import java.time.Duration;
 import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class KafkaSource<K, T> implements Source<T>, Iterable<T>, Iterator<T>, AutoCloseable {
+public class KafkaSource<K, T> implements Source<T>, Iterator<T>, AutoCloseable {
     KafkaConsumer<K, T> kafkaConsumer;
     Duration timeout = Duration.ofSeconds(60);
     ConsumerRecords<K,T> currentRecords = null;
@@ -63,11 +63,6 @@ public class KafkaSource<K, T> implements Source<T>, Iterable<T>, Iterator<T>, A
     public void close() throws Exception {
         kafkaConsumer.close();
         kafkaConsumer = null;
-    }
-
-    @Override
-    public Iterator<T> iterator() {
-        return null;
     }
 
     @Override

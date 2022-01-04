@@ -5,17 +5,17 @@ import org.sv.flexobject.io.Producer;
 
 import java.util.Iterator;
 
-public class SingleProducer extends Producer {
+public class SingleProducer<T extends Loadable> extends Producer<T> {
 
-    Loadable datum;
+    T datum;
 
-    public SingleProducer(Loadable datum) {
+    public SingleProducer(T datum) {
         this.datum = datum;
     }
 
     @Override
-    public Iterator<Loadable> iterator() {
-        return new Iterator<Loadable>() {
+    public Iterator<T> iterator() {
+        return new Iterator<T>() {
             boolean done = false;
 
             @Override
@@ -24,7 +24,7 @@ public class SingleProducer extends Producer {
             }
 
             @Override
-            public Loadable next() {
+            public T next() {
                 done = true;
                 return datum;
             }
@@ -32,8 +32,8 @@ public class SingleProducer extends Producer {
     }
 
     @Override
-    public Loadable produce() {
-        Loadable toReturn = datum;
+    public T produce() {
+        T toReturn = datum;
         datum = null;
         return toReturn;
     }

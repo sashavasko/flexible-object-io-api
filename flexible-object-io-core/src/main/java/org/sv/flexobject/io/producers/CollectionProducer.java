@@ -6,12 +6,12 @@ import org.sv.flexobject.io.Producer;
 import java.util.Collection;
 import java.util.Iterator;
 
-public class CollectionProducer extends Producer {
+public class CollectionProducer<T extends Loadable> extends Producer<T> {
 
-    Collection<Loadable> collection;
-    Iterator<Loadable> iterator;
+    Collection<T> collection;
+    Iterator<T> iterator;
 
-    public CollectionProducer(Collection<Loadable> collection) {
+    public CollectionProducer(Collection<T> collection) {
         this.collection = collection;
         this.iterator = collection.iterator();
     }
@@ -22,7 +22,7 @@ public class CollectionProducer extends Producer {
     }
 
     @Override
-    public Loadable produce() {
+    public T produce() {
         if (iterator.hasNext())
             return iterator.next();
         return null;

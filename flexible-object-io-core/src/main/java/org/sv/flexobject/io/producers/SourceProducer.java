@@ -8,7 +8,7 @@ import org.sv.flexobject.stream.Source;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class SourceProducer<T extends Loadable> extends CloseableProducer {
+public class SourceProducer<T extends Loadable> extends CloseableProducer<T> {
     Source<T> source;
 
     public SourceProducer(Source source) {

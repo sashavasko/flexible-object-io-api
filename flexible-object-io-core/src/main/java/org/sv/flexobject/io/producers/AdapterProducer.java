@@ -13,9 +13,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class AdapterProducer extends CloseableProducer {
+public class AdapterProducer<T extends Loadable> extends CloseableProducer<T> {
     InAdapter adapter;
-    Reader reader;
+    Reader<T> reader;
 
     public AdapterProducer(Source source, Class<? extends GenericInAdapter> adapterClass, Reader reader) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         adapter = GenericInAdapter.build(adapterClass, source);
@@ -40,8 +40,8 @@ public class AdapterProducer extends CloseableProducer {
         adapter.close();
     }
 
-    public Loadable produce(){
-        Loadable datum = null;
+    public T produce(){
+        T datum = null;
 
         try {
             if (adapter.next()) {
@@ -64,9 +64,9 @@ public class AdapterProducer extends CloseableProducer {
         adapter.setEOF();
     }
 
-    public class AdapterIterator implements Iterator<Loadable>{
+    public class AdapterIterator implements Iterator<T>{
 
-        Loadable datum = null;
+        T datum = null;
 
         @Override
         public boolean hasNext() {
@@ -75,7 +75,7 @@ public class AdapterProducer extends CloseableProducer {
         }
 
         @Override
-        public Loadable next() {
+        public T next() {
             if (datum == null)
                 throw new NoSuchElementException();
             return datum;
@@ -83,8 +83,7 @@ public class AdapterProducer extends CloseableProducer {
     }
 
     @Override
-    public Iterator<Loadable> iterator() {
+    public Iterator<T> iterator() {
         return new AdapterIterator();
     }
-
 }
