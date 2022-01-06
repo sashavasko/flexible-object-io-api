@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.*;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.sv.flexobject.InAdapter;
 import org.sv.flexobject.OutAdapter;
 import org.sv.flexobject.Streamable;
@@ -191,8 +192,11 @@ public enum DataTypes {
     public static Integer int32Converter(Object value) throws Exception {
         if (value == null || value instanceof Integer)
             return (Integer) value;
-        if (value instanceof String)
-            return Integer.valueOf(((String) value).trim());
+        if (value instanceof String){
+            String s = ((String) value).trim();
+            if (NumberUtils.isCreatable(s))
+                return Integer.decode(s);
+        }
         if (value instanceof ValueNode)
             return ((ValueNode)value).asInt();
         if (value instanceof Date) {
@@ -240,8 +244,11 @@ public enum DataTypes {
     public static Long int64Converter(Object value) throws Exception {
         if (value == null || value instanceof Long)
             return (Long) value;
-        if (value instanceof String)
-            return Long.valueOf((String)value);
+        if (value instanceof String){
+            String s = ((String) value).trim();
+            if (NumberUtils.isCreatable(s))
+                return Long.decode(s);
+        }
         if (value instanceof ValueNode)
             return ((ValueNode)value).asLong();
         if (value instanceof Timestamp)

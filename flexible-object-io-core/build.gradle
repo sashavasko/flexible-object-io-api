@@ -19,7 +19,7 @@ dependencies {
     testImplementation project(':flexible-object-io-testdata')
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
 
     compile group: 'joda-time', name: 'joda-time', version: '2.10.1'
 
