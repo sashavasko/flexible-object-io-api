@@ -8,6 +8,7 @@ import org.sv.flexobject.io.CloseableProducer;
 import org.sv.flexobject.io.Reader;
 import org.sv.flexobject.schema.Schema;
 import org.sv.flexobject.stream.Source;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
@@ -90,6 +91,14 @@ public class AdapterProducer<T extends Loadable> extends CloseableProducer<T> {
     @Deprecated  // Use builder() instead
     public AdapterProducer(InAdapter adapter, Class dataClass) {
         this(adapter, Schema.getRegisteredSchema(dataClass).getReader());
+    }
+
+    public void setAdapter(InAdapter adapter) {
+        this.adapter = adapter;
+    }
+
+    public void setReader(Reader<T> reader) {
+        this.reader = reader;
     }
 
     @Override
