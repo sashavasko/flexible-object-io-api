@@ -18,6 +18,9 @@ public class AdapterProducer<T extends Loadable> extends CloseableProducer<T> {
     InAdapter adapter;
     Reader<T> reader;
 
+    public AdapterProducer() {
+    }
+
     public static class Builder {
         Source source;
         Class<? extends GenericInAdapter> adapterClass;
