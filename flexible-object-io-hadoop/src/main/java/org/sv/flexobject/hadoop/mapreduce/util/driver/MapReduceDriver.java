@@ -248,7 +248,7 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
                     logger.info("Set reducer to " + reducerClass);
                 }
             }
-            if (numReduceTasks != null) {
+            if (numReduceTasks != null && isUnconfigured(conf, "mapreduce.job.reduces")) {
                 job.setNumReduceTasks(numReduceTasks);
                 logger.info("Set number of reducers to " + numReduceTasks);
             }
