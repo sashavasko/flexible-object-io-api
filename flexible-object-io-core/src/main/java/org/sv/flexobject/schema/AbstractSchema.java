@@ -61,7 +61,11 @@ public class AbstractSchema {
     }
 
     public AbstractFieldDescriptor getFieldDescriptor(String fieldName) {
-        return fieldsByName.get(fieldName).getDescriptor();
+        SchemaElement field = fieldsByName.get(fieldName);
+        if (field == null){
+            throw new SchemaException("Schema " + name + " does not have a field named " + fieldName);
+        }
+        return field.getDescriptor();
     }
 
     public Map<String, Integer> getParamNamesXref() {

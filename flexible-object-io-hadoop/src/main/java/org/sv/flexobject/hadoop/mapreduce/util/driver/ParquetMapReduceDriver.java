@@ -98,7 +98,7 @@ public abstract class ParquetMapReduceDriver<SELF extends ParquetMapReduceDriver
             }
         }
 
-        if (parquetConf.hasInputSchema() || useFileSchema) {
+        if (parquetConf.hasInputSchema() || useFileSchema || parquetConf.isUseFileSchema()) {
             setInputFormatClass(parquetConf.getInputFormat());
         }
 

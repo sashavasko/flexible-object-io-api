@@ -26,6 +26,7 @@ import java.util.List;
 public final class ParquetSchemaConf extends HadoopPropertiesWrapper<ParquetSchemaConf> {
     public static final String SUBNAMESPACE = "parquet";
 
+    boolean useFileSchema;
     Class<?> inputSchemaClass;
     Class<?> outputSchemaClass;
     JsonNode inputSchemaJson;
@@ -51,7 +52,7 @@ public final class ParquetSchemaConf extends HadoopPropertiesWrapper<ParquetSche
     }
 
     public MessageType getInputSchema(){
-        return getSchema(inputSchemaClass, inputSchemaJson);
+        return useFileSchema ? null : getSchema(inputSchemaClass, inputSchemaJson);
     }
 
     public MessageType getOutputSchema(){
@@ -115,7 +116,7 @@ public final class ParquetSchemaConf extends HadoopPropertiesWrapper<ParquetSche
     }
 
     public Class<? extends InputFormat> getInputFormat() {
-        if (inputSchemaClass != null) {
+        if (inputSchemaClass != null || useFileSchema) {
             return StreamableParquetInputFormat.class;
         } else if (inputSchemaJson != null) {
             return JsonParquetInputFormat.class;
@@ -133,6 +134,21 @@ public final class ParquetSchemaConf extends HadoopPropertiesWrapper<ParquetSche
     public Class<? extends Writable> getOutputClass() {
         // this should be fine as Parquet does not use actual methods from Writable:
         return (Class<? extends Writable>)(outputSchemaClass == null ?  JsonNode.class : outputSchemaClass);
+    }
+    public ParquetSchemaConf clearInputSchema() {
+        inputSchemaClass = null;
+        inputSchemaJson = null;
+        return this;
+    }
+
+    public boolean isUseFileSchema() {
+        return useFileSchema;
+    }
+
+    public ParquetSchemaConf clearOutputSchema() {
+        outputSchemaClass = null;
+        outputSchemaJson = null;
+        return this;
     }
 
     public FilterPredicate getFilterPredicate() {

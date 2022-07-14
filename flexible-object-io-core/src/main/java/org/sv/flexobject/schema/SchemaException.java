@@ -1,6 +1,6 @@
 package org.sv.flexobject.schema;
 
-public class SchemaException extends Exception {
+public class SchemaException extends RuntimeException {
 
     public SchemaException() {
     }
