@@ -2,6 +2,7 @@ package org.sv.flexobject.hadoop.mapreduce.input.mongo;
 
 
 import com.mongodb.client.MongoCollection;
+import org.apache.log4j.Logger;
 import org.sv.flexobject.Streamable;
 import org.sv.flexobject.hadoop.mapreduce.input.InputConf;
 import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
@@ -12,6 +13,8 @@ import org.sv.flexobject.properties.Namespace;
 import org.sv.flexobject.util.InstanceFactory;
 
 public class MongoInputConf<SELF extends HadoopPropertiesWrapper> extends InputConf<SELF> {
+    public static final Logger logger = Logger.getLogger(MongoInputConf.class);
+
     public static final String SUBNAMESPACE = "mongo";
 
     protected String connectionName;
@@ -83,6 +86,7 @@ public class MongoInputConf<SELF extends HadoopPropertiesWrapper> extends InputC
     }
 
     public MongoConnection getMongo() throws Exception {
+        logger.info("Making Mongo for connection: " + connectionName + ", db: " + dbName);
         return MongoConnection.builder().forName(getConnectionName()).db(getDbName()).build();
     }
 
@@ -95,22 +99,33 @@ public class MongoInputConf<SELF extends HadoopPropertiesWrapper> extends InputC
     }
 
     public MongoBuilder getMongoBuilder() {
+        logger.info("Making MongoBuilder for class: " + builderClass + ", connection: " + connectionName + ", db: " + dbName + ", collection:" + collectionName);
         MongoBuilder builder = InstanceFactory.get(builderClass);
         builder.connection(getConnectionName())
                 .db(getDbName())
                 .collection(getCollectionName());
 
-        if (hasSchema())
+        if (hasSchema()) {
             builder.schema(getInputSchema());
-
+            logger.info("Input schema set to: " + getInputSchema());
+        }
         return builder;
     }
 
     public MongoCollection getCollection() throws Exception {
+        logger.info("Making MongoBuilder for class: " + builderClass + ", connection: " + connectionName + ", db: " + dbName + ", collection:" + collectionName);
         MongoBuilder builder = InstanceFactory.get(builderClass);
         builder.connection(getConnectionName())
                 .db(getDbName())
                 .collection(getCollectionName());
         return builder.getCollection();
+    }
+
+    public void setDbName(String dbName) {
+        this.dbName = dbName;
+    }
+
+    public void setCollectionName(String collectionName) {
+        this.collectionName = collectionName;
     }
 }
