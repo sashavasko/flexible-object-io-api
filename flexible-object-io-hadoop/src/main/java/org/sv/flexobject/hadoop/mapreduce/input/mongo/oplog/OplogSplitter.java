@@ -7,6 +7,7 @@ import org.apache.hadoop.mapreduce.InputSplit;
 import org.bson.BsonTimestamp;
 import org.bson.conversions.Bson;
 import org.sv.flexobject.hadoop.mapreduce.input.mongo.MongoSplit;
+import org.sv.flexobject.hadoop.mapreduce.input.mongo.ShardSplitter;
 import org.sv.flexobject.hadoop.mapreduce.input.mongo.splitters.MongoSplitter;
 import org.sv.flexobject.hadoop.mapreduce.input.split.InputSplitImpl;
 import org.sv.flexobject.hadoop.mapreduce.input.split.ProxyInputSplit;
@@ -15,28 +16,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OplogSplitter extends MongoSplitter {
+public class OplogSplitter extends ShardSplitter {
 
     public OplogSplitter() {
     }
 
     protected BsonTimestamp getLastTimestamp(String shardName){ return null; }
 
-    @Override
-    public List<InputSplit> split(Configuration conf) throws IOException {
-        setConf(conf);
-
-        List<InputSplit> splits = new ArrayList<>();
+    public InputSplitImpl makeSplit(String name, String hosts) {
         OplogInputConf inputConf = getInputConf();
-
-        inputConf.getShards().forEach((name, hosts) -> {
-            splits.add(new ProxyInputSplit(makeSplit(inputConf, (String)name, (String)hosts)));
-        });
-
-        return splits;
-    }
-
-    private InputSplitImpl makeSplit(OplogInputConf inputConf, String name, String hosts) {
         Bson query = Filters.and(
                 Filters.eq("ns", inputConf.getDbName() + "." + inputConf.getCollectionName()),
                 Filters.in("op", inputConf.getSplitOps()),

@@ -1,20 +1,11 @@
 package org.sv.flexobject.hadoop.mapreduce.input.mongo.oplog;
 
 import org.bson.BsonTimestamp;
-import org.sv.flexobject.hadoop.mapreduce.input.mongo.MongoSplit;
+import org.sv.flexobject.hadoop.mapreduce.input.mongo.ShardSplit;
 
-public class OplogSplit extends MongoSplit {
-    protected String shardName;
+public class OplogSplit extends ShardSplit {
     protected Integer lastTimestampSeconds;
     protected Integer getLastTimestampInc;
-
-    public String getShardName() {
-        return shardName;
-    }
-
-    public void setShardName(String shardName) {
-        this.shardName = shardName;
-    }
 
     public void setLastTimestamp(BsonTimestamp lastTimestamp){
         if (lastTimestamp != null) {

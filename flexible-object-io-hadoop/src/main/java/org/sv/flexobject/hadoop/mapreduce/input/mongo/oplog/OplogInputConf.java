@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.Path;
 import org.bson.BsonTimestamp;
 import org.sv.flexobject.hadoop.mapreduce.input.mongo.MongoInputConf;
+import org.sv.flexobject.hadoop.mapreduce.input.mongo.ShardedInputConf;
 import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
 import org.sv.flexobject.properties.Namespace;
 
@@ -11,14 +12,13 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
-public class OplogInputConf<SELF extends HadoopPropertiesWrapper> extends MongoInputConf<SELF> {
+public class OplogInputConf<SELF extends HadoopPropertiesWrapper> extends ShardedInputConf<SELF> {
     public static final String SUBNAMESPACE = "oplog";
     
     String splitOps;
     String splitTimestampFolder;
     Timestamp startTimestamp;
     Integer maxSecondsToExtract;
-    public static final Map<String, String> shards = new HashMap<>();
 
     public OplogInputConf() {
         super(SUBNAMESPACE);
@@ -39,21 +39,6 @@ public class OplogInputConf<SELF extends HadoopPropertiesWrapper> extends MongoI
     @Override
     protected String getSubNamespace() {
         return SUBNAMESPACE;
-    }
-
-    public Map<String, String> getShards(){
-        return shards;
-    }
-
-    public SELF addShard(String name, String hosts){
-        shards.put(name, hosts);
-        return (SELF) this;
-    }
-
-    public SELF setShards(Map<String, String> shards){
-        this.shards.clear();
-        this.shards.putAll(shards);
-        return (SELF) this;
     }
 
     @Override
