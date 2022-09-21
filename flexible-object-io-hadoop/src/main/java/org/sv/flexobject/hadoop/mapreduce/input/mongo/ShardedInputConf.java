@@ -38,8 +38,6 @@ public class ShardedInputConf<SELF extends HadoopPropertiesWrapper> extends Mong
     @Override
     public SELF setDefaults() {
         super.setDefaults();
-        splitterClass = OplogSplitter.class;
-        readerClass = OplogRecordReader.NoKey.class;
 
         return (SELF) this;
     }
