@@ -4,6 +4,8 @@ package org.sv.flexobject.hadoop.mapreduce.input;
 import org.apache.hadoop.mapreduce.*;
 import org.apache.log4j.Logger;
 import org.sv.flexobject.hadoop.HadoopTask;
+import org.sv.flexobject.hadoop.mapreduce.input.split.InputSplitImpl;
+import org.sv.flexobject.hadoop.mapreduce.input.split.ProxyInputSplit;
 import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.IOException;
@@ -39,7 +41,11 @@ public class ConfiguredInputFormat<K,V> extends InputFormat<K,V> {
         InputConf conf = makeInputConf().from(context.getConfiguration());
         RecordReader reader = conf.getReader();
 
-        logger.info(getClass().getName() + " created new RecordReader " + reader.getClass().getName() + " using configuration " + conf.getClass().getName() + " " + conf.toString());
+        logger.info(getClass().getName() + " created new RecordReader " + reader.getClass().getName() + " using configuration " + conf.getClass().getName() + " " + conf);
+        if (split instanceof ProxyInputSplit){
+            InputSplitImpl data = ((ProxyInputSplit) split).getData();
+            logger.info("Input split:" + data);
+        }
 
         return reader;
     }

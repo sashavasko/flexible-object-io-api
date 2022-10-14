@@ -80,15 +80,22 @@ public class MongoClientProvider implements ConnectionProvider {
             builder.compressorList(compressorList);
         }
 
-        String timeout = connectionProperties.getProperty("timeout", "60000");
+        String timeout = connectionProperties.getProperty("timeout", "120000");
+        int serverSelectionTimeout = Integer.valueOf(connectionProperties.getProperty("serverSelectionTimeout", timeout));
+
+        logger.info("Server Selection timeout:" + serverSelectionTimeout);
+        builder.applyToClusterSettings(b->b.serverSelectionTimeout(serverSelectionTimeout, TimeUnit.MILLISECONDS));
+
         int connectTimeout = Integer.valueOf(connectionProperties.getProperty("connectTimeout", timeout));
         int readTimeout = Integer.valueOf(connectionProperties.getProperty("readTimeout", timeout));
+        logger.info("Connect timeout:" + connectTimeout + " reda timeout : " + readTimeout);
         builder.applyToSocketSettings(b ->
                 b.connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
                         .readTimeout(readTimeout, TimeUnit.MILLISECONDS));
 
         int maxConnections = Integer.valueOf(connectionProperties.getProperty("maxConnections", "1"));
         int maxWaitTime = Integer.valueOf(connectionProperties.getProperty("maxWaitTime", timeout));
+        logger.info("Max Wait time:" + maxWaitTime);
         builder.applyToConnectionPoolSettings(b ->
                 b.maxWaitTime(maxWaitTime, TimeUnit.MILLISECONDS)
                         .maxSize(maxConnections));
