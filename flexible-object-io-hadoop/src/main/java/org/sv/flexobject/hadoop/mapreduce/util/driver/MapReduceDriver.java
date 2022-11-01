@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.apache.hadoop.mapreduce.MRJobConfig.JOB_RUNNING_MAP_LIMIT;
 
@@ -258,9 +259,23 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
         }
 
         if (outputs.size() > 1) {
-            LazyOutputFormat.setOutputFormatClass(job, TextOutputFormat.class);
+            Optional<FullyDefinedOutputFormat> defaultOutput = outputs.stream()
+                    .filter(o->o.getName()==null)
+                    .findFirst();
+            if (defaultOutput.isPresent()){
+                if (isUnconfigured(conf, Job.OUTPUT_FORMAT_CLASS_ATTR))
+                    job.setOutputFormatClass(defaultOutput.get().getFormatClass());
+                if (isUnconfigured(conf, Job.OUTPUT_KEY_CLASS))
+                    job.setOutputKeyClass(defaultOutput.get().getKeyClass());
+                if (isUnconfigured(conf, Job.OUTPUT_VALUE_CLASS))
+                    job.setOutputValueClass(defaultOutput.get().getValueClass());
+            } else {
+                LazyOutputFormat.setOutputFormatClass(job, TextOutputFormat.class);
+            }
+
             for (FullyDefinedOutputFormat output : outputs) {
-                MultipleOutputs.addNamedOutput(job, output.getName(), output.getFormatClass(), output.getKeyClass(), output.getValueClass());
+                if (output.getName() != null)
+                    MultipleOutputs.addNamedOutput(job, output.getName(), output.getFormatClass(), output.getKeyClass(), output.getValueClass());
             }
             MultipleOutputs.setCountersEnabled(job, true);
         } else {
