@@ -1,9 +1,11 @@
 package org.sv.flexobject.mongo.schema;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mongodb.client.MongoCollection;
 import org.bson.*;
 import org.bson.types.ObjectId;
 import org.junit.Test;
+import org.sv.flexobject.json.MapperFactory;
 import org.sv.flexobject.mongo.EmbeddedMongoTest;
 import org.sv.flexobject.mongo.schema.testdata.ObjectWithObjectId;
 import org.sv.flexobject.mongo.schema.testdata.ObjectWithTimestampAndDate;
@@ -215,6 +217,7 @@ public class BsonSchemaTest extends EmbeddedMongoTest {
         assertEquals(2, document.size());
 
         data = TestDataWithSubSchema.random(true);
+        data.json = (ObjectNode) MapperFactory.getObjectReader().readTree("{\"foo\":\"one\",\"bar\":\"yes\"}");
         document = bsonSchema.toBson(data);
 
         TestDataWithSubSchema convertedData = bsonSchema.fromBson(document);

@@ -25,17 +25,17 @@ dependencies {
     compile group: 'joda-time', name: 'joda-time', version: '2.10.1'
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.7'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.12.3'
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.12.3'
 // https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-core
-    implementation group: 'org.mongodb', name: 'mongodb-driver-core', version: '4.2.3'
+    implementation group: 'org.mongodb', name: 'mongodb-driver-core', version: '4.7.2'
 
     // https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-sync
-    compile group: 'org.mongodb', name: 'mongodb-driver-sync', version: '4.2.3'
+    compile group: 'org.mongodb', name: 'mongodb-driver-sync', version: '4.7.2'
 
     // https://mvnrepository.com/artifact/de.bwaldvogel/mongo-java-server
-    testCompile group: 'de.bwaldvogel', name: 'mongo-java-server', version: '1.38.0'
+    testCompile group: 'de.bwaldvogel', name: 'mongo-java-server', version: '1.41.0'
 
 
     testImplementation "junit:junit:4.13"

@@ -1,8 +1,10 @@
 package org.sv.flexobject.mongo.streaming;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mongodb.client.model.Filters;
 import org.bson.types.ObjectId;
 import org.junit.Test;
+import org.sv.flexobject.json.MapperFactory;
 import org.sv.flexobject.mongo.EmbeddedMongoTest;
 import org.sv.flexobject.mongo.schema.BsonSchema;
 import org.sv.flexobject.mongo.schema.testdata.ObjectWithObjectId;
@@ -32,6 +34,8 @@ public class MongoSourceTest extends EmbeddedMongoTest {
         List<TestDataWithSubSchema> listOfData = new ArrayList<>();
         for (int i = 0 ; i < 10 ; ++i) {
             TestDataWithSubSchema data = TestDataWithSubSchema.random(true);
+            data.json = (ObjectNode) MapperFactory.getObjectReader().readTree("{\"a\":\"b\"}");
+
             listOfData.add(data);
             collection.insertOne(BsonSchema.serialize(data));
         }

@@ -12,6 +12,7 @@ import org.bson.codecs.pojo.PojoCodecProvider;
 import org.sv.flexobject.connections.ConnectionProvider;
 import org.sv.flexobject.mongo.codecs.SqlDateCodec;
 import org.sv.flexobject.mongo.codecs.TimestampCodec;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,96 +33,18 @@ public class MongoClientProvider implements ConnectionProvider {
 
     @Override
     public AutoCloseable getConnection(String name, Properties connectionProperties, Object secret) throws Exception {
-        String url = connectionProperties.getProperty("url");
 
-        if (connectionProperties.containsKey(HOSTS_OVERRIDE)){
-            url = replaceHosts(url, connectionProperties.getProperty(HOSTS_OVERRIDE));
-        }
+        MongoClientConf conf = InstanceFactory.get(MongoClientConf.class).from(connectionProperties);
 
-        ConnectionString connectionString = new ConnectionString(url);
+        MongoClientSettings.Builder builder = conf.makeClientSettingsBuilder();
 
-        MongoClientSettings.Builder builder = MongoClientSettings.builder();
+        conf.applyCompressorList(builder);
+        builder.applyToClusterSettings(b->conf.applyClusterSettings(b));
+        builder.applyToSocketSettings(b->conf.applySocketSettings(b));
+        builder.applyToConnectionPoolSettings(b->conf.applyConnectionPoolSettings(b));
+        builder.applyToServerSettings(b->conf.applyServerSettings(b));
 
-        builder.applyConnectionString(connectionString);
-
-        List<TagSet> tagsList = new ArrayList<>();
-        String tags = connectionProperties.getProperty("tags");
-        if (StringUtils.isNotBlank(tags)) {
-            String[] tagPairs = tags.split(",");
-            for (String tagPair : tagPairs) {
-                String[] tagValues = tagPair.split(":");
-                if (tagValues.length == 2){
-                    Tag tag = new Tag(tagValues[0], tagValues[1]);
-                    tagsList.add(new TagSet(tag));
-                }
-            }
-        }
-
-        ReadPreference readPreference = ReadPreference.secondaryPreferred(tagsList);
-        ReadPreference readPreferenceFromUrl = connectionString.getReadPreference();
-        String readPreferenceFromSetting = connectionProperties.getProperty("readPreference");
-        if (StringUtils.isNotBlank(readPreferenceFromSetting)){
-            readPreference = ReadPreference.valueOf(readPreferenceFromSetting, tagsList);
-        } else if (readPreferenceFromUrl != null)
-            readPreference = readPreferenceFromUrl;
-
-        builder.readPreference(readPreference);
-
-        String compressors = connectionProperties.getProperty("compressorList");
-        if (StringUtils.isNotBlank(compressors)) {
-            List<MongoCompressor> compressorList = new ArrayList<>();
-            for(String compressor : compressors.split(",")){
-                switch(compressor.toLowerCase()){
-                    case "snappy" : compressorList.add(MongoCompressor.createSnappyCompressor()); break;
-                    case "zlib" : compressorList.add(MongoCompressor.createZlibCompressor()); break;
-                    case "zstd" : compressorList.add(MongoCompressor.createZstdCompressor()); break;
-                }
-            }
-            builder.compressorList(compressorList);
-        }
-
-        String timeout = connectionProperties.getProperty("timeout", "120000");
-        int serverSelectionTimeout = Integer.valueOf(connectionProperties.getProperty("serverSelectionTimeout", timeout));
-
-        logger.info("Server Selection timeout:" + serverSelectionTimeout);
-        builder.applyToClusterSettings(b->b.serverSelectionTimeout(serverSelectionTimeout, TimeUnit.MILLISECONDS));
-
-        int connectTimeout = Integer.valueOf(connectionProperties.getProperty("connectTimeout", timeout));
-        int readTimeout = Integer.valueOf(connectionProperties.getProperty("readTimeout", timeout));
-        logger.info("Connect timeout:" + connectTimeout + " reda timeout : " + readTimeout);
-        builder.applyToSocketSettings(b ->
-                b.connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
-                        .readTimeout(readTimeout, TimeUnit.MILLISECONDS));
-
-        int maxConnections = Integer.valueOf(connectionProperties.getProperty("maxConnections", "1"));
-        int maxWaitTime = Integer.valueOf(connectionProperties.getProperty("maxWaitTime", timeout));
-        logger.info("Max Wait time:" + maxWaitTime);
-        builder.applyToConnectionPoolSettings(b ->
-                b.maxWaitTime(maxWaitTime, TimeUnit.MILLISECONDS)
-                        .maxSize(maxConnections));
-
-        String userName = connectionProperties.getProperty("username", connectionString.getUsername());
-        if (StringUtils.isNotBlank(userName)) {
-            String databaseName = connectionProperties.getProperty("database", connectionString.getDatabase());
-            char[] password;
-            if (secret == null){
-                password = "".toCharArray();
-                logger.warn("No password available for connection to " + url);
-            }else
-                password = secret.getClass().equals(char[].class) ?
-                        (char[]) secret
-                        : secret.toString().toCharArray();
-
-            builder.credential(MongoCredential.createCredential(userName, databaseName, password));
-        }
-//      The following should happen here : builder.applyConnectionString(connectionString);
-//
-//        List<String> mongoHosts = connectionString.getHosts();
-//        List<ServerAddress> servers = new ArrayList<>();
-//        for (String host : mongoHosts) {
-//            servers.add(new ServerAddress(host));
-//        }
-//        builder.applyToClusterSettings(b -> b.hosts(servers));
+        conf.setCredential(builder, secret);
 
         CodecRegistry pojoCodecRegistry = fromProviders(PojoCodecProvider.builder().automatic(true).build());
         CodecRegistry codecRegistry = fromRegistries(

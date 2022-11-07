@@ -34,7 +34,7 @@ public class MongoClientProviderTest extends EmbeddedMongoTest{
     public void usesHostsProperty() throws Exception {
         Properties connectionProperties = new Properties();
         connectionProperties.setProperty("url", "mongodb://foobar");
-        connectionProperties.setProperty("hosts", serverAddress.toString().substring(1));
+        connectionProperties.setProperty("hosts", serverAddress.getHostName()+":"+serverAddress.getPort());
 
         client = (MongoClient) provider.getConnection("blah", connectionProperties, null);
         db = client.getDatabase("testdb");
