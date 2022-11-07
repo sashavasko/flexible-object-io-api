@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 public class MapOutAdapter extends GenericOutAdapter<Map> implements DynamicOutAdapter {
 
     public MapOutAdapter() {
-        super(()->new HashMap<String, Object>());
+//        super(()->new HashMap<String, Object>());
     }
 
     public MapOutAdapter(Sink sink) {
@@ -77,11 +77,11 @@ public class MapOutAdapter extends GenericOutAdapter<Map> implements DynamicOutA
     }
 
     public static Map produceHashMap(ConsumerWithException<MapOutAdapter, Exception> consumer) throws Exception {
-        return produce(new MapOutAdapter(), consumer);
+        return produce(new MapOutAdapter(()->new HashMap<String, Object>()), consumer);
     }
 
     public static Map produceHashMap(Streamable data) throws Exception {
-        return produce(new MapOutAdapter(), data::save);
+        return produce(new MapOutAdapter(()->new HashMap<String, Object>()), data::save);
     }
 
     public static class Builder {

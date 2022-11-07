@@ -46,11 +46,11 @@ public class PropertiesWrapperTest {
 
         Properties props = testProps.getProps();
 
-        assertEquals(12345, props.get("intProp"));
-        assertEquals("foobar", props.get("stringProp"));
-        assertEquals(12.789, props.get("doubleProp"));
-        assertFalse((Boolean) props.get("boolProp"));
-        assertNull(props.get("nullProp"));
+        assertEquals(12345, props.get("int.prop"));
+        assertEquals("foobar", props.get("string.prop"));
+        assertEquals(12.789, props.get("double.prop"));
+        assertFalse((Boolean) props.get("bool.prop"));
+        assertNull(props.get("null.prop"));
 
     }
 
@@ -63,11 +63,11 @@ public class PropertiesWrapperTest {
 
         Map map = testProps.getMap();
 
-        assertEquals(123, map.get("intProp"));
-        assertEquals("barfoo", map.get("stringProp"));
-        assertEquals(12.7, map.get("doubleProp"));
-        assertTrue((Boolean) map.get("boolProp"));
-        assertFalse(map.containsKey("nullProp"));
+        assertEquals(123, map.get("int.prop"));
+        assertEquals("barfoo", map.get("string.prop"));
+        assertEquals(12.7, map.get("double.prop"));
+        assertTrue((Boolean) map.get("bool.prop"));
+        assertFalse(map.containsKey("null.prop"));
     }
 
     @Test
@@ -80,8 +80,8 @@ public class PropertiesWrapperTest {
     @Test
     public void from() throws Exception {
         Map map = new HashMap();
-        map.put("intProp", 789);
-        map.put("stringProp", "foo");
+        map.put("int.prop", 789);
+        map.put("string.prop", "foo");
 
         TestProps propsObject = new TestProps().from(map);
 
@@ -89,23 +89,24 @@ public class PropertiesWrapperTest {
         assertEquals("foo", propsObject.stringProp);
 
         Properties properties = new Properties();
-        properties.put("doubleProp", 1.456);
-        properties.put("stringProp", "bar");
+        properties.put("double.prop", 1.456);
+        properties.put("string.prop", "bar");
 
         propsObject.from(properties);
 
         assertEquals("bar", propsObject.stringProp);
         assertEquals(1.456, propsObject.doubleProp, 0.001);
+
         assertNull(propsObject.nullProp);
     }
 
     @Test
     public void fromWithNamespace() throws Exception {
         Map map = new HashMap();
-        map.put("foo.bar.intProp", 789);
-        map.put("foo.bar.stringProp", "foo");
-        map.put("foo.barbar.doubleProp", 3.678);
-        map.put("foofoo.bar.boolProp", true);
+        map.put("foo.bar.int.prop", 789);
+        map.put("foo.bar.string.prop", "foo");
+        map.put("foo.barbar.double.prop", 3.678);
+        map.put("foofoo.bar.bool.prop", true);
 
         TestProps propsObject = new TestProps().from(map, "foo.bar");
 

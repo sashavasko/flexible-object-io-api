@@ -65,59 +65,9 @@ public abstract class NamespacePropertiesWrapper<T extends NamespacePropertiesWr
         this.namespace = makeMyNamespace(parent == null ? Namespace.getDefaultNamespace() : parent, getSubNamespace());
     }
 
+    @Override
     public Translator getTranslator() {
         return namespace.getTranslator();
-    }
-
-    public String getSettingName(String fieldName){
-        return getTranslator().apply(fieldName);
-    }
-
-    public List<String> listSettings() {
-        List<String> settings = new ArrayList<>();
-
-        for (SchemaElement e : Schema.getRegisteredSchema(getClass()).getFields()) {
-            settings.add(getSettingName(e.getDescriptor().getName()));
-        }
-        return settings;
-    }
-
-    @Override
-    public Properties getProps() throws Exception {
-        return (Properties) MapOutAdapter.builder()
-                .forClass(Properties.class)
-                .translator(getTranslator())
-                .build().produce(this::save);
-    }
-
-    @Override
-    public Map getMap() throws Exception {
-        return MapOutAdapter.builder()
-                .forClass(HashMap.class)
-                .translator(getTranslator())
-                .build().produce(this::save);
-    }
-
-    @Override
-    public Map getMap(Class<? extends Map> mapClass) throws Exception {
-        return MapOutAdapter.builder()
-                .forClass(mapClass)
-                .translator(getTranslator())
-                .build().produce(this::save);
-    }
-
-    @Override
-    public Map getMap(Supplier<Map> mapFactory) throws Exception {
-        return MapOutAdapter.builder()
-                .withFactory(mapFactory)
-                .translator(getTranslator())
-                .build().produce(this::save);
-    }
-
-    @Override
-    public T from(Map source) throws Exception {
-        MapInAdapter.builder().from(source).translator(getTranslator()).build().consume(this::load);
-        return (T) this;
     }
 
     @Override

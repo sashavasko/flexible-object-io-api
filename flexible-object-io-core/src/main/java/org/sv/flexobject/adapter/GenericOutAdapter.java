@@ -2,8 +2,8 @@ package org.sv.flexobject.adapter;
 
 import org.sv.flexobject.OutAdapter;
 import org.sv.flexobject.stream.Sink;
-import org.sv.flexobject.stream.Source;
 import org.sv.flexobject.translate.Translator;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -67,7 +67,9 @@ public abstract class GenericOutAdapter<T> implements OutAdapter {
 
     public T createRecord() {
         try {
-            return recordFactory != null ? recordFactory.get() : recordClass.newInstance();
+            return recordFactory != null ?
+                    recordFactory.get() :
+                    InstanceFactory.get(recordClass);
         } catch (Exception e){
             throw new RuntimeException("Failed to create output record", e);
         }
