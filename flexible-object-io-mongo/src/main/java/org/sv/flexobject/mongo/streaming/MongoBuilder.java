@@ -114,7 +114,7 @@ public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Sou
                     .forName(connectionName)
                     .db(dbName);
             if (StringUtils.isNotBlank(hosts))
-                builder.override(MongoClientProvider.HOSTS_OVERRIDE, hosts);
+                builder.override("hosts", hosts);
 
             connection = builder.build();
             ownConnection = true;
