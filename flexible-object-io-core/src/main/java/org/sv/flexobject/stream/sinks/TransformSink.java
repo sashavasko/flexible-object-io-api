@@ -31,10 +31,18 @@ public class TransformSink<SELF,INPUT,OUTPUT> implements Sink<INPUT> {
     }
 
     public void transformAll(Source<INPUT> source) throws Exception {
+        transformAll(source, 0, Integer.MAX_VALUE);
+    }
+
+    public void transformAll(Source<INPUT> source, int skip, int limit) throws Exception {
         INPUT data;
-        while ((data = source.get()) != null) {
-            if (put(data))
-                break;
+        while ((data = source.get()) != null && limit > 0) {
+            if (skip <= 0) {
+                if (put(data))
+                    break;
+                --limit;
+            } else
+                --skip;
         }
         setEOF();
     }
