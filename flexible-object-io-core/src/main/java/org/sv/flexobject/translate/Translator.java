@@ -15,4 +15,15 @@ public interface Translator extends Function<String, String> {
         return (t) -> after.apply(this.apply(t));
     }
 
+    class Identity implements Translator{
+        @Override
+        public String apply(String s) {
+            return s;
+        }
+    }
+
+    Identity identity = new Identity();
+    static Translator identity(){
+        return identity;
+    }
 }

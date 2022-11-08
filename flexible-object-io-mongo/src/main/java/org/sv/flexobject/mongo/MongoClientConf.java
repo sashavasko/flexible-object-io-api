@@ -8,6 +8,7 @@ import org.sv.flexobject.properties.PropertiesWrapper;
 import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.schema.annotations.NonStreamableField;
 import org.sv.flexobject.schema.annotations.ValueType;
+import org.sv.flexobject.translate.Translator;
 import org.sv.flexobject.util.InstanceFactory;
 
 import java.util.ArrayList;
@@ -66,6 +67,11 @@ public class MongoClientConf extends PropertiesWrapper<MongoClientConf> {
     public MongoClientConf setDefaults() {
         this.timeout = 120000l;
         return this;
+    }
+
+    @Override
+    public Translator getTranslator() {
+        return Translator.identity();
     }
 
 
