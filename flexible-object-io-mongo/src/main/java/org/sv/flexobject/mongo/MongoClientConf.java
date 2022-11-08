@@ -17,6 +17,9 @@ import java.util.concurrent.TimeUnit;
 
 public class MongoClientConf extends PropertiesWrapper<MongoClientConf> {
 
+    public static final String MONGODB_PREFIX = "mongodb://";
+    public static final String MONGODB_SRV_PREFIX = "mongodb+srv://";
+
     String url;
     @ValueType(type = DataTypes.string)
     List<String> tags;
@@ -66,6 +69,7 @@ public class MongoClientConf extends PropertiesWrapper<MongoClientConf> {
     @Override
     public MongoClientConf setDefaults() {
         this.timeout = 120000l;
+        this.url = MONGODB_PREFIX;
         return this;
     }
 
@@ -104,6 +108,10 @@ public class MongoClientConf extends PropertiesWrapper<MongoClientConf> {
     }
 
     public MongoClientSettings.Builder makeClientSettingsBuilder(){
+
+        if (srvHost != null && url.equals(MONGODB_PREFIX))
+            url = MONGODB_SRV_PREFIX;
+
         MongoClientProvider.logger.info("Connecting to mongo using URL:" + url);
 
         connectionString = new ConnectionString(url);

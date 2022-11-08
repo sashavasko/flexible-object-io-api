@@ -27,10 +27,6 @@ public class MongoClientProvider implements ConnectionProvider {
 
     public static final Logger logger = LogManager.getLogger(MongoClientProvider.class);
 
-    public static final String MONGODB_PREFIX = "mongodb://";
-    public static final String MONGODB_SRV_PREFIX = "mongodb+srv://";
-    public static final String HOSTS_OVERRIDE = "hosts";
-
     @Override
     public AutoCloseable getConnection(String name, Properties connectionProperties, Object secret) throws Exception {
 
@@ -75,12 +71,12 @@ public class MongoClientProvider implements ConnectionProvider {
     private String parseUrlHostsPrefix(String url) {
         String unprocessedConnectionString;
         StringBuilder sb = new StringBuilder();
-        if (url.startsWith(MONGODB_SRV_PREFIX)) {
-            unprocessedConnectionString = url.substring(MONGODB_SRV_PREFIX.length());
-            sb.append(MONGODB_SRV_PREFIX);
+        if (url.startsWith(MongoClientConf.MONGODB_SRV_PREFIX)) {
+            unprocessedConnectionString = url.substring(MongoClientConf.MONGODB_SRV_PREFIX.length());
+            sb.append(MongoClientConf.MONGODB_SRV_PREFIX);
         } else {
-            unprocessedConnectionString = url.substring(MONGODB_PREFIX.length());
-            sb.append(MONGODB_PREFIX);
+            unprocessedConnectionString = url.substring(MongoClientConf.MONGODB_PREFIX.length());
+            sb.append(MongoClientConf.MONGODB_PREFIX);
         }
 
         // Stolen from mongodb driver sources :
