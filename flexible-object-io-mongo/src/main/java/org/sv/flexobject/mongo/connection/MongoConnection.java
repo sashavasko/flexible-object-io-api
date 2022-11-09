@@ -19,6 +19,14 @@ public class MongoConnection implements AutoCloseable{
         client.close();
     }
 
+    public MongoClient getClient() {
+        return client;
+    }
+
+    public MongoDatabase getDb() {
+        return db;
+    }
+
     public static class Builder<SELF extends Builder> {
         String connectionName;
         String dbName;

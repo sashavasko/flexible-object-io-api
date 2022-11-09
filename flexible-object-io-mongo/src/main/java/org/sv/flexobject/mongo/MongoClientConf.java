@@ -69,7 +69,6 @@ public class MongoClientConf extends PropertiesWrapper<MongoClientConf> {
     @Override
     public MongoClientConf setDefaults() {
         this.timeout = 120000l;
-        this.url = MONGODB_PREFIX;
         return this;
     }
 
@@ -99,7 +98,11 @@ public class MongoClientConf extends PropertiesWrapper<MongoClientConf> {
     }
     public ReadPreference compileReadPreference(List<TagSet> tagsList){
         ReadPreference readPreferenceFinal = ReadPreference.secondaryPreferred(tagsList);
-        ReadPreference readPreferenceFromUrl = connectionString.getReadPreference();
+
+        ReadPreference readPreferenceFromUrl = connectionString == null ?
+                null :
+                connectionString.getReadPreference();
+
         if (StringUtils.isNotBlank(readPreference)){
             readPreferenceFinal = ReadPreference.valueOf(readPreference, tagsList);
         } else if (readPreferenceFromUrl != null)
@@ -109,14 +112,12 @@ public class MongoClientConf extends PropertiesWrapper<MongoClientConf> {
 
     public MongoClientSettings.Builder makeClientSettingsBuilder(){
 
-        if (srvHost != null && url.equals(MONGODB_PREFIX))
-            url = MONGODB_SRV_PREFIX;
-
-        MongoClientProvider.logger.info("Connecting to mongo using URL:" + url);
-
-        connectionString = new ConnectionString(url);
         MongoClientSettings.Builder builder = MongoClientSettings.builder();
-        builder.applyConnectionString(connectionString);
+        if (url != null) {
+            MongoClientProvider.logger.info("Connecting to mongo using URL:" + url);
+            connectionString = new ConnectionString(url);
+            builder.applyConnectionString(connectionString);
+        }
         builder.readPreference(compileReadPreference());
 
         return builder;

@@ -4,6 +4,7 @@ import com.mongodb.CursorType;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
+import com.mongodb.connection.ClusterConnectionMode;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -19,6 +20,8 @@ public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Sou
     protected String dbName;
     private MongoConnection connection;
     protected String hosts;
+    protected ClusterConnectionMode connectionMode;
+    protected String replicaSet;
     private boolean ownConnection = true;
     protected String collectionName;
     protected Bson filter;
@@ -45,6 +48,16 @@ public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Sou
 
     public SELF hosts(String hosts) {
         this.hosts = hosts;
+        return (SELF) this;
+    }
+
+    public SELF connectionMode(ClusterConnectionMode mode){
+        this.connectionMode = mode;
+        return (SELF) this;
+    }
+
+    public SELF replicaSet(String replicaSet){
+        this.replicaSet = replicaSet;
         return (SELF) this;
     }
 
@@ -115,6 +128,10 @@ public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Sou
                     .db(dbName);
             if (StringUtils.isNotBlank(hosts))
                 builder.override("hosts", hosts);
+            if (connectionMode != null)
+                builder.override("mode", connectionMode.name());
+            if (StringUtils.isNotBlank(replicaSet))
+                builder.override("requiredReplicaSetName", replicaSet);
 
             connection = builder.build();
             ownConnection = true;
