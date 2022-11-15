@@ -52,6 +52,30 @@ public class OplogInputConf<SELF extends HadoopPropertiesWrapper> extends Sharde
         return (SELF) this;
     }
 
+    public Timestamp getStartTimestamp() {
+        return startTimestamp;
+    }
+
+    public Integer getMaxSecondsToExtract() {
+        return maxSecondsToExtract;
+    }
+
+    public void setSplitOps(String splitOps) {
+        this.splitOps = splitOps;
+    }
+
+    public void setSplitTimestampFolder(String splitTimestampFolder) {
+        this.splitTimestampFolder = splitTimestampFolder;
+    }
+
+    public void setStartTimestamp(Timestamp startTimestamp) {
+        this.startTimestamp = startTimestamp;
+    }
+
+    public void setMaxSecondsToExtract(Integer maxSecondsToExtract) {
+        this.maxSecondsToExtract = maxSecondsToExtract;
+    }
+
     public String[] getSplitOps() {
         return StringUtils.isNotBlank(splitOps) ? splitOps.split(",") : new String[0];
     }
