@@ -1,11 +1,10 @@
 package org.sv.flexobject.stream.sinks;
 
-import com.carfax.dt.streaming.Streamable;
-import com.carfax.dt.streaming.stream.Sink;
+
+import org.sv.flexobject.stream.Sink;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 public class BufferingSink<T> implements Sink<T> {
 

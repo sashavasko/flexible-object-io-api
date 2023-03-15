@@ -250,7 +250,7 @@ public class ConnectionManager {
             }
 
             for (SecretProvider provider : secretProviders) {
-                secret = provider.getSecret(connectionName, deploymentLevel, environment);
+                secret = provider.getSecret(connectionName, deploymentLevel, environment, connectionProperties);
                 if (secret != null)
                     break;
             }
