@@ -1,8 +1,12 @@
 package org.sv.flexobject.json;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
+
+import java.io.IOException;
 
 public class MapperFactory {
 
@@ -46,6 +50,13 @@ public class MapperFactory {
 
     public static void setObjectWriter(ObjectWriter objectWriter) {
         MapperFactory.objectWriter = objectWriter;
+    }
+    public static String pretty(String json) throws IOException {
+        JsonNode jsonNode = MapperFactory.getObjectReader().readTree(json);
+        return pretty(jsonNode);
+    }
+    public static String pretty(JsonNode jsonNode) throws JsonProcessingException {
+        return MapperFactory.getObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode);
     }
 
 }
