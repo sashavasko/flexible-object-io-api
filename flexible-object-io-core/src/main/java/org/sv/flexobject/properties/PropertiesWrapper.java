@@ -1,10 +1,12 @@
 package org.sv.flexobject.properties;
 
 
+import org.apache.commons.cli.CommandLine;
 import org.sv.flexobject.InAdapter;
 import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.adapter.MapInAdapter;
 import org.sv.flexobject.adapter.MapOutAdapter;
+import org.sv.flexobject.adapter.OptionsInAdapter;
 import org.sv.flexobject.schema.Schema;
 import org.sv.flexobject.schema.SchemaElement;
 import org.sv.flexobject.stream.sources.SingleValueSource;
@@ -61,6 +63,11 @@ public abstract class PropertiesWrapper<T extends PropertiesWrapper> extends Str
                 .withFactory(mapFactory)
                 .translator(getTranslator())
                 .build().produce(this::save);
+    }
+
+    public T from(CommandLine source) throws Exception {
+        OptionsInAdapter.builder().from(source).build().consume(this::load);
+        return (T) this;
     }
 
     public T from(Map source) throws Exception {

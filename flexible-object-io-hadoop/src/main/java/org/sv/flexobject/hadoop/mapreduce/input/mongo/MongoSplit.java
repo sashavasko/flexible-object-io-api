@@ -46,7 +46,7 @@ public class MongoSplit extends StreamableWritableImpl implements InputSplitImpl
     protected Long estimatedLength = 1l;
 
     @NonStreamableField
-    protected static final BsonToJsonConverter bsonToJsonConverter = new BsonToJsonConverter();
+    protected static final BsonToJsonConverter bsonToJsonConverter = BsonToJsonConverter.relaxed();
 
     public static Bson json2bson(JsonNode json){
         if (json != null){

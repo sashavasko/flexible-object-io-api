@@ -27,7 +27,7 @@ public class BsonToJsonConverterTest {
     public void convert() throws IOException {
         Bson query = Filters.and(Filters.gte("_id", new ObjectId("609285a90000000000000000")),Filters.lt("_id", new ObjectId("6092868a0000000000000000")));
 
-        JsonNode json = new BsonToJsonConverter().convert(query);
+        JsonNode json = BsonToJsonConverter.relaxed().convert(query);
         System.out.println(query.toBsonDocument().toJson());
         assertEquals(query.toBsonDocument().toJson().replace(" ", ""), json.toString());
     }

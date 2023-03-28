@@ -261,7 +261,7 @@ public class BsonSchema extends AbstractSchema {
         if (value == null || value instanceof BsonNull)
             return null;
 
-        BsonToJsonConverter bsonConverter = new BsonToJsonConverter();
+        BsonToJsonConverter bsonConverter = BsonToJsonConverter.relaxed();
 
         if (value instanceof Map) {
             Map<String, ?> map = (Map<String, ?>) value;

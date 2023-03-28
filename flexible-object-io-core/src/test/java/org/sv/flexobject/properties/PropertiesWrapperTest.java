@@ -1,5 +1,8 @@
 package org.sv.flexobject.properties;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
 import org.junit.Before;
 import org.junit.Test;
 import org.sv.flexobject.InAdapter;
@@ -77,6 +80,19 @@ public class PropertiesWrapperTest {
         assertTrue(map instanceof LinkedHashMap);
     }
 
+    @Test
+    public void fromCli() throws Exception {
+        Options options = new Options();
+        options.addOption("i", "intProp", true, "key");
+        options.addOption("s", "stringProp", true, "level");
+
+        CommandLine cli = new DefaultParser().parse(options, new String[]{"-i", "10", "-s", "foobar"}, true);
+
+        TestProps propsObject = new TestProps().from(cli);
+
+        assertEquals(10, (int) propsObject.intProp);
+        assertEquals("foobar", propsObject.stringProp);
+    }
     @Test
     public void from() throws Exception {
         Map map = new HashMap();

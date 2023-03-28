@@ -5,7 +5,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.codecs.Encoder;
 import org.bson.codecs.EncoderContext;
+import org.bson.json.JsonMode;
 import org.bson.json.JsonWriterSettings;
+import org.sv.flexobject.mongo.json.converters.HexObjectIdConverter;
+import org.sv.flexobject.mongo.json.converters.NormalDateConverter;
 import org.sv.flexobject.stream.Sink;
 import org.sv.flexobject.stream.Source;
 import org.sv.flexobject.stream.report.ProgressReporter;
@@ -22,8 +25,29 @@ public class BsonToJsonConverter {
 
     JsonNodeWriter singleValueWriter;
 
-    public BsonToJsonConverter() {
-        this(JsonWriterSettings.builder().build());
+    public static BsonToJsonConverter relaxed() {
+        return new BsonToJsonConverter(JsonWriterSettings.builder()
+                .outputMode(JsonMode.RELAXED)
+                .build());
+    }
+
+    public static BsonToJsonConverter extended() {
+        return new BsonToJsonConverter(JsonWriterSettings.builder()
+                .outputMode(JsonMode.EXTENDED)
+                .build());
+    }
+
+    public static BsonToJsonConverter shell() {
+        return new BsonToJsonConverter(JsonWriterSettings.builder()
+                .outputMode(JsonMode.SHELL)
+                .build());
+    }
+    public static BsonToJsonConverter relaxedNoDatesAndNoObjectId() {
+        return new BsonToJsonConverter(JsonWriterSettings.builder()
+                .outputMode(JsonMode.RELAXED)
+                .dateTimeConverter(new NormalDateConverter()) // disable $date
+                .objectIdConverter(new HexObjectIdConverter())// disable $oid
+                .build());
     }
 
     public BsonToJsonConverter(JsonWriterSettings writerSettings) {
