@@ -1,5 +1,7 @@
 package org.sv.flexobject.stream;
 
+import java.util.Iterator;
+
 public interface Sink<T> {
 
     /**
