@@ -1,10 +1,12 @@
 package org.sv.flexobject.ftp.providers;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.net.ftp.FTPClientConfig;
+import org.apache.commons.net.ftp.FTPReply;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.sv.flexobject.connections.ConnectionProvider;
 import org.sv.flexobject.ftp.FTPClient;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -21,54 +23,51 @@ public class FtpProvider implements ConnectionProvider, AutoCloseable {
     @Override
     public AutoCloseable getConnection(String name, Properties connectionProperties, Object secret) throws Exception {
         FTPClient client = new FTPClient();
-        String host = connectionProperties.getProperty("host");
-        String user = getUser(connectionProperties);
-        int port = getPort(connectionProperties);
+        FtpConnectionConf conf = InstanceFactory.get(FtpConnectionConf.class);
+        conf.from(connectionProperties);
 
-        boolean loginStatus = login(connectionProperties, secret, client, host, user, port);
-
-        if (loginStatus == false) {
-            throw new RuntimeException("Could not login with user " + user + " for host " + host);
+        if (!login(conf, secret, client)) {
+            throw new RuntimeException("Could not login with user " + conf.getUsername() + " for host " + conf.getHost());
         }
 
-        logger.info("Created FTP Connection \"" + name + "\" for USER: " + user + " and host: " + host);
+        if (conf.hasFtpDirectory())
+            if (!client.changeWorkingDirectory(conf.getFtpDirectory()))
+                throw new RuntimeException("Failed to change current directory to " + conf.getFtpDirectory());
+
+        logger.info("Created FTP Connection \"" + name + "\" for USER: " + conf.getUsername() + " and host: " + conf.getHost());
         return client;
     }
 
-    private boolean login(Properties connectionProperties, Object secret, FTPClient client, String host, String user, int port) throws IOException {
+    private boolean login(FtpConnectionConf conf, Object secret, FTPClient client) throws IOException {
         boolean loginStatus = false;
+        FTPClientConfig config = new FTPClientConfig(conf.getSystem());
+        client.configure(config);
+        client.connect(conf.getHost(), conf.getPort());
+        logger.info("Connected to " + conf.getHost() + ".");
+        logger.info(client.getReplyString());
+
+        if(!FTPReply.isPositiveCompletion(client.getReplyCode())) {
+            client.disconnect();
+            logger.error("FTP server refused connection.");
+            throw new RuntimeException("FTP server refused connection.");
+        }
 
         if (secret != null) {
-            client.connect(host, port);
-            loginStatus = client.login(user, (String) secret);
-        } else if (StringUtils.isNotBlank(connectionProperties.getProperty("password"))) {
-            client.connect(host, port);
-            loginStatus = client.login(user, connectionProperties.getProperty("password"));
+            loginStatus = client.login(conf.getUsername(), (String) secret);
+        } else if (conf.hasPassword()) {
+            loginStatus = client.login(conf.username, conf.getPassword());
         } else {
             logger.info("No password/secret found. Trying anonymous login");
-            client.connect(host, port);
             loginStatus = client.login("anonymous", null);
         }
+
+        client.setDataTimeout(conf.getDataTimeout());
+        client.setConnectTimeout(conf.getConnectTimeout());
+        client.setRemoteVerificationEnabled(conf.isRemoteVerificationEnabled());
+        if (conf.isLocalPassiveMode())
+            client.enterLocalPassiveMode();
+        client.setUseEPSVwithIPv4(conf.isUseEPSVwithIPv4());
         return loginStatus;
-    }
-
-    private int getPort(Properties connectionProperties) {
-        int port = 21;
-        if (connectionProperties.getProperty("port") != null) {
-            port = Integer.parseInt(connectionProperties.getProperty("port"));
-        }
-        return port;
-    }
-
-    private String getUser(Properties connectionProperties) {
-        String user = connectionProperties.getProperty("user");
-        if (StringUtils.isBlank(user)) {
-            user = connectionProperties.getProperty("username");
-        }
-        if (StringUtils.isBlank(user)) {
-            user = connectionProperties.getProperty("userName");
-        }
-        return user;
     }
 
     @Override

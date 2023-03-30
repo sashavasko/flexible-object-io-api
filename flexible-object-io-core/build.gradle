@@ -47,6 +47,8 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.h2database/h2
     testCompile group: 'com.h2database', name: 'h2', version: '1.4.200'
+    // https://mvnrepository.com/artifact/org.mockftpserver/MockFtpServer
+    testCompile group: 'org.mockftpserver', name: 'MockFtpServer', version: '2.7.1'
 
     // https://mvnrepository.com/artifact/com.google.guava/guava
     testCompile group: 'com.google.guava', name: 'guava', version: '19.0'
