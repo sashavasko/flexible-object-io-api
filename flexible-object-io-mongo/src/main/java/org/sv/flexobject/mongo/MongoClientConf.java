@@ -4,7 +4,7 @@ import com.mongodb.*;
 import com.mongodb.connection.*;
 import com.mongodb.selector.ServerSelector;
 import org.apache.commons.lang3.StringUtils;
-import org.sv.flexobject.properties.PropertiesWrapper;
+import org.sv.flexobject.connections.ConnectionConf;
 import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.schema.annotations.NonStreamableField;
 import org.sv.flexobject.schema.annotations.ValueType;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class MongoClientConf extends PropertiesWrapper<MongoClientConf> {
+public class MongoClientConf extends ConnectionConf<MongoClientConf> {
 
     public static final String MONGODB_PREFIX = "mongodb://";
     public static final String MONGODB_SRV_PREFIX = "mongodb+srv://";
@@ -71,12 +71,6 @@ public class MongoClientConf extends PropertiesWrapper<MongoClientConf> {
         this.timeout = 120000l;
         return this;
     }
-
-    @Override
-    public Translator getTranslator() {
-        return Translator.identity();
-    }
-
 
     public List<TagSet> compileTags(){
         List<TagSet> tagsList = new ArrayList<>();

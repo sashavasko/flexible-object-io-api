@@ -2,11 +2,11 @@ package org.sv.flexobject.ftp.providers;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTPClientConfig;
-import org.sv.flexobject.properties.PropertiesWrapper;
+import org.sv.flexobject.connections.ConnectionConf;
 
 import java.util.Map;
 
-public class FtpConnectionConf extends PropertiesWrapper<FtpConnectionConf> {
+public class FtpConnectionConf extends ConnectionConf<FtpConnectionConf> {
 
     String host;
     String username;
