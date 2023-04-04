@@ -1,81 +1,73 @@
 package org.sv.flexobject.hadoop.mapreduce.drivers;
 
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPClientConfig;
-import org.apache.commons.net.ftp.FTPReply;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.util.Tool;
 import org.apache.log4j.Logger;
+import org.sv.flexobject.connections.ConnectionManager;
+import org.sv.flexobject.ftp.FTPClient;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
 
 abstract public class FTPDriver extends Configured implements Tool{
-    Logger logger = Logger.getLogger(FTPDriver.class);
+    static public Logger logger = Logger.getLogger(FTPDriver.class);
 
-    protected String ftpHost;
-    protected String ftpUser;
-    protected String ftpPass;
-    protected String ftpDirectory;
+    protected String ftpConnectionName;
+
+    FTPClient ftp;
+
+    public void setFtpConnectionName(String ftpConnectionName) {
+        this.ftpConnectionName = ftpConnectionName;
+    }
+
+    public FTPDriver() {
+    }
+
+    public FTPDriver(String ftpConnectionName) {
+        this.ftpConnectionName = ftpConnectionName;
+    }
 
     @Override
     public int run(String[] args) throws Exception {
-        FTPClient ftp = new FTPClient();
+        ftp = (FTPClient) ConnectionManager.getConnection(FTPClient.class, ftpConnectionName);
         try {
-            ftp = getConnectedFtpClient(ftp);
-
             logger.info(ftp.getStatus());
-
-            if (ftpDirectory != null && !ftp.changeWorkingDirectory(ftpDirectory))
-                throw new RuntimeException("Failed to change current directory to " + ftpDirectory);
 
             ftpFiles(ftp);
         }catch (Exception e ){
-            logger.error("Connection to " + ftpHost, e);
+            logger.error("Failed to connect to ftp " + ftpConnectionName, e);
             throw new RuntimeException(e);
-        }
-        finally{
-            disconnect(ftp);
+        }finally {
+            disconnect();
         }
         return 0;
     }
 
-    public FTPClient getConnectedFtpClient(FTPClient ftp) throws IOException {
-        FTPClientConfig config = new FTPClientConfig(FTPClientConfig.SYST_UNIX);
-        ftp.configure(config);
-        ftp.connect(ftpHost);
-        logger.info("Connected to " + ftpHost + ".");
-        logger.info(ftp.getReplyString());
+    public void disconnect() {
 
-        if(!FTPReply.isPositiveCompletion(ftp.getReplyCode())) {
-            ftp.disconnect();
-            logger.error("FTP server refused connection.");
-            throw new RuntimeException("FTP server refused connection.");
-        }
-
-        ftp.login(ftpUser, ftpPass);
-        logger.info("Authenticated user " + ftpUser);
-        ftp.setDataTimeout(600000);
-        ftp.setConnectTimeout(600000);
-        ftp.setRemoteVerificationEnabled(false);
-        ftp.enterLocalPassiveMode();
-        ftp.setUseEPSVwithIPv4(true);
-        return ftp;
-    }
-
-    public void disconnect(FTPClient ftp) {
-
-        if(ftp.isConnected()) {
+        if(ftp != null && ftp.isConnected()) {
             try {
                 ftp.logout();
                 ftp.disconnect();
-                logger.info("Disconnected from " + ftpHost);
+                ftp = null;
+                logger.info("Disconnected from ftp " + ftpConnectionName);
             } catch(IOException ioe) {
                 // do nothing
             }
         }
     }
 
+    public void reconnect(boolean force) throws Exception {
+        if (!ftp.isConnected() || force) {
+            logger.info("FTP isConnected:" + ftp.isConnected());
+            disconnect();
+            logger.info("FTP has been disconnected for retry.");
+            ftp = (FTPClient) ConnectionManager.getConnection(FTPClient.class, ftpConnectionName);;
+            logger.info("Got new FTP Connection. Ftp.isConnected(): " + ftp.isConnected());
+            logger.info("FTP Status after reconnection: " + ftp.getStatus());
+            logger.info("FTP working directory: " + ftp.printWorkingDirectory());
+        }
+    }
 
     abstract public void ftpFiles(FTPClient ftp) throws IOException, MessagingException;
 }
