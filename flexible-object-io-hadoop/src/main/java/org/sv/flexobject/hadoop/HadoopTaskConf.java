@@ -3,6 +3,7 @@ package org.sv.flexobject.hadoop;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.util.Tool;
 import org.sv.flexobject.connections.ConnectionManager;
+import org.sv.flexobject.ftp.providers.FtpProvider;
 import org.sv.flexobject.hadoop.properties.HadoopPropertiesProvider;
 import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
 import org.sv.flexobject.hadoop.properties.HadoopSecretProvider;
@@ -23,7 +24,8 @@ public class HadoopTaskConf extends HadoopPropertiesWrapper<HadoopTaskConf> {
             HadoopSecretProvider.class,
             HadoopPropertiesProvider.class,
             UnPooledConnectionProvider.class,
-            MongoClientProvider.class
+            MongoClientProvider.class,
+            FtpProvider.class
     );
 
     public static final String DEFAULT_ENVIRONMENT = "hadoop";
