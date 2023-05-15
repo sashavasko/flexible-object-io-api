@@ -421,14 +421,17 @@ public enum DataTypes {
             String valueNames = stringConverter(value).trim();
             if (StringUtils.isNotBlank(valueNames)) {
                 if (valueNames.startsWith("["))
-                    valueNames = valueNames.substring(1, valueNames.length() - 1)
-                            ;
-                for (String item : valueNames.split(",")) {
-                    String valueName = item.trim();
-                    if (valueName.startsWith("\""))
-                        valueName = valueName.substring(1, valueName.length() - 1).trim();
-                    if (!valueName.equalsIgnoreCase(emptyValue)) {
-                        setOut.add(Enum.valueOf(enumClass, valueName));
+                    valueNames = valueNames.substring(1, valueNames.length() - 1);
+                if (StringUtils.isBlank(valueNames)){
+                    setOut.add(Enum.valueOf(enumClass, emptyValue));
+                } else {
+                    for (String item : valueNames.split(",")) {
+                        String valueName = item.trim();
+                        if (valueName.startsWith("\""))
+                            valueName = valueName.substring(1, valueName.length() - 1).trim();
+                        if (!valueName.equalsIgnoreCase(emptyValue)) {
+                            setOut.add(Enum.valueOf(enumClass, valueName));
+                        }
                     }
                 }
             }
