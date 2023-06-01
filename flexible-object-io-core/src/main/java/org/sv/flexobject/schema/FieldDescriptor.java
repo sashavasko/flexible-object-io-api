@@ -33,6 +33,10 @@ public class FieldDescriptor extends AbstractFieldDescriptor{
         this(name, type, new ScalarGetter(clazz, name), new ScalarSetter(clazz, name), order);
     }
 
+    public FieldDescriptor(Class<?> clazz, String name, String fieldName, DataTypes type, int order) {
+        this(fieldName, type, new ScalarGetter(clazz, name), new ScalarSetter(clazz, name), order);
+    }
+
     public FieldDescriptor(Class<?> clazz, String name, DataTypes type, FunctionWithException getter, int order) {
         this(name, type, getter, new ScalarSetter(clazz, name), order);
     }
@@ -167,7 +171,11 @@ public class FieldDescriptor extends AbstractFieldDescriptor{
             externalType = sft != null ? sft.type() :DataTypes.valueOf(fieldClass);
         }
 
-        return new FieldDescriptor(dataClass, name, externalType, order);
+        FieldName fieldName = field.getAnnotation(FieldName.class);
+        if (fieldName != null){
+            return new FieldDescriptor(dataClass, name, fieldName.name(), externalType, order);
+        } else
+            return new FieldDescriptor(dataClass, name, externalType, order);
     }
 
     static FieldDescriptor fromEnum(Class<?> dataClass, Enum <?> e) throws NoSuchFieldException, SchemaException {

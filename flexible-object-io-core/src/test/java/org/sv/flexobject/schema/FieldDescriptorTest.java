@@ -1,9 +1,12 @@
 package org.sv.flexobject.schema;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.sv.flexobject.StreamableImpl;
 import org.sv.flexobject.copy.CopyAdapter;
+import org.sv.flexobject.schema.annotations.FieldName;
 import org.sv.flexobject.schema.reflect.TestData;
 
 import java.util.HashMap;
@@ -103,4 +106,25 @@ public class FieldDescriptorTest {
 
         assertEquals(777, testData.getJson().get("a").get("b").get("fox").asInt());
     }
+
+    public static class TestDataWithNamedField extends StreamableImpl {
+        @FieldName(name = "@type")
+        public String type;
+    }
+
+    @Test
+    public void fieldName() throws Exception {
+        TestDataWithNamedField testData = new TestDataWithNamedField();
+        testData.type = "fooBar";
+
+        ObjectNode json = testData.toJson();
+        assertEquals("fooBar", json.get("@type").asText());
+
+        TestDataWithNamedField testData2 = new TestDataWithNamedField();
+        testData2.fromJson(json);
+
+        assertEquals("fooBar", testData2.type);
+
+    }
+
 }
