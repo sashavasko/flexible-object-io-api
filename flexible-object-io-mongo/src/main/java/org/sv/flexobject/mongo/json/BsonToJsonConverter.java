@@ -1,10 +1,15 @@
 package org.sv.flexobject.mongo.json;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.mongodb.MongoClientSettings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bson.UuidRepresentation;
 import org.bson.codecs.Encoder;
 import org.bson.codecs.EncoderContext;
+import org.bson.codecs.configuration.CodecRegistries;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.json.JsonMode;
 import org.bson.json.JsonWriterSettings;
 import org.sv.flexobject.mongo.json.converters.HexObjectIdConverter;
@@ -17,6 +22,8 @@ import org.sv.flexobject.stream.sinks.SingleValueSink;
 import java.io.IOException;
 
 import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 public class BsonToJsonConverter {
     public static final Logger logger = LogManager.getLogger(BsonToJsonConverter.class);
@@ -53,6 +60,11 @@ public class BsonToJsonConverter {
     public BsonToJsonConverter(JsonWriterSettings writerSettings) {
         this.writerSettings = writerSettings;
     }
+    private Encoder makeEncoder(Object value){
+        CodecRegistry codecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry());
+        CodecRegistry uuidRegistry = CodecRegistries.withUuidRepresentation(codecRegistry, UuidRepresentation.JAVA_LEGACY);
+        return uuidRegistry.get(value.getClass());
+    }
 
     public JsonNode convert(Object value) throws IOException {
         if (singleValueWriter == null){
@@ -60,7 +72,7 @@ public class BsonToJsonConverter {
             singleValueWriter = new JsonNodeWriter(singleValueSink, writerSettings);
         }
 
-        Encoder encoder = getDefaultCodecRegistry().get(value.getClass());
+        Encoder encoder = makeEncoder(value);
         if (encoder == null)
             throw new IOException("Unknown BSON document type " + value.getClass());
 
@@ -72,7 +84,7 @@ public class BsonToJsonConverter {
         JsonNodeWriter writer = new JsonNodeWriter(sink, writerSettings);
         Object value;
         while ((value = source.get()) != null){
-            Encoder encoder = getDefaultCodecRegistry().get(value.getClass());
+            Encoder encoder = makeEncoder(value);
             if (encoder == null)
                 logger.error("Unknown BSON document type " + value.getClass());
             else {

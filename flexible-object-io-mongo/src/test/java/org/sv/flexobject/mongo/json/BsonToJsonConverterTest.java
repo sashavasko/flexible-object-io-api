@@ -17,11 +17,26 @@ import org.sv.flexobject.stream.sinks.SingleValueSink;
 import org.sv.flexobject.testdata.TestDataWithInferredSchema;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
 import static junit.framework.TestCase.assertEquals;
 
 public class BsonToJsonConverterTest {
+
+    @Test
+    public void convertUUID() throws IOException {
+        JsonNode json = BsonToJsonConverter.relaxed().convert(UUID.fromString("8529e0c9-bde0-4d24-9340-f396512f5e6a"));
+        System.out.println(json);
+//        assertEquals(query.toBsonDocument().toJson().replace(" ", ""), json.toString());
+    }
+    @Test
+    public void convertUUIDFilter() throws IOException {
+        Bson query = Filters.eq("uuid", UUID.fromString("8529e0c9-bde0-4d24-9340-f396512f5e6a"));
+
+        JsonNode json = BsonToJsonConverter.relaxed().convert(query);
+        assertEquals("{\"uuid\":{\"$binary\":{\"base64\":\"JE3gvcngKYVqXi9RlvNAkw==\",\"subType\":\"03\"}}}", json.toString());
+    }
 
     @Test
     public void convert() throws IOException {
