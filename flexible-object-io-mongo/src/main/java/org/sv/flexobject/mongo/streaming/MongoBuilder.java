@@ -12,6 +12,7 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.sv.flexobject.Streamable;
 import org.sv.flexobject.mongo.connection.MongoConnection;
+import org.sv.flexobject.mongo.json.BsonToJsonConverter;
 import org.sv.flexobject.mongo.schema.BsonSchema;
 import org.sv.flexobject.schema.SchemaException;
 import org.sv.flexobject.stream.Source;
@@ -156,7 +157,7 @@ public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Sou
             FindIterable<TDocument> findIterable = collection.find();
             if (filter != null) {
                 findIterable = findIterable.filter(filter);
-                logger.info("Using filter: " + filter.toBsonDocument().toJson());
+                logger.info("Using filter: " + filter);
             }else
                 logger.info("No filter specified");
             if (limit != null)
@@ -167,7 +168,7 @@ public abstract class MongoBuilder<SELF extends MongoBuilder, SOURCE extends Sou
                 findIterable = findIterable.projection(projection);
             if (sort != null) {
                 findIterable = findIterable.sort(sort);
-                logger.info("Using sort :" + sort.toBsonDocument().toJson());
+                logger.info("Using sort :" + sort);
             }
             if (notimeout != null)
                 findIterable = findIterable.noCursorTimeout(true);

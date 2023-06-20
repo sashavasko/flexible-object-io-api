@@ -34,7 +34,7 @@ public class MongoClientProvider implements ConnectionProvider {
         MongoClientConf conf = InstanceFactory.get(MongoClientConf.class).from(connectionProperties);
 
         MongoClientSettings.Builder builder = conf.makeClientSettingsBuilder();
-        builder.uuidRepresentation(UuidRepresentation.JAVA_LEGACY);
+        builder.uuidRepresentation(UuidRepresentation.STANDARD);
 
         conf.applyCompressorList(builder);
         builder.applyToClusterSettings(b->conf.applyClusterSettings(b));
@@ -49,7 +49,7 @@ public class MongoClientProvider implements ConnectionProvider {
                 CodecRegistries.fromCodecs(new TimestampCodec(),new SqlDateCodec()),
                 MongoClientSettings.getDefaultCodecRegistry(),
                 pojoCodecRegistry);
-        builder.codecRegistry(CodecRegistries.withUuidRepresentation(codecRegistry, UuidRepresentation.JAVA_LEGACY));
+        builder.codecRegistry(CodecRegistries.withUuidRepresentation(codecRegistry, UuidRepresentation.STANDARD));
 
         MongoClient mongo = MongoClients.create(builder.build());
         logger.info("connected to Mongo");

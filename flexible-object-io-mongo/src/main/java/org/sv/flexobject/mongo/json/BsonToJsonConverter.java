@@ -62,7 +62,7 @@ public class BsonToJsonConverter {
     }
     private Encoder makeEncoder(Object value){
         CodecRegistry codecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry());
-        CodecRegistry uuidRegistry = CodecRegistries.withUuidRepresentation(codecRegistry, UuidRepresentation.JAVA_LEGACY);
+        CodecRegistry uuidRegistry = CodecRegistries.withUuidRepresentation(codecRegistry, UuidRepresentation.STANDARD);
         return uuidRegistry.get(value.getClass());
     }
 
