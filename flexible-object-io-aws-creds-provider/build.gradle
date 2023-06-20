@@ -1,7 +1,7 @@
 buildscript {
     repositories {
-        maven { url 'http://resolver.svc.cfx/all' }
-        maven { url "https://plugins.gradle.org/m2/" }
+        mavenLocal()
+        mavenCentral()
     }
 }
 
@@ -12,8 +12,8 @@ apply plugin: 'idea'
 sourceCompatibility = 1.8
 
 repositories {
+    mavenLocal()
     mavenCentral()
-    maven {  url 'http://resolver.svc.cfx/all' }
 }
 
 dependencies {

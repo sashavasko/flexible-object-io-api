@@ -1,0 +1,48 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.github.jengelman.gradle.plugins:shadow:4.0.2"
+    }
+}
+
+plugins {
+    id "com.github.johnrengelman.shadow" version "4.0.2"
+}
+
+apply plugin: 'java'
+
+dependencies {
+    implementation project(':flexible-object-io-core')
+    implementation project(':flexible-object-io-mongo')
+    implementation project(':flexible-object-io-hadoop')
+    implementation project(':flexible-object-io-rabbit')
+    implementation project(':flexible-object-io-kafka')
+    implementation project(':flexible-object-io-aws-creds-provider')
+//    implementation project(':dt-dremio-api')
+
+}
+
+shadowJar{
+    zip64 true
+
+    project.ext.env ='production'
+    def isRelease = project.gradle.startParameter.taskNames.any { it.split(':').last() == 'release' }
+    def cleanVersion = (isRelease) ? project.version.toString().replace('-SNAPSHOT', '') : project.version.toString()
+    from sourceSets.main.allJava
+    project.version = cleanVersion
+    version = cleanVersion
+
+    baseName = "lib/${project.name}"
+    classifier = ''
+}
+
+task jobsxml(type: Copy) {
+    from 'src/dist/jobs'
+    into 'build/libs/jobs'
+    include '**/*.xml'
+}
+
+// the following requires adding carfax-indifferent-rpm plugin :
