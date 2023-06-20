@@ -1,0 +1,17 @@
+apply plugin: 'maven'
+apply plugin: 'java'
+apply plugin: 'idea'
+group = 'org.sv'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':flexible-object-io-core')
+    // https://mvnrepository.com/artifact/com.rabbitmq/amqp-client
+    compile 'com.rabbitmq:amqp-client:5.16.0'
+
+    testImplementation "junit:junit:4.13"
+}
