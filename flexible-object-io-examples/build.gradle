@@ -14,6 +14,11 @@ plugins {
 
 apply plugin: 'java'
 
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
 dependencies {
     implementation project(':flexible-object-io-core')
     implementation project(':flexible-object-io-mongo')
