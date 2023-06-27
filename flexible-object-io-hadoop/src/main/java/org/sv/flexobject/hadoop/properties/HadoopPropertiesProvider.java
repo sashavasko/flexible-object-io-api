@@ -1,6 +1,8 @@
 package org.sv.flexobject.hadoop.properties;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.log4j.Logger;
+import org.sv.flexobject.connections.ConnectionManager;
 import org.sv.flexobject.hadoop.HadoopTask;
 import org.sv.flexobject.hadoop.utils.IConfigured;
 import org.sv.flexobject.properties.FilePropertiesProvider;
@@ -13,6 +15,9 @@ import java.util.List;
 import java.util.Properties;
 
 public class HadoopPropertiesProvider extends FilePropertiesProvider implements IConfigured {
+
+    private static final Logger logger = Logger.getLogger(HadoopPropertiesProvider.class);
+
     @Override
     public String getFileExtension() {
         return ".xml";
@@ -34,7 +39,9 @@ public class HadoopPropertiesProvider extends FilePropertiesProvider implements 
     @Override
     public List<String> getPathsToFiles() {
         List<String> setPathToFiles = super.getPathsToFiles();
-        return setPathToFiles == null ? getHadoopPathToFiles() : setPathToFiles;
+        setPathToFiles = setPathToFiles == null ? getHadoopPathToFiles() : setPathToFiles;
+        logger.info(" path to files: " + setPathToFiles);
+        return setPathToFiles;
     }
 
     @Override

@@ -5,9 +5,11 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.ClusterMapReduceTestCase;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sv.flexobject.connections.ConnectionManager;
 import org.sv.flexobject.hadoop.HadoopTask;
+import org.sv.flexobject.hadoop.utils.FileSystemUtilsTest;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,10 +17,16 @@ import java.io.OutputStream;
 import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class HadoopSecretProviderTest extends ClusterMapReduceTestCase {
 
     Properties testClusterProperties;
+
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        ClusterMapReduceTestCase.setupClassBase(HadoopSecretProviderTest.class);
+    }
 
     @Before
     public void setUp() throws Exception {
@@ -54,6 +62,7 @@ public class HadoopSecretProviderTest extends ClusterMapReduceTestCase {
 
         Object secret = provider.getSecret("test-connection", ConnectionManager.DeploymentLevel.alpha, null);
 
+        assertNotNull(secret);
         assertEquals("testPassword", secret.toString());
     }
 }

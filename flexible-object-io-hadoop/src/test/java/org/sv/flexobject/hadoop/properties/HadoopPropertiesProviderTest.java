@@ -5,10 +5,13 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.ClusterMapReduceTestCase;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sv.flexobject.connections.ConnectionManager;
 import org.sv.flexobject.hadoop.HadoopTask;
 import org.sv.flexobject.sql.providers.UnPooledConnectionProvider;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -19,9 +22,23 @@ import static org.junit.Assert.assertNotNull;
 
 public class HadoopPropertiesProviderTest extends ClusterMapReduceTestCase {
 
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        ClusterMapReduceTestCase.setupClassBase(HadoopPropertiesProviderTest.class);
+    }
+
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+        ConnectionManager.getInstance().clearAll();
+        InstanceFactory.reset();
+        ConnectionManager.getInstance().setDeploymentLevel(ConnectionManager.DeploymentLevel.alpha);
+    }
+
     @Test
     public void fullCycle() throws Exception {
-        startCluster(true, null);
+//        startCluster(true, null);
         Configuration conf = createJobConf();
         FileSystem fs = getFileSystem();
         HadoopSecretProviderTest.publishTestSecret(conf, fs);

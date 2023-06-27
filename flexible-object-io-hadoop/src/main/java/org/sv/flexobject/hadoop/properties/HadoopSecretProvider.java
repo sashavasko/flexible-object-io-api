@@ -18,13 +18,18 @@ public class HadoopSecretProvider implements SecretProvider, IConfigured {
 
     Logger logger = Logger.getLogger(HadoopSecretProvider.class);
 
-    public String getPassword(String propertyName, ConnectionManager.DeploymentLevel deploymentLevel) {
+    public String getCredsPath(ConnectionManager.DeploymentLevel deploymentLevel){
         String credentialsPath = "jceks://hdfs@"
                 + HadoopTask.getActiveNameNodeRPC(getConf())
                 + "/user/"
                 + HadoopTask.getUserName(getConf())
                 + "/creds/"
                 + deploymentLevel;
+        return credentialsPath;
+    }
+
+    public String getPassword(String propertyName, ConnectionManager.DeploymentLevel deploymentLevel) {
+        String credentialsPath = getCredsPath(deploymentLevel);
         logger.info("Using credentials path : " + credentialsPath);
         getConf().set("hadoop.security.credential.provider.path", credentialsPath + "/secret.jceks");
 
@@ -48,5 +53,10 @@ public class HadoopSecretProvider implements SecretProvider, IConfigured {
     @Override
     public Properties getProperties(String connectionName, ConnectionManager.DeploymentLevel deploymentLevel, String environment) {
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return "HadoopSecretProvider{credsPath=" + getCredsPath(ConnectionManager.getInstance().getDeploymentLevel()) + "}";
     }
 }

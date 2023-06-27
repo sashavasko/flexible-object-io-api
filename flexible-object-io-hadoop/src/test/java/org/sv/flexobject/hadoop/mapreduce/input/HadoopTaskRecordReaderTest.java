@@ -51,6 +51,7 @@ public class HadoopTaskRecordReaderTest {
 
     @Before
     public void setUp() throws Exception {
+        HadoopTask.clearConfiguration();
         InstanceFactory.set(SimpleProgressReporter.class, mockProgressReporter);
 
         reader = Mockito.mock(HadoopTaskRecordReader.class, Mockito.CALLS_REAL_METHODS);
@@ -60,6 +61,7 @@ public class HadoopTaskRecordReaderTest {
     @After
     public void tearDown() throws Exception {
         InstanceFactory.reset();
+        HadoopTask.clearConfiguration();
     }
 
     @Test()

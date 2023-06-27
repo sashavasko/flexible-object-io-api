@@ -1,6 +1,6 @@
 package org.sv.flexobject.hadoop.mapreduce.input.mongo.oplog;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.fs.Path;
 import org.bson.BsonTimestamp;
 import org.sv.flexobject.hadoop.mapreduce.input.mongo.MongoInputConf;
@@ -14,11 +14,35 @@ import java.util.Map;
 
 public class OplogInputConf<SELF extends HadoopPropertiesWrapper> extends ShardedInputConf<SELF> {
     public static final String SUBNAMESPACE = "oplog";
-    
+
     String splitOps;
     String splitTimestampFolder;
     Timestamp startTimestamp;
     Integer maxSecondsToExtract;
+
+    public void setSplitOps(String splitOps) {
+        this.splitOps = splitOps;
+    }
+
+    public void setSplitTimestampFolder(String splitTimestampFolder) {
+        this.splitTimestampFolder = splitTimestampFolder;
+    }
+
+    public void setStartTimestamp(Timestamp startTimestamp) {
+        this.startTimestamp = startTimestamp;
+    }
+
+    public void setMaxSecondsToExtract(Integer maxSecondsToExtract) {
+        this.maxSecondsToExtract = maxSecondsToExtract;
+    }
+
+    public Timestamp getStartTimestamp() {
+        return startTimestamp;
+    }
+
+    public Integer getMaxSecondsToExtract() {
+        return maxSecondsToExtract;
+    }
 
     public OplogInputConf() {
         super(SUBNAMESPACE);
@@ -50,30 +74,6 @@ public class OplogInputConf<SELF extends HadoopPropertiesWrapper> extends Sharde
         splitOps = "i,u,d";
         splitTimestampFolder = "oplog/lastTimestamp";
         return (SELF) this;
-    }
-
-    public Timestamp getStartTimestamp() {
-        return startTimestamp;
-    }
-
-    public Integer getMaxSecondsToExtract() {
-        return maxSecondsToExtract;
-    }
-
-    public void setSplitOps(String splitOps) {
-        this.splitOps = splitOps;
-    }
-
-    public void setSplitTimestampFolder(String splitTimestampFolder) {
-        this.splitTimestampFolder = splitTimestampFolder;
-    }
-
-    public void setStartTimestamp(Timestamp startTimestamp) {
-        this.startTimestamp = startTimestamp;
-    }
-
-    public void setMaxSecondsToExtract(Integer maxSecondsToExtract) {
-        this.maxSecondsToExtract = maxSecondsToExtract;
     }
 
     public String[] getSplitOps() {

@@ -10,8 +10,8 @@ repositories {
     mavenCentral()
 }
 
-ext.hadoopVersion = "3.3.0"
-ext.sparkVersion = "3.1.1"
+ext.hadoopVersion = "3.3.1"
+ext.sparkVersion = "3.3.2"
 
 dependencies {
 
@@ -43,12 +43,12 @@ dependencies {
     // https://mvnrepository.com/artifact/org.apache.avro/avro
     implementation group: 'org.apache.avro', name: 'avro', version: '1.10.2'
 
-    compile ('org.apache.parquet:parquet-hadoop:1.12.1'){
+    compile ('org.apache.parquet:parquet-hadoop:1.10.1'){
         exclude group: 'com.fasterxml.jackson.core', module:'jackson-databind'
         exclude group: 'com.fasterxml.jackson.core', module:'jackson-core'
         exclude module: 'httpcomponents'
     }
-    compile ('org.apache.parquet:parquet-avro:1.12.1'){
+    compile ('org.apache.parquet:parquet-avro:1.10.1'){
         exclude group: 'com.fasterxml.jackson.core', module:'jackson-databind'
         exclude group: 'com.fasterxml.jackson.core', module:'jackson-core'
         exclude group: 'org.apache.avro', module:'avro'

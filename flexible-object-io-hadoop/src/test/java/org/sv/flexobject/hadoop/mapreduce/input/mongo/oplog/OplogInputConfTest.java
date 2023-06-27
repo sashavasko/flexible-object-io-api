@@ -16,20 +16,20 @@ public class OplogInputConfTest {
     @Test
     public void listSettings() {
         List<String> expectedSettings = Arrays.asList(
-                "cfx.input.mongo.oplog.connection.name",
-                "cfx.input.mongo.oplog.db.name",
-                "cfx.input.mongo.oplog.collection.name",
-                "cfx.input.mongo.oplog.estimate.size.limit",
-                "cfx.input.mongo.oplog.estimate.time.limit.micros",
-                "cfx.input.mongo.oplog.builder.class",
-                "cfx.input.mongo.oplog.schema",
-                "cfx.input.mongo.oplog.splitter.class",
-                "cfx.input.mongo.oplog.reader.class",
-                "cfx.input.mongo.oplog.source.builder.class",
-                "cfx.input.mongo.oplog.split.ops",
-                "cfx.input.mongo.oplog.split.timestamp.folder",
-                "cfx.input.mongo.oplog.start.timestamp",
-                "cfx.input.mongo.oplog.max.seconds.to.extract"
+                "sv.input.mongo.oplog.connection.name",
+                "sv.input.mongo.oplog.db.name",
+                "sv.input.mongo.oplog.collection.name",
+                "sv.input.mongo.oplog.estimate.size.limit",
+                "sv.input.mongo.oplog.estimate.time.limit.micros",
+                "sv.input.mongo.oplog.builder.class",
+                "sv.input.mongo.oplog.schema",
+                "sv.input.mongo.oplog.splitter.class",
+                "sv.input.mongo.oplog.reader.class",
+                "sv.input.mongo.oplog.source.builder.class",
+                "sv.input.mongo.oplog.split.ops",
+                "sv.input.mongo.oplog.split.timestamp.folder",
+                "sv.input.mongo.oplog.start.timestamp",
+                "sv.input.mongo.oplog.max.seconds.to.extract"
         );
         List<String> actualSettings = conf.listSettings();
 
@@ -39,12 +39,12 @@ public class OplogInputConfTest {
     @Test
     public void limitTimestamp() {
         conf.maxSecondsToExtract = 100;
-        BsonTimestamp expectedTimestamp = new BsonTimestamp((int)(System.currentTimeMillis()/1000)-100);
+        BsonTimestamp expectedTimestamp = new BsonTimestamp((int)(System.currentTimeMillis()/1000)-100, 0);
         assertEquals(expectedTimestamp, conf.limitTimestamp(null));
 
         long tsMillis = System.currentTimeMillis()-20000;
         conf.startTimestamp = new Timestamp(tsMillis);
-        expectedTimestamp = new BsonTimestamp((int)(tsMillis/1000));
+        expectedTimestamp = new BsonTimestamp((int)(tsMillis/1000), 0);
         assertEquals(expectedTimestamp, conf.limitTimestamp(null));
     }
 }

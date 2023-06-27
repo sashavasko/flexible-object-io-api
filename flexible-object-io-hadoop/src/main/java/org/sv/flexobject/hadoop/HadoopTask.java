@@ -147,6 +147,10 @@ public class HadoopTask extends Configured {
         return getInstance().configured;
     }
 
+    public static void clearConfiguration(){
+        getInstance().configured = false;
+    }
+
     public static class Builder{
         private ConnectionManager.DeploymentLevel deploymentLevel;
         private String connectionManagerEnvironment;

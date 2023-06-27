@@ -228,6 +228,9 @@ public class MongoSplitTest {
                 "  optional int32 limit;\n" +
                 "  optional int32 skip;\n" +
                 "  optional boolean noTimeout;\n" +
+                "  optional binary hosts (UTF8);\n" +
+                        "  optional binary dbName (UTF8);\n" +
+                        "  optional binary collectionName (UTF8);\n" +
                 "  optional int64 estimatedLength;\n" +
                 "}\n", ParquetSchema.forClass(MongoSplit.class).toString());
     }

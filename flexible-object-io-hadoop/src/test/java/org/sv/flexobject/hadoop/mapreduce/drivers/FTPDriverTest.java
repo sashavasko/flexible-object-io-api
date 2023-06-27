@@ -12,6 +12,7 @@ import org.sv.flexobject.connections.ConnectionManager;
 import org.sv.flexobject.connections.PropertiesProvider;
 import org.sv.flexobject.ftp.FTPClient;
 import org.sv.flexobject.ftp.providers.FtpProvider;
+import org.sv.flexobject.util.InstanceFactory;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
@@ -40,6 +41,7 @@ public class FTPDriverTest {
 
     @Before
     public void setUp() throws Exception {
+        InstanceFactory.reset();
         fakeFtpServer = new FakeFtpServer();
         fakeFtpServer.addUserAccount(new UserAccount("user", "password", "/data"));
 
@@ -64,6 +66,7 @@ public class FTPDriverTest {
                 return null;
             }
         };
+        ConnectionManager.getInstance().clearAll();
         ConnectionManager.getInstance().registerPropertiesProvider(testFtpPropertiesProvider);
         ConnectionManager.getInstance().registerProvider(new FtpProvider());
     }

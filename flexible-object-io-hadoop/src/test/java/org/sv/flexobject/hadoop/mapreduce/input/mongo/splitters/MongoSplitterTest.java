@@ -72,6 +72,7 @@ public class MongoSplitterTest {
     public void setConf() {
         splitter.setConf(null);
         assertNull(splitter.getConf());
+        splitter.setInputConf(conf);
         assertSame(conf, splitter.getInputConf());
 
         splitter.setConf(rawConf);
@@ -85,6 +86,7 @@ public class MongoSplitterTest {
 
         doReturn(1l).when(split1).getLength(collection, 1, 1);
         doReturn(0l).when(split2).getLength(collection, 1, 1);
+        splitter.setInputConf(conf);
 
         List<InputSplit> filtered = splitter.filterEmptySplits(Arrays.asList(new ProxyInputSplit(split1), new ProxyInputSplit(split2)));
 

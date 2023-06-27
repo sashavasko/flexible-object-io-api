@@ -5,11 +5,17 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.ClusterMapReduceTestCase;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class FileSystemUtilsTest extends ClusterMapReduceTestCase {
+
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        ClusterMapReduceTestCase.setupClassBase(FileSystemUtilsTest.class);
+    }
 
     @Test
     public void writeLongToFile() throws Exception {
