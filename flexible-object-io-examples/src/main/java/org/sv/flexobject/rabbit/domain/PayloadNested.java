@@ -1,4 +1,4 @@
-package org.sv.flexobject.dt.streaming.examples.rabbit.domain;
+package org.sv.flexobject.rabbit.domain;
 
 
 import org.sv.flexobject.StreamableWithSchema;

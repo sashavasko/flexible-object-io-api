@@ -1,17 +1,13 @@
-package org.sv.flexobject.dt.streaming.examples.rabbit;
+package org.sv.flexobject.rabbit;
 
 import org.sv.flexobject.Streamable;
-import org.sv.flexobject.dt.streaming.examples.rabbit.domain.PayloadNested;
-import org.sv.flexobject.dt.streaming.examples.rabbit.domain.PayloadSimple;
+import org.sv.flexobject.rabbit.domain.PayloadNested;
+import org.sv.flexobject.rabbit.domain.PayloadSimple;
 import com.rabbitmq.client.BuiltinExchangeType;
-import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.util.Tool;
 import org.apache.log4j.Logger;
-import org.sv.flexobject.rabbit.RabbitConnectionConf;
-import org.sv.flexobject.rabbit.RabbitConnectionProvider;
-import org.sv.flexobject.rabbit.RabbitExchangeBuilder;
 import org.sv.flexobject.rabbit.streaming.BufferingSinkFactory;
 import org.sv.flexobject.rabbit.streaming.MessageConsumer;
 import org.sv.flexobject.rabbit.streaming.RabbitSink;
