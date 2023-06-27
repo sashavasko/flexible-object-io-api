@@ -249,6 +249,10 @@ public class ConnectionManager {
                     connectionProperties.putAll(overrides);
             }
 
+            if (connectionProperties == null){
+                throw new IOException ("Failed to load properties for connection " + connectionName + " using providers: " +  propertiesProviders.toString());
+            }
+
             for (SecretProvider provider : secretProviders) {
                 secret = provider.getSecret(connectionName, deploymentLevel, environment, connectionProperties);
                 if (secret != null)

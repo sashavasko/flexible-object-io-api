@@ -137,4 +137,11 @@ public class FilePropertiesProvider implements PropertiesProvider {
         }
         return null;
     }
+
+    @Override
+    public String toString() {
+        return "FilePropertiesProvider{" +
+                "pathsToFiles=" + pathsToFiles +
+                '}';
+    }
 }
