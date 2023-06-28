@@ -90,8 +90,6 @@ public class ConnectionManagerTest {
     FakeConnection mockConnection2;
     @Mock
     FakeConnection mockConnection3;
-    @Mock
-    FakeConnection mockEmptyConnection;
 
     String connectionName = "fooConn";
 
@@ -180,6 +178,7 @@ public class ConnectionManagerTest {
     @Test
     public void registerProviderByClass() throws Exception {
         ConnectionManager.getInstance().registerProvider(FakeConnectionProvider.class);
+        when(mockPropertiesProvider.getProperties("connectionRegisteredByClass", ConnectionManager.DeploymentLevel.alpha, "unitTest")).thenReturn(mockProperties);
 
         FakeConnection connection = (FakeConnection) ConnectionManager.getInstance().getConnection(FakeConnection.class, "connectionRegisteredByClass");
         assertEquals(connection.getName(), "connectionRegisteredByClass");
@@ -188,6 +187,8 @@ public class ConnectionManagerTest {
     @Test
     public void unregisterProviderByClass() throws Exception {
         ConnectionManager.getInstance().registerProvider(FakeConnectionProvider.class);
+
+        when(mockPropertiesProvider.getProperties("connectionUnRegisteredByClass", ConnectionManager.DeploymentLevel.alpha, "unitTest")).thenReturn(mockProperties);
 
         FakeConnection connection = (FakeConnection) ConnectionManager.getInstance().getConnection(FakeConnection.class, "connectionUnRegisteredByClass");
         assertEquals(connection.getName(), "connectionUnRegisteredByClass");
@@ -215,7 +216,6 @@ public class ConnectionManagerTest {
         when(mockPropertiesProvider3.getProperties(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest")).thenReturn(mockProperties3);
         when(mockConnectionProvider.getConnection(connectionName, mockProperties2, mockSecret)).thenReturn(mockConnection2);
         when(mockConnectionProvider.getConnection(connectionName, mockProperties3, mockSecret)).thenReturn(mockConnection3);
-        when(mockConnectionProvider.getConnection(connectionName, null, mockSecret)).thenReturn(mockEmptyConnection);
 
         assertSame(mockConnection, ConnectionManager.getInstance().getConnection(FakeConnection.class, connectionName));
 
@@ -236,12 +236,19 @@ public class ConnectionManagerTest {
         assertSame(mockConnection, ConnectionManager.getInstance().getConnection(FakeConnection.class, connectionName));
 
         when(mockPropertiesProvider.getProperties(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest")).thenReturn(null);
-
-        assertSame(mockEmptyConnection, ConnectionManager.getInstance().getConnection(FakeConnection.class, connectionName));
+        try {
+            ConnectionManager.getInstance().getConnection(FakeConnection.class, connectionName);
+            throw new RuntimeException("Must have thrown an IOException");
+        }catch(IOException e){
+        }
 
         ConnectionManager.getInstance().unregisterPropertiesProvider(mockPropertiesProvider);
 
-        assertSame(mockEmptyConnection, ConnectionManager.getInstance().getConnection(FakeConnection.class, connectionName));
+        try{
+            ConnectionManager.getInstance().getConnection(FakeConnection.class, connectionName);
+            throw new RuntimeException("Must have thrown an IOException");
+        }catch(IOException e){
+        }
     }
 
     @Test
@@ -256,7 +263,6 @@ public class ConnectionManagerTest {
         when(mockSecretProvider3.getSecret(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest", mockProperties)).thenReturn(mockSecret3);
         when(mockConnectionProvider.getConnection(connectionName, mockProperties, mockSecret2)).thenReturn(mockConnection2);
         when(mockConnectionProvider.getConnection(connectionName, mockProperties, mockSecret3)).thenReturn(mockConnection3);
-        when(mockConnectionProvider.getConnection(connectionName, mockProperties, null)).thenReturn(mockEmptyConnection);
 
         assertSame(mockConnection, ConnectionManager.getInstance().getConnection(FakeConnection.class, connectionName));
 
@@ -276,12 +282,5 @@ public class ConnectionManagerTest {
 
         assertSame(mockConnection, ConnectionManager.getInstance().getConnection(FakeConnection.class, connectionName));
 
-        when(mockSecretProvider.getSecret(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest", mockProperties)).thenReturn(null);
-
-        assertSame(mockEmptyConnection, ConnectionManager.getInstance().getConnection(FakeConnection.class, connectionName));
-
-        ConnectionManager.getInstance().unregisterSecretProvider(mockSecretProvider);
-
-        assertSame(mockEmptyConnection, ConnectionManager.getInstance().getConnection(FakeConnection.class, connectionName));
     }
 }
