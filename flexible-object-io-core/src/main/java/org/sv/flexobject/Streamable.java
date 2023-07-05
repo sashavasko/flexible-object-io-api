@@ -105,12 +105,16 @@ public interface Streamable extends Savable, Loadable {
         return MapOutAdapter.produce(outputMapClass, this);
     }
 
-    default Streamable fromMap(Map map) throws Exception {
-        return MapInAdapter.builder().from(map).build().consume(this) ? this : null;
+    default <T extends Streamable> T fromMap(Map map) throws Exception {
+        return MapInAdapter.builder().from(map).build().consume(this) ? (T)this : null;
     }
 
-    default Streamable fromJson(JsonNode json) throws Exception {
-        return JsonInputAdapter.forValue(json).consume(this) ? this : null;
+    default <T extends Streamable> T fromJson(JsonNode json) throws Exception {
+        return JsonInputAdapter.forValue(json).consume(this) ? (T)this : null;
+    }
+
+    default <T extends Streamable> T fromYaml(String yaml) throws Exception {
+        return fromJson(MapperFactory.getYamlObjectReader().readTree(yaml));
     }
 
     static boolean equals(Streamable o1, Object o2) {

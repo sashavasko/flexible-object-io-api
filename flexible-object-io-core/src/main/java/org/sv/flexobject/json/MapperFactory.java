@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import java.io.IOException;
 
@@ -13,6 +14,10 @@ public class MapperFactory {
     private static ObjectMapper objectMapper = new ObjectMapper();
     private static ObjectReader objectReader = objectMapper.reader();
     private static ObjectWriter objectWriter = objectMapper.writer();
+
+    private static ObjectMapper objectMapperYaml = new ObjectMapper(new YAMLFactory());
+    private static ObjectReader objectReaderYaml = objectMapperYaml.reader();
+    private static ObjectWriter objectWriterYaml = objectMapperYaml.writer();
 
     private static final MapperFactory instance = new MapperFactory();
 
@@ -26,6 +31,9 @@ public class MapperFactory {
         objectMapper = new ObjectMapper();
         objectReader = objectMapper.reader();
         objectWriter = objectMapper.writer();
+        objectMapperYaml = new ObjectMapper(new YAMLFactory());
+        objectReaderYaml = objectMapperYaml.reader();
+        objectWriterYaml = objectMapperYaml.writer();
     }
 
     public static ObjectMapper getObjectMapper(){
@@ -40,6 +48,18 @@ public class MapperFactory {
         return getInstance().objectWriter;
     }
 
+    public static ObjectMapper getYamlObjectMapper(){
+        return  getInstance().objectMapperYaml;
+    }
+
+    public static ObjectReader getYamlObjectReader(){
+        return getInstance().objectReaderYaml;
+    }
+
+    public static ObjectWriter getYamlObjectWriter(){
+        return getInstance().objectWriterYaml;
+    }
+
     public static void setObjectMapper(ObjectMapper objectMapper) {
         MapperFactory.objectMapper = objectMapper;
     }
@@ -50,6 +70,18 @@ public class MapperFactory {
 
     public static void setObjectWriter(ObjectWriter objectWriter) {
         MapperFactory.objectWriter = objectWriter;
+    }
+
+    public static void setYamlObjectMapper(ObjectMapper objectMapper) {
+        MapperFactory.objectMapperYaml = objectMapper;
+    }
+
+    public static void setYamlObjectReader(ObjectReader objectReader) {
+        MapperFactory.objectReaderYaml = objectReader;
+    }
+
+    public static void setYamlObjectWriter(ObjectWriter objectWriter) {
+        MapperFactory.objectWriterYaml = objectWriter;
     }
     public static String pretty(String json) throws IOException {
         JsonNode jsonNode = MapperFactory.getObjectReader().readTree(json);
