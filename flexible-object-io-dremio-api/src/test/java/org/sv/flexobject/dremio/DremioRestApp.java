@@ -47,6 +47,7 @@ public class DremioRestApp {
     public static Container dremioContainer;
     static DremioClient client;
     static DremioClient enterpriseClient;
+    static Boolean enterpriseClientNotAvailable;
 
     static Space testSpace;
     static View zips;
@@ -96,12 +97,14 @@ public class DremioRestApp {
         return client;
     }
     static public DremioClient getEnterpriseClient(){
-        if (enterpriseClient == null) {
+        if (enterpriseClient == null && enterpriseClientNotAvailable == null) {
             try {
                 enterpriseClient = (DremioClient) ConnectionManager.getConnection(DremioClient.class, "dremioREST_Enterprise");
                 checkCreateSamples(enterpriseClient.catalog());
+                enterpriseClientNotAvailable = false;
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                enterpriseClientNotAvailable = true;
+                return null;
             }
         }
         return enterpriseClient;
