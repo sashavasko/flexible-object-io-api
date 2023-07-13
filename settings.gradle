@@ -1,3 +1,12 @@
 rootProject.name = 'flexible-object-io-api'
-include 'flexible-object-io-core', 'flexible-object-io-hadoop', 'flexible-object-io-kafka', 'flexible-object-io-mongo','flexible-object-io-testdata','flexible-object-io-rabbit','flexible-object-io-aws-creds-provider','flexible-object-io-examples'
+include 'flexible-object-io-core'
+include 'flexible-object-io-hadoop'
+include 'flexible-object-io-kafka'
+include 'flexible-object-io-mongo'
+include 'flexible-object-io-testdata'
+include 'flexible-object-io-rabbit'
+include 'flexible-object-io-aws-creds-provider'
+include 'flexible-object-io-examples'
+include 'flexible-object-io-dremio-api'
+include 'flexible-object-io-docker'
 
