@@ -2,6 +2,7 @@ package org.sv.flexobject.dremio;
 
 
 import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.Image;
@@ -151,14 +152,14 @@ public class DremioRestApp {
 
             Container dremioContainer = DockerUtils.getContainer(dockerClient, DREMIO_CONTAINER_NAME);
             if (dremioContainer != null) {
-                if (DockerUtils.ContainerState.running == DockerUtils.ContainerState.valueOf(dremioContainer.getState())){
+                if (DockerUtils.ContainerState.running == DockerUtils.ContainerState.valueOf(dremioContainer.getState())) {
                     try {
                         client = (DremioClient) ConnectionManager.getConnection(DremioClient.class, "dremioREST");
                         if (client != null) {
                             // Container is running and has correct admin credentials
                             return;
                         }
-                    } catch (Exception e){
+                    } catch (Exception e) {
                     }
                 }
                 // must delete container as otherwise it will retain that first user created
@@ -183,6 +184,8 @@ public class DremioRestApp {
             DockerUtils.startRestartContainer(dockerClient, dremioContainer);
             Thread.sleep(5000);
             System.out.println(DockerUtils.waitContainerRunning(dockerClient, dremioContainer));
+        }catch (NotFoundException notFoundException) {
+            logger.error("Docker unavailable");
         } catch (Exception e) {
             logger.error("Failed to start Dremio in Docker", e);
             throw new RuntimeException(e);
