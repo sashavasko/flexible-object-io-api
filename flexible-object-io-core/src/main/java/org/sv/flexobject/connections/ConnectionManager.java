@@ -249,7 +249,7 @@ public class ConnectionManager {
                     connectionProperties.putAll(overrides);
             }
 
-            if (connectionProperties == null){
+            if (connectionProperties == null && connectionProvider.requiresProperties()){
                 throw new IOException ("Failed to load properties for connection " + connectionName + " using providers: " +  propertiesProviders.toString());
             }
 
