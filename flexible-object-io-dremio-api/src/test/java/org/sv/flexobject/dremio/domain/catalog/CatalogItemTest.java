@@ -1,5 +1,6 @@
 package org.sv.flexobject.dremio.domain.catalog;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.sql.Timestamp;
@@ -8,6 +9,7 @@ import static org.junit.Assert.*;
 
 public class CatalogItemTest {
 
+//    @Ignore
     @Test
     public void fromJsonCreatedAt() throws Exception {
         CatalogItem item = new CatalogItem();

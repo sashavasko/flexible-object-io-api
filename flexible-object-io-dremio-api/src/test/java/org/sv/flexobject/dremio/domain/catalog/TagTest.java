@@ -25,7 +25,12 @@ public class TagTest {
         View view = View.builder(catalogAPI)
                 .path("TestSpace", "zips")
                 .get();
-        Tag tag = catalogAPI.tag(view);
+        Tag tag;
+        try {
+            tag = catalogAPI.tag(view);
+        }catch (DremioApiException e){
+            tag = null;
+        }
         if (tag == null)
            tag = catalogAPI.createTag(view, Arrays.asList("zips"));
         else
