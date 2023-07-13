@@ -90,7 +90,6 @@ public class ConnectionManagerTest {
     FakeConnection mockConnection2;
     @Mock
     FakeConnection mockConnection3;
-
     String connectionName = "fooConn";
 
     @Before
@@ -103,8 +102,13 @@ public class ConnectionManagerTest {
                 .setDeploymentLevel(ConnectionManager.DeploymentLevel.alpha)
                 .setEnvironment("unitTest");
         when(mockSecretProvider.getSecret(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest", mockProperties)).thenReturn(mockSecret);
+        when(mockSecretProvider.getSecret(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest", mockProperties2)).thenReturn(mockSecret);
+        when(mockSecretProvider.getSecret(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest", mockProperties3)).thenReturn(mockSecret);
+        when(mockSecretProvider.getSecret(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest", null)).thenReturn(mockSecret);
         when(mockPropertiesProvider.getProperties(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest")).thenReturn(mockProperties);
         when(mockConnectionProvider.getConnection(connectionName, mockProperties, mockSecret)).thenReturn(mockConnection);
+        when(mockConnectionProvider.requiresProperties()).thenReturn(true);
+        when(mockConnectionProvider2.requiresProperties()).thenReturn(true);
     }
 
     @After
@@ -208,10 +212,6 @@ public class ConnectionManagerTest {
                 .registerPropertiesProvider(mockPropertiesProvider2)
                 .registerPropertiesProvider(mockPropertiesProvider3);
 
-        when(mockSecretProvider.getSecret(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest", null)).thenReturn(mockSecret);
-        when(mockSecretProvider.getSecret(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest", mockProperties2)).thenReturn(mockSecret);
-        when(mockSecretProvider.getSecret(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest", mockProperties3)).thenReturn(mockSecret);
-
         when(mockPropertiesProvider2.getProperties(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest")).thenReturn(mockProperties2);
         when(mockPropertiesProvider3.getProperties(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest")).thenReturn(mockProperties3);
         when(mockConnectionProvider.getConnection(connectionName, mockProperties2, mockSecret)).thenReturn(mockConnection2);
@@ -236,6 +236,7 @@ public class ConnectionManagerTest {
         assertSame(mockConnection, ConnectionManager.getInstance().getConnection(FakeConnection.class, connectionName));
 
         when(mockPropertiesProvider.getProperties(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest")).thenReturn(null);
+
         try {
             ConnectionManager.getInstance().getConnection(FakeConnection.class, connectionName);
             throw new RuntimeException("Must have thrown an IOException");
@@ -256,8 +257,6 @@ public class ConnectionManagerTest {
         ConnectionManager.getInstance()
                 .registerSecretProvider(mockSecretProvider2)
                 .registerSecretProvider(mockSecretProvider3);
-
-        when(mockSecretProvider.getSecret(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest", null)).thenReturn(mockSecret);
 
         when(mockSecretProvider2.getSecret(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest", mockProperties)).thenReturn(mockSecret2);
         when(mockSecretProvider3.getSecret(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest", mockProperties)).thenReturn(mockSecret3);
@@ -281,6 +280,5 @@ public class ConnectionManagerTest {
         ConnectionManager.getInstance().unregisterSecretProvider(mockSecretProvider3);
 
         assertSame(mockConnection, ConnectionManager.getInstance().getConnection(FakeConnection.class, connectionName));
-
     }
 }
