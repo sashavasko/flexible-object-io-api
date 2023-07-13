@@ -1,0 +1,34 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+}
+
+apply plugin: 'maven'
+apply plugin: 'java'
+apply plugin: 'idea'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+
+    implementation project(':flexible-object-io-core')
+
+    // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
+    compile group: 'com.github.docker-java', name: 'docker-java-core', version: '3.3.1'
+    compile group: 'com.github.docker-java', name: 'docker-java-transport-httpclient5', version: '3.3.1'
+    // https://mvnrepository.com/artifact/net.java.dev.jna/jna
+// https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform
+    implementation group: 'net.java.dev.jna', name: 'jna-platform', version: '5.13.0'
+
+// https://mvnrepository.com/artifact/org.slf4j/slf4j-reload4j
+    testImplementation group: 'org.slf4j', name: 'slf4j-reload4j', version: '2.0.7'
+    testImplementation "junit:junit:4.13"
+
+}
