@@ -20,6 +20,9 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public enum DataTypes {
@@ -348,10 +351,30 @@ public enum DataTypes {
             String timestampString = ((String) value).trim();
             if (StringUtils.isNumeric(timestampString) || timestampString.length() < "yyyy-mm-dd hh:mm:ss".length())
                 return new Timestamp(dateConverter(value).getTime());
+            if (timestampString.contains("T")) {// UTC time
+                LocalDateTime localDateTime;
+                if (timestampString.endsWith("Z")) {
+                    DateTimeFormatter f = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.systemDefault());
+                    localDateTime = LocalDateTime.parse(timestampString, f);
+                }else {
+                    String timeString = timestampString.substring(11);
+                    if (timeString.contains("+") || timeString.contains("-")) {
+                        ZonedDateTime dateTime = ZonedDateTime.parse(timestampString);
+                        localDateTime = LocalDateTime.ofInstant(dateTime.toInstant(), ZoneId.systemDefault());
+                    } else {
+                        localDateTime = LocalDateTime.parse(timestampString);
+                    }
+                }
+                return Timestamp.valueOf(localDateTime);
+            }
             return Timestamp.valueOf((String) value);
         }
-        if (value instanceof ValueNode)
-            return Timestamp.valueOf(((ValueNode)value).asText());
+        if (value instanceof ValueNode) {
+            ValueNode valueNode = (ValueNode) value;
+            if (valueNode.isLong())
+                return new Timestamp(valueNode.asLong());
+            return timestampConverter(valueNode.asText());
+        }
         if (value instanceof LocalDateTime)
             return Timestamp.valueOf((LocalDateTime)value);
         if (value instanceof Date)

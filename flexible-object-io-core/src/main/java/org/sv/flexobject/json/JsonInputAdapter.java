@@ -9,6 +9,7 @@ import org.sv.flexobject.InAdapter;
 import org.sv.flexobject.adapter.GenericInAdapter;
 import org.sv.flexobject.copy.CopyAdapter;
 import org.sv.flexobject.copy.Copyable;
+import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.stream.Source;
 import org.sv.flexobject.stream.sources.SingleValueSource;
 import org.sv.flexobject.util.ConsumerWithException;
@@ -95,7 +96,15 @@ public class JsonInputAdapter extends GenericInAdapter<JsonNode> implements Copy
     }
 
     public static Timestamp jsonNodeToTimestamp(JsonNode n){
-        return n == null ? null : new Timestamp(n.asLong());
+        if (n == null)
+            return null;
+        if (n.isLong())
+            return new Timestamp(n.asLong());
+        try {
+            return DataTypes.timestampConverter(n);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override
