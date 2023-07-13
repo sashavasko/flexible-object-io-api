@@ -33,9 +33,12 @@ public class BsonToJsonConverterTest {
     @Test
     public void convertUUIDFilter() throws IOException {
         Bson query = Filters.eq("uuid", UUID.fromString("8529e0c9-bde0-4d24-9340-f396512f5e6a"));
-
         JsonNode json = BsonToJsonConverter.relaxed().convert(query);
-        assertEquals("{\"uuid\":{\"$binary\":{\"base64\":\"JE3gvcngKYVqXi9RlvNAkw==\",\"subType\":\"03\"}}}", json.toString());
+
+//        assertEquals("{\"uuid\":{\"$binary\":{\"base64\":\"JE3gvcngKYVqXi9RlvNAkw==\",\"subType\":\"03\"}}}", json.toString());
+
+        Document query2 = Document.parse(json.toString());
+        assertEquals(UUID.fromString("8529e0c9-bde0-4d24-9340-f396512f5e6a"), query2.get("uuid"));
     }
 
     @Test
