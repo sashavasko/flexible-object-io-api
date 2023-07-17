@@ -44,4 +44,4 @@ jobs:
       if: failure()
       with:
         name: build-reports
-        path: build/reports/
+        path: /home/runner/work/flexible-object-io-api/flexible-object-io-api/flexible-object-io-dremio-api/build/reports/tests/test
