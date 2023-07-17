@@ -1,14 +1,3 @@
-plugins {
-    id 'groovy-gradle-plugin'
-    id "com.gradle.build-scan" version "3.13.4"
-}
-
-gradleEnterprise {
-    buildScan {
-        termsOfServiceUrl = "https://gradle.com/terms-of-service"
-        termsOfServiceAgree = "yes"
-    }
-}
 
 repositories {
     mavenCentral()
