@@ -38,10 +38,10 @@ jobs:
     - name: Build with Gradle
       uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
       with:
-        arguments: build --scan
+        arguments: build
     - name: Upload build reports
       uses: actions/upload-artifact@v3
       if: failure()
       with:
         name: build-reports
-        path: /home/runner/work/flexible-object-io-api/flexible-object-io-api/flexible-object-io-dremio-api/build/reports/tests/test
+        path: /home/runner/work/flexible-object-io-api/flexible-object-io-api/*/build/reports/tests/test
