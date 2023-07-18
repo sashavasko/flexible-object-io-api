@@ -1,11 +1,11 @@
 plugins {
 //    id 'groovy-gradle-plugin'
-    id "com.gradle.enterprise"
+//    id "com.gradle.enterprise"
 }
 
-gradleEnterprise {
-    buildScan {
-        termsOfServiceUrl = "https://gradle.com/terms-of-service"
-        termsOfServiceAgree = "yes"
-    }
-}
+//gradleEnterprise {
+//    buildScan {
+//        termsOfServiceUrl = "https://gradle.com/terms-of-service"
+//        termsOfServiceAgree = "yes"
+//    }
+//}
