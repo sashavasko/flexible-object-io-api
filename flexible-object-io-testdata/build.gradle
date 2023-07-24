@@ -12,5 +12,5 @@ repositories {
 
 dependencies {
 
-    implementation project(':flexible-object-io-core')
+    api project(':flexible-object-io-core')
 }

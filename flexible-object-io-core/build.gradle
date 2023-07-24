@@ -20,45 +20,45 @@ dependencies {
     testImplementation project(':flexible-object-io-testdata')
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
+    api group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
 
-    compile group: 'joda-time', name: 'joda-time', version: '2.10.1'
+    api group: 'joda-time', name: 'joda-time', version: '2.10.1'
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: "${jacksonVersion}"
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "${jacksonVersion}"
-    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: "${jacksonVersion}"
-    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-csv', version: "${jacksonVersion}"
-    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-smile', version: "${jacksonVersion}"
-    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-cbor', version: "${jacksonVersion}"
-    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-protobuf', version: "${jacksonVersion}"
-    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-toml', version: "${jacksonVersion}"
+    api group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: "${jacksonVersion}"
+    api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "${jacksonVersion}"
+    api group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: "${jacksonVersion}"
+    api group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-csv', version: "${jacksonVersion}"
+    api group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-smile', version: "${jacksonVersion}"
+    api group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-cbor', version: "${jacksonVersion}"
+    api group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-protobuf', version: "${jacksonVersion}"
+    api group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-toml', version: "${jacksonVersion}"
 
     // https://mvnrepository.com/artifact/commons-io/commons-io
-    compile group: 'commons-io', name: 'commons-io', version: '2.6'
+    api group: 'commons-io', name: 'commons-io', version: '2.6'
 
     // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
-    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: "${log4jVersion}"
+    api group: 'org.apache.logging.log4j', name: 'log4j-core', version: "${log4jVersion}"
     // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api
-    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: "${log4jVersion}"
+    api group: 'org.apache.logging.log4j', name: 'log4j-api', version: "${log4jVersion}"
     // https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2
-    compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.7.0'
+    api group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.7.0'
 
-    compile group: 'commons-net', name: 'commons-net', version: '3.6'
+    api group: 'commons-net', name: 'commons-net', version: '3.6'
 
     // https://mvnrepository.com/artifact/commons-codec/commons-codec
-    compile group: 'commons-codec', name: 'commons-codec', version: '1.15'
+    api group: 'commons-codec', name: 'commons-codec', version: '1.15'
     // https://mvnrepository.com/artifact/commons-cli/commons-cli
-    compile 'commons-cli:commons-cli:1.5.0'
+    api 'commons-cli:commons-cli:1.5.0'
 
     // https://mvnrepository.com/artifact/com.h2database/h2
-    testCompile group: 'com.h2database', name: 'h2', version: '1.4.200'
+    testImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'
     // https://mvnrepository.com/artifact/org.mockftpserver/MockFtpServer
-    testCompile group: 'org.mockftpserver', name: 'MockFtpServer', version: '2.7.1'
+    testImplementation group: 'org.mockftpserver', name: 'MockFtpServer', version: '2.7.1'
 
     // https://mvnrepository.com/artifact/com.google.guava/guava
-    testCompile group: 'com.google.guava', name: 'guava', version: '19.0'
-    testCompile group: 'com.carrotsearch', name: 'junit-benchmarks', version: '0.7.2'
+    testImplementation group: 'com.google.guava', name: 'guava', version: '19.0'
+    testImplementation group: 'com.carrotsearch', name: 'junit-benchmarks', version: '0.7.2'
 
 
     testImplementation "junit:junit:4.13"

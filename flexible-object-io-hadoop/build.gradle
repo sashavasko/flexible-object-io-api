@@ -15,59 +15,59 @@ ext.sparkVersion = "3.3.2"
 
 dependencies {
 
-    implementation project(':flexible-object-io-core')
-    implementation project(':flexible-object-io-mongo')
+    api project(':flexible-object-io-core')
+    api project(':flexible-object-io-mongo')
     testImplementation project(':flexible-object-io-testdata')
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+    api group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
 
-    compile group: 'joda-time', name: 'joda-time', version: '2.10.1'
+    api group: 'joda-time', name: 'joda-time', version: '2.10.1'
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.7'
+    api group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.7'
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
+    api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
 
-    compile ("org.apache.hadoop:hadoop-client:${hadoopVersion}"){
+    api ("org.apache.hadoop:hadoop-client:${hadoopVersion}"){
         exclude group: 'com.fasterxml.jackson.core', module:'jackson-databind'
         exclude group: 'com.fasterxml.jackson.core', module:'jackson-core'
         exclude group: 'org.apache.avro', module:'avro'
     }
-    compile (group: 'org.apache.spark', name: 'spark-core_2.12', version: "${sparkVersion}"){
+    api (group: 'org.apache.spark', name: 'spark-core_2.12', version: "${sparkVersion}"){
         exclude group: 'org.apache.avro', module:'avro-mapred'
     }
     compileOnly ("org.apache.spark:spark-sql_2.12:${sparkVersion}"){
         exclude group: 'org.apache.avro', module:'avro-mapred'
     }
     // https://mvnrepository.com/artifact/org.apache.avro/avro
-    implementation group: 'org.apache.avro', name: 'avro', version: '1.10.2'
+    api group: 'org.apache.avro', name: 'avro', version: '1.10.2'
 
-    compile ('org.apache.parquet:parquet-hadoop:1.10.1'){
+    api ('org.apache.parquet:parquet-hadoop:1.10.1'){
         exclude group: 'com.fasterxml.jackson.core', module:'jackson-databind'
         exclude group: 'com.fasterxml.jackson.core', module:'jackson-core'
         exclude module: 'httpcomponents'
     }
-    compile ('org.apache.parquet:parquet-avro:1.10.1'){
+    api ('org.apache.parquet:parquet-avro:1.10.1'){
         exclude group: 'com.fasterxml.jackson.core', module:'jackson-databind'
         exclude group: 'com.fasterxml.jackson.core', module:'jackson-core'
         exclude group: 'org.apache.avro', module:'avro'
         exclude module: 'httpcomponents'
     }
 
-    compile group: 'javax.mail', name: 'mail', version: '1.4'
-    compile ("joda-time:joda-time:2.7")
+    api group: 'javax.mail', name: 'mail', version: '1.4'
+    api ("joda-time:joda-time:2.7")
 
     testImplementation "junit:junit:4.13"
     testImplementation 'org.mockito:mockito-core:1.9.5', {exclude group:"org.hamcrest"}
     // https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-minicluster
     testImplementation group: 'org.apache.hadoop', name: 'hadoop-minicluster', version: "${hadoopVersion}"
     // https://mvnrepository.com/artifact/com.h2database/h2
-    testCompile group: 'com.h2database', name: 'h2', version: '1.4.200'
+    testImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'
     // https://mvnrepository.com/artifact/org.mockftpserver/MockFtpServer
     testImplementation group: 'org.mockftpserver', name: 'MockFtpServer', version: '2.7.1'
 
     // https://mvnrepository.com/artifact/com.google.guava/guava
-    testCompile group: 'com.google.guava', name: 'guava', version: '19.0'
-    testCompile group: 'com.carrotsearch', name: 'junit-benchmarks', version: '0.7.2'
+    testImplementation group: 'com.google.guava', name: 'guava', version: '19.0'
+    testImplementation group: 'com.carrotsearch', name: 'junit-benchmarks', version: '0.7.2'
 }

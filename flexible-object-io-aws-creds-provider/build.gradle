@@ -18,13 +18,13 @@ repositories {
 
 dependencies {
 
-    implementation project(':flexible-object-io-core')
+    api project(':flexible-object-io-core')
 
     // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
-    compile 'org.apache.httpcomponents:httpclient:4.5.14'
+    api 'org.apache.httpcomponents:httpclient:4.5.14'
 
-    compile 'software.amazon.awssdk:secretsmanager:2.18.35'
-    compile 'com.bettercloud:vault-java-driver:5.1.0'
+    api 'software.amazon.awssdk:secretsmanager:2.18.35'
+    api 'com.bettercloud:vault-java-driver:5.1.0'
     testImplementation "junit:junit:4.13"
 
 }

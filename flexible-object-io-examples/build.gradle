@@ -20,13 +20,13 @@ repositories {
 }
 
 dependencies {
-    implementation project(':flexible-object-io-core')
-    implementation project(':flexible-object-io-mongo')
-    implementation project(':flexible-object-io-hadoop')
-    implementation project(':flexible-object-io-rabbit')
-    implementation project(':flexible-object-io-kafka')
-    implementation project(':flexible-object-io-aws-creds-provider')
-//    implementation project(':dt-dremio-api')
+    api project(':flexible-object-io-core')
+    api project(':flexible-object-io-mongo')
+    api project(':flexible-object-io-hadoop')
+    api project(':flexible-object-io-rabbit')
+    api project(':flexible-object-io-kafka')
+    api project(':flexible-object-io-aws-creds-provider')
+//    api project(':dt-dremio-api')
 
 }
 
