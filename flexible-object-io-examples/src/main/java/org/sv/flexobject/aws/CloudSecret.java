@@ -91,21 +91,19 @@ public class CloudSecret extends Configured implements Tool  {
             System.exit(1);
         }
 
-        AWSSecretProviderWithVault provider = providerBuilder.build();
-
-
-        if (!config.hasArn()){
-            Map<String,String> vaultCreds = provider.getAWSCredentialsFromVault(config.getLevel());
-            System.out.println("\n");
-            System.out.println("export AWS_ACCESS_KEY_ID=" + vaultCreds.get(AWSSecretProviderWithVault.ACCESS_KEY));
-            System.out.println("export AWS_SECRET_ACCESS_KEY=" + vaultCreds.get(AWSSecretProviderWithVault.SECRET_KEY));
-            System.out.println("export AWS_SESSION_TOKEN=" + vaultCreds.get(AWSSecretProviderWithVault.SECURITY_TOKEN));
-            System.out.println("\n");
-        } else {
-            String secretString = provider.getAWSSecret(config.getArn(), config.getRegion(), config.getLevel());
-            System.out.println("\n" + MapperFactory.pretty(secretString) + "\n");
+        try(AWSSecretProviderWithVault provider = providerBuilder.build()) {
+            if (!config.hasArn()) {
+                Map<String, String> vaultCreds = provider.getAWSCredentialsFromVault(config.getLevel());
+                System.out.println("\n");
+                System.out.println("export AWS_ACCESS_KEY_ID=" + vaultCreds.get(AWSSecretProviderWithVault.ACCESS_KEY));
+                System.out.println("export AWS_SECRET_ACCESS_KEY=" + vaultCreds.get(AWSSecretProviderWithVault.SECRET_KEY));
+                System.out.println("export AWS_SESSION_TOKEN=" + vaultCreds.get(AWSSecretProviderWithVault.SECURITY_TOKEN));
+                System.out.println("\n");
+            } else {
+                String secretString = provider.getAWSSecret(config.getArn(), config.getRegion(), config.getLevel());
+                System.out.println("\n" + MapperFactory.pretty(secretString) + "\n");
+            }
         }
-
         return 0;
     }
 }

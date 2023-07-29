@@ -1,5 +1,5 @@
-apply plugin: 'maven'
 apply plugin: 'java'
+apply plugin: 'java-library'
 apply plugin: 'idea'
 group = 'org.sv'
 
@@ -8,7 +8,7 @@ sourceCompatibility = 1.8
 repositories {
     mavenLocal()
     mavenCentral()
-    maven { url 'http://packages.confluent.io/maven/' }
+    maven { url 'https://packages.confluent.io/maven/' }
 }
 
 ext.hadoopVersion = "3.3.0"

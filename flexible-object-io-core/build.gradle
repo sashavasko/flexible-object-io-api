@@ -1,6 +1,6 @@
 plugins {
-    id 'maven'
     id 'java'
+    id 'java-library'
     id 'idea'
 //    id 'myproject.java-conventions'
 }
