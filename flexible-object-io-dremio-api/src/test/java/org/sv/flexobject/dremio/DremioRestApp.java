@@ -152,41 +152,53 @@ public class DremioRestApp {
 
             Container dremioContainer = DockerUtils.getContainer(dockerClient, DREMIO_CONTAINER_NAME);
             if (dremioContainer != null) {
-                if (DockerUtils.ContainerState.running == DockerUtils.ContainerState.valueOf(dremioContainer.getState())) {
+                logger.debug("Got dremio container");
+                if (DockerUtils.isRunning(dremioContainer)) {
+                    logger.debug("Dremio container is Running");
                     try {
                         client = (DremioClient) ConnectionManager.getConnection(DremioClient.class, "dremioREST");
                         if (client != null) {
+                            logger.debug("Dremio container already has first user");
                             // Container is running and has correct admin credentials
                             return;
                         }
                     } catch (Exception e) {
+                        logger.debug("Dremio container does not have first user");
                     }
+                } else {
+                    logger.debug("Dremio container is not running");
                 }
                 // must delete container as otherwise it will retain that first user created
                 dockerClient.removeContainerCmd(dremioContainer.getId()).withForce(true).exec();
+                logger.debug("Dremio container is removed");
+            } else {
+                logger.debug("No Dremio container found");
             }
 
 
+            logger.debug("Pulling Dremio Image...");
             Image image = DockerUtils.checkAndPullImage(dockerClient, DREMIO_DOCKER_IMAGE_NAME, "latest");
             assertNotNull(image);
-
+            logger.debug("Got Dremio image");
             HostConfig hostConfig = HostConfig.newHostConfig()
                     .withPortBindings(DockerUtils.localhostPortBindings(DREMIO_PORTS));
+            logger.debug("Creating Dremio container with host config:" + hostConfig);
             dockerClient.createContainerCmd(image.getId())
                     .withName(DREMIO_CONTAINER_NAME)
                     .withExposedPorts(DockerUtils.exposedTcpPorts(DREMIO_PORTS))
                     .withHostConfig(hostConfig)
                     .exec();
-
+            logger.debug("Created Dremio container");
             dremioContainer = DockerUtils.getImageContainers(dockerClient, image).get(0);
 
             assertNotNull(dremioContainer);
+            logger.debug("Got Dremio container:" + dremioContainer + " Starting ...");
             DockerUtils.startRestartContainer(dockerClient, dremioContainer);
             Thread.sleep(5000);
-            System.out.println(DockerUtils.waitContainerRunning(dockerClient, dremioContainer));
-        }catch (NotFoundException notFoundException) {
-            logger.error("Docker unavailable");
-        } catch (Exception e) {
+            logger.info("Waiting for strted DRemio Container: " + DockerUtils.waitContainerRunning(dockerClient, dremioContainer));
+        }catch (NotFoundException notFoundException){
+            logger.error("Docker unavailable", notFoundException);
+        }catch (Exception e) {
             logger.error("Failed to start Dremio in Docker", e);
             throw new RuntimeException(e);
         }

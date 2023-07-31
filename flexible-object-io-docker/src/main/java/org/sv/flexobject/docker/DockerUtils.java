@@ -4,11 +4,15 @@ import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.model.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.*;
 
 public class DockerUtils {
+
+    public static final Logger logger = LogManager.getLogger(DockerUtils.class);
 
     public enum ContainerState{
         created,
@@ -17,6 +21,35 @@ public class DockerUtils {
         exited,
         paused,
         dead
+    }
+
+    public static boolean isRunning(Container container){
+        return ContainerState.running
+                == ContainerState.valueOf(container.getState());
+    }
+
+    public static boolean isRestarting(Container container){
+        return ContainerState.restarting
+                == ContainerState.valueOf(container.getState());
+    }
+    public static boolean isExited(Container container){
+        return ContainerState.exited
+                == ContainerState.valueOf(container.getState());
+    }
+
+    public static boolean isPaused(Container container){
+        return ContainerState.paused
+                == ContainerState.valueOf(container.getState());
+    }
+
+    public static boolean isDead(Container container){
+        return ContainerState.dead
+                == ContainerState.valueOf(container.getState());
+    }
+
+    public static boolean isCreated(Container container){
+        return ContainerState.created
+                == ContainerState.valueOf(container.getState());
     }
 
     public static List<Image> getImagesForRepoName(DockerClient dockerClient, String name){
@@ -94,9 +127,18 @@ public class DockerUtils {
     }
 
     public static Container getContainer(DockerClient dockerClient, String name){
-        InspectContainerResponse response  = dockerClient.inspectContainerCmd(name).exec();
-        System.out.println(response);
-        List<Container> containers = dockerClient.listContainersCmd().withShowAll(true).withIdFilter(Arrays.asList(response.getId())).exec();
+        InspectContainerResponse response  = dockerClient
+                .inspectContainerCmd(name)
+                .exec();
+
+        logger.debug(response);
+
+        List<Container> containers = dockerClient
+                .listContainersCmd()
+                .withShowAll(true)
+                .withIdFilter(Arrays.asList(response.getId()))
+                .exec();
+
         return containers.isEmpty() ? null : containers.get(0);
     }
     public static Container checkCreateContainer(DockerClient dockerClient, Image image, String name, boolean stopIfRunning){
