@@ -79,21 +79,28 @@ public class DockerClientProviderTest {
 
     @Test
     public void listContainers() {
-        List<Container> containers = dockerClient.listContainersCmd().withShowAll(true).exec();
+        if (dockerClient != null) {
+            List<Container> containers = dockerClient.listContainersCmd().withShowAll(true).exec();
 
-        for (Container container : containers){
-            System.out.println(container);
+            System.out.println("Containers:");
+            for (Container container : containers) {
+                System.out.println(container);
+            }
         }
     }
 
     @Test
     public void listImages(){
-        List<Image> images = dockerClient.listImagesCmd().exec();
-        for (Image image : images) {
-            for (String tag : image.getRepoTags()){
-                String imageName = tag.split(":")[0];
-                System.out.println(imageName);
-                break;
+        if (dockerClient != null) {
+
+            List<Image> images = dockerClient.listImagesCmd().exec();
+            System.out.println("Images:");
+            for (Image image : images) {
+                for (String tag : image.getRepoTags()) {
+                    String imageName = tag.split(":")[0];
+                    System.out.println(imageName);
+                    break;
+                }
             }
         }
     }
