@@ -12,6 +12,8 @@ import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -485,6 +487,24 @@ public class DataTypesTest {
         assertEquals(new Timestamp(Date.valueOf(LocalDate.of(2020,1,30)).getTime()), DataTypes.timestampConverter("1302020"));
     }
 
+    @Test
+    public void timestampConverterHandlesNumericDatesZoned1() throws Exception {
+        ZonedDateTime zonedDateTime = ZonedDateTime.of(2023, 4, 26, 18, 42, 2, 0, ZoneId.of("UTC"));
+        Timestamp expectedTimestamp = Timestamp.valueOf(zonedDateTime.withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime());
+        assertEquals(expectedTimestamp, DataTypes.timestampConverter("2023-04-26T18:42:02-00:00"));
+    }
+    @Test
+    public void timestampConverterHandlesNumericDatesZoned2() throws Exception {
+        assertEquals(Timestamp.valueOf("2023-04-26 18:42:02.000"), DataTypes.timestampConverter("2023-04-26T18:42:02"));
+    }
+
+    @Test
+    public void timestampConverterHandlesNumericDatesZoned3() throws Exception {
+
+        ZonedDateTime zonedDateTime = ZonedDateTime.of(2023, 4, 26, 18, 42, 2, 923*1000000, ZoneId.of("UTC"));
+        Timestamp expectedTimestamp = Timestamp.valueOf(zonedDateTime.withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime());
+        assertEquals(expectedTimestamp, DataTypes.timestampConverter("2023-04-26T18:42:02.923Z"));
+    }
     @Test
     public void dateConverterHandlesUnixTime() throws Exception {
         assertEquals(testDate, DataTypes.dateConverter(testDate.getTime()));
