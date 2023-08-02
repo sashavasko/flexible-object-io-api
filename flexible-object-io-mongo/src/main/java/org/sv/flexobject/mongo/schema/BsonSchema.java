@@ -18,7 +18,11 @@ import java.sql.Timestamp;
 import java.util.*;
 
 public class BsonSchema extends AbstractSchema {
-    public static FunctionWithException bsonTimestampConverter = (v)-> {BsonTimestamp bson = (BsonTimestamp) v; return new Timestamp(bson.getTime()*1000L + bson.getInc()/1000000L);};
+    public static FunctionWithException bsonTimestampConverter = (v)-> {BsonTimestamp bson = (BsonTimestamp) v;
+        Timestamp t = new Timestamp(bson.getTime()*1000L);
+        t.setNanos(bson.getInc());
+        return t;
+    };
     public static FunctionWithException bsonDateConverter = (v)-> new Date(((BsonDateTime)v).getValue());
 
     static {
