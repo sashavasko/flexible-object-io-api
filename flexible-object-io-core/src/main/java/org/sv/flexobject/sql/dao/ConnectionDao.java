@@ -31,7 +31,7 @@ public class ConnectionDao extends ConnectionWrapper implements AutoCloseable{
 
     public ConnectionDao(){}
 
-    public ConnectionDao(String connectionName) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+    public ConnectionDao(String connectionName) {
         this.connectionName = connectionName;
     }
 

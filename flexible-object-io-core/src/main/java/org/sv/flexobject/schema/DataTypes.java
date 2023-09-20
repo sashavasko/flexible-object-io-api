@@ -158,11 +158,11 @@ public enum DataTypes {
             }
             return json;
         }
-        if (value instanceof List){
-            List list = (List) value;
-            ArrayNode json = jsonArrayNode(list.size());
+        if (value instanceof Collection){
+            Collection collection = (Collection) value;
+            ArrayNode json = jsonArrayNode(collection.size());
 
-            for (Object o : list) {
+            for (Object o : collection) {
                 if (o instanceof String)
                     json.add((String)o);
                 else

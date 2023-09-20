@@ -7,6 +7,7 @@ import org.sv.flexobject.Streamable;
 import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.schema.SchemaException;
 import org.sv.flexobject.util.BiConsumerWithException;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.util.*;
 
@@ -32,14 +33,14 @@ public class ScalarSetter extends FieldWrapper implements BiConsumerWithExceptio
             return;
         }
 
-        if (value instanceof List) {
-            List list = (List) value;
+        if (value instanceof Collection) {
+            Collection collection = (Collection) value;
             if (getStructure() == STRUCT.array) {
                 Object[] array = (Object[]) getValue(dataObject);
                 if (array == null)
                     throw new SchemaException(getQualifiedName() + ": Arrays must be initialized in data objects with Schema. Field " + fieldName + " in class " + clazz.getName());
                 int idx = 0;
-                for (Object elem : list) {
+                for (Object elem : collection) {
                     if (elem == null || array[idx] instanceof Streamable) {
                         array[idx] = elem;
                     } else {
@@ -51,7 +52,9 @@ public class ScalarSetter extends FieldWrapper implements BiConsumerWithExceptio
                 }
             } else {
                 if (getValue(dataObject) instanceof Set){
-                    ((Set) getValue(dataObject)).addAll(list);
+                    Set set = (Set) getValue(dataObject);
+                    set.clear();
+                    set.addAll(collection);
                 }else
                     setValue(dataObject, value);
             }
@@ -111,7 +114,7 @@ public class ScalarSetter extends FieldWrapper implements BiConsumerWithExceptio
                     } else if (array[idx] == null && elemNode.isContainerNode()){
                         if (valueClass == null)
                             throw new SchemaException(getQualifiedName() + ": Arrays of substructures must be initialized with instances, or ValueType annotation must be used.");
-                        array[idx] = valueClass.newInstance();
+                        array[idx] = InstanceFactory.get(valueClass);
                         ((Streamable)array[idx]).fromJson(elemNode);
                     }else {
                         array[idx] = getType().convert(elemNode);
@@ -122,33 +125,37 @@ public class ScalarSetter extends FieldWrapper implements BiConsumerWithExceptio
                 }
             }else if (getStructure() == STRUCT.list){
                 int idx = 0;
-                List list = (List) getValue(dataObject);
+                Collection collection = (Collection) getValue(dataObject);
                 for (JsonNode elemNode : arrayNode){
                     Object convertedValue = null;
                     if (valueClass != null) {
-                        if (list.size() > idx)
-                            convertedValue = list.get(idx);
+                        if (collection instanceof List) {
+                            List list = (List) collection;
+                            if (list.size() > idx)
+                                convertedValue = list.get(idx);
+                        }
                         if (convertedValue == null)
-                            convertedValue = valueClass.newInstance();
+                            convertedValue = InstanceFactory.get(valueClass);
                         ((Streamable)convertedValue).fromJson(elemNode);
                     }else {
                         convertedValue = getType().convert(elemNode);
                     }
 
 
-                    if (list.size() <= idx)
-                        list.add(convertedValue);
-                    else
-                        list.set(idx, convertedValue);
+                    if (collection.size() <= idx || !(collection instanceof List))
+                        collection.add(convertedValue);
+                    else {
+                        ((List)collection).set(idx, convertedValue);
+                    }
                     idx++;
                 }
             } else
-                throw new SchemaException(getQualifiedName() + ": Cannot set scalar field from Json Array");
+                throw new SchemaException(getQualifiedName() + ": Cannot set scalar field from Json Array. Perhaps you need @ValueType annotation?");
         } else if (value instanceof ObjectNode && !JsonNode.class.isAssignableFrom(getFieldClass())){
             if (Streamable.class.isAssignableFrom(getFieldClass())){
                 Streamable subStruct = (Streamable) getValue(dataObject);
                 if (subStruct == null) {
-                    subStruct = (Streamable) getFieldClass().newInstance();
+                    subStruct = (Streamable) InstanceFactory.get(getFieldClass());
                     setValue(dataObject, subStruct);
                 }
                 subStruct.fromJson((JsonNode) value);
@@ -166,7 +173,7 @@ public class ScalarSetter extends FieldWrapper implements BiConsumerWithExceptio
                     if (valueClass != null && node.isObject()){
                         convertedValue = map.get(key);
                         if (convertedValue == null)
-                            convertedValue = valueClass.newInstance();
+                            convertedValue = InstanceFactory.get(valueClass);
                         ((Streamable)convertedValue).fromJson(node);
                     }else {
                         convertedValue = getType().convert(node);

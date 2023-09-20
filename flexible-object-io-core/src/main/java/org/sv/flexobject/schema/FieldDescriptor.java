@@ -12,6 +12,7 @@ import org.sv.flexobject.util.BiConsumerWithException;
 import org.sv.flexobject.util.FunctionWithException;
 
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -253,6 +254,13 @@ public class FieldDescriptor extends AbstractFieldDescriptor{
         Object value = null;
         try {
             value = type.get(adapter, name);
+            if (type == DataTypes.string){
+                String stringValue = (String) value;
+                Object objectValue = getter.apply(o);
+                if (objectValue != null && objectValue instanceof Collection){
+                    value = DataTypes.jsonConverter(stringValue);
+                }
+            }
         }catch(Exception e){
             if (e instanceof SchemaException)
                 throw (SchemaException) e;
@@ -266,7 +274,12 @@ public class FieldDescriptor extends AbstractFieldDescriptor{
     @Override
     public void save(Object o, OutAdapter adapter) throws SchemaException {
         try {
-            type.set(adapter, name, getter.apply(o));
+            Object value = getter.apply(o);
+            if (type == DataTypes.string && value instanceof Collection){
+                value = DataTypes.jsonConverter(value);
+            }
+
+            type.set(adapter, name, value);
         }catch(Exception e){
             if (e instanceof SchemaException)
                 throw (SchemaException) e;

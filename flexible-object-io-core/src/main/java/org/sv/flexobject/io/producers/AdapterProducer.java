@@ -2,6 +2,7 @@ package org.sv.flexobject.io.producers;
 
 import org.sv.flexobject.InAdapter;
 import org.sv.flexobject.Loadable;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.adapter.GenericInAdapter;
 import org.sv.flexobject.io.CloseableProducer;
@@ -51,6 +52,10 @@ public class AdapterProducer<T extends Loadable> extends CloseableProducer<T> {
             return this;
         }
 
+        public Builder forClass(Class<? extends Streamable> streamableClass){
+            this.reader = Schema.getRegisteredSchema(streamableClass).getReader();
+            return this;
+        }
         public Builder instanceOf(Class<? extends AdapterProducer> producerClass){
             this.producerClass = producerClass;
             return this;

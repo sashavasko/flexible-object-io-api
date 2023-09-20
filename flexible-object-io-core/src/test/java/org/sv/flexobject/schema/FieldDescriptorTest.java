@@ -9,9 +9,12 @@ import org.sv.flexobject.copy.CopyAdapter;
 import org.sv.flexobject.schema.annotations.FieldName;
 import org.sv.flexobject.schema.reflect.TestData;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class FieldDescriptorTest {
 
@@ -51,6 +54,59 @@ public class FieldDescriptorTest {
         fd.load(testData, adapter);
 
         assertEquals("bar", testData.getArrayOfStrings()[1]);
+    }
+
+    @Test
+    public void builderForSetField() throws Exception {
+        FieldDescriptor fd = FieldDescriptor.builder()
+                .withClass(TestData.class)
+                .withName("stringNo2")
+                .withClassFieldName("setOfStrings")
+                .withType(DataTypes.string)
+                .build();
+        TestData testData = new TestData(new HashSet<>(Arrays.asList("zero", "one", "two", "three")));
+
+        assertEquals(new HashSet<>(Arrays.asList("zero", "one", "two", "three")), fd.get(testData));
+
+        fd.set(testData, Arrays.asList("foo", "bar"));
+
+        assertTrue(testData.getSetOfStrings().contains("foo"));
+
+        fd.save(testData, adapter);
+
+        assertEquals("[\"bar\",\"foo\"]", adapter.get("stringNo2"));
+
+//        adapter.put("stringNo2", "bar");
+
+        fd.load(testData, adapter);
+
+        assertTrue(testData.getSetOfStrings().contains("bar"));
+    }
+    @Test
+    public void builderForListField() throws Exception {
+        FieldDescriptor fd = FieldDescriptor.builder()
+                .withClass(TestData.class)
+                .withName("stringNo2")
+                .withClassFieldName("listOfStrings")
+                .withType(DataTypes.string)
+                .build();
+        TestData testData = new TestData(Arrays.asList("zero", "one", "two", "three"));
+
+        assertEquals(Arrays.asList("zero", "one", "two", "three"), fd.get(testData));
+
+        fd.set(testData, Arrays.asList("foo", "bar"));
+
+        assertTrue(testData.getListOfStrings().contains("foo"));
+
+        fd.save(testData, adapter);
+
+        assertEquals("[\"foo\",\"bar\"]", adapter.get("stringNo2"));
+
+        adapter.put("stringNo2", "bar");
+
+        fd.load(testData, adapter);
+
+        assertTrue(testData.getListOfStrings().contains("bar"));
     }
 
     @Test
