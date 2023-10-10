@@ -3,9 +3,11 @@ package org.sv.flexobject.mongo.connection;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.RawBsonDocument;
 import org.sv.flexobject.connections.ConnectionManager;
+import org.sv.flexobject.mongo.MongoClientProvider;
 import org.sv.flexobject.util.InstanceFactory;
 
 import java.util.Properties;
@@ -31,6 +33,7 @@ public class MongoConnection implements AutoCloseable{
         String connectionName;
         String dbName;
         Properties overrides = new Properties();
+        Object secret;
 
         public SELF forName(String connectionName){
             this.connectionName = connectionName;
@@ -42,20 +45,38 @@ public class MongoConnection implements AutoCloseable{
             return (SELF) this;
         }
 
+        public SELF password(Object secret){
+            this.secret = secret;
+            return (SELF) this;
+        }
+
         public SELF override(String propertyName, String propertyValue){
             overrides.setProperty(propertyName, propertyValue);
             return (SELF)this;
         }
 
         public SELF override(Properties overrides){
-            overrides.putAll(overrides);
+            this.overrides.putAll(overrides);
             return (SELF)this;
         }
 
         public MongoConnection build() throws Exception {
             MongoConnection connection = InstanceFactory.get(MongoConnection.class);
 
-            connection.client = (MongoClient) ConnectionManager.getConnection(MongoClient.class, connectionName, overrides);
+            if (StringUtils.isNotBlank(connectionName)){
+                connection.client = (MongoClient) ConnectionManager.getConnection(MongoClient.class, connectionName, overrides);
+            } else if (overrides != null){
+                if (secret == null){
+                    if (overrides.containsKey("secret"))
+                        secret = overrides.getProperty("secret");
+                    else if (overrides.containsKey("password"))
+                        secret = overrides.getProperty("password");
+                    else if (overrides.containsKey("pwd"))
+                        secret = overrides.getProperty("pwd");
+                }
+                connection.client = (MongoClient) MongoClientProvider.getConnection(overrides, secret);
+            } else
+                throw new RuntimeException("Can't create Mongo Connection: Either connection name or url in properties must be set");
             connection.db = connection.client.getDatabase(dbName);
             return connection;
         }

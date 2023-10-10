@@ -28,8 +28,11 @@ public class MongoClientProvider implements ConnectionProvider {
 
     public static final Logger logger = LogManager.getLogger(MongoClientProvider.class);
 
-    @Override
     public AutoCloseable getConnection(String name, Properties connectionProperties, Object secret) throws Exception {
+        return getConnection(connectionProperties, secret);
+    }
+
+    public static AutoCloseable getConnection(Properties connectionProperties, Object secret) throws Exception {
 
         MongoClientConf conf = InstanceFactory.get(MongoClientConf.class).from(connectionProperties);
 
