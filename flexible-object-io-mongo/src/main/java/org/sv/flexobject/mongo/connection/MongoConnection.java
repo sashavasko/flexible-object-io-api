@@ -74,6 +74,8 @@ public class MongoConnection implements AutoCloseable{
                     else if (overrides.containsKey("pwd"))
                         secret = overrides.getProperty("pwd");
                 }
+                if (!overrides.containsKey("database"))
+                    overrides.setProperty("database", dbName); // required for credentials to work properly
                 connection.client = (MongoClient) MongoClientProvider.getConnection(overrides, secret);
             } else
                 throw new RuntimeException("Can't create Mongo Connection: Either connection name or url in properties must be set");

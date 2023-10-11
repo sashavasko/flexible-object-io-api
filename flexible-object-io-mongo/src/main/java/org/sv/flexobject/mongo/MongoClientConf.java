@@ -75,13 +75,18 @@ public class MongoClientConf extends ConnectionConf<MongoClientConf> {
     public List<TagSet> compileTags(){
         List<TagSet> tagsList = new ArrayList<>();
         if (tags != null && !tags.isEmpty()) {
-            for (String tagPair : tags) {
-                String[] tagValues = tagPair.split(":");
-                if (tagValues.length == 2){
-                    Tag tag = new Tag(tagValues[0], tagValues[1]);
-                    MongoClientProvider.logger.info("Tag : " + tagValues[0] + ":" + tagValues[1]);
-                    tagsList.add(new TagSet(tag));
+            for (String tagSet : tags) {
+                List<Tag> compiledTags = new ArrayList<>();
+                String[] tagStrings = tagSet.split(",");
+                for (String tagPair : tagStrings) {
+                    String[] tagValues = tagPair.split("[:_]");
+                    if (tagValues.length == 2) {
+                        Tag tag = new Tag(tagValues[0], tagValues[1]);
+                        MongoClientProvider.logger.info("Tag : " + tagValues[0] + ":" + tagValues[1]);
+                        compiledTags.add(tag);
+                    }
                 }
+                tagsList.add(new TagSet(compiledTags));
             }
         }
         return tagsList;

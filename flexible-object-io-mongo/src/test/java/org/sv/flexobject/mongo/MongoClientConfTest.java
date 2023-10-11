@@ -1,5 +1,7 @@
 package org.sv.flexobject.mongo;
 
+import com.mongodb.Tag;
+import com.mongodb.TagSet;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -55,4 +57,25 @@ public class MongoClientConfTest {
         assertEquals("mongodb://foo:bar@mongohost", conf.url);
         assertEquals(100, (int)conf.maxSize);
     }
+
+    @Test
+    public void tagsParsing() {
+        conf.tags = Arrays.asList("dc:TXD,rack:cdd","dc:TXD,rack:add","dc:TXD,rack:ddd","dc_TXD,rack_bdd");
+
+        List<TagSet> compiledTags = conf.compileTags();
+        List<TagSet> expectedTags = Arrays.asList(new TagSet(Arrays.asList(new Tag("dc", "TXD"), new Tag("rack", "cdd"))),
+                new TagSet(Arrays.asList(new Tag("dc", "TXD"), new Tag("rack", "add"))),
+                new TagSet(Arrays.asList(new Tag("dc", "TXD"), new Tag("rack", "ddd"))),
+                new TagSet(Arrays.asList(new Tag("dc", "TXD"), new Tag("rack", "bdd")))
+        );
+
+        assertEquals(expectedTags, compiledTags);
+        conf.tags = Arrays.asList("dc:TXD");
+
+        compiledTags = conf.compileTags();
+        expectedTags = Arrays.asList(new TagSet(Arrays.asList(new Tag("dc", "TXD"))));
+
+        assertEquals(expectedTags, compiledTags);
+    }
+
 }
