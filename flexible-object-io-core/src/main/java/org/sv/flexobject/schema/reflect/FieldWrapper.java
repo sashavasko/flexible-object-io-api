@@ -90,11 +90,6 @@ public class FieldWrapper {
                     if (vt != null) {
                         type = vt.type();
                         structure = figureOutCollectionStructure();
-                        if (structure == STRUCT.map) {
-                            KeyType kt = field.getAnnotation(KeyType.class);
-                            if (kt != null)
-                                keyType = kt.type();
-                        }
                     } else if (vc != null) {
                         type = DataTypes.jsonNode;
                         valueClass = vc.valueClass();
@@ -102,6 +97,11 @@ public class FieldWrapper {
                     } else if (fieldClass.isArray() && Streamable[].class.isAssignableFrom(fieldClass)) {
                         type = DataTypes.jsonNode;
                         structure = STRUCT.array;
+                    }
+                    if (structure == STRUCT.map) {
+                        KeyType kt = field.getAnnotation(KeyType.class);
+                        if (kt != null)
+                            keyType = kt.type();
                     }
                 } else if (fieldClass.isArray()) {
                     structure = STRUCT.array;
