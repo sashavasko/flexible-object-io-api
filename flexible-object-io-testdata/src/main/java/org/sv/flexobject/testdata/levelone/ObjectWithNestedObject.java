@@ -4,8 +4,8 @@ import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.testdata.levelone.leveltwo.SimpleObject;
 
 public class ObjectWithNestedObject extends StreamableWithSchema {
-    int intField;
-    SimpleObject nestedObject;
+    public int intField;
+    public SimpleObject nestedObject;
 
     public static ObjectWithNestedObject random() {
         ObjectWithNestedObject data = new ObjectWithNestedObject();

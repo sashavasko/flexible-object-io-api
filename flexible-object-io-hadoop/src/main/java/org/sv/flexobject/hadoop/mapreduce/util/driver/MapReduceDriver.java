@@ -36,6 +36,7 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
         Class keyClass;
         Class valueClass;
         Class<? extends OutputFormat> formatClass;
+        boolean lazy = false;
 
         public FullyDefinedOutputFormat(Class keyClass, Class valueClass, Class<? extends OutputFormat> formatClass) {
             this.keyClass = keyClass;
@@ -50,6 +51,11 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
             this.formatClass = formatClass;
         }
 
+        public FullyDefinedOutputFormat lazy(){
+            lazy = true;
+            return this;
+        }
+
         public Class getKeyClass() {
             return keyClass;
         }
@@ -60,6 +66,10 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
 
         public Class<? extends OutputFormat> getFormatClass() {
             return formatClass;
+        }
+
+        public boolean isLazy(){
+            return lazy;
         }
 
         public String getName() {
@@ -148,6 +158,12 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
     public SELF setOutput(Class<? extends OutputFormat> outputFormatClass, Class keyOutClass, Class<? extends Writable> valueOutClass) {
         outputs.clear();
         outputs.add(new FullyDefinedOutputFormat(keyOutClass, valueOutClass, outputFormatClass));
+        return (SELF) this;
+    }
+
+    public SELF setLazyOutput(Class<? extends OutputFormat> outputFormatClass, Class keyOutClass, Class<? extends Writable> valueOutClass) {
+        outputs.clear();
+        outputs.add(new FullyDefinedOutputFormat(keyOutClass, valueOutClass, outputFormatClass).lazy());
         return (SELF) this;
     }
 
@@ -263,8 +279,12 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
                     .filter(o->o.getName()==null)
                     .findFirst();
             if (defaultOutput.isPresent()){
-                if (isUnconfigured(conf, Job.OUTPUT_FORMAT_CLASS_ATTR))
-                    job.setOutputFormatClass(defaultOutput.get().getFormatClass());
+                if (isUnconfigured(conf, Job.OUTPUT_FORMAT_CLASS_ATTR)) {
+                    if (defaultOutput.get().isLazy())
+                        LazyOutputFormat.setOutputFormatClass(job, defaultOutput.get().getFormatClass());
+                    else
+                        job.setOutputFormatClass(defaultOutput.get().getFormatClass());
+                }
                 if (isUnconfigured(conf, Job.OUTPUT_KEY_CLASS))
                     job.setOutputKeyClass(defaultOutput.get().getKeyClass());
                 if (isUnconfigured(conf, Job.OUTPUT_VALUE_CLASS))
