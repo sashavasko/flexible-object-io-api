@@ -46,7 +46,13 @@ public class AdapterConsumer extends CloseableConsumer {
             } else if (writer.convert(datum, adapter))
                 recordsConsumed++;
 
-            return adapter.saveIfYouShould();
+            if (adapter.saveIfYouShould())
+                return true;
+
+            if (!adapter.getErrors().isEmpty()){
+                setException(adapter.getErrors().get(0), datum);
+                adapter.clearErrors();
+            }
         }catch (Exception e){
             setException(e, datum);
         }

@@ -114,10 +114,12 @@ public class SqlOutBatchAdapter extends SqlOutAdapter {
         return commandsExecuted;
     }
 
+    @Override
     public List<Exception> getErrors() {
         return errors;
     }
 
+    @Override
     public void clearErrors(){
         errors.clear();
     }

@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
 
 public interface OutAdapter extends Parameterized{
 
@@ -36,5 +38,12 @@ public interface OutAdapter extends Parameterized{
     {
         return fieldName;
     }
+    default List<Exception> getErrors(){
+        return Collections.emptyList();
+    }
+
+    default void clearErrors(){
+    }
+
 
 }
