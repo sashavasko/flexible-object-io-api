@@ -34,10 +34,14 @@ public class JsonInputAdapter extends GenericInAdapter<JsonNode> implements Copy
         super(source);
     }
 
+    public static boolean isNull(JsonNode n){
+        return n == null || n.isNull();
+    }
+
     @Override
     public String getString(String fieldName) throws Exception {
         JsonNode n = getCurrent().get(translateInputFieldName(fieldName));
-        if (n == null)
+        if (isNull(n))
             return null;
 
         if (n.isValueNode()){
@@ -49,35 +53,36 @@ public class JsonInputAdapter extends GenericInAdapter<JsonNode> implements Copy
 
     @Override
     public JsonNode getJson(String fieldName) throws Exception {
-        return getCurrent().get(translateInputFieldName(fieldName));
+        JsonNode n = getCurrent().get(translateInputFieldName(fieldName));
+        return isNull(n) ? null : n;
     }
 
     @Override
     public Integer getInt(String fieldName) throws Exception {
         JsonNode n = getCurrent().get(translateInputFieldName(fieldName));
-        return n == null ? null : n.asInt();
+        return isNull(n) ? null : n.asInt();
     }
 
     @Override
     public Boolean getBoolean(String fieldName) throws Exception {
         JsonNode n = getCurrent().get(translateInputFieldName(fieldName));
-        return n == null ? null : n.asBoolean();
+        return isNull(n) ? null : n.asBoolean();
     }
 
     @Override
     public Long getLong(String fieldName) throws Exception {
         JsonNode n = getCurrent().get(translateInputFieldName(fieldName));
-        return n == null ? null : n.asLong();
+        return isNull(n) ? null : n.asLong();
     }
 
     @Override
     public Double getDouble(String fieldName) throws Exception {
         JsonNode n = getCurrent().get(translateInputFieldName(fieldName));
-        return n == null ? null : n.asDouble();
+        return isNull(n) ? null : n.asDouble();
     }
 
     public static Date jsonNodeToDate(JsonNode n){
-        if (n == null)
+        if (isNull(n))
             return null;
         String dateString = n.asText();
         DateTimeFormatter formatter = dateString.length() == JSON_DATE_FORMAT_SHORT.length() ? jsonDateFormatterShort: jsonDateFormatter;
@@ -86,7 +91,7 @@ public class JsonInputAdapter extends GenericInAdapter<JsonNode> implements Copy
     }
 
     public static LocalDate jsonNodeToLocalDate(JsonNode n){
-        return n == null ? null : jsonNodeToDate(n).toLocalDate();
+        return isNull(n) ? null : jsonNodeToDate(n).toLocalDate();
     }
 
     @Override
@@ -96,7 +101,7 @@ public class JsonInputAdapter extends GenericInAdapter<JsonNode> implements Copy
     }
 
     public static Timestamp jsonNodeToTimestamp(JsonNode n){
-        if (n == null)
+        if (isNull(n))
             return null;
         if (n.isLong())
             return new Timestamp(n.asLong());
@@ -132,7 +137,7 @@ public class JsonInputAdapter extends GenericInAdapter<JsonNode> implements Copy
     }
 
     public static JsonInputAdapter forValue(JsonNode json) throws Exception {
-        if (json != null) {
+        if (!isNull(json)) {
             SingleValueSource<JsonNode> source = new SingleValueSource<>(json);
             return new JsonInputAdapter(source);
         }
@@ -145,11 +150,21 @@ public class JsonInputAdapter extends GenericInAdapter<JsonNode> implements Copy
         Iterator<Map.Entry<String, JsonNode>> fields = current.fields();
         while (fields.hasNext()){
             Map.Entry<String, JsonNode> field = fields.next();
-            switch(field.getValue().getNodeType()){
-                case BOOLEAN: to.put(field.getKey(), field.getValue().asBoolean()); break;
-                case NUMBER: to.put(field.getKey(), field.getValue().asLong()); break;
-                case STRING: to.put(field.getKey(), field.getValue().asText()); break;
-                case OBJECT: to.put(field.getKey(), field.getValue()); break;
+            if (!isNull(field.getValue())) {
+                switch (field.getValue().getNodeType()) {
+                    case BOOLEAN:
+                        to.put(field.getKey(), field.getValue().asBoolean());
+                        break;
+                    case NUMBER:
+                        to.put(field.getKey(), field.getValue().asLong());
+                        break;
+                    case STRING:
+                        to.put(field.getKey(), field.getValue().asText());
+                        break;
+                    case OBJECT:
+                        to.put(field.getKey(), field.getValue());
+                        break;
+                }
             }
         }
     }
