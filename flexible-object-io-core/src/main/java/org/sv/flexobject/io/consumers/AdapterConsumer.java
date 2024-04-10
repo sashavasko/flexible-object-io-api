@@ -11,7 +11,7 @@ import org.sv.flexobject.stream.Sink;
 
 import java.lang.reflect.InvocationTargetException;
 
-public class AdapterConsumer implements CloseableConsumer {
+public class AdapterConsumer extends CloseableConsumer {
 
     OutAdapter adapter;
     Writer writer;
@@ -35,23 +35,28 @@ public class AdapterConsumer implements CloseableConsumer {
         this(adapter, null);
     }
 
-    public boolean consume (Savable datum) throws Exception {
+    public boolean consume (Savable datum) {
         if (writer == null && datum instanceof Streamable)
             writer = Schema.getRegisteredSchema(datum.getClass()).getWriter();
 
-        if (writer == null){
-            if (datum.save(adapter))
+        try {
+            if (writer == null) {
+                if (datum.save(adapter))
+                    recordsConsumed++;
+            } else if (writer.convert(datum, adapter))
                 recordsConsumed++;
-        }else if (writer.convert(datum, adapter))
-            recordsConsumed++;
 
-        return adapter.saveIfYouShould();
+            return adapter.saveIfYouShould();
+        }catch (Exception e){
+            setException(e, datum);
+        }
+        return false;
     }
 
     @Override
     public void close() throws Exception {
         if (adapter instanceof AutoCloseable) {
-                ((AutoCloseable) adapter).close();
+            ((AutoCloseable) adapter).close();
         }
     }
 

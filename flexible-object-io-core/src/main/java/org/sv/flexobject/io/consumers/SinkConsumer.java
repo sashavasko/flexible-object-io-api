@@ -4,7 +4,7 @@ import org.sv.flexobject.Savable;
 import org.sv.flexobject.io.CloseableConsumer;
 import org.sv.flexobject.stream.Sink;
 
-public class SinkConsumer<T extends Savable> implements CloseableConsumer {
+public class SinkConsumer<T extends Savable> extends CloseableConsumer {
     Sink<T> sink;
     long recordsConsumed = 0;
 
@@ -21,9 +21,16 @@ public class SinkConsumer<T extends Savable> implements CloseableConsumer {
     }
 
     @Override
-    public boolean consume(Savable datum) throws Exception {
-        recordsConsumed++;
-        return sink.put((T) datum);
+    public boolean consume(Savable datum) {
+        boolean result = false;
+        try {
+            result = sink.put((T) datum);
+            recordsConsumed++;
+        } catch (Exception e){
+            setException(e, datum);
+        }
+
+        return result;
     }
 
     @Override

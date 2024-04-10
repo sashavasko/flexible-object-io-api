@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class FanOutConsumer implements CloseableConsumer {
+public class FanOutConsumer extends CloseableConsumer {
 
     List<Consumer> consumers = new ArrayList<>();
     long recordsConsumed = 0;
@@ -26,7 +26,7 @@ public class FanOutConsumer implements CloseableConsumer {
     }
 
     @Override
-    public boolean consume(Savable datum) throws Exception {
+    public boolean consume(Savable datum) {
         Boolean succees = true;
 
         for(Consumer consumer : consumers){
