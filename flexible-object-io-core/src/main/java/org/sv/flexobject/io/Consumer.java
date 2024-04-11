@@ -2,6 +2,10 @@ package org.sv.flexobject.io;
 
 import org.sv.flexobject.Savable;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public abstract class Consumer {
 
     private IOException exception = null;
@@ -36,4 +40,11 @@ public abstract class Consumer {
         }
         return getRecordsConsumed();
     }
+
+    public List<Exception> getAllErrors(){
+        if (getException() == null)
+            return Collections.emptyList();
+        return Arrays.asList(getException());
+    }
+
 }

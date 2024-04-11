@@ -57,7 +57,22 @@ public class FanOutConsumer extends CloseableConsumer {
 
     @Override
     public void close() throws Exception {
-        for (Consumer consumer : consumers)
-            consumer.cleanup();
+        for (Consumer consumer : consumers) {
+            try {
+                consumer.cleanup();
+            }catch (Exception e){
+            }
+
+        }
+        super.close();
+    }
+
+    @Override
+    public List<Exception> getAllErrors() {
+        List<Exception> exceptions = new ArrayList<>();
+        for (Consumer consumer : consumers) {
+            exceptions.addAll(consumer.getAllErrors());
+        }
+        return exceptions;
     }
 }

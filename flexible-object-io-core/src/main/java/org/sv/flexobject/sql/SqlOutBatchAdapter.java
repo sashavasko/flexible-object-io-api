@@ -90,6 +90,9 @@ public class SqlOutBatchAdapter extends SqlOutAdapter {
     public void close() throws Exception {
         executeBatch();
         super.close();
+        if (!errors.isEmpty()){
+            throw errors.get(errors.size()-1);
+        }
     }
 
     @Override

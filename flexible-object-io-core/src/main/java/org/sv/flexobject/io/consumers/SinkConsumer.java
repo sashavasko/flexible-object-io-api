@@ -18,6 +18,7 @@ public class SinkConsumer<T extends Savable> extends CloseableConsumer {
             ((AutoCloseable)sink).close();
         else
             sink.setEOF();
+        super.close();
     }
 
     @Override

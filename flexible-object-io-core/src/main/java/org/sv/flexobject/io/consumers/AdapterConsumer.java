@@ -10,6 +10,7 @@ import org.sv.flexobject.schema.Schema;
 import org.sv.flexobject.stream.Sink;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 public class AdapterConsumer extends CloseableConsumer {
 
@@ -64,6 +65,12 @@ public class AdapterConsumer extends CloseableConsumer {
         if (adapter instanceof AutoCloseable) {
             ((AutoCloseable) adapter).close();
         }
+        super.close();
+    }
+
+    @Override
+    public List<Exception> getAllErrors() {
+        return adapter.getErrors();
     }
 
     public long getRecordsConsumed() {
