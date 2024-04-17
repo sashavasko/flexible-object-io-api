@@ -42,7 +42,7 @@ public class OptionsInAdapter extends GenericInAdapter<CommandLine> implements D
         }
         if (!isMap) {
             String[] values = getCurrent().getOptionValues(fieldName);
-            if (values != null) {
+            if (values != null && values.length > 0) {
                 ArrayNode jsonArray = JsonNodeFactory.instance.arrayNode(values.length);
                 for (String value : values)
                     jsonArray.add(value);

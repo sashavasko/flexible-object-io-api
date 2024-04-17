@@ -25,10 +25,21 @@ public class ScalarSetter extends FieldWrapper implements BiConsumerWithExceptio
         return list;
     }
 
+    protected boolean isNull(Object value){
+        if (value == null)
+            return true;
+        if (value instanceof JsonNode
+                && ((JsonNode)value).isNull())
+            return true;
+        if (value instanceof ObjectNode
+                && ((ObjectNode)value).isEmpty())
+            return true;
+        return false;
+    }
     @Override
     public void accept(Object dataObject, Object value) throws Exception {
         Class<? extends Streamable> valueClass = getValueClass();
-        if (value == null) {
+        if (isNull(value)) {
             setValue(dataObject, null);
             return;
         }
