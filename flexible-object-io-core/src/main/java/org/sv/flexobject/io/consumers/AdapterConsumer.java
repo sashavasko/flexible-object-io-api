@@ -41,14 +41,14 @@ public class AdapterConsumer extends CloseableConsumer {
             writer = Schema.getRegisteredSchema(datum.getClass()).getWriter();
 
         try {
-            if (writer == null) {
-                if (datum.save(adapter))
-                    recordsConsumed++;
-            } else if (writer.convert(datum, adapter))
-                recordsConsumed++;
+            boolean saved = writer == null
+                    ? datum.save(adapter)
+                    : writer.convert(datum, adapter);
 
-            if (adapter.saveIfYouShould())
+            if (saved) {
+                recordsConsumed++;
                 return true;
+            }
 
             if (!adapter.getErrors().isEmpty()){
                 setException(adapter.getErrors().get(0), datum);
