@@ -19,6 +19,15 @@ import java.util.Properties;
 
 public abstract class AWSSecretProvider implements SecretProvider, AutoCloseable {
 
+    public static final String ARN = "arn";
+    public static final String REGION = "region";
+    public static final String LEVEL = "level";
+    public static final String DEFAULT_REGION = Region.US_EAST_1.toString();
+    public static final String LEVEL_ALPHA = "development";
+    public static final String LEVEL_BETA = "staging";
+    public static final String LEVEL_PROD = "production";
+
+
     public static class AWSSecretProviderWithEnvCredentials extends AWSSecretProvider{
 
         @Override
@@ -29,8 +38,31 @@ public abstract class AWSSecretProvider implements SecretProvider, AutoCloseable
 
     public abstract AwsCredentialsProvider getCredentialsProvider(String awsLevel);
 
-    private static final Map<Region, SecretsManagerClient> clients = new HashMap<>();
+    private static final Map<String, SecretsManagerClient> clients = new HashMap<>();
 
+    public SecretsManagerClient getClient (Region region, String level){
+        String clientKey = region.toString() + ":" + level;
+
+        if (!clients.containsKey(clientKey)){
+            synchronized (clients){
+                if (!clients.containsKey(clientKey)) {
+                    SecretsManagerClient secretsClient = SecretsManagerClient.builder()
+                            .region(region)
+                            .credentialsProvider(getCredentialsProvider(level))
+                            .build();
+                    clients.put(clientKey, secretsClient);
+                    return secretsClient;
+                }
+            }
+        }
+        return clients.get(clientKey);
+    }
+
+    public static void clear(){
+        for (SecretsManagerClient client : clients.values())
+            client.close();
+        clients.clear();
+    }
 
     private Object handleSecretWithProperties(JsonNode secretJson, Properties connectionProperties) {
         if (secretJson.isValueNode()){
@@ -49,7 +81,7 @@ public abstract class AWSSecretProvider implements SecretProvider, AutoCloseable
     }
     private Object handleSecretWithProperties(String secret, Properties connectionProperties) {
         try{
-            JsonNode jsonSecret = MapperFactory.getObjectReader().readTree((String)secret);
+            JsonNode jsonSecret = MapperFactory.getObjectReader().readTree(secret);
             if (jsonSecret.has("SecretString")){
                 return handleSecretWithProperties(jsonSecret.get("SecretString"), connectionProperties);
             }
@@ -61,27 +93,15 @@ public abstract class AWSSecretProvider implements SecretProvider, AutoCloseable
 
     private String translateLevel(ConnectionManager.DeploymentLevel deploymentLevel){
         switch (deploymentLevel){
-            case alpha: return "development";
-            case beta: return "staging";
-            case prod: return "production";
+            case alpha: return LEVEL_ALPHA;
+            case beta: return LEVEL_BETA;
+            case prod: return LEVEL_PROD;
         }
         return null;
     }
 
-
     public String getAWSSecret(String arn, Region region, String level) {
-        SecretsManagerClient secretsClient = null;
-        if (!clients.containsKey(region)){
-            synchronized (clients){
-                secretsClient = SecretsManagerClient.builder()
-                        .region(region)
-                        .credentialsProvider(getCredentialsProvider(level))
-                        .build();
-                clients.put(region, secretsClient);
-            }
-        }
-        if (secretsClient == null)
-            secretsClient = clients.get(region);
+        SecretsManagerClient secretsClient = getClient(region, level);
 
         try {
             GetSecretValueRequest valueRequest = GetSecretValueRequest.builder()
@@ -102,9 +122,9 @@ public abstract class AWSSecretProvider implements SecretProvider, AutoCloseable
 
     @Override
     public Object getSecret(String connectionName, ConnectionManager.DeploymentLevel deploymentLevel, String environment, Properties connectionProperties) {
-        String arn = connectionProperties.getProperty("arn", connectionName);
-        String region = connectionProperties.getProperty("region", Region.US_EAST_1.toString());
-        String level = connectionProperties.getProperty("level", translateLevel(deploymentLevel));
+        String arn = connectionProperties.getProperty(ARN, connectionName);
+        String region = connectionProperties.getProperty(REGION, DEFAULT_REGION);
+        String level = connectionProperties.getProperty(LEVEL, translateLevel(deploymentLevel));
         String secret = getAWSSecret(arn, Region.of(region), level);
         return handleSecretWithProperties(secret, connectionProperties);
     }
@@ -117,11 +137,5 @@ public abstract class AWSSecretProvider implements SecretProvider, AutoCloseable
     @Override
     public void close() {
         clear();
-    }
-
-    public static void clear(){
-        for (SecretsManagerClient client : clients.values())
-            client.close();
-        clients.clear();
     }
 }
