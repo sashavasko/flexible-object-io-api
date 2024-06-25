@@ -164,17 +164,25 @@ public class FieldWrapper {
             else
                 setValue(o, 0);
         } else if (getFieldClass().isArray()){
-            try {
-                Object[] array = (Object[]) getValue(o);
-                if (valueClass != null){
-                    for (Object elem : array){
-                        if (elem != null)
-                            ((Streamable)elem).clear();
+            Object value = getValue(o);
+            if (value != null) {
+                if (byte[].class.equals(value.getClass())) {
+                    byte[] byteArray = (byte[]) value;
+                    Arrays.fill(byteArray, (byte) 0x00);
+                } else {
+                    try {
+                        Object[] array = (Object[]) value;
+                        if (valueClass != null) {
+                            for (Object elem : array) {
+                                if (elem != null)
+                                    ((Streamable) elem).clear();
+                            }
+                        } else if (array != null)
+                            Arrays.fill(array, null);
+                    } catch (ClassCastException e) {
+                        throw new SchemaException(getQualifiedName() + ": Only arrays of non-primitive types are allowed in data objects with Schema.", e);
                     }
-                }else if(array != null)
-                    Arrays.fill(array, null);
-            }catch (ClassCastException e){
-                throw new SchemaException(getQualifiedName() + ": Only arrays of non-primitive types are allowed in data objects with Schema.", e);
+                }
             }
         } else if (Collection.class.isAssignableFrom(getFieldClass())){
             ((Collection)getValue(o)).clear();
