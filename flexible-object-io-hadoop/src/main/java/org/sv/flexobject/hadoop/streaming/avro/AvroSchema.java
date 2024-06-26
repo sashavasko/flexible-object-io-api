@@ -14,6 +14,7 @@ import org.sv.flexobject.schema.SchemaElement;
 import org.sv.flexobject.schema.SchemaException;
 import org.sv.flexobject.schema.reflect.FieldWrapper;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +51,11 @@ public class AvroSchema {
         List<Schema.Field> fields = new ArrayList<>(internalFields.length);
         for (SchemaElement field : internalFields){
             FieldDescriptor descriptor = (FieldDescriptor) field.getDescriptor();
-            fields.add(new Schema.Field(descriptor.getName(), nullable(compileField(descriptor))));
+            if (descriptor.getValueType() == DataTypes.binary){
+                fields.add(new Schema.Field(descriptor.getName(), Schema.create(Schema.Type.BYTES)));
+            } else {
+                fields.add(new Schema.Field(descriptor.getName(), nullable(compileField(descriptor))));
+            }
         }
         return fields;
     }
@@ -64,6 +69,9 @@ public class AvroSchema {
         Class<? extends Streamable> subSchema = field.getSubschema();
         switch(structure){
             case array:
+                if (field.getValueType() == DataTypes.binary){
+                    return Schema.create(Schema.Type.BYTES);
+                }
             case list:
                 return Schema.createArray(nullable(compileField(field, subSchema)));
             case map:
@@ -88,6 +96,7 @@ public class AvroSchema {
             case string: return Schema.create(Schema.Type.STRING);
             case float64: return Schema.create(Schema.Type.DOUBLE);
             case timestamp: return LogicalTypes.timestampMillis().addToSchema(Schema.create(Schema.Type.LONG));
+            case binary: return Schema.create(Schema.Type.BYTES);
         }
         throw new SchemaException("Unknown datatype of field " + field.getName() + " class " + subSchema);
     }
@@ -120,9 +129,11 @@ public class AvroSchema {
         return findContainerSchema(field.schema(), containerType);
     }
     public static Schema findContainerSchema(Schema schema, Schema.Type containerType) {
-        for (Schema item : schema.getTypes()) {
-            if (item.getType() == containerType)
-                return item;
+        if (schema.isUnion()) {
+            for (Schema item : schema.getTypes()) {
+                if (item.getType() == containerType)
+                    return item;
+            }
         }
         return null;
     }
@@ -130,6 +141,11 @@ public class AvroSchema {
     public static <T extends Streamable> T convertGenericRecord(GenericRecord src, Schema avroSchema) throws Exception {
         Class<? extends Streamable> dstClass = (Class<? extends Streamable>) Class.forName(avroSchema.getFullName());
         Streamable dst = dstClass.newInstance();
+        return convertGenericRecord(src, avroSchema, dst);
+    }
+
+    public static <T extends Streamable> T convertGenericRecord(GenericRecord src, Schema avroSchema, Streamable dst) throws Exception {
+        Class<? extends Streamable> dstClass = dst.getClass();
         org.sv.flexobject.schema.Schema internalSchema = dst.getSchema();
         for (Schema.Field field : avroSchema.getFields()) {
             Schema recordSchema = AvroSchema.findRecordSchema(field);
@@ -149,7 +165,9 @@ public class AvroSchema {
                 } else if (value instanceof Map) {
                     recordSchema = AvroSchema.findRecordSchema(AvroSchema.findMapSchema(field).getValueType());
                     dst.set(field.name(), convertAvroMap((Map) value, recordSchema, valueType));
-                } else
+                } else if (field.schema().getType() == Schema.Type.BYTES) {
+                    dst.set(field.name(), ((ByteBuffer)value).array());
+                }else
                     dst.set(field.name(), convertAvroValue(value, null));
             }
         }
@@ -207,10 +225,15 @@ public class AvroSchema {
 
         switch (structure) {
             case array:
-                Object[] array = (Object[]) value;
-                List avroArray = new ArrayList(array.length);
-                for (Object item : array) {
-                    avroArray.add(toAvro(item, descriptor, avroSubSchema));
+                List avroArray;
+                if (byte[].class.equals(value.getClass())){
+                    return toAvro(value, descriptor, avroSubSchema);
+                } else {
+                    Object[] array = (Object[]) value;
+                    avroArray = new ArrayList(array.length);
+                    for (Object item : array) {
+                        avroArray.add(toAvro(item, descriptor, avroSubSchema));
+                    }
                 }
                 return avroArray;
             case list:
@@ -250,6 +273,8 @@ public class AvroSchema {
                 return DataTypes.int64Converter(value);
             case classObject:
                 return DataTypes.stringConverter(value);
+            case binary:
+                return ByteBuffer.wrap((byte[]) value);
         }
 
         return descriptor.getValueType().convert(value);
