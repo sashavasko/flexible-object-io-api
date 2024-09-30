@@ -167,8 +167,7 @@ public class FieldWrapper {
             Object value = getValue(o);
             if (value != null) {
                 if (byte[].class.equals(value.getClass())) {
-                    byte[] byteArray = (byte[]) value;
-                    Arrays.fill(byteArray, (byte) 0x00);
+                    setValue(o, null);
                 } else {
                     try {
                         Object[] array = (Object[]) value;
@@ -269,5 +268,9 @@ public class FieldWrapper {
 
     public String getQualifiedName(){
         return clazz.getName() + "." + fieldName;
+    }
+
+    public DataTypes getKeyType() {
+        return keyType;
     }
 }

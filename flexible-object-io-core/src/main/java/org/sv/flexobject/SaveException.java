@@ -2,6 +2,12 @@ package org.sv.flexobject;
 
 public class SaveException extends Exception {
 
+    public static class NoRowsAffectedException extends SaveException {
+        public NoRowsAffectedException() {
+            super("Failed to save record - 0 rows affected.");
+        }
+    }
+
     public SaveException() {
     }
 

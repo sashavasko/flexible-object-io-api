@@ -2,6 +2,7 @@ package org.sv.flexobject.io.consumers;
 
 import org.sv.flexobject.OutAdapter;
 import org.sv.flexobject.Savable;
+import org.sv.flexobject.SaveException;
 import org.sv.flexobject.Streamable;
 import org.sv.flexobject.adapter.GenericOutAdapter;
 import org.sv.flexobject.io.CloseableConsumer;
@@ -54,6 +55,7 @@ public class AdapterConsumer extends CloseableConsumer {
                 setException(adapter.getErrors().get(0), datum);
                 adapter.clearErrors();
             }
+        } catch (SaveException.NoRowsAffectedException nre) {
         }catch (Exception e){
             setException(e, datum);
         }

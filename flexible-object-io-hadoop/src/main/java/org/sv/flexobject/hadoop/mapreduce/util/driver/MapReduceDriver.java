@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.apache.hadoop.mapreduce.MRJobConfig.JOB_RUNNING_MAP_LIMIT;
+import static org.apache.hadoop.mapreduce.MRJobConfig.JOB_RUNNING_REDUCE_LIMIT;
 
 abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends ConfiguredDriver<SELF> implements IMapperHelper, IReducerHelper {
 
@@ -84,6 +85,7 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
     Class<? extends Reducer> reducerClass = ReducerProxy.class;
 
     int maxConcurrentMaps = 1000;
+    Integer numConcurrentReduceTasks = null;
     Integer numReduceTasks = null;
     Class<? extends MapReduceDriver> driverClass;
     String jobName;
@@ -141,6 +143,11 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
 
     public SELF setMaxConcurrentMaps(Integer maxConcurrentMaps) {
         this.maxConcurrentMaps = maxConcurrentMaps;
+        return (SELF) this;
+    }
+
+    public SELF setMaxConcurrentReducers(Integer maxConcurrentReducers) {
+        this.numConcurrentReduceTasks = maxConcurrentReducers;
         return (SELF) this;
     }
 
@@ -268,6 +275,10 @@ abstract public class MapReduceDriver<SELF extends MapReduceDriver> extends Conf
             if (numReduceTasks != null && isUnconfigured(conf, "mapreduce.job.reduces")) {
                 job.setNumReduceTasks(numReduceTasks);
                 logger.info("Set number of reducers to " + numReduceTasks);
+            }
+            if (numConcurrentReduceTasks != null && isUnconfigured(conf, JOB_RUNNING_REDUCE_LIMIT)) {
+                conf.setInt(JOB_RUNNING_REDUCE_LIMIT, numConcurrentReduceTasks);
+                logger.info("Set number of concurrent reducers to " + numConcurrentReduceTasks);
             }
         } else{
             job.setNumReduceTasks(0);

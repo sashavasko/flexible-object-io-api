@@ -31,12 +31,10 @@ public class ConnectionDaoTest {
     
     @Mock
     ConnectionProvider mockProvider;
-    
-    @Mock
-    Properties mockProperties1;
-    
-    @Mock
-    Properties mockProperties2;
+
+    Properties mockProperties1 = new Properties();
+
+    Properties mockProperties2 = new Properties();
     
     @Mock
     Connection connection;
@@ -55,6 +53,8 @@ public class ConnectionDaoTest {
 
      @Before
     public void setUp() throws Exception {
+         mockProperties1.put("foo1", "bar1");
+         mockProperties2.put("foo2", "bar2");
          ConnectionManager.getInstance().registerProvider(mockProvider, Connection.class);
          ConnectionManager.getInstance().registerPropertiesProvider(mockPropertiesProvider);
          ConnectionManager.getInstance().setEnvironment("unitTest");

@@ -18,6 +18,12 @@ dependencies {
 
     api 'software.amazon.awssdk:secretsmanager:2.18.35'
     api 'com.bettercloud:vault-java-driver:5.1.0'
+    // https://mvnrepository.com/artifact/org.apache.arrow/flight-sql
+    api group: 'org.apache.arrow', name: 'flight-sql', version: '17.0.0'
+// https://mvnrepository.com/artifact/org.apache.arrow/flight-sql-jdbc-driver
+    api group: 'org.apache.arrow', name: 'flight-sql-jdbc-driver', version: '17.0.0'
+
+
     testImplementation "junit:junit:4.13"
     testImplementation project(':flexible-object-io-docker')
 }

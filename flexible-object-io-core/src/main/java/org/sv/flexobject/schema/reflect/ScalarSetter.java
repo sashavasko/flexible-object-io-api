@@ -52,7 +52,7 @@ public class ScalarSetter extends FieldWrapper implements BiConsumerWithExceptio
                     throw new SchemaException(getQualifiedName() + ": Arrays must be initialized in data objects with Schema. Field " + fieldName + " in class " + clazz.getName());
                 int idx = 0;
                 for (Object elem : collection) {
-                    if (elem == null || array[idx] instanceof Streamable) {
+                    if (elem == null || elem instanceof Streamable) {
                         array[idx] = elem;
                     } else {
                         array[idx] = getType().convert(elem);

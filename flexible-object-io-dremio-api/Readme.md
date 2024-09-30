@@ -12,3 +12,13 @@ dockerd-rootless.sh -H tcp://0.0.0.0:2375
 docker pull dremio/dremio-oss
 docker run -p 9047:9047 -p 31010:31010 -p 45678:45678 dremio/dremio-oss
 ```
+
+Add the following to services section of /opt/dremio/conf/dremio.conf file :
+
+```
+flight: {
+    enabled: true,
+    port: 32010,
+    auth.mode: "legacy.arrow.flight.auth"
+  }
+```

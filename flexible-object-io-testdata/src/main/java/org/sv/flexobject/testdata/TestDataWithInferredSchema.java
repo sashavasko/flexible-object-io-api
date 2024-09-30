@@ -23,7 +23,7 @@ public class TestDataWithInferredSchema extends StreamableWithSchema {
     // Arrays must not be arrays of primitives to allow for null values
     public Integer[] intArray = new Integer[10];
     // ScalarFieldTyped is ignored for arrays, lists and maps
-    @ScalarFieldTyped(type = DataTypes.string) @ValueType(type=DataTypes.int32) public List intList;
+    @ScalarFieldTyped(type = DataTypes.string) @ValueType(type=DataTypes.int32) public List intList = new ArrayList();
     @ValueType(type=DataTypes.int32) public Map intMap;
     public ObjectNode json;
 

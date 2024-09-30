@@ -46,6 +46,7 @@ public class DremioRestApp {
     public static final String DREMIO_CONTAINER_NAME = "TestDremio";
 
     static DremioClient client;
+    static DremioFlightSqlClient flightClient;
     static Boolean clientNotAvailable;
     static DremioClient enterpriseClient;
 
@@ -77,6 +78,7 @@ public class DremioRestApp {
 
         ConnectionManager.getInstance()
                 .registerProvider(DremioClientProvider.class)
+                .registerProvider(DremioFlightSqlClientProvider.class)
                 .registerPropertiesProvider(propertiesProvider)
                 .registerSecretProvider(secretProvider)
                 .registerSecretProvider(new AWSSecretProviderWithVault())
@@ -127,6 +129,17 @@ public class DremioRestApp {
         }
         return client;
     }
+
+    static public DremioFlightSqlClient getFlightClient() throws Exception {
+        if (flightClient == null) {
+            getClient();
+            if (!clientNotAvailable) {
+                flightClient = (DremioFlightSqlClient) ConnectionManager.getConnection(DremioFlightSqlClient.class, "dremioREST");
+            }
+        }
+        return flightClient;
+    }
+
     static public DremioClient getEnterpriseClient(){
         if (enterpriseClient == null && enterpriseClientNotAvailable == null) {
             try {

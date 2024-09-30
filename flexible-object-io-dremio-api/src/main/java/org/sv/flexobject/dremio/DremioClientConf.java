@@ -1,22 +1,30 @@
 package org.sv.flexobject.dremio;
 
 
+import org.apache.arrow.memory.BufferAllocator;
+import org.apache.arrow.memory.RootAllocator;
 import org.sv.flexobject.connections.ConnectionConf;
+import org.sv.flexobject.util.InstanceFactory;
 
 public class DremioClientConf extends ConnectionConf<DremioClientConf> {
 
     String scheme;
     String hostname;
     int port;
+    int flightPort;
     String username;
     String apiPath;
+
+    Class<? extends BufferAllocator> allocatorClass;
 
     @Override
     public DremioClientConf setDefaults() {
         scheme = "https";
 //        hostname = "dremiod02p.d.carfax.us";
         port = 9047;
+        flightPort = 32010;
         apiPath = "api/v3";
+        allocatorClass = RootAllocator.class;
         return null;
     }
 
@@ -30,6 +38,10 @@ public class DremioClientConf extends ConnectionConf<DremioClientConf> {
 
     public int getPort() {
         return port;
+    }
+
+    public int getFlightPort() {
+        return flightPort;
     }
 
     public String getUsername() {
@@ -69,5 +81,9 @@ public class DremioClientConf extends ConnectionConf<DremioClientConf> {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public BufferAllocator getAllocator() {
+        return InstanceFactory.get(allocatorClass);
     }
 }

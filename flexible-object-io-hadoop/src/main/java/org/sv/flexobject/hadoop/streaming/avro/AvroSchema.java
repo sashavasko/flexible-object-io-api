@@ -35,18 +35,18 @@ public class AvroSchema {
 
     public static Schema forClass(Class<? extends Streamable> dataClass) {
         try {
-            return forSchema(org.sv.flexobject.schema.Schema.getRegisteredSchema(dataClass));
+            return forSchema(com.carfax.dt.streaming.schema.Schema.getRegisteredSchema(dataClass));
         } catch (Exception e) {
             throw new RuntimeException("Failed to compile Avro Schema for " + dataClass.getName(), e);
         }
     }
 
-    public static Schema forSchema(org.sv.flexobject.schema.Schema internalSchema) throws NoSuchFieldException, SchemaException {
+    public static Schema forSchema(com.carfax.dt.streaming.schema.Schema internalSchema) throws NoSuchFieldException, SchemaException {
         List<Schema.Field> fields = compileFields(internalSchema);
         return Schema.createRecord(internalSchema.getSimpleName(), null, internalSchema.getNamespace(), false, fields);
     }
 
-    public static List<Schema.Field> compileFields(org.sv.flexobject.schema.Schema internalSchema) throws NoSuchFieldException, SchemaException {
+    public static List<Schema.Field> compileFields(com.carfax.dt.streaming.schema.Schema internalSchema) throws NoSuchFieldException, SchemaException {
         SchemaElement[] internalFields = internalSchema.getFields();
         List<Schema.Field> fields = new ArrayList<>(internalFields.length);
         for (SchemaElement field : internalFields){
@@ -146,7 +146,7 @@ public class AvroSchema {
 
     public static <T extends Streamable> T convertGenericRecord(GenericRecord src, Schema avroSchema, Streamable dst) throws Exception {
         Class<? extends Streamable> dstClass = dst.getClass();
-        org.sv.flexobject.schema.Schema internalSchema = dst.getSchema();
+        com.carfax.dt.streaming.schema.Schema internalSchema = dst.getSchema();
         for (Schema.Field field : avroSchema.getFields()) {
             Schema recordSchema = AvroSchema.findRecordSchema(field);
             Object value = src.get(field.name());
@@ -275,6 +275,7 @@ public class AvroSchema {
                 return DataTypes.stringConverter(value);
             case binary:
                 return ByteBuffer.wrap((byte[]) value);
+
         }
 
         return descriptor.getValueType().convert(value);

@@ -2,6 +2,7 @@ package org.sv.flexobject.sql;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.sv.flexobject.OutAdapter;
+import org.sv.flexobject.SaveException;
 import org.sv.flexobject.json.MapperFactory;
 import org.sv.flexobject.schema.Schema;
 
@@ -150,10 +151,15 @@ public class SqlOutAdapter implements OutAdapter, AutoCloseable {
 
     @Override
     public SqlOutAdapter save() throws Exception {
-        int rowsAffected = preparedStatement.executeUpdate();
-        clearParameters();
-        if (rowsAffected == 0)
-            throw new RuntimeException("Failed to save record - 0 rows affected.");
+        try {
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected == 0)
+                throw new SaveException.NoRowsAffectedException();
+        }catch (SQLException e){
+            throw new SaveException("Failed to save record", e);
+        }finally {
+            clearParameters();
+        }
         return this;
     }
 

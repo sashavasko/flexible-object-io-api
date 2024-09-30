@@ -21,9 +21,9 @@ public class TestDataWithSubSchemaInCollection extends StreamableWithSchema {
     @ValueClass(valueClass = TestDataWithInferredSchema.class)
     public TestDataWithInferredSchema[] subStructArray = new TestDataWithInferredSchema[10];
     @ValueClass(valueClass = TestDataWithInferredSchema.class)
-    public List subStructList;
+    public List subStructList = new ArrayList();
     @ValueClass(valueClass = TestDataWithInferredSchema.class)
-    public Map subStructMap;
+    public Map subStructMap = new HashMap();
 
     public static TestDataWithSubSchemaInCollection random(boolean withJson) throws Exception {
         TestDataWithSubSchemaInCollection d = new TestDataWithSubSchemaInCollection();

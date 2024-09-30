@@ -352,6 +352,16 @@ public class FieldDescriptor extends AbstractFieldDescriptor{
 
     }
 
+    public DataTypes getKeyType() throws NoSuchFieldException, SchemaException {
+        if (isScalar())
+            return type;
+        else if (setter instanceof FieldWrapper){
+            return((FieldWrapper) setter).getKeyType();
+        }
+        return null;
+
+    }
+
     public Class<? extends Streamable> getSubschema() throws NoSuchFieldException, SchemaException {
         if (type == DataTypes.jsonNode && setter instanceof FieldWrapper){
             return((FieldWrapper) setter).getValueClass();

@@ -131,7 +131,7 @@ public interface Streamable extends Savable, Loadable {
         try {
             return o.toJson().toString();
         } catch (Exception e) {
-            return o.getClass().getName() + "@" + Integer.toHexString(o.hashCode());
+            return o.getClass().getName() + "@" + Integer.toHexString(o.hashCode()) + "(" + e.getMessage() + ")";
         }
     }
 }

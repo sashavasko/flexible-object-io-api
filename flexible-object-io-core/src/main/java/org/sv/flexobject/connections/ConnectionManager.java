@@ -228,39 +228,50 @@ public class ConnectionManager {
         }
     }
 
-    protected AutoCloseable getConnectionImpl(Class<? extends AutoCloseable> connectionType, String connectionName, Properties overrides) throws Exception {
+    protected AutoCloseable getConnectionImpl(Class<? extends AutoCloseable> connectionType, String fullConnectionName, Properties overrides) throws Exception {
+        String connectionName = fullConnectionName;
+        DeploymentLevel deploymentLevel = this.deploymentLevel;
+        if (fullConnectionName.contains(":")){
+            String[] parts = fullConnectionName.split(":");
+            try{
+                deploymentLevel = DeploymentLevel.valueOf(parts[0]);
+                connectionName = parts[1];
+            }catch(IllegalArgumentException e){
+                try{
+                    deploymentLevel = DeploymentLevel.valueOf(parts[1]);
+                    connectionName = parts[0];
+                }catch(IllegalArgumentException ee){
+                }
+            }
+        }
+        ConnectionGetter getter = new ConnectionGetter()
+                .forName(connectionName);
+
         synchronized (lock) {
-            ConnectionProvider connectionProvider = connectionProviders.get(connectionType);
-            if (connectionProvider == null) {
-                throw new IOException("Unknown connection provider for " + connectionType + " named " + connectionName);
+            getter.usingProvider(connectionProviders.get(connectionType));
+            if (!getter.hasProvider()) {
+                throw new IOException("Unknown connection provider for " + connectionType + " named " + fullConnectionName);
             }
 
-            Properties connectionProperties = null;
-            Object secret = null;
             for (PropertiesProvider provider : propertiesProviders) {
-                connectionProperties = provider.getProperties(connectionName, deploymentLevel, environment);
-                if (connectionProperties != null && !connectionProperties.isEmpty())
+                getter.withProperties(provider.getProperties(connectionName, deploymentLevel, environment));
+                if (getter.hasProperties())
                     break;
             }
-            if(overrides != null){
-                if (connectionProperties == null)
-                    connectionProperties = overrides;
-                else
-                    connectionProperties.putAll(overrides);
-            }
+            getter.overrideProperties(overrides);
 
-            if (connectionProperties == null && connectionProvider.requiresProperties()){
-                throw new IOException ("Failed to load properties for connection " + connectionName + " using providers: " +  propertiesProviders.toString());
+            if (getter.missingRequiredProperties()){
+                throw new IOException ("Failed to load properties for connection " + fullConnectionName + " using providers: " +  propertiesProviders.toString());
             }
 
             for (SecretProvider provider : secretProviders) {
-                secret = provider.getSecret(connectionName, deploymentLevel, environment, connectionProperties);
-                if (secret != null)
+                getter.withSecret(provider.getSecret(connectionName, deploymentLevel, environment, getter.getProperties()));
+                if (getter.hasSecret())
                     break;
             }
-
-            return connectionProvider.getConnection(connectionName, connectionProperties, secret);
         }
+
+        return getter.connect();
     }
 
     protected void forEachProviderImpl(Class implementsClass, ConsumerWithException<Provider, Exception> consumer) throws Exception {
