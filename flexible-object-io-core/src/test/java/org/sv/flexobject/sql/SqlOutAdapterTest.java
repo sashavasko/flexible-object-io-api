@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.sv.flexobject.SaveException;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -194,7 +195,7 @@ public class SqlOutAdapterTest {
         try{
             adapter.save();
             throw new RuntimeException("Should have thrown an exception when executeUpdate return 0");
-        }catch (RuntimeException e){
+        }catch (SaveException.NoRowsAffectedException e){
             assertEquals("Failed to save record - 0 rows affected.", e.getMessage());
         }
 

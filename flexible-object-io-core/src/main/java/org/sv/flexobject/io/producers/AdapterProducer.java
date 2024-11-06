@@ -15,63 +15,21 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class AdapterProducer<T extends Loadable> extends CloseableProducer<T> {
-    InAdapter adapter;
-    Reader<T> reader;
+public class AdapterProducer<T extends Loadable> extends ConvertingAdapterProducer<T, T> {
 
-    public AdapterProducer() {
+    @Override
+    public T convert(T sourceDatum) {
+        return sourceDatum;
     }
 
-    public static class Builder {
-        Source source;
-        Class<? extends GenericInAdapter> adapterClass;
-        Reader reader;
-        InAdapter adapter;
-        Class<? extends AdapterProducer> producerClass = AdapterProducer.class;
+    public AdapterProducer() {
+        super();
+    }
 
-        private Builder() {
-        }
-
-        public Builder from(Source source){
-            this.source = source;
-            return this;
-        }
-
-        public Builder using(Class<? extends GenericInAdapter> adapterClass){
-            this.adapterClass = adapterClass;
-            return this;
-        }
-
-        public Builder using(InAdapter adapter){
-            this.adapter = adapter;
-            return this;
-        }
-
-        public Builder with(Reader reader){
-            this.reader = reader;
-            return this;
-        }
-
-        public Builder forClass(Class<? extends Streamable> streamableClass){
-            this.reader = Schema.getRegisteredSchema(streamableClass).getReader();
-            return this;
-        }
-        public Builder instanceOf(Class<? extends AdapterProducer> producerClass){
-            this.producerClass = producerClass;
-            return this;
-        }
-
+    public static class Builder extends ConvertingAdapterProducer.Builder<AdapterProducer>{
+        @Override
         public AdapterProducer build() {
-            AdapterProducer producer = InstanceFactory.get(producerClass);
-            producer.setReader(reader);
-            if (adapter == null) {
-                adapter = InstanceFactory.get(adapterClass);
-                adapter.setParam(GenericInAdapter.PARAMS.source.name(), source);
-                producer.setAdapter(adapter);
-            }else {
-                producer.setAdapter(adapter);
-            }
-            return producer;
+            return super.build();
         }
     }
 
@@ -79,85 +37,23 @@ public class AdapterProducer<T extends Loadable> extends CloseableProducer<T> {
         return new Builder();
     }
 
-    @Deprecated  // Use builder() instead
+    @Deprecated
     public AdapterProducer(Source source, Class<? extends GenericInAdapter> adapterClass, Reader reader) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        adapter = GenericInAdapter.build(adapterClass, source);
-        this.reader = reader;
+        super(source, adapterClass, reader);
     }
 
-    @Deprecated  // Use builder() instead
+    @Deprecated
     public AdapterProducer(InAdapter adapter, Reader reader) {
-        this.adapter = adapter;
-        this.reader = reader;
+        super(adapter, reader);
     }
 
-    @Deprecated  // Use builder() instead
-    public AdapterProducer(Source source, Class<? extends GenericInAdapter> adapterClass, Class<? extends StreamableWithSchema> dataClass) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        this(source, adapterClass, Schema.getRegisteredSchema(dataClass).getReader());
+    @Deprecated
+    public AdapterProducer(Source source, Class<? extends GenericInAdapter> adapterClass, Class dataClass) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        super(source, adapterClass, dataClass);
     }
 
-    @Deprecated  // Use builder() instead
+    @Deprecated
     public AdapterProducer(InAdapter adapter, Class dataClass) {
-        this(adapter, Schema.getRegisteredSchema(dataClass).getReader());
-    }
-
-    public void setAdapter(InAdapter adapter) {
-        this.adapter = adapter;
-    }
-
-    public void setReader(Reader<T> reader) {
-        this.reader = reader;
-    }
-
-    @Override
-    public void unsafeClose() throws Exception {
-        adapter.close();
-    }
-
-    public T produce(){
-        T datum = null;
-
-        try {
-            if (adapter.next()) {
-                datum = reader.create();
-                reader.convert(adapter, datum);
-            }
-        } catch (Exception e) {
-            setException(e);
-        }
-        return datum;
-    }
-
-    @Override
-    public void ack() {
-        adapter.ack();
-    }
-
-    @Override
-    public void setEOF() {
-        adapter.setEOF();
-    }
-
-    public class AdapterIterator implements Iterator<T>{
-
-        T datum = null;
-
-        @Override
-        public boolean hasNext() {
-            datum = produce();
-            return datum != null;
-        }
-
-        @Override
-        public T next() {
-            if (datum == null)
-                throw new NoSuchElementException();
-            return datum;
-        }
-    }
-
-    @Override
-    public Iterator<T> iterator() {
-        return new AdapterIterator();
+        super(adapter, dataClass);
     }
 }
