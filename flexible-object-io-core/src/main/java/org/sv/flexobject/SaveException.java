@@ -1,6 +1,6 @@
 package org.sv.flexobject;
 
-public class SaveException extends Exception {
+public class SaveException extends RuntimeException {
 
     public static class NoRowsAffectedException extends SaveException {
         public NoRowsAffectedException() {
