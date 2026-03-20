@@ -1,6 +1,5 @@
 package org.sv.flexobject.io.producers;
 
-
 import org.sv.flexobject.Loadable;
 import org.sv.flexobject.stream.Source;
 

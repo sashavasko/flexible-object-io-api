@@ -3,8 +3,6 @@ package org.sv.flexobject.json;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.sv.flexobject.Streamable;
 import org.sv.flexobject.adapter.GenericOutAdapter;
 import org.sv.flexobject.stream.Sink;
@@ -14,6 +12,8 @@ import org.sv.flexobject.util.ConsumerWithException;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.function.Supplier;
 
 public class JsonOutputAdapter extends GenericOutAdapter<ObjectNode> {
@@ -70,8 +70,8 @@ public class JsonOutputAdapter extends GenericOutAdapter<ObjectNode> {
             getCurrent().put(translateOutputFieldName(paramName), value);
     }
 
-    public static String formatDate(Date date){
-        return new DateTime(date.getTime(), DateTimeZone.UTC).toString(JsonInputAdapter.JSON_DATE_FORMAT);
+    public static String formatDate(java.sql.Date date){
+        return JsonInputAdapter.jsonDateFormatter.format(LocalDateTime.ofEpochSecond(date.getTime()/1000, 0, ZoneOffset.UTC));
     }
 
     public static JsonNode dateToJsonNode(Object value){

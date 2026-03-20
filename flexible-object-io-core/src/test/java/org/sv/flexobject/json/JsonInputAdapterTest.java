@@ -119,7 +119,15 @@ public class JsonInputAdapterTest {
         values.add(json);
         adapter.next();
         Date expectedDate = new Date(1544116803000l);
+        /*
+            GMT:            Thursday, December 6, 2018 5:20:03 PM
+            Your time zone: Thursday, December 6, 2018 11:20:03 AM GMT-06:00
+         */
         assertEquals(expectedDate.getTime(), adapter.getDate("date").getTime());
+        /* Bad value : 1544076000000
+            GMT:            Thursday, December 6, 2018 6:00:00 AM
+            Your time zone: Thursday, December 6, 2018 12:00:00 AM GMT-06:00
+         */
         assertNull(adapter.getDate("badField"));
     }
 

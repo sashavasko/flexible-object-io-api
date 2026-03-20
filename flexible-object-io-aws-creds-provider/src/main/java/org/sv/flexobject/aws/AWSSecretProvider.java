@@ -1,11 +1,14 @@
 package org.sv.flexobject.aws;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.commons.lang3.StringUtils;
 import org.sv.flexobject.connections.ConnectionManager;
 import org.sv.flexobject.connections.SecretProvider;
 import org.sv.flexobject.json.MapperFactory;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
 import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueRequest;
@@ -26,7 +29,11 @@ public abstract class AWSSecretProvider implements SecretProvider, AutoCloseable
     public static final String LEVEL_ALPHA = "development";
     public static final String LEVEL_BETA = "staging";
     public static final String LEVEL_PROD = "production";
+    public static final String AWS_PROFILE_NAME = "aws_profile_name";
 
+    public abstract AwsCredentialsProvider getCredentialsProvider(String awsLevel);
+    private static final Map<String, AwsCredentialsProvider> credentialProviders = new HashMap<>();
+    private static final Map<String, SecretsManagerClient> clients = new HashMap<>();
 
     public static class AWSSecretProviderWithEnvCredentials extends AWSSecretProvider{
 
@@ -36,9 +43,80 @@ public abstract class AWSSecretProvider implements SecretProvider, AutoCloseable
         }
     }
 
-    public abstract AwsCredentialsProvider getCredentialsProvider(String awsLevel);
+//    public static boolean checkProfile(String profileName) {
+//        GetCallerIdentityRequest request = GetCallerIdentityRequest.builder()..build();
+//        StsClient.create().getCallerIdentity(request);
+//    }
 
-    private static final Map<String, SecretsManagerClient> clients = new HashMap<>();
+    public static class AWSSecretProviderWithProfile extends AWSSecretProvider{
+        Map<String, String> profileNames = new HashMap<>();
+        String profileName;
+
+        public AWSSecretProviderWithProfile(String profileName) {
+            this.profileName = profileName;
+        }
+
+        public AWSSecretProviderWithProfile() {
+        }
+
+        public AWSSecretProviderWithProfile setProfileName(String awsLevel, String profileName){
+            profileNames.put(awsLevel, profileName);
+            return this;
+        }
+
+        public AWSSecretProviderWithProfile setProfileName(String profileName){
+            this.profileName = profileName;
+            return this;
+        }
+
+        public String getProfileName(String awsLevel) {
+            if (profileName != null)
+                return profileName;
+
+            if (profileNames.containsKey(awsLevel))
+                return profileNames.get(awsLevel);
+
+            String levelSpecificProfileName = System.getProperty(AWS_PROFILE_NAME + "_" + awsLevel);
+            if (StringUtils.isNotBlank(levelSpecificProfileName))
+                return levelSpecificProfileName;
+
+            return System.getProperty(AWS_PROFILE_NAME);
+        }
+
+        @Override
+        public AwsCredentialsProvider getCredentialsProvider(String awsLevel) {
+            ProfileCredentialsProvider.Builder builder = ProfileCredentialsProvider.builder();
+
+            String profileName = getProfileName(awsLevel);
+            if (!StringUtils.isEmpty(profileName))
+                builder.profileName(profileName);
+
+            AwsCredentialsProvider credentialsProvider = builder.build();
+
+
+            try {
+                credentialsProvider.resolveCredentials();
+            } catch (SdkClientException e){
+                if (e.getMessage().toLowerCase().contains("token") || e.getMessage().contains("SSO")){
+                    System.err.println("Please login into AWS using command : \"aws sso login --profile " + profileName + "\"");
+                } else {
+                    System.err.println("Failed to resolve AWS credentials using profile " + profileName + ". \nPlease add appropriate profile to ~/.aws/config by either copy-pasting existing profile with this name or re-running \"aws configure sso\"\n\n\n");
+                }
+                throw e;
+            }
+            return credentialsProvider;
+        }
+    }
+
+
+
+    public static AWSSecretProvider createForTest(){
+        return new AWSSecretProvider.AWSSecretProviderWithProfile()
+                .setProfileName(AWSSecretProvider.LEVEL_ALPHA, "test-development")
+                .setProfileName(AWSSecretProvider.LEVEL_BETA, "test-staging")
+                .setProfileName(AWSSecretProvider.LEVEL_PROD, "test-production")
+                ;
+    }
 
     public SecretsManagerClient getClient (Region region, String level){
         String clientKey = region.toString() + ":" + level;
@@ -46,9 +124,11 @@ public abstract class AWSSecretProvider implements SecretProvider, AutoCloseable
         if (!clients.containsKey(clientKey)){
             synchronized (clients){
                 if (!clients.containsKey(clientKey)) {
+                    AwsCredentialsProvider credentialsProvider = getCachedCredentialProvider(level);
+
                     SecretsManagerClient secretsClient = SecretsManagerClient.builder()
                             .region(region)
-                            .credentialsProvider(getCredentialsProvider(level))
+                            .credentialsProvider(credentialsProvider)
                             .build();
                     clients.put(clientKey, secretsClient);
                     return secretsClient;
@@ -56,6 +136,15 @@ public abstract class AWSSecretProvider implements SecretProvider, AutoCloseable
             }
         }
         return clients.get(clientKey);
+    }
+
+    public AwsCredentialsProvider getCachedCredentialProvider(String level) {
+        if (credentialProviders.containsKey(level))
+            return credentialProviders.get(level);
+        AwsCredentialsProvider credentialsProvider = getCredentialsProvider(level);
+        credentialProviders.put(level, credentialsProvider);
+
+        return credentialsProvider;
     }
 
     public static void clear(){
@@ -138,4 +227,5 @@ public abstract class AWSSecretProvider implements SecretProvider, AutoCloseable
     public void close() {
         clear();
     }
+
 }

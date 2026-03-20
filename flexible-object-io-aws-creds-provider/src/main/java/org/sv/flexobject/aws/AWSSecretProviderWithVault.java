@@ -46,15 +46,19 @@ public class AWSSecretProviderWithVault extends AWSSecretProvider{
 
         public Builder() {
         }
-        public Builder(Map<String, String> env) {
+        public Builder(Map<String, String> env){
             token(env.get("VAULT_TOKEN"));
             key(env.get("VAULT_SECRET_KEY"));
             vaultRoleId(env.get("VAULT_APP_ROLE"));
             vaultRoleSecretId(env.get("VAULT_APP_ROLE_SECRET"));
             vaultRoleJWT(env.get("VAULT_JWT"));
-            vaultRolePath(env.get("VAULT_ROLE_PATH"));
-            team(env.get("VAULT_TEAM"));
-            role(env.get("VAULT_ROLE"));
+
+            if (env.containsKey("VAULT_ROLE_PATH"))
+                vaultRolePath(env.get("VAULT_ROLE_PATH"));
+            if (env.containsKey("VAULT_TEAM"))
+                team(env.get("VAULT_TEAM"));
+            if (env.containsKey("VAULT_ROLE"))
+                role(env.get("VAULT_ROLE"));
         }
 
         public Builder key(String awsVaultSecretKey){
@@ -81,10 +85,6 @@ public class AWSSecretProviderWithVault extends AWSSecretProvider{
             return this;
         }
 
-        public Builder token(String token) {
-            this.token = token;
-            return this;
-        }
         public Builder vaultRoleJWT(String vaultRoleJWT) {
             this.vaultRoleJWT = vaultRoleJWT;
             return this;
@@ -92,6 +92,11 @@ public class AWSSecretProviderWithVault extends AWSSecretProvider{
 
         public Builder vaultRolePath(String vaultRolePath) {
             this.vaultRolePath = vaultRolePath;
+            return this;
+        }
+
+        public Builder token(String token) {
+            this.token = token;
             return this;
         }
 
@@ -106,6 +111,8 @@ public class AWSSecretProviderWithVault extends AWSSecretProvider{
             provider.token = token;
             provider.vaultRoleId = vaultRoleId;
             provider.vaultRoleSecretId = vaultRoleSecretId;
+            provider.vaultRoleJWT = vaultRoleJWT;
+            provider.vaultRolePath = vaultRolePath;
             return provider;
         }
     }

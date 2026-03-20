@@ -13,16 +13,12 @@ repositories {
     mavenLocal()
     mavenCentral()
 }
-ext.jacksonVersion = "2.15.2"
-ext.log4jVersion = "2.17.0"
 dependencies {
 
     testImplementation project(':flexible-object-io-testdata')
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     api group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
-
-    api group: 'joda-time', name: 'joda-time', version: '2.10.1'
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
     api group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: "${jacksonVersion}"

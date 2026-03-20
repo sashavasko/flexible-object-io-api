@@ -10,3 +10,5 @@ include 'flexible-object-io-examples'
 include 'flexible-object-io-dremio-api'
 include 'flexible-object-io-docker'
 
+
+include 'flexible-object-io-arrow-flight'

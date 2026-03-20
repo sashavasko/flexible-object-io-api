@@ -1,0 +1,26 @@
+apply plugin: 'java'
+apply plugin: 'java-library'
+apply plugin: 'idea'
+group = 'org.sv'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api group: 'com.google.protobuf', name: 'protobuf-java', version: "${protobufVersion}"
+    api group: 'com.google.protobuf', name: 'protobuf-java-util', version: "${protobufVersion}"
+    api group: 'io.netty', name: 'netty-codec-http2', version: "${nettyVersion}"
+
+    api group: 'org.apache.arrow', name: 'flight-sql', version: "${arrowVersion}"
+    api group: 'org.apache.arrow', name: 'flight-sql-jdbc-driver', version: "${arrowVersion}"
+    api group: 'org.apache.arrow', name: 'arrow-compression', version: "${arrowVersion}"
+
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+    jvmArgs "--add-opens=java.base/java.nio=org.apache.arrow.memory.core,ALL-UNNAMED", "-Duser.language=en"
+}
