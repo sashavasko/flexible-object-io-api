@@ -8,4 +8,9 @@
       <module name="flexible-object-io-api.test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="flexible-object-io-api.flexible-object-io-hadoop-properties.test" options="-Xlint:unchecked -Xlint:deprecation" />
+    </option>
+  </component>
 </project>

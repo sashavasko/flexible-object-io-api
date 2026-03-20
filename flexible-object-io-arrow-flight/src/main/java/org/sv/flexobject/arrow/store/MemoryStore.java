@@ -19,7 +19,7 @@
 
 package org.sv.flexobject.arrow.store;
 
-import com.carfax.arrow.util.TicketUtils;
+import org.sv.flexobject.arrow.util.TicketUtils;
 import org.apache.arrow.flight.*;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.util.AutoCloseables;

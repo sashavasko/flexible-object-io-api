@@ -1,8 +1,8 @@
 package org.sv.flexobject.arrow.streaming;
 
-import com.carfax.arrow.read.ArrowRootReader;
-import com.carfax.arrow.util.MessageUtils;
-import com.carfax.dt.streaming.Streamable;
+import org.sv.flexobject.arrow.read.ArrowRootReader;
+import org.sv.flexobject.arrow.util.MessageUtils;
+import org.sv.flexobject.Streamable;
 import org.apache.arrow.flatbuf.MessageHeader;
 import org.apache.arrow.memory.ArrowBuf;
 import org.apache.arrow.util.AutoCloseables;

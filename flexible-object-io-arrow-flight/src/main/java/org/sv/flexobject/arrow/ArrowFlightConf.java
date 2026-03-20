@@ -1,7 +1,7 @@
 package org.sv.flexobject.arrow;
 
-import com.carfax.hadoop.properties.HadoopPropertiesWrapperBase;
-import com.carfax.utility.InstanceFactory;
+import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapperBase;
+import org.sv.flexobject.utility.InstanceFactory;
 import org.apache.arrow.flight.FlightClient;
 import org.apache.arrow.flight.FlightProducer;
 import org.apache.arrow.flight.FlightServer;

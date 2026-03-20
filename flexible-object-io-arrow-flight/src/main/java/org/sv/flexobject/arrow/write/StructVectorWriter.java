@@ -1,6 +1,6 @@
 package org.sv.flexobject.arrow.write;
 
-import com.carfax.dt.streaming.schema.SchemaException;
+import org.sv.flexobject.schema.SchemaException;
 import org.apache.arrow.vector.ValueVector;
 import org.apache.arrow.vector.complex.StructVector;
 

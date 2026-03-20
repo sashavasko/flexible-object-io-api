@@ -1,11 +1,11 @@
 package org.sv.flexobject.arrow.read;
 
-import com.carfax.arrow.ArrowSchema;
-import com.carfax.dt.streaming.Streamable;
-import com.carfax.dt.streaming.schema.Schema;
-import com.carfax.dt.streaming.schema.SchemaException;
-import com.carfax.dt.streaming.stream.Source;
-import com.carfax.utility.InstanceFactory;
+import org.sv.flexobject.arrow.ArrowSchema;
+import org.sv.flexobject.Streamable;
+import org.sv.flexobject.schema.Schema;
+import org.sv.flexobject.schema.SchemaException;
+import org.sv.flexobject.stream.Source;
+import org.sv.flexobject.utility.InstanceFactory;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.FieldVector;
@@ -71,7 +71,7 @@ public class ArrowRootReader extends ArrowRecordReader implements Source<Streama
     public static class Builder<SELF extends Builder> {
         Class <? extends Streamable> schemaClass;
         org.apache.arrow.vector.types.pojo.Schema arrowSchema;
-        com.carfax.dt.streaming.schema.Schema internalSchema;
+        org.sv.flexobject.schema.Schema internalSchema;
         VectorSchemaRoot root;
         protected Map<Long, Dictionary> dictionaryMap;
         Class<? extends ArrowRootReader> instanceOf = ArrowRootReader.class;
@@ -98,7 +98,7 @@ public class ArrowRootReader extends ArrowRecordReader implements Source<Streama
             return (SELF) this;
         }
 
-        public SELF withInternalSchema(com.carfax.dt.streaming.schema.Schema internalSchema) {
+        public SELF withInternalSchema(org.sv.flexobject.schema.Schema internalSchema) {
             this.internalSchema = internalSchema;
             return (SELF) this;
         }
@@ -131,7 +131,7 @@ public class ArrowRootReader extends ArrowRecordReader implements Source<Streama
                 throw new SchemaException("Source schema for writing is undefined");
 
             if (internalSchema == null)
-                internalSchema = com.carfax.dt.streaming.schema.Schema.getRegisteredSchema(schemaClass);
+                internalSchema = org.sv.flexobject.schema.Schema.getRegisteredSchema(schemaClass);
 
             if (arrowSchema == null)
                 arrowSchema = ArrowSchema.forSchema(internalSchema);

@@ -1,12 +1,12 @@
 package org.sv.flexobject.arrow.write;
 
-import com.carfax.arrow.ArrowJson;
-import com.carfax.arrow.testdata.IntList;
-import com.carfax.arrow.testdata.StringIntMap;
-import com.carfax.arrow.testdata.StringObjectMap;
-import com.carfax.arrow.testdata.SubSchemaInList;
-import com.carfax.dt.streaming.testdata.levelone.ObjectWithNestedObject;
-import com.carfax.dt.streaming.testdata.levelone.leveltwo.SimpleObject;
+import org.sv.flexobject.arrow.ArrowJson;
+import org.sv.flexobject.arrow.testdata.IntList;
+import org.sv.flexobject.arrow.testdata.StringIntMap;
+import org.sv.flexobject.arrow.testdata.StringObjectMap;
+import org.sv.flexobject.arrow.testdata.SubSchemaInList;
+import org.sv.flexobject.testdata.levelone.ObjectWithNestedObject;
+import org.sv.flexobject.testdata.levelone.leveltwo.SimpleObject;
 import org.apache.arrow.vector.FieldVector;
 import org.apache.arrow.vector.IntVector;
 import org.apache.arrow.vector.VarCharVector;

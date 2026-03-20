@@ -1,9 +1,9 @@
 package org.sv.flexobject.arrow.write;
 
-import com.carfax.arrow.ArrowMapEntry;
-import com.carfax.dt.streaming.Streamable;
-import com.carfax.dt.streaming.schema.FieldDescriptor;
-import com.carfax.dt.streaming.schema.SchemaException;
+import org.sv.flexobject.arrow.ArrowMapEntry;
+import org.sv.flexobject.Streamable;
+import org.sv.flexobject.schema.FieldDescriptor;
+import org.sv.flexobject.schema.SchemaException;
 import org.apache.arrow.vector.ValueVector;
 import org.apache.arrow.vector.types.pojo.Field;
 

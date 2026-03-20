@@ -1,11 +1,11 @@
 package org.sv.flexobject.arrow;
 
-import com.carfax.arrow.read.ArrowMapEntryReader;
-import com.carfax.arrow.read.ArrowStructReader;
-import com.carfax.arrow.write.ArrowMapEntryWriter;
-import com.carfax.arrow.write.ArrowStructWriter;
-import com.carfax.dt.streaming.Streamable;
-import com.carfax.dt.streaming.StreamableImpl;
+import org.sv.flexobject.arrow.read.ArrowMapEntryReader;
+import org.sv.flexobject.arrow.read.ArrowStructReader;
+import org.sv.flexobject.arrow.write.ArrowMapEntryWriter;
+import org.sv.flexobject.arrow.write.ArrowStructWriter;
+import org.sv.flexobject.Streamable;
+import org.sv.flexobject.StreamableImpl;
 import org.apache.arrow.vector.ValueVector;
 import org.apache.arrow.vector.complex.ListVector;
 import org.apache.arrow.vector.types.pojo.Field;

@@ -1,0 +1,44 @@
+apply plugin: 'java'
+apply plugin: 'java-library'
+apply plugin: 'idea'
+group = 'org.sv'
+
+repositories {
+    mavenCentral()
+}
+
+tasks.named('compileTestJava', JavaCompile) {
+    options.compilerArgs << "-Xlint:unchecked"
+    options.compilerArgs << "-Xlint:deprecation"
+}
+
+dependencies {
+    api group: 'com.google.guava', name: 'guava', version: "${guavaVersion}"
+    api ("org.apache.hadoop:hadoop-common:${hadoopVersion}"){
+        exclude(group:'javax.servlet')
+        exclude(group:'org.eclipse.jetty')
+        exclude(group:'com.sun.jersey')
+        exclude(group:'org.slf4j')
+        exclude(group:'org.apache.avro')
+        exclude(group:'org.apache.hadoop', module:'hadoop-auth')
+        exclude(group:'log4j', module:'log4j')
+        exclude(group:'org.apache.curator')
+        exclude(group:'org.apache.zookeeper')
+        exclude(group:'org.apache.kerby')
+        exclude(group:'org.bouncycastle')
+        exclude(group:'com.fasterxml.jackson.core')
+        exclude(group:'org.codehaus.woodstox')
+        exclude(group:'com.fasterxml.woodstox')
+        exclude(group:'dnsjava:dnsjava')
+        exclude(group:'org.xerial.snappy')
+        exclude(group:'io.netty')
+    }
+
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+    jvmArgs "--add-opens=java.base/java.lang=ALL-UNNAMED", "--add-opens=java.base/java.util=ALL-UNNAMED"
+}

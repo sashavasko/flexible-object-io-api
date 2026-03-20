@@ -19,7 +19,7 @@
 
 package org.sv.flexobject.arrow.store;
 
-import com.carfax.arrow.ArrowFlightConf;
+import org.sv.flexobject.arrow.ArrowFlightConf;
 import org.apache.arrow.flight.FlightServer;
 import org.apache.arrow.flight.Location;
 import org.apache.arrow.memory.BufferAllocator;

@@ -1,7 +1,7 @@
 package org.sv.flexobject.arrow.read;
 
-import com.carfax.arrow.vector.VectorGetters;
-import com.carfax.dt.streaming.schema.SchemaException;
+import org.sv.flexobject.arrow.vector.VectorGetters;
+import org.sv.flexobject.schema.SchemaException;
 import org.apache.arrow.vector.ValueVector;
 
 public class ValueListVectorReader extends ListVectorReader {

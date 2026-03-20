@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 // To run :
-// hdpjob -jar build/libs/lib/dt-streaming-examples-1.0.0-SNAPSHOT.jar -drv com.carfax.dt.streaming.examples.rabbit.SimpleRoundtrip
+// hdpjob -jar build/libs/lib/dt-streaming-examples-1.0.0-SNAPSHOT.jar -drv org.sv.flexobject.examples.rabbit.SimpleRoundtrip
 public class ThreadedRoundtrip extends Configured implements Tool {
 
     Logger logger = Logger.getLogger(ThreadedRoundtrip.class);

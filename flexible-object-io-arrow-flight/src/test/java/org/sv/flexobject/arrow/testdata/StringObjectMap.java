@@ -1,10 +1,10 @@
 package org.sv.flexobject.arrow.testdata;
 
-import com.carfax.dt.streaming.StreamableImpl;
-import com.carfax.dt.streaming.schema.DataTypes;
-import com.carfax.dt.streaming.schema.annotations.KeyType;
-import com.carfax.dt.streaming.schema.annotations.ValueClass;
-import com.carfax.dt.streaming.testdata.levelone.leveltwo.SimpleObject;
+import org.sv.flexobject.StreamableImpl;
+import org.sv.flexobject.schema.DataTypes;
+import org.sv.flexobject.schema.annotations.KeyType;
+import org.sv.flexobject.schema.annotations.ValueClass;
+import org.sv.flexobject.testdata.levelone.leveltwo.SimpleObject;
 
 import java.util.HashMap;
 import java.util.Map;

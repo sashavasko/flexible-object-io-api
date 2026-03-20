@@ -1,7 +1,7 @@
 package org.sv.flexobject.arrow;
 
-import com.carfax.dt.streaming.connections.ConnectionProvider;
-import com.carfax.utility.InstanceFactory;
+import org.sv.flexobject.connections.ConnectionProvider;
+import org.sv.flexobject.utility.InstanceFactory;
 import org.apache.arrow.flight.FlightClient;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;

@@ -1,6 +1,6 @@
 package org.sv.flexobject.arrow.streaming;
 
-import com.carfax.dt.streaming.testdata.levelone.leveltwo.SimpleObject;
+import org.sv.flexobject.testdata.levelone.leveltwo.SimpleObject;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.ipc.message.ArrowRecordBatch;

@@ -1,6 +1,6 @@
 package org.sv.flexobject.arrow;
 
-import com.carfax.arrow.write.JsonFileWriter;
+import org.sv.flexobject.arrow.write.JsonFileWriter;
 import org.apache.arrow.vector.VectorSchemaRoot;
 import org.apache.arrow.vector.ipc.message.ArrowRecordBatch;
 

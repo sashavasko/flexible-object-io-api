@@ -1,8 +1,8 @@
 package org.sv.flexobject.arrow.streaming;
 
-import com.carfax.arrow.read.ArrowRootReader;
-import com.carfax.dt.streaming.Streamable;
-import com.carfax.dt.streaming.util.SupplierWithException;
+import org.sv.flexobject.arrow.read.ArrowRootReader;
+import org.sv.flexobject.Streamable;
+import org.sv.flexobject.util.SupplierWithException;
 import org.apache.arrow.compression.CommonsCompressionFactory;
 import org.apache.arrow.vector.VectorLoader;
 import org.apache.arrow.vector.VectorSchemaRoot;

@@ -1,7 +1,7 @@
 package org.sv.flexobject.arrow.streaming;
 
-import com.carfax.arrow.read.ArrowRootReader;
-import com.carfax.dt.streaming.Streamable;
+import org.sv.flexobject.arrow.read.ArrowRootReader;
+import org.sv.flexobject.Streamable;
 import org.apache.arrow.flight.FlightClient;
 import org.apache.arrow.flight.FlightEndpoint;
 import org.apache.arrow.flight.FlightStream;

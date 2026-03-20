@@ -1,8 +1,8 @@
 package org.sv.flexobject.arrow.streaming;
 
-import com.carfax.arrow.vector.VectorUtils;
-import com.carfax.arrow.write.ArrowRootWriter;
-import com.carfax.dt.streaming.SaveException;
+import org.sv.flexobject.arrow.vector.VectorUtils;
+import org.sv.flexobject.arrow.write.ArrowRootWriter;
+import org.sv.flexobject.SaveException;
 import org.apache.arrow.util.AutoCloseables;
 import org.apache.arrow.vector.FieldVector;
 import org.apache.arrow.vector.VectorSchemaRoot;

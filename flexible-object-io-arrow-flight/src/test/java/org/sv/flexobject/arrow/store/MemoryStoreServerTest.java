@@ -1,15 +1,15 @@
 package org.sv.flexobject.arrow.store;
 
-import com.carfax.arrow.ArrowFlightConf;
-import com.carfax.arrow.read.ArrowRecordReader;
-import com.carfax.arrow.read.ArrowRootReader;
-import com.carfax.arrow.streaming.FlightEndpointSource;
-import com.carfax.arrow.streaming.FlightSink;
-import com.carfax.arrow.streaming.FlightSource;
-import com.carfax.arrow.testdata.SubSchemaInList;
-import com.carfax.arrow.write.ArrowRootWriter;
-import com.carfax.dt.streaming.Streamable;
-import com.carfax.dt.streaming.testdata.TestDataUtils;
+import org.sv.flexobject.arrow.ArrowFlightConf;
+import org.sv.flexobject.arrow.read.ArrowRecordReader;
+import org.sv.flexobject.arrow.read.ArrowRootReader;
+import org.sv.flexobject.arrow.streaming.FlightEndpointSource;
+import org.sv.flexobject.arrow.streaming.FlightSink;
+import org.sv.flexobject.arrow.streaming.FlightSource;
+import org.sv.flexobject.arrow.testdata.SubSchemaInList;
+import org.sv.flexobject.arrow.write.ArrowRootWriter;
+import org.sv.flexobject.Streamable;
+import org.sv.flexobject.testdata.TestDataUtils;
 import org.apache.arrow.flight.*;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;

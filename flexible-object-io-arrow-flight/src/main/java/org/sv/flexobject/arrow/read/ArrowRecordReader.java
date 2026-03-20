@@ -1,15 +1,15 @@
 package org.sv.flexobject.arrow.read;
 
-import com.carfax.arrow.ArrowSchema;
-import com.carfax.arrow.vector.VectorGetters;
-import com.carfax.dt.streaming.Streamable;
-import com.carfax.dt.streaming.schema.FieldDescriptor;
-import com.carfax.dt.streaming.schema.Schema;
-import com.carfax.dt.streaming.schema.SchemaException;
-import com.carfax.utility.InstanceFactory;
+import org.sv.flexobject.arrow.ArrowSchema;
+import org.sv.flexobject.arrow.vector.VectorGetters;
+import org.sv.flexobject.Streamable;
+import org.sv.flexobject.schema.FieldDescriptor;
+import org.sv.flexobject.schema.Schema;
+import org.sv.flexobject.schema.SchemaException;
 import org.apache.arrow.vector.FieldVector;
 import org.apache.arrow.vector.complex.ListVector;
 import org.apache.arrow.vector.types.pojo.Field;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +23,7 @@ public abstract class ArrowRecordReader extends ArrowReader{
 
     Class <? extends Streamable> schemaClass;
     List<Field> fields;
-    com.carfax.dt.streaming.schema.Schema internalSchema;
+    org.sv.flexobject.schema.Schema internalSchema;
     int rowIndex = 0;
 
     protected Map<String, ArrowReader> fieldReaders = new HashMap<>();
@@ -31,7 +31,7 @@ public abstract class ArrowRecordReader extends ArrowReader{
     public ArrowRecordReader() {
     }
 
-    protected ArrowRecordReader(Class<? extends Streamable> schemaClass, List<Field> fields, com.carfax.dt.streaming.schema.Schema internalSchema) {
+    protected ArrowRecordReader(Class<? extends Streamable> schemaClass, List<Field> fields, org.sv.flexobject.schema.Schema internalSchema) {
         setSchemaClass(schemaClass);
         setFields(fields);
         setInternalSchema(internalSchema);

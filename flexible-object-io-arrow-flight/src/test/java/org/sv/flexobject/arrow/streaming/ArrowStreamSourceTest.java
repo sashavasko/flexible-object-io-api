@@ -1,9 +1,9 @@
 package org.sv.flexobject.arrow.streaming;
 
-import com.carfax.arrow.testdata.SubSchemaInList;
-import com.carfax.dt.streaming.Streamable;
-import com.carfax.dt.streaming.testdata.TestDataUtils;
-import com.carfax.dt.streaming.testdata.levelone.leveltwo.SimpleObject;
+import org.sv.flexobject.arrow.testdata.SubSchemaInList;
+import org.sv.flexobject.Streamable;
+import org.sv.flexobject.testdata.TestDataUtils;
+import org.sv.flexobject.testdata.levelone.leveltwo.SimpleObject;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
 import org.junit.AfterClass;

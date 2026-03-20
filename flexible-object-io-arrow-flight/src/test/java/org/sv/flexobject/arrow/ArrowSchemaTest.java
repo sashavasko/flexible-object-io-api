@@ -1,10 +1,10 @@
 package org.sv.flexobject.arrow;
 
-import com.carfax.dt.streaming.testdata.TestDataWithSubSchema;
-import com.carfax.dt.streaming.testdata.TestDataWithSubSchemaInCollection;
-import com.carfax.dt.streaming.testdata.levelone.ObjectWithNestedObject;
-import com.carfax.dt.streaming.testdata.levelone.ObjectWithNestedObjectInMap;
-import com.carfax.dt.streaming.testdata.levelone.leveltwo.SimpleObject;
+import org.sv.flexobject.testdata.TestDataWithSubSchema;
+import org.sv.flexobject.testdata.TestDataWithSubSchemaInCollection;
+import org.sv.flexobject.testdata.levelone.ObjectWithNestedObject;
+import org.sv.flexobject.testdata.levelone.ObjectWithNestedObjectInMap;
+import org.sv.flexobject.testdata.levelone.leveltwo.SimpleObject;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.VectorSchemaRoot;
@@ -17,13 +17,13 @@ public class ArrowSchemaTest {
 
     @Test
     public void simpleSchema() throws Exception {
-        Schema arrowSchema = ArrowSchema.forSchema(com.carfax.dt.streaming.schema.Schema.getRegisteredSchema(SimpleObject.class));
-        assertEquals("Schema<intField: Int(32, true)>(metadata: {name=com.carfax.dt.streaming.testdata.levelone.leveltwo.SimpleObject})", arrowSchema.toString());
+        Schema arrowSchema = ArrowSchema.forSchema(org.sv.flexobject.schema.Schema.getRegisteredSchema(SimpleObject.class));
+        assertEquals("Schema<intField: Int(32, true)>(metadata: {name=org.sv.flexobject.testdata.levelone.leveltwo.SimpleObject})", arrowSchema.toString());
     }
 
     @Test
     public void objectWithNestedObjectInMap() throws Exception {
-        Schema arrowSchema = ArrowSchema.forSchema(com.carfax.dt.streaming.schema.Schema.getRegisteredSchema(ObjectWithNestedObjectInMap.class));
+        Schema arrowSchema = ArrowSchema.forSchema(org.sv.flexobject.schema.Schema.getRegisteredSchema(ObjectWithNestedObjectInMap.class));
         try(BufferAllocator allocator = new RootAllocator();
             VectorSchemaRoot root = VectorSchemaRoot.create(arrowSchema, allocator)){
             assertEquals("Schema<" +
@@ -36,14 +36,14 @@ public class ArrowSchemaTest {
                     "> not null" +
                     ">" +
                     ">" +
-                    "(metadata: {name=com.carfax.dt.streaming.testdata.levelone.ObjectWithNestedObjectInMap})", arrowSchema.toString());
+                    "(metadata: {name=org.sv.flexobject.testdata.levelone.ObjectWithNestedObjectInMap})", arrowSchema.toString());
 
         }
     }
 
     @Test
     public void testDataWithSubSchema() throws NoSuchFieldException {
-        Schema arrowSchema = ArrowSchema.forSchema(com.carfax.dt.streaming.schema.Schema.getRegisteredSchema(TestDataWithSubSchema.class));
+        Schema arrowSchema = ArrowSchema.forSchema(org.sv.flexobject.schema.Schema.getRegisteredSchema(TestDataWithSubSchema.class));
         assertEquals("Schema<" +
                         "intField: Int(32, true), " +
                         "intFieldOptional: Int(32, true), " +
@@ -62,26 +62,26 @@ public class ArrowSchemaTest {
                                     ">, " +
                                 "json: Utf8" +
                         ">" +
-                        ">(metadata: {name=com.carfax.dt.streaming.testdata.TestDataWithSubSchema})",
+                        ">(metadata: {name=org.sv.flexobject.testdata.TestDataWithSubSchema})",
                 arrowSchema.toString());
     }
 
     @Test
     public void testDataWithSimpleSubSchema() throws Exception {
-        Schema arrowSchema = ArrowSchema.forSchema(com.carfax.dt.streaming.schema.Schema.getRegisteredSchema(ObjectWithNestedObject.class));
+        Schema arrowSchema = ArrowSchema.forSchema(org.sv.flexobject.schema.Schema.getRegisteredSchema(ObjectWithNestedObject.class));
         assertEquals("Schema<" +
                         "intField: Int(32, true), " +
                         "nestedObject: " +
                             "Struct<" +
                                 "intField: Int(32, true)" +
                             ">" +
-                        ">(metadata: {name=com.carfax.dt.streaming.testdata.levelone.ObjectWithNestedObject})",
+                        ">(metadata: {name=org.sv.flexobject.testdata.levelone.ObjectWithNestedObject})",
                 arrowSchema.toString());
     }
 
     @Test
     public void TestDataWithSubSchemaInCollection() throws Exception {
-        Schema arrowSchema = ArrowSchema.forSchema(com.carfax.dt.streaming.schema.Schema.getRegisteredSchema(TestDataWithSubSchemaInCollection.class));
+        Schema arrowSchema = ArrowSchema.forSchema(org.sv.flexobject.schema.Schema.getRegisteredSchema(TestDataWithSubSchemaInCollection.class));
         try(BufferAllocator allocator = new RootAllocator();
             VectorSchemaRoot root = VectorSchemaRoot.create(arrowSchema, allocator)){
             assertEquals("Schema<" +
@@ -154,7 +154,7 @@ public class ArrowSchemaTest {
                     ">" +
                     "> not null" +
                     ">" +
-                    ">(metadata: {name=com.carfax.dt.streaming.testdata.TestDataWithSubSchemaInCollection})", arrowSchema.toString());
+                    ">(metadata: {name=org.sv.flexobject.testdata.TestDataWithSubSchemaInCollection})", arrowSchema.toString());
         }
     }
 }

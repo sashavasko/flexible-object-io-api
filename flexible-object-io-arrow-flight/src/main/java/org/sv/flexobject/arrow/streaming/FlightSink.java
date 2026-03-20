@@ -1,6 +1,6 @@
 package org.sv.flexobject.arrow.streaming;
 
-import com.carfax.arrow.write.ArrowRootWriter;
+import org.sv.flexobject.arrow.write.ArrowRootWriter;
 import org.apache.arrow.flight.AsyncPutListener;
 import org.apache.arrow.flight.FlightClient;
 import org.apache.arrow.flight.FlightDescriptor;

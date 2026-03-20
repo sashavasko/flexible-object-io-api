@@ -1,7 +1,7 @@
 package org.sv.flexobject.arrow.streaming;
 
-import com.carfax.dt.streaming.Streamable;
-import com.carfax.dt.streaming.stream.Source;
+import org.sv.flexobject.Streamable;
+import org.sv.flexobject.stream.Source;
 import org.apache.arrow.flight.CallOptions;
 import org.apache.arrow.flight.FlightDescriptor;
 import org.apache.arrow.flight.FlightInfo;

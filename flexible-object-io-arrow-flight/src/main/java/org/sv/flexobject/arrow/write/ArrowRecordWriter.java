@@ -1,12 +1,12 @@
 package org.sv.flexobject.arrow.write;
 
-import com.carfax.arrow.ArrowMapEntry;
-import com.carfax.arrow.ArrowSchema;
-import com.carfax.arrow.vector.VectorSetters;
-import com.carfax.dt.streaming.Streamable;
-import com.carfax.dt.streaming.schema.FieldDescriptor;
-import com.carfax.dt.streaming.schema.Schema;
-import com.carfax.dt.streaming.schema.SchemaException;
+import org.sv.flexobject.arrow.ArrowMapEntry;
+import org.sv.flexobject.arrow.ArrowSchema;
+import org.sv.flexobject.arrow.vector.VectorSetters;
+import org.sv.flexobject.Streamable;
+import org.sv.flexobject.schema.FieldDescriptor;
+import org.sv.flexobject.schema.Schema;
+import org.sv.flexobject.schema.SchemaException;
 import org.apache.arrow.vector.FieldVector;
 import org.apache.arrow.vector.complex.ListVector;
 import org.apache.arrow.vector.types.pojo.Field;
@@ -18,7 +18,7 @@ import java.util.Map;
 public abstract class ArrowRecordWriter implements ArrowWriter {
     Class <? extends Streamable> schemaClass;
     List<Field> fields;
-    com.carfax.dt.streaming.schema.Schema internalSchema;
+    org.sv.flexobject.schema.Schema internalSchema;
     int rowCount = 0;
 
     protected Map<String, ArrowWriter> fieldWriters = new HashMap<>();
@@ -27,7 +27,7 @@ public abstract class ArrowRecordWriter implements ArrowWriter {
 
     }
 
-    protected ArrowRecordWriter(Class<? extends Streamable> schemaClass, List<Field> fields, com.carfax.dt.streaming.schema.Schema internalSchema) {
+    protected ArrowRecordWriter(Class<? extends Streamable> schemaClass, List<Field> fields, org.sv.flexobject.schema.Schema internalSchema) {
         setSchemaClass(schemaClass);
         setFields(fields);
         setInternalSchema(internalSchema);
@@ -111,7 +111,7 @@ public abstract class ArrowRecordWriter implements ArrowWriter {
         return fields;
     }
 
-    public com.carfax.dt.streaming.schema.Schema getInternalSchema() {
+    public org.sv.flexobject.schema.Schema getInternalSchema() {
         return internalSchema;
     }
 

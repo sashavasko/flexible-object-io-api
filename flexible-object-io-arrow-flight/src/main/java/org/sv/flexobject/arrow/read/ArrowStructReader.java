@@ -1,8 +1,8 @@
 package org.sv.flexobject.arrow.read;
 
-import com.carfax.dt.streaming.Streamable;
-import com.carfax.dt.streaming.schema.Schema;
-import com.carfax.dt.streaming.schema.SchemaException;
+import org.sv.flexobject.Streamable;
+import org.sv.flexobject.schema.Schema;
+import org.sv.flexobject.schema.SchemaException;
 import org.apache.arrow.vector.FieldVector;
 import org.apache.arrow.vector.ValueVector;
 import org.apache.arrow.vector.types.pojo.Field;

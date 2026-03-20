@@ -1,7 +1,7 @@
 package org.sv.flexobject.arrow.write;
 
-import com.carfax.arrow.vector.VectorSetters;
-import com.carfax.dt.streaming.schema.SchemaException;
+import org.sv.flexobject.arrow.vector.VectorSetters;
+import org.sv.flexobject.schema.SchemaException;
 import org.apache.arrow.vector.ValueVector;
 
 public class ValueVectorWriter extends VectorWriter{

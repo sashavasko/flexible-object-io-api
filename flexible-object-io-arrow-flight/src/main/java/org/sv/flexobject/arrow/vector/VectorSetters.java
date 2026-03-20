@@ -19,8 +19,8 @@
  */
 package org.sv.flexobject.arrow.vector;
 
-import com.carfax.dt.streaming.schema.DataTypes;
-import com.carfax.dt.streaming.schema.FieldDescriptor;
+import org.sv.flexobject.schema.DataTypes;
+import org.sv.flexobject.schema.FieldDescriptor;
 import org.apache.arrow.vector.*;
 import org.apache.arrow.vector.types.pojo.Field;
 import org.apache.arrow.vector.util.Text;

@@ -12,3 +12,4 @@ include 'flexible-object-io-docker'
 
 
 include 'flexible-object-io-arrow-flight'
+include 'flexible-object-io-hadoop-properties'

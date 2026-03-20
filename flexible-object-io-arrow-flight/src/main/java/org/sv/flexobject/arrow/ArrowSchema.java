@@ -1,11 +1,11 @@
 package org.sv.flexobject.arrow;
 
-import com.carfax.dt.streaming.Streamable;
-import com.carfax.dt.streaming.schema.DataTypes;
-import com.carfax.dt.streaming.schema.FieldDescriptor;
-import com.carfax.dt.streaming.schema.SchemaElement;
-import com.carfax.dt.streaming.schema.SchemaException;
-import com.carfax.dt.streaming.schema.reflect.FieldWrapper;
+import org.sv.flexobject.Streamable;
+import org.sv.flexobject.schema.DataTypes;
+import org.sv.flexobject.schema.FieldDescriptor;
+import org.sv.flexobject.schema.SchemaElement;
+import org.sv.flexobject.schema.SchemaException;
+import org.sv.flexobject.schema.reflect.FieldWrapper;
 import com.google.protobuf.ByteString;
 import org.apache.arrow.vector.ipc.WriteChannel;
 import org.apache.arrow.vector.ipc.message.IpcOption;
@@ -30,20 +30,20 @@ public class ArrowSchema {
 
     public static Schema forClass(Class <? extends Streamable> streamableClass) {
         try {
-            return forSchema(com.carfax.dt.streaming.schema.Schema.getRegisteredSchema(streamableClass));
+            return forSchema(org.sv.flexobject.schema.Schema.getRegisteredSchema(streamableClass));
         } catch (NoSuchFieldException e) {
             throw new SchemaException("Failed to compile Arrow schema for class " + streamableClass, e);
         }
     }
 
-    public static Schema forSchema(com.carfax.dt.streaming.schema.Schema internalSchema) throws NoSuchFieldException, SchemaException {
+    public static Schema forSchema(org.sv.flexobject.schema.Schema internalSchema) throws NoSuchFieldException, SchemaException {
         List<Field> fields = compileFields(internalSchema);
         Map<String, String> metadata = new HashMap<>();
         metadata.put("name", internalSchema.getName());
         return new Schema(fields, metadata);
     }
 
-    private static List<Field> compileFields(com.carfax.dt.streaming.schema.Schema internalSchema) throws NoSuchFieldException {
+    private static List<Field> compileFields(org.sv.flexobject.schema.Schema internalSchema) throws NoSuchFieldException {
         SchemaElement[] internalFields = internalSchema.getFields();
         List<Field> fields = new ArrayList<>(internalFields.length);
         for (SchemaElement field : internalFields){
@@ -115,7 +115,7 @@ public class ArrowSchema {
         List<Field> subFields = null;
 
         if (subSchema != null) {
-            subFields = compileFields(com.carfax.dt.streaming.schema.Schema.getRegisteredSchema(subSchema));
+            subFields = compileFields(org.sv.flexobject.schema.Schema.getRegisteredSchema(subSchema));
             if (structure == FieldWrapper.STRUCT.scalar){
                 children.addAll(subFields);
             } else {
