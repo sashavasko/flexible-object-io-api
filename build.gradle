@@ -1,0 +1,183 @@
+buildscript {
+    repositories {
+        maven { url "https://plugins.gradle.org/m2/" }
+        mavenCentral()
+    }
+}
+
+plugins {
+    id 'java-library'
+}
+
+group = 'org.sv'
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'java-library'
+    apply plugin: 'idea'
+
+    java {
+        sourceCompatibility = '17'
+        targetCompatibility = '17'
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        api 'org.apache.httpcomponents:httpclient:4.5.14'
+
+        api group: 'io.github.classgraph', name: 'classgraph', version:'4.8.180'
+        api group: 'com.github.luben', name: 'zstd-jni', version: '1.5.6-7'
+        api group: 'com.google.code.gson', name: 'gson', version: '2.10.1'
+
+        api group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'
+        api group: 'commons-codec', name: 'commons-codec', version: '1.17.1'
+        api group: 'commons-io', name: 'commons-io', version: '2.17.0'
+        api group: 'commons-net', name: 'commons-net', version: '3.11.1'
+        api group: 'commons-cli', name: 'commons-cli', version: '1.9.0'
+        api group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
+        api group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.12.0'
+        api group: 'org.apache.commons', name:'commons-csv', version: '1.14.0'
+
+        api group: 'org.ow2.asm', name: 'asm', version:'9.8'
+
+        api group: 'org.apache.logging.log4j', name: 'log4j-core', version: "${log4jVersion}"
+        api group: 'org.apache.logging.log4j', name: 'log4j-api', version: "${log4jVersion}"
+
+        api group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: "${jacksonVersion}"
+        api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "${jacksonVersion}"
+        api group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: "${jacksonVersion}"
+        api group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-csv', version: "${jacksonVersion}"
+        api group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-smile', version: "${jacksonVersion}"
+        api group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-cbor', version: "${jacksonVersion}"
+        api group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-protobuf', version: "${jacksonVersion}"
+        api group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-toml', version: "${jacksonVersion}"
+
+        testImplementation "junit:junit:4.13.2"
+        testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.14.2'
+        // Source: https://mvnrepository.com/artifact/com.carrotsearch/junit-benchmarks
+        testImplementation("com.carrotsearch:junit-benchmarks:0.7.2")
+    }
+}
+
+project(':flexible-object-io-core') {
+    dependencies {
+        testImplementation project(':flexible-object-io-testdata')
+    }
+}
+
+project(':flexible-object-io-testdata') {
+    dependencies {
+        api project(':flexible-object-io-core')
+    }
+}
+
+project(':flexible-object-io-aws-creds-provider') {
+    dependencies {
+        api project(':flexible-object-io-core')
+    }
+
+    processTestResources{
+        duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    }
+}
+
+project(':flexible-object-io-dremio-api') {
+    dependencies {
+        api project(':flexible-object-io-core')
+        api project(':flexible-object-io-aws-creds-provider')
+        api project(':flexible-object-io-arrow-flight')
+        testImplementation project(':flexible-object-io-docker')
+    }
+
+    processTestResources{
+        duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    }
+}
+
+project(':flexible-object-io-hadoop-properties') {
+    dependencies {
+        api project(':flexible-object-io-core')
+        testImplementation project(':flexible-object-io-testdata')
+    }
+    processTestResources{
+        duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    }
+}
+
+project(':flexible-object-io-hadoop') {
+    dependencies {
+        api project(':flexible-object-io-core')
+        api project(':flexible-object-io-hadoop-properties')
+        api project(':flexible-object-io-mongo')
+        testImplementation project(':flexible-object-io-testdata')
+    }
+    processTestResources{
+        duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    }
+}
+
+project(':flexible-object-io-kafka') {
+    repositories {
+        maven { url 'http://packages.confluent.io/maven/'
+            allowInsecureProtocol true}
+    }
+    processTestResources{
+        duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    }
+
+    dependencies {
+        api project(':flexible-object-io-core')
+    }
+}
+
+project(':flexible-object-io-rabbit') {
+    dependencies {
+        api project(':flexible-object-io-core')
+    }
+}
+
+project(':flexible-object-io-mongo') {
+    dependencies {
+        api project(':flexible-object-io-core')
+        testImplementation project(':flexible-object-io-testdata')
+    }
+    processTestResources{
+        duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    }
+}
+
+project(':flexible-object-io-examples') {
+    dependencies {
+        api project(':flexible-object-io-core')
+        api project(':flexible-object-io-mongo')
+        api project(':flexible-object-io-hadoop')
+        api project(':flexible-object-io-rabbit')
+        api project(':flexible-object-io-kafka')
+        api project(':flexible-object-io-aws-creds-provider')
+        api project(':flexible-object-io-dremio-api')
+    }
+}
+
+project(':flexible-object-io-docker') {
+    dependencies {
+        api project(':flexible-object-io-core')
+    }
+    processTestResources{
+        duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    }
+}
+
+project(':flexible-object-io-arrow-flight') {
+    dependencies {
+        api project(':flexible-object-io-core')
+        api project(':flexible-object-io-hadoop-properties')
+        testImplementation project(':flexible-object-io-testdata')
+    }
+    processTestResources{
+        duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    }
+}
+

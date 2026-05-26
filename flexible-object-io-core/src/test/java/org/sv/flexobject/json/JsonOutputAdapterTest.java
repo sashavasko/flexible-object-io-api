@@ -8,11 +8,17 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.sv.flexobject.SaveException;
+import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.stream.sinks.SingleValueSink;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.Temporal;
 
 import static org.junit.Assert.*;
 
@@ -36,7 +42,7 @@ public class JsonOutputAdapterTest {
         adapter = null;
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = SaveException.class)
     public void setStringNull() throws Exception {
         adapter.setString("field", null);
         adapter.save();
@@ -55,7 +61,7 @@ public class JsonOutputAdapterTest {
         assertEquals("yes", sink.get().get("field").asText());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = SaveException.class)
     public void setJsonNull() throws Exception {
         adapter.setJson("field", null);
         adapter.save();
@@ -64,7 +70,7 @@ public class JsonOutputAdapterTest {
     @Test
     public void setJson() throws Exception {
         String value = "{'a':1,'b':7}".replace('\'', '"');
-        JsonNode valueJson = objectReader.readTree(value);
+        JsonNode valueJson = MapperFactory.getObjectReader().readTree(value);
         adapter.setJson("field", valueJson);
         adapter.save();
         assertEquals(valueJson, sink.get().get("field"));
@@ -79,7 +85,7 @@ public class JsonOutputAdapterTest {
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = SaveException.class)
     public void setBooleanNotNull() throws Exception {
         Boolean value = null;
         adapter.setBoolean("field", value);
@@ -95,7 +101,7 @@ public class JsonOutputAdapterTest {
         assertFalse(adapter.hasOutput());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = SaveException.class)
     public void setIntNotNull() throws Exception {
         Integer value = null;
         adapter.setInt("field", value);
@@ -110,7 +116,7 @@ public class JsonOutputAdapterTest {
         assertEquals((long) value, sink.get().get("field").asLong());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = SaveException.class)
     public void setLongNotNull() throws Exception {
         Long value = null;
         adapter.setLong("field", value);
@@ -119,13 +125,55 @@ public class JsonOutputAdapterTest {
 
     @Test
     public void setDate() throws Exception {
-        Date date = new Date(1544116803000l);
+        long millis = 1544116803000l;
+        /*
+            GMT: Thursday, December 6, 2018 5:20:03 PM
+            Your time zone: Thursday, December 6, 2018 11:20:03 AM GMT-06:00
+         */
+
+        adapter = new JsonOutputAdapter(sink);
+        Date date = new Date(millis);
         adapter.setDate("date", date);
         adapter.save();
-        assertEquals("{\"date\":\"Dec 06, 2018 05:20:03 PM\"}", sink.get().toString());
+        ObjectNode json = sink.get();
+        String actual = json.toString();
+        assertEquals("{\"date\":\"2018-12-06T17:20:03Z\"}", actual);
+        String actualDateString = json.get("date").asText();
+        LocalDateTime expectedDate = LocalDateTime.of(2018, 12, 6, 11, 20, 3);
+        LocalDateTime actualDate = LocalDateTime.parse(actualDateString, DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.systemDefault()));
+        System.out.println(actualDate);
+        assertEquals(millis, DataTypes.dateConverter(actualDate).getTime());
+        assertEquals(millis, DataTypes.dateConverter(actualDateString).getTime());
+        assertEquals(expectedDate, actualDate);
+
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
+    public void setDateLegacy() throws Exception {
+        long millis = 1544116803000l;
+        /*
+            GMT: Thursday, December 6, 2018 5:20:03 PM
+            Your time zone: Thursday, December 6, 2018 11:20:03 AM GMT-06:00
+         */
+
+        adapter = new JsonOutputAdapter(sink, JsonOutputAdapter::dateToJsonNodeUsingLegacyFormat);
+        Date date = new Date(millis);
+        adapter.setDate("date", date);
+        adapter.save();
+        ObjectNode json = sink.get();
+        String actual = json.toString();
+        assertEquals("{\"date\":\"Dec 6, 2018 05:20:03 PM\"}", actual);
+        String actualDateString = json.get("date").asText();
+        LocalDateTime expectedDate = LocalDateTime.of(2018, 12, 6, 11, 20, 3);
+        Temporal actualDate = DataTypes.parseDateString(actualDateString);
+        System.out.println(actualDate);
+        assertEquals(millis, DataTypes.dateConverter(actualDate).getTime());
+        assertEquals(millis, DataTypes.dateConverter(actualDateString).getTime());
+        assertEquals(expectedDate, actualDate);
+
+    }
+
+    @Test(expected = SaveException.class)
     public void setDateNotNull() throws Exception {
         Date date = null;
         adapter.setDate("date", date);
@@ -134,6 +182,7 @@ public class JsonOutputAdapterTest {
 
     @Test
     public void setTimestamp() throws Exception {
+        adapter = new JsonOutputAdapter(sink);
         Timestamp date = new Timestamp(1544116803000l);
         adapter.setTimestamp("ts", date);
         adapter.save();
@@ -141,7 +190,7 @@ public class JsonOutputAdapterTest {
         assertEquals("{\"ts\":1544116803000}", sink.get().toString());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = SaveException.class)
     public void setTimestampNotNull() throws Exception {
         Timestamp ts = null;
         adapter.setTimestamp("ts", ts);
@@ -158,9 +207,9 @@ public class JsonOutputAdapterTest {
     @Test
     public void produce() throws Exception {
         ObjectNode jsonOut = JsonOutputAdapter.produce(adapter->{
-           adapter.setString("a", "foo");
-           adapter.setInt("b", 1234567);
-           adapter.save();
+            adapter.setString("a", "foo");
+            adapter.setInt("b", 1234567);
+            adapter.save();
         });
 
         assertEquals(MapperFactory.getObjectReader().readTree("{'a':'foo','b':1234567}".replace('\'', '"')), jsonOut);

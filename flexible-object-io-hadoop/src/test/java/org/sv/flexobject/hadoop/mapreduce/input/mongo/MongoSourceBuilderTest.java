@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sv.flexobject.hadoop.mapreduce.input.split.ProxyInputSplit;
 import org.sv.flexobject.mongo.streaming.MongoSource;
 import org.sv.flexobject.testdata.TestDataWithSubSchema;

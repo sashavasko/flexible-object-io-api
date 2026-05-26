@@ -18,14 +18,14 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.Temporal;
 import java.util.*;
 
 public enum DataTypes {
+
     string(InAdapter::getString, DataTypes::setString, DataTypes::stringConverter),
     jsonNode(InAdapter::getJson, DataTypes::setJson, DataTypes::jsonConverter),
     int32(InAdapter::getInt, DataTypes::setInt, DataTypes::int32Converter),
@@ -48,6 +48,16 @@ public enum DataTypes {
         this.getter = getter;
         this.setter = setter;
         this.converter = converter;
+    }
+
+    private static ZoneId defaultZoneId = ZoneId.of("CST", ZoneId.SHORT_IDS);
+
+    public static void setDefaultZoneId(ZoneId defaultZoneId) {
+        DataTypes.defaultZoneId = defaultZoneId;
+    }
+
+    public static ZoneId getDefaultZoneId(){
+        return defaultZoneId;
     }
 
     public void registerCustomConverter(Class sourceType, FunctionWithException converter){
@@ -197,8 +207,13 @@ public enum DataTypes {
             return (Integer) value;
         if (value instanceof String){
             String s = ((String) value).trim();
-            if (NumberUtils.isCreatable(s))
-                return Integer.decode(s);
+            try {
+                if (NumberUtils.isCreatable(s))
+                    return Integer.decode(s);
+            }catch(NoSuchMethodError e){
+                if (StringUtils.isNumeric(s))
+                    return Integer.decode(s);
+            }
         }
         if (value instanceof ValueNode)
             return ((ValueNode)value).asInt();
@@ -249,8 +264,14 @@ public enum DataTypes {
             return (Long) value;
         if (value instanceof String){
             String s = ((String) value).trim();
-            if (NumberUtils.isCreatable(s))
-                return Long.decode(s);
+            try{
+                if (NumberUtils.isCreatable(s))
+                    return Long.decode(s);
+                throw new SchemaException("Invalid long value: `" + s + "`.");
+            }catch(NoSuchMethodError e){
+                if (StringUtils.isNumeric(s))
+                    return Long.decode(s);
+            }
         }
         if (value instanceof ValueNode)
             return ((ValueNode)value).asLong();
@@ -282,7 +303,77 @@ public enum DataTypes {
     public static LocalDate localDateConverter(Object value) throws Exception {
         if (value == null || value instanceof LocalDate)
             return (LocalDate) value;
+        if (value instanceof LocalDateTime){
+            return ((LocalDateTime) value).toLocalDate();
+        }
+        if (value instanceof String) {
+            Temporal parsed = parseDateString((String) value);
+            if (parsed != null) {
+                if (parsed instanceof LocalDate)
+                    return (LocalDate) parsed;
+                else
+                    return ((LocalDateTime)parsed).toLocalDate();
+            }
+        }
         return (LocalDate) DataTypes.localDate.applyCustomConverter(value, (v)->dateConverter(v).toLocalDate());
+    }
+
+    public static Temporal parseDateString(String dateString) throws Exception {
+        dateString = dateString.trim();
+        if (StringUtils.isNumeric(dateString)){
+            int month;
+            int day;
+            int year;
+            if (dateString.length() == 6){
+                // broken add_date made up of juris + sourceId
+                month = Integer.valueOf(dateString.substring(5));
+                year = Integer.valueOf(dateString.substring(0, 4));
+                day = 1;
+            } else if (dateString.length() == 7){
+                month = dateString.charAt(0) - '0';
+                day =  Integer.valueOf(dateString.substring(1, 3));
+                year =  Integer.valueOf(dateString.substring(3));
+            } else if (dateString.length() != 8){
+                if (StringUtils.isNumeric(dateString)){
+                    long timestamp = Long.valueOf(dateString);
+                    return new Date(timestamp).toLocalDate();
+                } else {
+                    throw new IllegalArgumentException("All numeric dates must be in either MMDDYYYY or YYYYMMDD format. Actual value :" + dateString);
+                }
+            } else {
+                month = Integer.valueOf(dateString.substring(0, 2));
+                if (month > 12) {
+                    year =  Integer.valueOf(dateString.substring(0, 4));
+                    month = Integer.valueOf(dateString.substring(4, 6));
+                    day =  Integer.valueOf(dateString.substring(6));
+                } else {
+                    day =  Integer.valueOf(dateString.substring(2, 4));
+                    year =  Integer.valueOf(dateString.substring(4));
+                }
+            }
+            return LocalDate.of(year, month, day);
+        } else {
+
+            if (dateString.length() == JsonInputAdapter.JSON_DATE_FORMAT_SHORT.length()){
+                if (dateString.charAt(2) == '/') {
+                    return LocalDate.parse(dateString, JsonInputAdapter.jsonDateFormatterShortMMDDYYYY);
+                } else
+                    return LocalDate.parse(dateString, JsonInputAdapter.jsonDateFormatterShort);
+            } else if (dateString.contains("T")){
+                //UTC time
+                return parseUTCTime(dateString);
+            } else {
+                try {
+                    return LocalDateTime.parse(dateString, JsonInputAdapter.jsonDateFormatter);
+                } catch(DateTimeParseException e){
+                    ZoneId zoneId = dateString.endsWith("12:00:00 AM") ? getDefaultZoneId() : ZoneOffset.UTC;
+                    ZonedDateTime zonedDateTime = ZonedDateTime.parse(dateString, JsonInputAdapter.jsonDateFormatterLegacy.withZone(zoneId));
+                    LocalDateTime ldt = zonedDateTime.withZoneSameInstant(getDefaultZoneId()).toLocalDateTime();
+                    return ldt;
+                }
+
+            }
+        }
     }
 
     public static Date dateConverter(Object value) throws Exception {
@@ -290,41 +381,18 @@ public enum DataTypes {
             return (Date) value;
         if (value instanceof java.util.Date)
             return new Date(((java.util.Date)value).getTime());
-        if (value instanceof LocalDate)
-            return Date.valueOf((LocalDate) value);
         if (value instanceof ValueNode)
             return JsonInputAdapter.jsonNodeToDate((JsonNode)value);
         if (value instanceof String) {
-            String dateString = ((String) value).trim();
-            if (StringUtils.isNumeric(dateString)){
-                int month;
-                int day;
-                int year;
-                if (dateString.length() == 6){
-                    // broken add_date made up of juris + sourceId
-                    month = Integer.valueOf(dateString.substring(5));
-                    year = Integer.valueOf(dateString.substring(0, 4));
-                    day = 1;
-                } else if (dateString.length() == 7){
-                    month = dateString.charAt(0) - '0';
-                    day =  Integer.valueOf(dateString.substring(1, 3));
-                    year =  Integer.valueOf(dateString.substring(3));
-                } else if (dateString.length() != 8){
-                    throw new IllegalArgumentException("All numeric dates must be in either MMDDYYYY or YYYYMMDD format. Actual value :" + dateString);
-                } else {
-                    month = Integer.valueOf(dateString.substring(0, 2));
-                    if (month > 12) {
-                        year =  Integer.valueOf(dateString.substring(0, 4));
-                        month = Integer.valueOf(dateString.substring(4, 6));
-                        day =  Integer.valueOf(dateString.substring(6));
-                    } else {
-                        day =  Integer.valueOf(dateString.substring(2, 4));
-                        year =  Integer.valueOf(dateString.substring(4));
-                    }
-                }
-                return Date.valueOf(LocalDate.of(year, month, day));
-            }
-            return Date.valueOf((String) value);
+            value = parseDateString((String) value);
+            if (value == null)
+                return null;
+        }
+        if (value instanceof LocalDate)
+            return Date.valueOf((LocalDate) value);
+        if (value instanceof LocalDateTime) {
+            LocalDateTime localDateTime = (LocalDateTime)value;
+            return new Date(localDateTime.atZone(getDefaultZoneId()).toInstant().toEpochMilli());
         }
         if (value instanceof Timestamp)
             return new Date(((Timestamp)value).getTime());
@@ -339,7 +407,33 @@ public enum DataTypes {
     }
 
     public static void setDate(OutAdapter adapter, String fieldName, Object value) throws Exception {
-        adapter.setDate(fieldName, dateConverter(value));
+        if (value instanceof LocalDate)
+            adapter.setDate(fieldName, (LocalDate)value);
+        else
+            adapter.setDate(fieldName, dateConverter(value));
+    }
+
+    public static void setDate(OutAdapter adapter, String fieldName, LocalDate value) throws Exception {
+        adapter.setDate(fieldName, value);
+    }
+
+    public static LocalDateTime parseUTCTime(String timestampString){
+        if (timestampString.endsWith("Z")) {
+            DateTimeFormatter f;
+//            if (timestampString.length() > 20) // CRAZY Carfax Dates
+            f = DateTimeFormatter.ISO_INSTANT.withZone(getDefaultZoneId());
+//            else
+//                f = DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.UTC);
+            return LocalDateTime.parse(timestampString, f);
+        }else {
+            String timeString = timestampString.substring(11);
+            if (timeString.contains("+") || timeString.contains("-")) {
+                ZonedDateTime dateTime = ZonedDateTime.parse(timestampString);
+                return LocalDateTime.ofInstant(dateTime.toInstant(), getDefaultZoneId());
+            } else {
+                return LocalDateTime.parse(timestampString);
+            }
+        }
     }
 
     public static Timestamp timestampConverter(Object value) throws Exception {
@@ -352,19 +446,7 @@ public enum DataTypes {
             if (StringUtils.isNumeric(timestampString) || timestampString.length() < "yyyy-mm-dd hh:mm:ss".length())
                 return new Timestamp(dateConverter(value).getTime());
             if (timestampString.contains("T")) {// UTC time
-                LocalDateTime localDateTime;
-                if (timestampString.endsWith("Z")) {
-                    DateTimeFormatter f = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.systemDefault());
-                    localDateTime = LocalDateTime.parse(timestampString, f);
-                }else {
-                    String timeString = timestampString.substring(11);
-                    if (timeString.contains("+") || timeString.contains("-")) {
-                        ZonedDateTime dateTime = ZonedDateTime.parse(timestampString);
-                        localDateTime = LocalDateTime.ofInstant(dateTime.toInstant(), ZoneId.systemDefault());
-                    } else {
-                        localDateTime = LocalDateTime.parse(timestampString);
-                    }
-                }
+                LocalDateTime localDateTime = parseUTCTime(timestampString);
                 return Timestamp.valueOf(localDateTime);
             }
             return Timestamp.valueOf((String) value);
@@ -398,7 +480,18 @@ public enum DataTypes {
             return (Class) value;
         String stringValue = stringConverter(value).trim();
         if (StringUtils.isNotEmpty(stringValue)){
-            return Class.forName(stringValue);
+            if (stringValue.contains("/"))
+                return convertDescriptorToClass(stringValue);
+
+            try {
+                return Thread.currentThread().getContextClassLoader().loadClass(stringValue);
+            } catch (ClassNotFoundException e) {
+                try{
+                    return Class.forName(stringValue);
+                } catch (ClassNotFoundException ee) {
+                    throw new SchemaException("Cannot load class " + stringValue + ". Classpath:" + System.getProperty("java.class.path"), ee);
+                }
+            }
         }
 
         return (Class<?>) DataTypes.classObject.applyCustomConverter(value, null);
@@ -436,7 +529,15 @@ public enum DataTypes {
         if (value instanceof ArrayNode) {
             for (JsonNode item : ((ArrayNode)value)) {
                 String valueName = item.asText().trim();
-                if (!valueName.equalsIgnoreCase(emptyValue)) {
+                if (emptyValue == null || !valueName.equalsIgnoreCase(emptyValue)) {
+                    setOut.add(Enum.valueOf(enumClass, valueName));
+                }
+            }
+        }else if (value instanceof Collection) {
+            Collection collection = (Collection) value;
+            for (Object item : collection) {
+                String valueName = DataTypes.stringConverter(item);
+                if (emptyValue == null || !valueName.equalsIgnoreCase(emptyValue)) {
                     setOut.add(Enum.valueOf(enumClass, valueName));
                 }
             }
@@ -446,13 +547,14 @@ public enum DataTypes {
                 if (valueNames.startsWith("["))
                     valueNames = valueNames.substring(1, valueNames.length() - 1);
                 if (StringUtils.isBlank(valueNames)){
-                    setOut.add(Enum.valueOf(enumClass, emptyValue));
+                    if (emptyValue != null)
+                        setOut.add(Enum.valueOf(enumClass, emptyValue));
                 } else {
                     for (String item : valueNames.split(",")) {
                         String valueName = item.trim();
                         if (valueName.startsWith("\""))
                             valueName = valueName.substring(1, valueName.length() - 1).trim();
-                        if (!valueName.equalsIgnoreCase(emptyValue)) {
+                        if (emptyValue == null || !valueName.equalsIgnoreCase(emptyValue)) {
                             setOut.add(Enum.valueOf(enumClass, valueName));
                         }
                     }
@@ -576,9 +678,41 @@ public enum DataTypes {
         // These are tricky since we need to know which Enum they belong to
         if (Enum.class.isAssignableFrom(clazz))
             return string;
-        if (Set.class.isAssignableFrom(clazz))
+        if (EnumSet.class.isAssignableFrom(clazz))
             return string;
+        if (Set.class.isAssignableFrom(clazz))
+            return jsonNode;
 
         return invalid;
     }
+
+    public static Class<?> convertDescriptorToClass(String jniDescriptor) throws Exception {
+        if (jniDescriptor == null || jniDescriptor.isEmpty()) {
+            throw new IllegalArgumentException("JNI descriptor cannot be null or empty.");
+        }
+
+        switch (jniDescriptor) {
+            case "Z": return boolean.class;
+            case "B": return byte.class;
+            case "C": return char.class;
+            case "S": return short.class;
+            case "I": return int.class;
+            case "J": return long.class;
+            case "F": return float.class;
+            case "D": return double.class;
+            case "V": return void.class; // For void return type
+        }
+
+        if (jniDescriptor.startsWith("[")) {
+            // Array type, e.g., "[Ljava/lang/String;" or "[I"
+            return classConverter(jniDescriptor.replace('/', '.'));
+        } else if (jniDescriptor.startsWith("L") && jniDescriptor.endsWith(";")) {
+            // Object type, e.g., "Ljava/lang/String;"
+            String className = jniDescriptor.substring(1, jniDescriptor.length() - 1).replace('/', '.');
+            return classConverter(className);
+        } else {
+            throw new IllegalArgumentException("Invalid JNI descriptor: " + jniDescriptor);
+        }
+    }
+
 }

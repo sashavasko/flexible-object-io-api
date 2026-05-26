@@ -1,5 +1,7 @@
 package org.sv.flexobject.schema;
 
+import org.sv.flexobject.schema.describe.PropertiesDescriptor;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -12,6 +14,19 @@ public class SchemaRegistry {
     private final Set<String> loadedClasses = new HashSet<>();
 
     private final Map<String, AbstractSchema> schemas = new HashMap<>();
+    private final Map<Class, PropertiesDescriptor> knownProperties = new HashMap<>();
+
+    public PropertiesDescriptor describe(Class<?> instanceClass){
+        if (knownProperties.containsKey(instanceClass)) {
+            return knownProperties.get(instanceClass);
+        }
+
+        synchronized (instanceClass) {
+            PropertiesDescriptor desc = new PropertiesDescriptor(instanceClass);
+            knownProperties.put(instanceClass, desc);
+            return desc;
+        }
+    }
 
     private SchemaRegistry(){};
 

@@ -3,7 +3,7 @@ package org.sv.flexobject.hadoop.streaming.parquet.write.streamable;
 import org.apache.parquet.hadoop.ParquetWriter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sv.flexobject.hadoop.streaming.parquet.ParquetSchema;
 import org.sv.flexobject.hadoop.streaming.parquet.write.output.ByteArrayOutputFile;
 import org.sv.flexobject.testdata.TestDataWithInferredSchema;

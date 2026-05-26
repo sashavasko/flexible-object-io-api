@@ -20,5 +20,5 @@ public class TestDataWithEnumAndClass extends StreamableWithSchema {
     public Class clazz;
     public TestEnum enumValue;
     @EnumSetField(enumClass = TestEnum.class, emptyValue = "none")
-    public Set<TestEnum> enumSet = EnumSet.noneOf(TestEnum.class);
+    public EnumSet<TestEnum> enumSet = EnumSet.noneOf(TestEnum.class);
 }

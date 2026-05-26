@@ -6,7 +6,7 @@ import org.apache.parquet.io.api.RecordMaterializer;
 import org.apache.parquet.schema.MessageType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sv.flexobject.hadoop.streaming.parquet.ParquetSchema;
 import org.sv.flexobject.hadoop.streaming.parquet.read.streamable.ParquetReadSupport;
 import org.sv.flexobject.testdata.SimpleTestDataWithSchema;

@@ -3,11 +3,9 @@ package org.sv.flexobject.schema;
 import org.sv.flexobject.InAdapter;
 import org.sv.flexobject.OutAdapter;
 import org.sv.flexobject.Streamable;
+import org.sv.flexobject.util.InstanceFactory;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class AbstractSchema {
     protected String name;
@@ -15,8 +13,39 @@ public class AbstractSchema {
     protected Map<String, SchemaElement> fieldsByName = new HashMap<>();
     protected Map<String, Integer> paramNamesXref = new HashMap<>();
 
+    public AbstractSchema() {
+    }
+
     public AbstractSchema(Class<?> dataClass) {
         this.name = dataClass.getName();
+    }
+
+    public <T extends AbstractSchema> T clone(Class<? extends AbstractSchema> targetClass){
+        T instance = (T) InstanceFactory.get(targetClass);
+        instance.name = this.name;
+        instance.fields = new SchemaElement[this.fields.length];
+        for (int i = 0; i < this.fields.length; i++) {
+            instance.fields[i] = fields[i];
+        }
+        instance.fieldsByName.putAll(fieldsByName);
+        instance.paramNamesXref.putAll(paramNamesXref);
+        return (T) targetClass.cast(instance);
+    }
+
+    public void removeFields(String ... names){
+        List<String> namesList = Arrays.asList(names);
+        List<SchemaElement> newFields = new ArrayList<>();
+        for (int i = 0; i < this.fields.length; i++) {
+            String fieldName = fields[i].getName();
+            if (namesList.contains(fieldName)) {
+                fieldsByName.remove(fieldName);
+                paramNamesXref.remove(fieldName);
+            } else {
+                newFields.add(fields[i]);
+            }
+        }
+        this.fields = newFields.toArray(new SchemaElement[0]);
+
     }
 
     protected void addField(SchemaElement field, int order){
@@ -136,4 +165,13 @@ public class AbstractSchema {
     }
 
 
+    @Override
+    public String toString() {
+        return "AbstractSchema{" +
+                "name='" + name + '\'' +
+                ", fields=" + Arrays.toString(fields) +
+                ", fieldsByName=" + fieldsByName +
+                ", paramNamesXref=" + paramNamesXref +
+                '}';
+    }
 }

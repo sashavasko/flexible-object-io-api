@@ -1,62 +1,25 @@
-plugins {
-    id 'java'
-    id 'java-library'
-    id 'idea'
-//    id 'myproject.java-conventions'
-}
-
 group = 'org.sv'
 
-sourceCompatibility = 1.8
-
-repositories {
-    mavenLocal()
-    mavenCentral()
+tasks.withType(JavaCompile) {
+    options.encoding = 'ISO-8859-1'
 }
+
 dependencies {
-
-    testImplementation project(':flexible-object-io-testdata')
-
-    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-    api group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
-
-    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-    api group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: "${jacksonVersion}"
-    api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "${jacksonVersion}"
-    api group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: "${jacksonVersion}"
-    api group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-csv', version: "${jacksonVersion}"
-    api group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-smile', version: "${jacksonVersion}"
-    api group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-cbor', version: "${jacksonVersion}"
-    api group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-protobuf', version: "${jacksonVersion}"
-    api group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-toml', version: "${jacksonVersion}"
-
-    // https://mvnrepository.com/artifact/commons-io/commons-io
-    api group: 'commons-io', name: 'commons-io', version: '2.6'
-
-    // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
-    api group: 'org.apache.logging.log4j', name: 'log4j-core', version: "${log4jVersion}"
-    // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api
-    api group: 'org.apache.logging.log4j', name: 'log4j-api', version: "${log4jVersion}"
-    // https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2
-    api group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.7.0'
-
-    api group: 'commons-net', name: 'commons-net', version: '3.6'
-
-    // https://mvnrepository.com/artifact/commons-codec/commons-codec
-    api group: 'commons-codec', name: 'commons-codec', version: '1.15'
-    // https://mvnrepository.com/artifact/commons-cli/commons-cli
-    api 'commons-cli:commons-cli:1.5.0'
-
-    // https://mvnrepository.com/artifact/com.h2database/h2
-    testImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'
-    // https://mvnrepository.com/artifact/org.mockftpserver/MockFtpServer
+    testImplementation group: 'com.h2database', name: 'h2', version: '2.3.232'
     testImplementation group: 'org.mockftpserver', name: 'MockFtpServer', version: '2.7.1'
+    testImplementation "junit:junit:4.13.2"
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.14.2'
 
-    // https://mvnrepository.com/artifact/com.google.guava/guava
-    testImplementation group: 'com.google.guava', name: 'guava', version: '19.0'
-    testImplementation group: 'com.carrotsearch', name: 'junit-benchmarks', version: '0.7.2'
+}
 
-
-    testImplementation "junit:junit:4.13"
-    testImplementation 'org.mockito:mockito-core:1.9.5', {exclude group:"org.hamcrest"}
+tasks.register('printProps'){
+    project.properties.entrySet().forEach {
+        if (it.value instanceof String) {
+            String key = it.key
+            key = key.replace('.', '_')
+            String value = it.value
+            if (!key.contains("Token") && !key.contains("token"))
+                println " ${key} = \"${value}\";"
+        }
+    }
 }

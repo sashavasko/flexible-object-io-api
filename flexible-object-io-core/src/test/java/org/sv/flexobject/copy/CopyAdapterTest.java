@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.sql.Timestamp;
 import java.sql.Date;

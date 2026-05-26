@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -107,7 +107,6 @@ public class ConnectionManagerTest {
         when(mockSecretProvider.getSecret(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest", mockProperties)).thenReturn(mockSecret);
         when(mockSecretProvider.getSecret(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest", mockProperties2)).thenReturn(mockSecret);
         when(mockSecretProvider.getSecret(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest", mockProperties3)).thenReturn(mockSecret);
-        when(mockSecretProvider.getSecret(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest", null)).thenReturn(mockSecret);
         when(mockPropertiesProvider.getProperties(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest")).thenReturn(mockProperties);
         when(mockConnectionProvider.getConnection(connectionName, mockProperties, mockSecret)).thenReturn(mockConnection);
         when(mockConnectionProvider.requiresProperties()).thenReturn(true);

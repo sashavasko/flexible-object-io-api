@@ -5,7 +5,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.sv.flexobject.SaveException;
 import org.sv.flexobject.stream.Sink;
 
 import java.sql.Date;
@@ -125,7 +126,7 @@ public class GenericOutAdapterTest {
         assertSame(mockRecord2, adapter.convertRecordForSink(mockRecord2));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = SaveException.class)
     public void saveWithoutGetCurrent() throws Exception {
         adapter.save();
     }
@@ -154,5 +155,4 @@ public class GenericOutAdapterTest {
 
         verify(mockSink, times(2)).hasOutput();
     }
-
 }

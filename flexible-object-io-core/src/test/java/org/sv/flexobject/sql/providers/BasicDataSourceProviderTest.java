@@ -38,7 +38,7 @@ public class BasicDataSourceProviderTest {
                 throw new RuntimeException("Should have thrown due to bad password");
             }catch (Exception e){
                 assertEquals(SQLException.class, e.getClass());
-                assertEquals("Cannot create PoolableConnectionFactory (Wrong user name or password [28000-200])", e.getMessage());
+                assertEquals("Cannot create PoolableConnectionFactory (Wrong user name or password [28000-232])", e.getMessage());
             }
         }
     }

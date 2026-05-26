@@ -21,11 +21,14 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class JsonInputAdapter extends GenericInAdapter<JsonNode> implements Copyable {
-    public static final String JSON_DATE_FORMAT = "MMM dd, yyyy hh:mm:ss a"; //'Z'
+    public static final String JSON_DATE_FORMAT = "MMM d, yyyy hh:mm:ss a"; //'Z'
     public static final String JSON_DATE_FORMAT_SHORT = "yyyy-MM-dd";
+    public static final String JSON_DATE_FORMAT_SHORT_MMDDYYYY = "MM/dd/yyyy";
 
-    public static final DateTimeFormatter jsonDateFormatter = DateTimeFormatter.ofPattern(JSON_DATE_FORMAT);//.withZoneUTC();
+    public static final DateTimeFormatter jsonDateFormatter = DateTimeFormatter.ISO_INSTANT;//DATE_TIME;
+    public static final DateTimeFormatter jsonDateFormatterLegacy = DateTimeFormatter.ofPattern(JSON_DATE_FORMAT);//.withZoneUTC();
     public static final DateTimeFormatter jsonDateFormatterShort = DateTimeFormatter.ofPattern(JSON_DATE_FORMAT_SHORT);
+    public static final DateTimeFormatter jsonDateFormatterShortMMDDYYYY = DateTimeFormatter.ofPattern(JSON_DATE_FORMAT_SHORT_MMDDYYYY);
 
     public JsonInputAdapter() {super();
     }
@@ -81,11 +84,6 @@ public class JsonInputAdapter extends GenericInAdapter<JsonNode> implements Copy
         return isNull(n) ? null : n.asDouble();
     }
 
-    public static String formatDate(java.sql.Date date){
-        return JsonInputAdapter.jsonDateFormatter.format(LocalDateTime.ofEpochSecond(date.getTime()/1000, 0, ZoneOffset.UTC));
-        //new DateTime(date.getTime(), DateTimeZone.UTC).toString();
-    }
-
     public static Date jsonNodeToDate(JsonNode n){
         if (isNull(n))
             return null;
@@ -95,6 +93,9 @@ public class JsonInputAdapter extends GenericInAdapter<JsonNode> implements Copy
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse Json date:" + dateString, e);
         }
+//        DateTimeFormatter formatter = dateString.length() == JSON_DATE_FORMAT_SHORT.length() ? jsonDateFormatterShort: jsonDateFormatter;
+//        DateTime date = DateTime.parse(dateString, formatter);
+//        return new Date(date.getMillis());
     }
 
     public static LocalDate jsonNodeToLocalDate(JsonNode n){

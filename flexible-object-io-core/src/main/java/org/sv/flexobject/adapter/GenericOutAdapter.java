@@ -1,6 +1,7 @@
 package org.sv.flexobject.adapter;
 
 import org.sv.flexobject.OutAdapter;
+import org.sv.flexobject.SaveException;
 import org.sv.flexobject.stream.Sink;
 import org.sv.flexobject.translate.Translator;
 import org.sv.flexobject.util.InstanceFactory;
@@ -10,6 +11,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.function.Supplier;
 
 public abstract class GenericOutAdapter<T> implements OutAdapter {
+
 
     public enum PARAMS {
         sink,
@@ -75,7 +77,7 @@ public abstract class GenericOutAdapter<T> implements OutAdapter {
         }
     }
 
-    protected T getCurrent(){
+    protected T getCurrent() {
         if (currentRecord == null)
             currentRecord = createRecord();
         return currentRecord;
@@ -93,8 +95,12 @@ public abstract class GenericOutAdapter<T> implements OutAdapter {
     @Override
     public GenericOutAdapter<T> save() throws Exception {
         if (currentRecord == null)
-            throw new IllegalArgumentException("Cannot save empty record");
-        sink.put(convertRecordForSink(currentRecord));
+            throw new SaveException("Cannot save empty record");
+        try {
+            sink.put(convertRecordForSink(currentRecord));
+        }catch(Exception e){
+            throw new SaveException("Failed to save record", e);
+        }
         currentRecord = null;
         return this;
     }
@@ -118,5 +124,4 @@ public abstract class GenericOutAdapter<T> implements OutAdapter {
         adapter.sink = sink;
         return adapter;
     }
-
 }

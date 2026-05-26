@@ -186,6 +186,7 @@ public class FieldDescriptor extends AbstractFieldDescriptor{
             ScalarField sf = field.getAnnotation(ScalarField.class);
             if (sf != null) {
                 Class<?> fieldClass = dataClass.getDeclaredField(e.name()).getType();
+
                 DataTypes type = DataTypes.invalid;
                 if (fieldClass.isArray())
                     type = DataTypes.jsonNode;
@@ -288,12 +289,22 @@ public class FieldDescriptor extends AbstractFieldDescriptor{
     }
 
     @Override
+    public Object getRaw(Object o) throws SchemaException {
+        try {
+            if(getter instanceof FieldWrapper)
+                return ((FieldWrapper) getter).getValue(o);
+
+            return getter.apply(o);
+        }catch(Exception e){
+            throw new SchemaException("Error getting field " + getQualifiedName(o), e);
+        }
+    }
+
+    @Override
     public Object get(Object o) throws SchemaException {
         try {
             return getter.apply(o);
         }catch(Exception e){
-            if (e instanceof SchemaException)
-                throw (SchemaException) e;
             throw new SchemaException("Error getting field " + getQualifiedName(o), e);
         }
     }
@@ -369,6 +380,7 @@ public class FieldDescriptor extends AbstractFieldDescriptor{
         return null;
     }
 
+    @Override
     public FieldWrapper.STRUCT getStructure() {
         try {
             if (setter instanceof FieldWrapper)
@@ -381,5 +393,24 @@ public class FieldDescriptor extends AbstractFieldDescriptor{
     public boolean isScalar(){
         return type != DataTypes.jsonNode
                 || getStructure() == FieldWrapper.STRUCT.scalar;
+    }
+
+    public FunctionWithException getGetter() {
+        return getter;
+    }
+
+    public BiConsumerWithException getSetter() {
+        return setter;
+    }
+
+    @Override
+    public String toString() {
+        return "FieldDescriptor{" +
+                "type=" + type +
+                ", getter=" + getter +
+                ", setter=" + setter +
+                ", name='" + name + '\'' +
+                ", order=" + order +
+                '}';
     }
 }

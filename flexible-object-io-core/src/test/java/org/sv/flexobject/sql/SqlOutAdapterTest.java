@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sv.flexobject.SaveException;
 
 import java.sql.*;
@@ -104,7 +104,7 @@ public class SqlOutAdapterTest {
     @Test
     public void setIntForBadParameter() throws SQLException {
         adapter.setInt("tooManyFields", 1);
-        verifyZeroInteractions(preparedStatement);
+        verifyNoInteractions(preparedStatement);
     }
 
     @Test
@@ -122,7 +122,7 @@ public class SqlOutAdapterTest {
     @Test
     public void setBooleanBadParam() throws Exception {
         adapter.setBoolean("badfield", true);
-        verifyZeroInteractions(preparedStatement);
+        verifyNoInteractions(preparedStatement);
     }
 
     @Test
@@ -140,7 +140,7 @@ public class SqlOutAdapterTest {
     @Test
     public void setLongForBadParam() throws SQLException  {
         adapter.setLong("badfield", 1l);
-        verifyZeroInteractions(preparedStatement);
+        verifyNoInteractions(preparedStatement);
     }
 
     @Test
@@ -161,7 +161,7 @@ public class SqlOutAdapterTest {
     public void setDateBadField()  throws SQLException {
         Date date = new Date(1234567l);
         adapter.setDate("badfield", date);
-        verifyZeroInteractions(preparedStatement);
+        verifyNoInteractions(preparedStatement);
     }
 
     @Test
@@ -183,7 +183,7 @@ public class SqlOutAdapterTest {
     public void setTimestampBadField()  throws SQLException {
         Timestamp timestamp = new Timestamp(1234567l);
         adapter.setTimestamp("badfield", timestamp);
-        verifyZeroInteractions(preparedStatement);
+        verifyNoInteractions(preparedStatement);
     }
 
     @Test

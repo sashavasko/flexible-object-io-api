@@ -6,6 +6,7 @@ import org.sv.flexobject.io.GenericWriter;
 import org.sv.flexobject.io.Reader;
 import org.sv.flexobject.io.Writer;
 import org.sv.flexobject.schema.annotations.NonStreamableField;
+import org.sv.flexobject.schema.describe.PropertiesDescriptor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -16,6 +17,9 @@ public class Schema extends AbstractSchema{
     private boolean isInferred;
     private Reader reader;
     private Writer writer;
+
+    public Schema() {
+    }
 
     public Schema(Class<?> dataClass) {
         super(dataClass);
@@ -33,6 +37,22 @@ public class Schema extends AbstractSchema{
 
         initParamXref();
         SchemaRegistry.getInstance().registerSchema(this);
+    }
+
+    @Override
+    public <T extends AbstractSchema> T clone(Class<? extends AbstractSchema> targetClass) {
+        T instance = super.clone(targetClass);
+        if (instance instanceof Schema) {
+            Schema clonedSchema = (Schema) instance;
+            clonedSchema.isInferred = isInferred;
+            clonedSchema.reader = reader;
+            clonedSchema.writer = writer;
+        }
+        return (T) targetClass.cast(instance);
+    }
+
+    public Schema clone(){
+        return clone(Schema.class);
     }
 
     public static boolean isStreamableField(Field field){
@@ -111,6 +131,10 @@ public class Schema extends AbstractSchema{
         return xref;
     }
 
+    public static PropertiesDescriptor describe(Class<?> dataClass){
+        return SchemaRegistry.getInstance().describe(dataClass);
+    }
+
     public FieldDescriptor getDescriptor(Enum<?> e) {
         return (FieldDescriptor) getFieldDescriptor(e);
     }
@@ -153,5 +177,14 @@ public class Schema extends AbstractSchema{
 
     public boolean save(Object datum, OutAdapter output) throws Exception {
         return getWriter().convert((Savable) datum, output);
+    }
+
+    @Override
+    public String toString() {
+        return "Schema{" + super.toString() +
+                ", isInferred=" + isInferred +
+                ", reader=" + reader +
+                ", writer=" + writer +
+                '}';
     }
 }

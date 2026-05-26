@@ -3,6 +3,7 @@ package org.sv.flexobject.schema;
 import org.sv.flexobject.InAdapter;
 import org.sv.flexobject.OutAdapter;
 import org.sv.flexobject.Streamable;
+import org.sv.flexobject.schema.reflect.FieldWrapper;
 
 public class AbstractFieldDescriptor {
     protected String name;
@@ -33,6 +34,10 @@ public class AbstractFieldDescriptor {
         throw new SchemaException("Class " + getClass().getName() + " does not implements save()");
     }
 
+    public Object getRaw(Object o) throws SchemaException{
+        return get(o);
+    }
+
     public Object get(Object o) throws SchemaException{
         throw new SchemaException("Class " + getClass().getName() + " does not implements get()");
     }
@@ -46,7 +51,39 @@ public class AbstractFieldDescriptor {
         throw new SchemaException("Class " + getClass().getName() + " does not implements clear()");
     }
 
+    public DataTypes getType() {
+        return DataTypes.invalid;
+    }
+
+    public DataTypes getValueType() throws NoSuchFieldException, SchemaException {
+        return DataTypes.invalid;
+    }
+
+    public DataTypes getKeyType() throws NoSuchFieldException, SchemaException {
+        return DataTypes.invalid;
+    }
+
+    public Class<? extends Streamable> getSubschema() throws NoSuchFieldException, SchemaException {
+        return null;
+    }
+
+    public FieldWrapper.STRUCT getStructure() {
+        return FieldWrapper.STRUCT.unknown;
+    }
+
+    public boolean isScalar() {
+        return true;
+    }
+
     public boolean isEmpty(Streamable o){
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "AbstractFieldDescriptor{" +
+                "name='" + name + '\'' +
+                ", order=" + order +
+                '}';
     }
 }

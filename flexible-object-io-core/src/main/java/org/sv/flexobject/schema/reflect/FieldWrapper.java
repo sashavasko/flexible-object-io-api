@@ -72,6 +72,8 @@ public class FieldWrapper {
                     if (enumSetField != null) {
                         enumClass = enumSetField.enumClass();
                         emptyValue = enumSetField.emptyValue();
+                        if ("null".equals(emptyValue))
+                            emptyValue  = null;
                     } else {
                         ValueType vt = field.getAnnotation(ValueType.class);
                         if (vt != null) {
@@ -168,6 +170,8 @@ public class FieldWrapper {
             if (value != null) {
                 if (byte[].class.equals(value.getClass())) {
                     setValue(o, null);
+//                    byte[] byteArray = (byte[]) value;
+//                    Arrays.fill(byteArray, (byte) 0x00);
                 } else {
                     try {
                         Object[] array = (Object[]) value;
@@ -272,5 +276,25 @@ public class FieldWrapper {
 
     public DataTypes getKeyType() {
         return keyType;
+    }
+
+    public boolean isEnum() {
+        return isEnum;
+    }
+
+    public Class<? extends Enum> getEnumClass() {
+        return enumClass;
+    }
+
+    public String getEmptyValue() {
+        return emptyValue;
+    }
+
+    public String getFieldName() {
+        return fieldName;
+    }
+
+    public Class<?> getClazz() {
+        return clazz;
     }
 }

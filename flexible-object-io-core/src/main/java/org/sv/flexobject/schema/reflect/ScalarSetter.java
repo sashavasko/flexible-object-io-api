@@ -3,7 +3,9 @@ package org.sv.flexobject.schema.reflect;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.sv.flexobject.Streamable;
+import org.sv.flexobject.json.MapperFactory;
 import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.schema.SchemaException;
 import org.sv.flexobject.util.BiConsumerWithException;
@@ -65,7 +67,10 @@ public class ScalarSetter extends FieldWrapper implements BiConsumerWithExceptio
                 if (getValue(dataObject) instanceof Set){
                     Set set = (Set) getValue(dataObject);
                     set.clear();
-                    set.addAll(collection);
+                    if(getEnumClass() != null){
+                        set.addAll(DataTypes.enumSetConverter(collection, getEnumClass(), getEmptyValue()));
+                    }else
+                        set.addAll(collection);
                 }else
                     setValue(dataObject, value);
             }
@@ -204,7 +209,22 @@ public class ScalarSetter extends FieldWrapper implements BiConsumerWithExceptio
                 Object field = getField().get(dataObject);
                 if (field == null)
                     throw new SchemaException("List fields must be pre-initialized");
-                ((Collection)getField().get(dataObject)).add(getType().convert(value));
+                Collection collection = (Collection)getField().get(dataObject);
+
+                if (value instanceof TextNode){
+                    String text = ((TextNode) value).asText();
+                    if (text.startsWith("[") && text.endsWith("]")) {
+                        JsonNode json = MapperFactory.getObjectReader().readTree(text);
+                        if (json.isArray()) {
+                            ArrayNode arrayNode = (ArrayNode) json;
+                            for (int i = 0; i < arrayNode.size(); i++) {
+                                collection.add(getType().convert( arrayNode.get(i)));
+                            }
+                            return;
+                        }
+                    }
+                }
+                collection.add(getType().convert(value));
             }else
                 setValue(dataObject, getType().convert(value));
         }
