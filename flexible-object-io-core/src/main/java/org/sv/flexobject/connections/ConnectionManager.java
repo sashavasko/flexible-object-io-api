@@ -1,5 +1,6 @@
 package org.sv.flexobject.connections;
 
+import org.sv.flexobject.util.AutoCloseables;
 import org.sv.flexobject.util.ConsumerWithException;
 import org.sv.flexobject.util.InstanceFactory;
 
@@ -7,8 +8,6 @@ import java.io.IOException;
 import java.util.*;
 
 public class ConnectionManager {
-    // TODO add extensive Loggin for providers registration/unregistration
-
     private static ConnectionManager instance = new ConnectionManager();
     private final Object lock = new Object();
 
@@ -228,22 +227,59 @@ public class ConnectionManager {
         }
     }
 
-    protected AutoCloseable getConnectionImpl(Class<? extends AutoCloseable> connectionType, String fullConnectionName, Properties overrides) throws Exception {
-        String connectionName = fullConnectionName;
-        DeploymentLevel deploymentLevel = this.deploymentLevel;
-        if (fullConnectionName.contains(":")){
-            String[] parts = fullConnectionName.split(":");
-            try{
-                deploymentLevel = DeploymentLevel.valueOf(parts[0]);
-                connectionName = parts[1];
-            }catch(IllegalArgumentException e){
+    public class ConnectionDescriptor {
+        String connectionName;
+        DeploymentLevel parsedDeploymentLevel;
+        public ConnectionDescriptor(String fullConnectionName) {
+            this.connectionName = fullConnectionName;
+            this.parsedDeploymentLevel = deploymentLevel;
+            if (fullConnectionName.contains(":")){
+                String[] parts = fullConnectionName.split(":");
                 try{
-                    deploymentLevel = DeploymentLevel.valueOf(parts[1]);
-                    connectionName = parts[0];
-                }catch(IllegalArgumentException ee){
+                    parsedDeploymentLevel = DeploymentLevel.valueOf(parts[0]);
+                    connectionName = parts[1];
+                }catch(IllegalArgumentException e){
+                    try{
+                        parsedDeploymentLevel = DeploymentLevel.valueOf(parts[1]);
+                        connectionName = parts[0];
+                    }catch(IllegalArgumentException ee){
+                    }
                 }
             }
         }
+
+        public String getConnectionName() {
+            return connectionName;
+        }
+
+        public DeploymentLevel getDeploymentLevel() {
+            return parsedDeploymentLevel;
+        }
+    }
+
+    public Properties getConnectionProperties(String fullConnectionName, Properties overrides){
+        ConnectionDescriptor descriptor = new ConnectionDescriptor(fullConnectionName);
+        Properties properties = new Properties();
+        for (PropertiesProvider provider : propertiesProviders) {
+            Properties foundProps = provider.getProperties(descriptor.getConnectionName(), descriptor.getDeploymentLevel(), environment);
+            if (foundProps != null) {
+                properties.putAll(foundProps);
+            }
+            if (!properties.isEmpty())
+                break;
+        }
+        if(overrides != null)
+            properties.putAll(overrides);
+
+        return properties;
+    }
+
+    protected AutoCloseable getConnectionImpl(Class<? extends AutoCloseable> connectionType, String fullConnectionName, Properties overrides) throws Exception {
+        ConnectionDescriptor descriptor = new ConnectionDescriptor(fullConnectionName);
+
+        String connectionName = descriptor.getConnectionName();
+        DeploymentLevel deploymentLevel = descriptor.getDeploymentLevel();
+
         ConnectionGetter getter = new ConnectionGetter()
                 .forName(connectionName);
 
@@ -252,6 +288,7 @@ public class ConnectionManager {
             if (!getter.hasProvider()) {
                 throw new IOException("Unknown connection provider for " + connectionType + " named " + fullConnectionName);
             }
+            getter.forConnectionType(connectionType);
 
             for (PropertiesProvider provider : propertiesProviders) {
                 getter.withProperties(provider.getProperties(connectionName, deploymentLevel, environment));
@@ -293,7 +330,7 @@ public class ConnectionManager {
         for (PropertiesProvider provider : list) {
             if (provider.getClass().equals(providerClass)) {
                 list.remove(provider);
-                // there could me multiple instances make sure we remove all
+                // there could be multiple instances make sure we remove all
                 return unregisterPropertiesProvider(providerClass, list);
             }
         }
@@ -329,13 +366,7 @@ public class ConnectionManager {
     }
 
     private void removeConnectionType(Class<? extends AutoCloseable> connectionType){
-        ConnectionProvider old = connectionProviders.get(connectionType);
-        if (old != null && old instanceof AutoCloseable){
-            try {
-                ((AutoCloseable) old).close();
-            } catch (Exception e) {
-            }
-        }
+        AutoCloseables.closeQuietly(connectionProviders.get(connectionType));
         connectionProviders.remove(connectionType);
     }
 
@@ -343,4 +374,5 @@ public class ConnectionManager {
         removeConnectionType(connectionType);
         connectionProviders.put(connectionType, provider);
     }
+
 }

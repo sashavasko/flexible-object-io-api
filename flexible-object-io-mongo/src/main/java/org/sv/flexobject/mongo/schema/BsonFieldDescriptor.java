@@ -5,18 +5,17 @@ import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.codecs.pojo.annotations.BsonRepresentation;
 import org.sv.flexobject.Streamable;
 import org.sv.flexobject.mongo.schema.annotations.BsonName;
-import org.sv.flexobject.schema.AbstractFieldDescriptor;
-import org.sv.flexobject.schema.DataTypes;
-import org.sv.flexobject.schema.Schema;
-import org.sv.flexobject.schema.SchemaException;
+import org.sv.flexobject.schema.*;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class BsonFieldDescriptor extends AbstractFieldDescriptor {
 
-    protected BsonType type;
+    protected DataTypes type;
+    protected BsonType bsonType;
     protected String bsonName;
     protected boolean isArray = false;
     protected boolean isDocument = false;
@@ -26,15 +25,19 @@ public class BsonFieldDescriptor extends AbstractFieldDescriptor {
 
         Class<?> fieldClass = field.getType();
         DataTypes dataType = DataTypes.valueOf(fieldClass);
+        this.type = dataType;
 
         BsonProperty bsonProperty = field.getAnnotation(BsonProperty.class);
         BsonName bn = field.getAnnotation(BsonName.class);
         bsonName = bn != null ? bn.name() : bsonProperty != null ? bsonProperty.value() : getName();
 
         try {
-            if (fieldClass.isArray() || List.class.isAssignableFrom(fieldClass)) {
+            if (fieldClass.isArray()
+                    || List.class.isAssignableFrom(fieldClass)
+                    || Set.class.isAssignableFrom(fieldClass)) {
                 this.isArray = true;
-                dataType = Schema.getRegisteredSchema(dataClass).getDescriptor(order).getValueType();
+                FieldDescriptor fieldDescriptor = Schema.getRegisteredSchema(dataClass).getDescriptor(order);
+                dataType = fieldDescriptor.getValueType();
             } else if (Streamable.class.isAssignableFrom(fieldClass) || Map.class.isAssignableFrom(fieldClass)) {
                 this.isDocument = true;
                 dataType = Schema.getRegisteredSchema(dataClass).getDescriptor(order).getValueType();
@@ -44,7 +47,7 @@ public class BsonFieldDescriptor extends AbstractFieldDescriptor {
 
         BsonRepresentation bsonRepresentation = field.getAnnotation(BsonRepresentation.class);
         org.sv.flexobject.mongo.schema.annotations.BsonType bt =  field.getAnnotation(org.sv.flexobject.mongo.schema.annotations.BsonType.class);
-        type = bt != null ? bt.type() : bsonRepresentation != null ? bsonRepresentation.value() : genericBsonType(dataType);
+        bsonType = bt != null ? bt.type() : bsonRepresentation != null ? bsonRepresentation.value() : genericBsonType(dataType);
     }
 
     private BsonType genericBsonType(DataTypes dataType) {
@@ -64,8 +67,12 @@ public class BsonFieldDescriptor extends AbstractFieldDescriptor {
         return null;
     }
 
-    public BsonType getType() {
+    public DataTypes getType() {
         return type;
+    }
+
+    public BsonType getBsonType() {
+        return bsonType;
     }
 
     public boolean isArray() {

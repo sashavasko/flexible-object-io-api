@@ -17,12 +17,14 @@ import org.sv.flexobject.stream.sinks.SingleValueSink;
 import org.sv.flexobject.testdata.TestDataWithInferredSchema;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.UUID;
 
 import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
 import static junit.framework.TestCase.assertEquals;
 
 public class BsonToJsonConverterTest {
+
 
     @Test
     public void convertUUID() throws IOException {
@@ -39,6 +41,25 @@ public class BsonToJsonConverterTest {
 
         Document query2 = Document.parse(json.toString());
         assertEquals(UUID.fromString("8529e0c9-bde0-4d24-9340-f396512f5e6a"), query2.get("uuid"));
+    }
+
+    public static final int OBJECT_ID_LENGTH = 12;
+
+    public static ByteBuffer parseIdString(final String s) {
+        ByteBuffer bb = ByteBuffer.allocate(OBJECT_ID_LENGTH);
+        for (int i = 0; i < OBJECT_ID_LENGTH; i++) {
+            bb.put((byte) Integer.parseInt(s.substring(i * 2, i * 2 + 2), 16));
+        }
+        bb.position(0);
+        return bb;
+    }
+
+    @Test
+    public void objectId() {
+        String oid = "621cc7aa59080100011db2df";
+        ByteBuffer bb = parseIdString(oid);
+        System.out.println("recordIdTimestamp:" + bb.getInt());
+        System.out.println("recordIdIncrement:" + bb.getLong());
     }
 
     @Test
@@ -59,7 +80,7 @@ public class BsonToJsonConverterTest {
         JsonNode json = testData.toJson();
         Document document = Document.parse(json.toString());
 
-        JsonNodeWriter writer = new JsonNodeWriter(new SingleValueSink<JsonNode>(), JsonWriterSettings.builder().build());
+        JsonNodeWriter writer = new JsonNodeWriter(new SingleValueSink<>(), JsonWriterSettings.builder().build());
         Encoder encoder = getDefaultCodecRegistry().get(Document.class);
         encoder.encode(writer, document, EncoderContext.builder().isEncodingCollectibleDocument(true).build());
 
@@ -69,4 +90,18 @@ public class BsonToJsonConverterTest {
         assertEquals(json.toString(), actualJson.toString());
     }
 
+    public void doTest(String file) throws IOException {
+        String simpleReportJson = IOUtils.toString(
+                this.getClass().getResourceAsStream(file),
+                "UTF-8"
+        );
+        BasicDBObject dbObject = BasicDBObject.parse(simpleReportJson);
+
+        BsonToJsonConverter converter = BsonToJsonConverter.relaxed();
+
+        JsonNode cleanJson = objectMapper.readTree(dbObject.toJson());
+        JsonNode converted = converter.convert(dbObject);
+//        assertEquals (cleanJson, converted);
+        assertEquals (cleanJson.toString(), objectMapper.writeValueAsString(converted));
+    }
 }

@@ -1,9 +1,6 @@
 package org.sv.flexobject.mongo.json;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.bson.*;
 import org.bson.json.Converter;
 import org.bson.json.JsonMode;
@@ -11,7 +8,6 @@ import org.bson.json.JsonWriterSettings;
 import org.bson.json.StrictJsonWriter;
 import org.bson.types.Decimal128;
 import org.bson.types.ObjectId;
-import org.joda.time.DateTime;
 import org.sv.flexobject.stream.Sink;
 
 import java.util.Stack;

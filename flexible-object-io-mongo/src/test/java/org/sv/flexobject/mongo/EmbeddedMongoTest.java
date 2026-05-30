@@ -9,6 +9,8 @@ import org.bson.Document;
 import org.bson.RawBsonDocument;
 import org.junit.After;
 import org.junit.Before;
+import org.sv.flexobject.connections.ConnectionManager;
+import org.sv.flexobject.connections.SecretProvider;
 
 import java.net.InetSocketAddress;
 import java.util.Properties;
@@ -22,6 +24,16 @@ public class EmbeddedMongoTest {
     protected MongoDatabase db;
     protected MongoCollection<Document> collection;
     protected MongoCollection<RawBsonDocument> collectionRaw;
+    Properties connectionProperties = new Properties();
+    protected String dbName = "testdb";
+
+    public class EmbeddedPropertiesProvider implements SecretProvider {
+
+        @Override
+        public Properties getProperties(String connectionName, ConnectionManager.DeploymentLevel deploymentLevel, String environment) {
+            return connectionProperties;
+        }
+    }
 
     @Before
     public void setUp() throws Exception {
@@ -34,11 +46,15 @@ public class EmbeddedMongoTest {
         // bind on a random local port
         serverAddress = server.bind();
         System.out.println("Started embedded Fake Mongo instance on " + serverAddress);
-        Properties connectionProperties = new Properties();
         connectionProperties.setProperty("url", "mongodb:/" + serverAddress.toString());
+        ConnectionManager.getInstance()
+                .clearAll()
+                .registerPropertiesProvider(new EmbeddedPropertiesProvider())
+                .registerProvider(MongoClientProvider.class, MongoClient.class)
+        ;
 
         client = (MongoClient) provider.getConnection("blah", connectionProperties, null);
-        db = client.getDatabase("testdb");
+        db = client.getDatabase(dbName);
         collection = db.getCollection(COLLECTION_NAME);
         collectionRaw = db.getCollection(COLLECTION_NAME, RawBsonDocument.class);
     }
@@ -47,7 +63,7 @@ public class EmbeddedMongoTest {
     public void tearDown() {
         client.close();
         server.shutdown();
+        ConnectionManager.getInstance()
+                .clearAll();
     }
-
-
 }

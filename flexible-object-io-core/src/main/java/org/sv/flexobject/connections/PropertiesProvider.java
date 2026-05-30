@@ -18,7 +18,6 @@ public interface PropertiesProvider extends Provider {
         return props;
     }
 
-
     default Properties filter(Namespace namespace, Properties properties){
         Properties connectionProperties = filter(properties, namespace.getNamespace() + ".");
         return connectionProperties.isEmpty() ? filter(properties, null) : connectionProperties;
@@ -39,8 +38,5 @@ public interface PropertiesProvider extends Provider {
         return filtered;
     }
 
-
-
     Properties getProperties(String connectionName, ConnectionManager.DeploymentLevel deploymentLevel, String environment);
-
 }

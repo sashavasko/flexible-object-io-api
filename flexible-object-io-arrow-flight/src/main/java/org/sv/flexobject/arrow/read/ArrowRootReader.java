@@ -5,7 +5,6 @@ import org.sv.flexobject.Streamable;
 import org.sv.flexobject.schema.Schema;
 import org.sv.flexobject.schema.SchemaException;
 import org.sv.flexobject.stream.Source;
-import org.sv.flexobject.utility.InstanceFactory;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.FieldVector;
@@ -13,6 +12,7 @@ import org.apache.arrow.vector.VectorSchemaRoot;
 import org.apache.arrow.vector.dictionary.Dictionary;
 import org.apache.arrow.vector.types.pojo.Field;
 import org.apache.commons.lang3.NotImplementedException;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.util.List;
 import java.util.Map;

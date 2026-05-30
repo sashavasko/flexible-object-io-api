@@ -5,24 +5,95 @@ import com.mongodb.client.MongoCollection;
 import org.bson.*;
 import org.bson.types.ObjectId;
 import org.junit.Test;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.json.MapperFactory;
 import org.sv.flexobject.mongo.EmbeddedMongoTest;
+import org.sv.flexobject.mongo.schema.testdata.ObjectWithArrayOfStrings;
 import org.sv.flexobject.mongo.schema.testdata.ObjectWithObjectId;
+import org.sv.flexobject.mongo.schema.testdata.ObjectWithSetOfLongs;
 import org.sv.flexobject.mongo.schema.testdata.ObjectWithTimestampAndDate;
+import org.sv.flexobject.schema.AbstractFieldDescriptor;
 import org.sv.flexobject.schema.DataTypes;
+import org.sv.flexobject.schema.SchemaElement;
 import org.sv.flexobject.testdata.TestDataWithInferredSchema;
 import org.sv.flexobject.testdata.TestDataWithSubSchema;
 import org.sv.flexobject.testdata.levelone.leveltwo.SimpleObject;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
 public class BsonSchemaTest extends EmbeddedMongoTest {
 
     BsonSchema bsonSchema;
+
+    @Test
+    public void testSetOfLongs() throws Exception {
+        ObjectWithSetOfLongs data = new ObjectWithSetOfLongs();
+        data.getSchema();
+        long val1 = 178575;
+        long val2 = 178675;
+        long val3 = 178375;
+        data.add(val1);
+        data.add(val2);
+        data.add(val3);
+        data.add(ObjectWithSetOfLongs.TestEnum.one);
+        data.add(ObjectWithSetOfLongs.TestEnum.two);
+
+        bsonSchema = BsonSchema.getRegisteredSchema(data.getClass());
+        collection.insertOne(bsonSchema.toBson(data));
+
+        assertEquals(1, collection.countDocuments());
+        Document documentInCollection = collection.find().first();
+
+        ObjectWithSetOfLongs dataOut = bsonSchema.fromBson(documentInCollection);
+        assertEquals(data, dataOut);
+    }
+
+    @Test
+    public void testEmptySet() throws Exception {
+        ObjectWithSetOfLongs data = new ObjectWithSetOfLongs();
+        data.getSchema();
+        data.add(ObjectWithSetOfLongs.TestEnum.one);
+        data.add(ObjectWithSetOfLongs.TestEnum.two);
+
+        bsonSchema = BsonSchema.getRegisteredSchema(data.getClass());
+        collection.insertOne(bsonSchema.toBson(data));
+
+        assertEquals(1, collection.countDocuments());
+        Document documentInCollection = collection.find().first();
+
+        assertFalse(documentInCollection.containsKey("set"));
+        ObjectWithSetOfLongs dataOut = bsonSchema.fromBson(documentInCollection);
+        assertEquals(data, dataOut);
+    }
+
+    @Test
+    public void testEmptyEnumSet() throws Exception {
+        ObjectWithSetOfLongs data = new ObjectWithSetOfLongs();
+        data.getSchema();
+        long val1 = 178575;
+        long val2 = 178675;
+        long val3 = 178375;
+        data.add(val1);
+        data.add(val2);
+        data.add(val3);
+
+        bsonSchema = BsonSchema.getRegisteredSchema(data.getClass());
+        collection.insertOne(bsonSchema.toBson(data));
+
+        assertEquals(1, collection.countDocuments());
+        Document documentInCollection = collection.find().first();
+
+        assertFalse(documentInCollection.containsKey("enumSet"));
+
+        ObjectWithSetOfLongs dataOut = bsonSchema.fromBson(documentInCollection);
+        assertEquals(data, dataOut);
+    }
 
     @Test
     public void testSimpleInsertQuery() throws Exception {
@@ -175,7 +246,6 @@ public class BsonSchemaTest extends EmbeddedMongoTest {
         assertEquals(data, convertedData);
     }
 
-    @Test
     public void toBsonTestDataWithInferredSchema() throws Exception {
         TestDataWithInferredSchema data = new TestDataWithInferredSchema();
         BsonSchema bsonSchema = BsonSchema.getRegisteredSchema(data.getClass());
@@ -240,5 +310,75 @@ public class BsonSchemaTest extends EmbeddedMongoTest {
 //        MongoCollection<TestDataWithInferredSchema> pojoCollection = db.getCollection(COLLECTION_NAME, TestDataWithInferredSchema.class);
 //        convertedData = pojoCollection.find().first();
 //        assertEquals(data, convertedData);
+    }
+
+    public static boolean compareFields(Object o1, Object o2){
+        for (SchemaElement field : ((Streamable)o1).getSchema().getFields()) {
+            AbstractFieldDescriptor descriptor = field.getDescriptor();
+            Object value = descriptor.get(o1);
+            Object otherValue = descriptor.get(o2);
+            if (value != null) {
+                if (otherValue == null){
+                    throw new RuntimeException("o1:" + value + " o2:" + otherValue + " " + field);
+                }
+
+                if (value.getClass().isArray() != otherValue.getClass().isArray()){
+                    throw new RuntimeException("o1:" + value + " o2:" + otherValue + " " + field);
+                }
+
+                if (value.getClass().isArray()) {
+                    if (!Arrays.equals((Object[])value, (Object[])otherValue)) {
+                        throw new RuntimeException("o1:" + value + " o2:" + otherValue + " " + field);
+                    }
+                } else if (value instanceof Map) {
+                    if (otherValue instanceof Map){
+                        return ((Map)value).entrySet().equals(((Map)otherValue).entrySet());
+                    } else{
+                        throw new RuntimeException("o1:" + value + " o2:" + otherValue + " " + field);
+                    }
+                } else {
+                    if (value instanceof Timestamp && otherValue instanceof Timestamp){
+                        Timestamp t1 = (Timestamp) value;
+                        Timestamp t2 = (Timestamp) otherValue;
+                        if (t1.getTime() != t2.getTime() || t1.getNanos() != t2.getNanos()) {
+                            throw new RuntimeException("o1.time:" + t1.getTime() + " o2.time:" + t2.getTime() + "o1.nanos:" + t1.getNanos() + " o2.nanos:" + t2.getNanos() + " t1:" + t1 + " t2:" + t2);
+                        } else {
+                            if (!t1.equals(t2))
+                                throw new RuntimeException("Timestamp comparison sucks!");
+                            return true;
+                        }
+                    } else if (!value.equals(otherValue)) {
+                        throw new RuntimeException("o1:" + value + " o2:" + otherValue + " " + field);
+                    }
+                }
+            } else if (otherValue != null){
+                throw new RuntimeException("o1:" + value + " o2:" + otherValue + " " + field);
+            }
+        }
+
+        return true;
+    }
+
+    @Test
+    public void toFromBsonWithEmptyArray() throws Exception {
+        ObjectWithArrayOfStrings data = new ObjectWithArrayOfStrings();
+        BsonSchema bsonSchema = BsonSchema.getRegisteredSchema(data.getClass());
+        Document bson = bsonSchema.toBson(data);
+
+        ObjectWithArrayOfStrings convertedData = bsonSchema.fromBson(bson);
+        assertEquals(data, convertedData);
+    }
+
+    @Test
+    public void toFromBsonWithArrayValues() throws Exception {
+        ObjectWithArrayOfStrings data = new ObjectWithArrayOfStrings();
+        data.array[1] = "foo";
+        data.array[3] = "bar";
+
+        BsonSchema bsonSchema = BsonSchema.getRegisteredSchema(data.getClass());
+        Document bson = bsonSchema.toBson(data);
+
+        ObjectWithArrayOfStrings convertedData = bsonSchema.fromBson(bson);
+        assertEquals(data, convertedData);
     }
 }

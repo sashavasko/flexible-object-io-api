@@ -54,12 +54,14 @@ public class BsonToJsonConverter {
                 .outputMode(JsonMode.RELAXED)
                 .dateTimeConverter(new NormalDateConverter()) // disable $date
                 .objectIdConverter(new HexObjectIdConverter())// disable $oid
+
                 .build());
     }
 
     public BsonToJsonConverter(JsonWriterSettings writerSettings) {
         this.writerSettings = writerSettings;
     }
+
     private Encoder makeEncoder(Object value){
         CodecRegistry codecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry());
         CodecRegistry uuidRegistry = CodecRegistries.withUuidRepresentation(codecRegistry, UuidRepresentation.STANDARD);
@@ -76,7 +78,10 @@ public class BsonToJsonConverter {
         if (encoder == null)
             throw new IOException("Unknown BSON document type " + value.getClass());
 
-        encoder.encode(singleValueWriter, value, EncoderContext.builder().isEncodingCollectibleDocument(true).build());
+        encoder.encode(singleValueWriter, value,
+                EncoderContext.builder()
+                        .isEncodingCollectibleDocument(true)
+                        .build());
         return singleValueWriter.getSink().get();
     }
 
@@ -93,6 +98,4 @@ public class BsonToJsonConverter {
             }
         }
     }
-
-
 }

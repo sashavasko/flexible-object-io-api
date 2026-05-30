@@ -1,15 +1,10 @@
-apply plugin: 'java'
-apply plugin: 'java-library'
-apply plugin: 'idea'
-group = 'org.sv'
-
-repositories {
-    mavenCentral()
-}
-
 tasks.named('compileTestJava', JavaCompile) {
     options.compilerArgs << "-Xlint:unchecked"
     options.compilerArgs << "-Xlint:deprecation"
+}
+
+test {
+    jvmArgs "--add-opens=java.base/java.lang=ALL-UNNAMED", "--add-opens=java.base/java.util=ALL-UNNAMED"
 }
 
 dependencies {
@@ -33,12 +28,10 @@ dependencies {
         exclude(group:'org.xerial.snappy')
         exclude(group:'io.netty')
     }
-
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.0'
 }
 
 test {
     useJUnitPlatform()
-    jvmArgs "--add-opens=java.base/java.lang=ALL-UNNAMED", "--add-opens=java.base/java.util=ALL-UNNAMED"
 }

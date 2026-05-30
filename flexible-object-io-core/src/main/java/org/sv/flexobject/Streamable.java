@@ -48,6 +48,10 @@ public interface Streamable extends Savable, Loadable {
         return descriptor.get(this);
     }
 
+    default Object getRaw(AbstractFieldDescriptor descriptor) throws Exception {
+        return descriptor.getRaw(this);
+    }
+
     default Object get(Enum field) throws Exception {
 //        if (getSchema().isInferred())
 //            throw new SchemaException("Enum Generic Getters and Setters only available in Streamable classes with explicit or annotated schema. Class " + schema.getName());
@@ -131,6 +135,7 @@ public interface Streamable extends Savable, Loadable {
         try {
             return o.toJson().toString();
         } catch (Exception e) {
+//            System.out.println(e);
             return o.getClass().getName() + "@" + Integer.toHexString(o.hashCode()) + "(" + e.getMessage() + ")";
         }
     }

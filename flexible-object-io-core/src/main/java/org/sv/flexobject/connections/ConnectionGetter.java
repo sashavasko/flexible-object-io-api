@@ -6,6 +6,7 @@ import java.util.Properties;
 public class ConnectionGetter implements Runnable {
     ConnectionProvider connectionProvider;
     String connectionName;
+    Class<? extends AutoCloseable> connectionType;
     Properties connectionProperties = new Properties();
     Object secret;
     AutoCloseable connection;
@@ -30,7 +31,7 @@ public class ConnectionGetter implements Runnable {
     @Override
     public void run() {
         try {
-            connection = connectionProvider.getConnection(connectionName, connectionProperties, secret);
+            connection = connectionProvider.getConnection(connectionName, connectionType, connectionProperties, secret);
             if (cancelled) {
                 connection.close();
                 connection = null;
@@ -52,6 +53,11 @@ public class ConnectionGetter implements Runnable {
 
     public ConnectionGetter forName(String connectionName) {
         this.connectionName = connectionName;
+        return this;
+    }
+
+    public ConnectionGetter forConnectionType(Class<? extends AutoCloseable> connectionType) {
+        this.connectionType = connectionType;
         return this;
     }
 

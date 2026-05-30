@@ -107,8 +107,9 @@ public class ConnectionManagerTest {
         when(mockSecretProvider.getSecret(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest", mockProperties)).thenReturn(mockSecret);
         when(mockSecretProvider.getSecret(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest", mockProperties2)).thenReturn(mockSecret);
         when(mockSecretProvider.getSecret(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest", mockProperties3)).thenReturn(mockSecret);
+//        when(mockSecretProvider.getSecret(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest", null)).thenReturn(mockSecret);
         when(mockPropertiesProvider.getProperties(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest")).thenReturn(mockProperties);
-        when(mockConnectionProvider.getConnection(connectionName, mockProperties, mockSecret)).thenReturn(mockConnection);
+        when(mockConnectionProvider.getConnection(connectionName, FakeConnection.class, mockProperties, mockSecret)).thenReturn(mockConnection);
         when(mockConnectionProvider.requiresProperties()).thenReturn(true);
         when(mockConnectionProvider2.requiresProperties()).thenReturn(true);
     }
@@ -152,7 +153,7 @@ public class ConnectionManagerTest {
         expectedFullProperties.putAll(mockProperties);
         expectedFullProperties.putAll(overrides);
 
-        when(mockConnectionProvider.getConnection(connectionName, expectedFullProperties, null)).thenReturn(mockConnection);
+        when(mockConnectionProvider.getConnection(connectionName, FakeConnection.class, expectedFullProperties, null)).thenReturn(mockConnection);
         assertSame(mockConnection, ConnectionManager.getInstance().getConnection(FakeConnection.class, connectionName, overrides));
     }
 
@@ -165,7 +166,7 @@ public class ConnectionManagerTest {
     public void registerProviderForMultipleClasses() throws Exception {
         ConnectionManager.getInstance()
                 .registerProvider(mockConnectionProvider2, FakeConnection.class, AutoCloseable.class);
-        when(mockConnectionProvider2.getConnection(connectionName, mockProperties, mockSecret)).thenReturn(mockConnection2);
+        when(mockConnectionProvider2.getConnection(connectionName, AutoCloseable.class, mockProperties, mockSecret)).thenReturn(mockConnection2);
         assertSame(mockConnection2, ConnectionManager.getInstance().getConnection(AutoCloseable.class, connectionName));
     }
 
@@ -180,7 +181,7 @@ public class ConnectionManagerTest {
     public void registerAnotherProvider() throws Exception {
         assertEquals(mockConnection, ConnectionManager.getInstance().getConnection(FakeConnection.class, connectionName));
 
-        when(mockConnectionProvider2.getConnection(connectionName, mockProperties, mockSecret)).thenReturn(mockConnection2);
+        when(mockConnectionProvider2.getConnection(connectionName, FakeConnection.class, mockProperties, mockSecret)).thenReturn(mockConnection2);
         ConnectionManager.getInstance().registerProvider(mockConnectionProvider2, FakeConnection.class);
 
         assertSame(mockConnection2, ConnectionManager.getInstance().getConnection(FakeConnection.class, connectionName));
@@ -221,8 +222,8 @@ public class ConnectionManagerTest {
 
         when(mockPropertiesProvider2.getProperties(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest")).thenReturn(mockProperties2);
         when(mockPropertiesProvider3.getProperties(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest")).thenReturn(mockProperties3);
-        when(mockConnectionProvider.getConnection(connectionName, mockProperties2, mockSecret)).thenReturn(mockConnection2);
-        when(mockConnectionProvider.getConnection(connectionName, mockProperties3, mockSecret)).thenReturn(mockConnection3);
+        when(mockConnectionProvider.getConnection(connectionName, FakeConnection.class, mockProperties2, mockSecret)).thenReturn(mockConnection2);
+        when(mockConnectionProvider.getConnection(connectionName, FakeConnection.class, mockProperties3, mockSecret)).thenReturn(mockConnection3);
 
 //        assertSame(mockConnection, ConnectionManager.getInstance().getConnection(FakeConnection.class, connectionName));
 
@@ -267,8 +268,8 @@ public class ConnectionManagerTest {
 
         when(mockSecretProvider2.getSecret(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest", mockProperties)).thenReturn(mockSecret2);
         when(mockSecretProvider3.getSecret(connectionName, ConnectionManager.DeploymentLevel.alpha, "unitTest", mockProperties)).thenReturn(mockSecret3);
-        when(mockConnectionProvider.getConnection(connectionName, mockProperties, mockSecret2)).thenReturn(mockConnection2);
-        when(mockConnectionProvider.getConnection(connectionName, mockProperties, mockSecret3)).thenReturn(mockConnection3);
+        when(mockConnectionProvider.getConnection(connectionName, FakeConnection.class, mockProperties, mockSecret2)).thenReturn(mockConnection2);
+        when(mockConnectionProvider.getConnection(connectionName, FakeConnection.class, mockProperties, mockSecret3)).thenReturn(mockConnection3);
 
         assertSame(mockConnection, ConnectionManager.getInstance().getConnection(FakeConnection.class, connectionName));
 

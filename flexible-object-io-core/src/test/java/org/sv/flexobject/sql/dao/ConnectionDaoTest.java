@@ -28,14 +28,14 @@ public class ConnectionDaoTest {
 
     @Mock
     PropertiesProvider mockPropertiesProvider;
-    
+
     @Mock
     ConnectionProvider mockProvider;
 
     Properties mockProperties1 = new Properties();
 
     Properties mockProperties2 = new Properties();
-    
+
     @Mock
     Connection connection;
 
@@ -51,20 +51,20 @@ public class ConnectionDaoTest {
     @Mock
     OutAdapter outAdapter;
 
-     @Before
+    @Before
     public void setUp() throws Exception {
-         mockProperties1.put("foo1", "bar1");
-         mockProperties2.put("foo2", "bar2");
-         ConnectionManager.getInstance().registerProvider(mockProvider, Connection.class);
-         ConnectionManager.getInstance().registerPropertiesProvider(mockPropertiesProvider);
-         ConnectionManager.getInstance().setEnvironment("unitTest");
-         
-         when(mockPropertiesProvider.getProperties("test", ConnectionManager.DeploymentLevel.alpha, "unitTest"))
-                 .thenReturn(mockProperties1);
-         when(mockPropertiesProvider.getProperties("test2", ConnectionManager.DeploymentLevel.alpha, "unitTest"))
-                 .thenReturn(mockProperties2);
-        when(mockProvider.getConnection("test", mockProperties1, null)).thenReturn(connection);
-        when(mockProvider.getConnection("test2", mockProperties2, null)).thenReturn(connection2);
+        mockProperties1.put("foo1", "bar1");
+        mockProperties2.put("foo2", "bar2");
+        ConnectionManager.getInstance().registerProvider(mockProvider, Connection.class);
+        ConnectionManager.getInstance().registerPropertiesProvider(mockPropertiesProvider);
+        ConnectionManager.getInstance().setEnvironment("unitTest");
+
+        when(mockPropertiesProvider.getProperties("test", ConnectionManager.DeploymentLevel.alpha, "unitTest"))
+                .thenReturn(mockProperties1);
+        when(mockPropertiesProvider.getProperties("test2", ConnectionManager.DeploymentLevel.alpha, "unitTest"))
+                .thenReturn(mockProperties2);
+        when(mockProvider.getConnection("test", Connection.class, mockProperties1, null)).thenReturn(connection);
+        when(mockProvider.getConnection("test2", Connection.class, mockProperties2, null)).thenReturn(connection2);
         when(adapterFactory.createInputAdapter("input")).thenReturn(inAdapter);
         when(adapterFactory.createOutputAdapter("output")).thenReturn(outAdapter);
     }
@@ -84,7 +84,7 @@ public class ConnectionDaoTest {
         Mockito.verify(connection).close();
 
         dao.getConnection();
-        Mockito.verify(mockProvider, Mockito.times(2)).getConnection("test", mockProperties1, null);
+        Mockito.verify(mockProvider, Mockito.times(2)).getConnection("test", Connection.class, mockProperties1, null);
 
         ConnectionDao dao2 = new ConnectionDao("test2");
         assertSame(connection2, dao2.getConnection());
@@ -101,7 +101,5 @@ public class ConnectionDaoTest {
 
         assertSame(inAdapter, dao.createInputAdapter("input"));
         assertSame(outAdapter, dao.createOutputAdapter("output"));
-     }
-
-
+    }
 }

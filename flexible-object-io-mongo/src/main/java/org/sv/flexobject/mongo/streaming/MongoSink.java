@@ -27,11 +27,24 @@ public class MongoSink<SELF extends MongoSink> extends MongoAbstractSink<Streama
         return (SELF) this;
     }
 
-    @Override
-    public boolean put(Streamable value) throws Exception {
+    public SELF forSchema(BsonSchema schema){
+        bsonSchema = schema;
+        return (SELF) this;
+    }
+
+    public BsonSchema getBsonSchema(Streamable value) {
         if (bsonSchema == null)
             bsonSchema = BsonSchema.getRegisteredSchema(value.getClass());
-        Document document = bsonSchema.toBson(value);
+        return bsonSchema;
+    }
+
+    public MongoCollection<Document> getCollection() {
+        return collection;
+    }
+
+    @Override
+    public boolean put(Streamable value) throws Exception {
+        Document document = getBsonSchema(value).toBson(value);
         return handleResult(collection.insertOne(document));
     }
 }

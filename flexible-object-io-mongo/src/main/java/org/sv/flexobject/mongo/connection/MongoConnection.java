@@ -21,14 +21,6 @@ public class MongoConnection implements AutoCloseable{
         client.close();
     }
 
-    public MongoClient getClient() {
-        return client;
-    }
-
-    public MongoDatabase getDb() {
-        return db;
-    }
-
     public static class Builder<SELF extends Builder> {
         String connectionName;
         String dbName;
@@ -79,6 +71,16 @@ public class MongoConnection implements AutoCloseable{
                 connection.client = (MongoClient) MongoClientProvider.getConnection(overrides, secret);
             } else
                 throw new RuntimeException("Can't create Mongo Connection: Either connection name or url in properties must be set");
+
+            if (StringUtils.isBlank(dbName)){
+                Properties connectionProperties = ConnectionManager.getInstance().getConnectionProperties(connectionName, overrides);
+                if (connectionProperties.containsKey("database")) {
+                    dbName = connectionProperties.getProperty("database");
+                    MongoClientProvider.logger.warn("Database is not specified - Using database from connection properties named: {}", dbName);
+                }else
+                    throw new RuntimeException("Can't create Mongo Connection: Database is not set");
+            }
+
             connection.db = connection.client.getDatabase(dbName);
             return connection;
         }
@@ -108,4 +110,11 @@ public class MongoConnection implements AutoCloseable{
         return db.getCollection(collectionName, documentClass);
     }
 
+    public MongoDatabase getDb() {
+        return db;
+    }
+
+    public MongoClient getClient() {
+        return client;
+    }
 }

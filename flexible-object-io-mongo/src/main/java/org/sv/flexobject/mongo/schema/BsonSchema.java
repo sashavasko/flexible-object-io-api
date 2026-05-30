@@ -6,7 +6,7 @@ import org.bson.types.Binary;
 import org.bson.types.ObjectId;
 import org.sv.flexobject.Streamable;
 import org.sv.flexobject.StreamableWithSchema;
-import org.sv.flexobject.mongo.json.BsonToJsonConverter;
+import org.sv.flexobject.mongo.json.SimplisticBsonObjectToJsonConverter;
 import org.sv.flexobject.schema.*;
 import org.sv.flexobject.schema.reflect.FieldWrapper;
 import org.sv.flexobject.util.FunctionWithException;
@@ -51,6 +51,9 @@ public class BsonSchema extends AbstractSchema {
 
     }
 
+    public BsonSchema() {
+    }
+
     public BsonSchema(Class<?> dataClass) {
         super(dataClass);
         List<SchemaElement> fieldList = new ArrayList<>();
@@ -61,6 +64,10 @@ public class BsonSchema extends AbstractSchema {
         setFields(fieldList);
 
         SchemaRegistry.getInstance().registerSchema(this);
+    }
+
+    public BsonSchema clone(){
+        return super.clone(BsonSchema.class);
     }
 
     public static BsonSchema getRegisteredSchema(Class<?> dataClass) {
@@ -92,7 +99,11 @@ public class BsonSchema extends AbstractSchema {
     }
 
     private String getBsonFieldName(String fieldName) {
-        return getFieldDescriptor(fieldName).getBsonName();
+        try {
+            return getFieldDescriptor(fieldName).getBsonName();
+        }catch (SchemaException e){
+            return null;
+        }
     }
 
     public static Document serialize(Streamable value) throws Exception {
@@ -105,7 +116,7 @@ public class BsonSchema extends AbstractSchema {
         for (int i = 0 ; i < fields.length ; ++i){
             FieldDescriptor schemaElement = schema.getDescriptor(i);
             BsonFieldDescriptor bsonSchemaElement = getFieldDescriptor(i);
-            Object bsonValue = toBson(schemaElement, bsonSchemaElement, value.get(schemaElement));
+            Object bsonValue = toBson(schemaElement, bsonSchemaElement, value.getRaw(schemaElement));
             if (bsonValue != null)
                 bson.put(bsonSchemaElement.getBsonName(), bsonValue);
         }
@@ -116,7 +127,11 @@ public class BsonSchema extends AbstractSchema {
         if (value == null)
             return null;
 
-        FieldWrapper.STRUCT structure = descriptor.getStructure();
+        FieldWrapper.STRUCT structure;
+        if(value instanceof EnumSet)
+            structure = FieldWrapper.STRUCT.list;
+        else
+            structure = descriptor.getStructure();
 
         Class<? extends Streamable> subSchema = descriptor.getSubschema();
         BsonSchema bsonSubSchema = subSchema == null ? null : getRegisteredSchema(subSchema);
@@ -127,6 +142,16 @@ public class BsonSchema extends AbstractSchema {
                     return new BsonBinary((byte[])value);
                 } else {
                     Object[] array = (Object[]) value;
+                    boolean isAllNull = true;
+                    for (Object o : array) {
+                        if (o != null) {
+                            isAllNull = false;
+                            break;
+                        }
+                    }
+                    if (isAllNull) {
+                        return null;
+                    }
                     List bsonArray = new ArrayList(array.length);
                     for (Object item : array) {
                         bsonArray.add(toBson(item, descriptor, bsonSchemaElement, bsonSubSchema));
@@ -136,6 +161,9 @@ public class BsonSchema extends AbstractSchema {
 
             case list:
                 Collection list = (Collection) value;
+                if(list.isEmpty())
+                    return null;
+
                 List bsonList = new ArrayList(list.size());
                 for (Object item : list) {
                     bsonList.add(toBson(item, descriptor, bsonSchemaElement, bsonSubSchema));
@@ -143,6 +171,9 @@ public class BsonSchema extends AbstractSchema {
                 return bsonList;
             case map:
                 Map<Object,Object> map = (Map) value;
+                if(map.isEmpty())
+                    return null;
+
                 Document bsonMap = new Document();
                 for (Map.Entry<Object,Object> entry : map.entrySet()) {
                     Object item = entry.getValue();
@@ -173,7 +204,7 @@ public class BsonSchema extends AbstractSchema {
             return null;
 
         if (bsonSchemaElement != null){
-            switch (bsonSchemaElement.getType()){
+            switch (bsonSchemaElement.getBsonType()){
                 case INT32: return new BsonInt32(DataTypes.int32Converter (value));
                 case BINARY:
                     if (value instanceof String){
@@ -234,7 +265,12 @@ public class BsonSchema extends AbstractSchema {
             String fieldName = field.getDescriptor().getName();
             FieldDescriptor descriptor = (FieldDescriptor) field.getDescriptor();
             Class<? extends Streamable> recordSchema = descriptor.getSubschema();
-            Object value = src.get(bsonSchema.getBsonFieldName(fieldName));
+
+            String bsonName = bsonSchema.getBsonFieldName(fieldName);
+            if (bsonName == null || !src.containsKey(bsonName))
+                continue;
+
+            Object value = src.get(bsonName);
             DataTypes valueType = descriptor.getValueType();
             if (value == null){
                 dst.set(fieldName, null);
@@ -265,15 +301,13 @@ public class BsonSchema extends AbstractSchema {
         if (value == null || value instanceof BsonNull)
             return null;
 
-        BsonToJsonConverter bsonConverter = BsonToJsonConverter.relaxed();
-
         if (value instanceof Map) {
             Map<String, ?> map = (Map<String, ?>) value;
             if (recordSchema != null)
                 return fromBson(map, recordSchema);
             else {// actual map of values
                 if (valueType == DataTypes.jsonNode){
-                    return bsonConverter.convert(value);
+                    return SimplisticBsonObjectToJsonConverter.getInstance().convert(value);
                 }else {
                     Map<String, Object> convertedMap = new HashMap<>();
                     for (Map.Entry<String, ?> entry : map.entrySet()) {
