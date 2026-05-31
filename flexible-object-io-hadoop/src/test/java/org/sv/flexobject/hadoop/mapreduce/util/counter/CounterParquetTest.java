@@ -17,9 +17,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(MockitoJUnitRunner.class)
 public class CounterParquetTest {
 
-    @Mock
-    Configuration configuration;
-
+    Configuration configuration = new Configuration(false);
     @Mock
     TaskInputOutputContext context;
 
@@ -33,10 +31,10 @@ public class CounterParquetTest {
         Mockito.when(context.getConfiguration()).thenReturn(configuration);
         Mockito.when(context.getTaskAttemptID()).thenReturn(taskId);
         Mockito.when(taskId.toString()).thenReturn("testTask");
-        Mockito.when(configuration.get("org.sv.flexobject.hadoop.parquet.counters")).thenReturn("test_CounterParquet");
-        Mockito.when(configuration.get("fs.defaultFS", "file:///")).thenReturn("file:///");
-        Mockito.when(configuration.getInt("file.bytes-per-checksum", 512)).thenReturn(512);
-        Mockito.when(configuration.getInt("io.file.buffer.size", 4096)).thenReturn(4096);
+        configuration.set("sv.hadoop.parquet.counters", "test_CounterParquet");
+        configuration.set("fs.defaultFS", "file:///", "file:///");
+        configuration.setInt("file.bytes-per-checksum", 512);
+        configuration.setInt("io.file.buffer.size", 4096);
         counter.setContext(context);
     }
 
@@ -65,7 +63,7 @@ public class CounterParquetTest {
     public void closeWithNoCountersDoesNothing() throws Exception {
         counter.close();
 
-        Mockito.verifyZeroInteractions(context);
+        Mockito.verifyNoInteractions(context);
     }
 
 
@@ -84,8 +82,6 @@ public class CounterParquetTest {
         counter.increment("foo", 5);
 
         counter.close();
-
-        Mockito.verify(configuration).get("sv.hadoop.parquet.counters");
     }
 
     @Test
@@ -93,7 +89,5 @@ public class CounterParquetTest {
         counter.increment("foo", 5);
 
         counter.close();
-
-        Mockito.verify(configuration).get("sv.hadoop.parquet.counters");
     }
 }

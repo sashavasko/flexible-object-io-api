@@ -1,60 +1,72 @@
-apply plugin: 'java'
-apply plugin: 'java-library'
-apply plugin: 'idea'
-group = 'org.sv'
-
-sourceCompatibility = 1.8
-
-repositories {
-    mavenLocal()
-    mavenCentral()
+test {
+    jvmArgs "--add-opens=java.base/java.lang=ALL-UNNAMED", "--add-opens=java.base/java.util=ALL-UNNAMED"
 }
 
-ext.hadoopVersion = "3.3.1"
-ext.sparkVersion = "3.3.2"
 
 dependencies {
+    api group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.16'
+    api group: 'ch.qos.logback', name: 'logback-core', version: '1.5.16'
+    api group: 'org.xerial.snappy', name: 'snappy-java', version: '1.1.10.7'
+    api group: 'com.google.protobuf', name: 'protobuf-java', version: "${protobufVersion}"
+    api group: 'com.google.protobuf', name: 'protobuf-java-util', version: "${protobufVersion}"
 
-    api project(':flexible-object-io-core')
-    api project(':flexible-object-io-mongo')
-    testImplementation project(':flexible-object-io-testdata')
+    api group: 'io.netty', name: 'netty-all', version: "${nettyVersion}"
 
-    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-    api group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
-
-    api group: 'joda-time', name: 'joda-time', version: '2.10.1'
-
-    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-    api group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.7'
-    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
-
-    api ("org.apache.hadoop:hadoop-client:${hadoopVersion}"){
-        exclude group: 'com.fasterxml.jackson.core', module:'jackson-databind'
-        exclude group: 'com.fasterxml.jackson.core', module:'jackson-core'
-        exclude group: 'org.apache.avro', module:'avro'
+    api ("org.apache.hadoop:hadoop-auth:${hadoopVersion}"){
+        exclude(group:'org.apache.kerby')
+        exclude(group:'log4j', module:'log4j')
     }
+
+    api group: 'org.eclipse.jetty', name: 'jetty-http', version: "${jettyVersion}"
+    api group: 'org.eclipse.jetty', name: 'jetty-util', version: "${jettyVersion}"
+    api group: 'org.apache.ivy', name: 'ivy', version: '2.5.2'
+
+    api ("org.apache.hadoop:hadoop-hdfs-client:${hadoopVersion}")
+    api ("org.apache.hadoop:hadoop-hdfs-native-client:${hadoopVersion}")
+    api ("org.apache.hadoop:hadoop-mapreduce-client-app:${hadoopVersion}")
+    api ("org.apache.hadoop:hadoop-mapreduce-client-common:${hadoopVersion}")
+    api ("org.apache.hadoop:hadoop-mapreduce-client-core:${hadoopVersion}")
+    api ("org.apache.hadoop:hadoop-mapreduce-client-jobclient:${hadoopVersion}")
+    api ("org.apache.hadoop:hadoop-mapreduce-client-nativetask:${hadoopVersion}")
+    api ("org.apache.hadoop:hadoop-yarn-client:${hadoopVersion}")
+
+
     api (group: 'org.apache.spark', name: 'spark-core_2.12', version: "${sparkVersion}"){
         exclude group: 'org.apache.avro', module:'avro-mapred'
-        exclude group: 'org.apache.parquet', module:'parquet-column'
-        exclude group: 'org.apache.parquet', module:'parquet-hadoop'
-        exclude group: 'org.apache.parquet', module:'parquet-avro'
+        exclude(group:'log4j', module:'log4j')
+        exclude(group:'org.apache.ivy', module:'ivy')
+        exclude(group:'org.apache.logging.log4j', module:'log4j-slf4j-impl')
+        exclude(group:'org.apache.hadoop', module:'hadoop-client-api')
+        exclude(group:'org.apache.hadoop', module:'hadoop-client-runtime')
     }
-    compileOnly ("org.apache.spark:spark-sql_2.12:${sparkVersion}"){
+    api ("org.apache.spark:spark-sql_2.12:${sparkVersion}"){
+        exclude group: 'org.apache.arrow', module:'arrow-vector'
+        exclude group: 'org.apache.arrow', module:'arrow-memory'
+        exclude group: 'org.apache.arrow', module:'arrow-memory-netty'
         exclude group: 'org.apache.avro', module:'avro-mapred'
         exclude group: 'org.apache.parquet', module:'parquet-column'
         exclude group: 'org.apache.parquet', module:'parquet-hadoop'
         exclude group: 'org.apache.parquet', module:'parquet-avro'
+        exclude(group:'log4j', module:'log4j')
+        exclude(group:'org.apache.logging.log4j', module:'log4j-slf4j-impl')
+        exclude(group:'org.apache.hadoop', module:'hadoop-client-api')
+        exclude(group:'org.apache.hadoop', module:'hadoop-client-runtime')
     }
-    // https://mvnrepository.com/artifact/org.apache.avro/avro
-    api group: 'org.apache.avro', name: 'avro', version: '1.10.2'
 
-    api ('org.apache.parquet:parquet-hadoop:1.10.1'){
+    api group: 'org.apache.avro', name: 'avro', version: "${avroVersion}"
+
+    api ("org.apache.parquet:parquet-hadoop:${parquetVersion}"){
+        version {
+            strictly "${parquetVersion}"
+        }
         exclude group: 'com.fasterxml.jackson.core', module:'jackson-databind'
         exclude group: 'com.fasterxml.jackson.core', module:'jackson-core'
         exclude module: 'httpcomponents'
     }
-    api ('org.apache.parquet:parquet-avro:1.10.1'){
+    api ("org.apache.parquet:parquet-avro:${parquetVersion}"){
+        version {
+            strictly "${parquetVersion}"
+        }
         exclude group: 'com.fasterxml.jackson.core', module:'jackson-databind'
         exclude group: 'com.fasterxml.jackson.core', module:'jackson-core'
         exclude group: 'org.apache.avro', module:'avro'
@@ -62,18 +74,33 @@ dependencies {
     }
 
     api group: 'javax.mail', name: 'mail', version: '1.4'
-    api ("joda-time:joda-time:2.7")
 
-    testImplementation "junit:junit:4.13"
-    testImplementation 'org.mockito:mockito-core:1.9.5', {exclude group:"org.hamcrest"}
-    // https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-minicluster
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
     testImplementation group: 'org.apache.hadoop', name: 'hadoop-minicluster', version: "${hadoopVersion}"
-    // https://mvnrepository.com/artifact/com.h2database/h2
-    testImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'
-    // https://mvnrepository.com/artifact/org.mockftpserver/MockFtpServer
+    testImplementation ("org.apache.hadoop:hadoop-client:${hadoopVersion}"){
+        exclude group: 'com.fasterxml.jackson.core', module:'jackson-databind'
+        exclude group: 'com.fasterxml.jackson.core', module:'jackson-core'
+        exclude group: 'org.apache.avro', module:'avro'
+        exclude group: 'org.eclipse.jetty'
+        exclude(group:'org.apache.kerby')
+        exclude(group:'log4j', module:'log4j')
+    }
+    testImplementation ("org.apache.hadoop:hadoop-client-api:${hadoopVersion}")
+    testImplementation ("org.apache.hadoop:hadoop-client-runtime:${hadoopVersion}")
+    testImplementation group: 'com.h2database', name: 'h2', version: '2.3.232'//'1.4.200'
+
     testImplementation group: 'org.mockftpserver', name: 'MockFtpServer', version: '2.7.1'
 
-    // https://mvnrepository.com/artifact/com.google.guava/guava
-    testImplementation group: 'com.google.guava', name: 'guava', version: '19.0'
-    testImplementation group: 'com.carrotsearch', name: 'junit-benchmarks', version: '0.7.2'
+}
+
+tasks.register('printProps'){
+    project.properties.entrySet().forEach {
+        if (it.value instanceof String) {
+            String key = it.key
+            key = key.replace('.', '_')
+            String value = it.value
+            if (!key.contains("Token") && !key.contains("token"))
+                println " ${key} = \"${value}\";"
+        }
+    }
 }

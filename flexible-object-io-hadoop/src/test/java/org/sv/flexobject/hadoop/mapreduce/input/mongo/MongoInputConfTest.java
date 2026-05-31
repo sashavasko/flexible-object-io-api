@@ -17,7 +17,7 @@ import org.sv.flexobject.testdata.TestDataWithSubSchema;
 import org.sv.flexobject.util.InstanceFactory;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 

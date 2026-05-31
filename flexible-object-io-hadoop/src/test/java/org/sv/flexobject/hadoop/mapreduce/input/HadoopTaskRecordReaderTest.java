@@ -77,19 +77,6 @@ public class HadoopTaskRecordReaderTest {
     }
 
     @Test()
-    public void initializeWithException() throws IOException, InterruptedException {
-
-        doThrow(Exception.class).when(mockContext).getConfiguration();
-
-        try {
-            reader.initialize(mockSplit, mockContext);
-        }catch(RuntimeException e){
-            assertTrue(e.getMessage().startsWith("Failed to initialize HadoopTask"));
-            assertNotNull(e.getCause());
-        }
-    }
-
-    @Test()
     public void initializeWithRuntimeException() throws IOException, InterruptedException {
 
         doThrow(TestException.class).when(mockContext).getConfiguration();

@@ -3,8 +3,6 @@ package org.sv.flexobject.hadoop.streaming.parquet;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.schema.MessageType;
-import org.joda.time.DateTime;
-import org.joda.time.MutableDateTime;
 import org.junit.After;
 import org.junit.Test;
 import org.sv.flexobject.hadoop.streaming.parquet.json.ParquetJsonSink;
@@ -24,26 +22,6 @@ public class ParquetUtilsTest {
         Configuration conf = new Configuration();
         testDataPath.getFileSystem(conf).delete(testDataPath, true);
         testFilepath.getFileSystem(conf).delete(testFilepath, false);
-    }
-
-    @Test
-    public void testTranDateAsNumberOfDaysSinceEpoch() throws Exception {
-        MutableDateTime vd = new MutableDateTime(2016, 1, 1, 0, 0, 0, 0);//"2016-01-01");
-
-// Prior to Apache Drill 1.9:        assertEquals(4897977, ParquetUtils.jodaDateToParquetDate(vd));
-        assertEquals(16801, ParquetUtils.jodaDateToParquetDate(vd));
-
-        assertEquals(vd, ParquetUtils.parquetDateToMutableDateTime(4897977));
-        assertEquals(vd, ParquetUtils.parquetDateToMutableDateTime(16801));
-
-    }
-
-    @Test
-    public void testTranDateAsNumberOfDaysSinceEpochDT() throws Exception {
-        DateTime dt = new DateTime(2016, 1, 1, 0, 0, 0, 0);//"2016-01-01");
-
-        assertEquals(dt, ParquetUtils.parquetDateToDateTime(4897977));
-        assertEquals(dt, ParquetUtils.parquetDateToDateTime(16801));
     }
 
     @Test

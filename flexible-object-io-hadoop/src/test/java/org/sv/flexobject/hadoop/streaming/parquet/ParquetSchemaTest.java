@@ -41,7 +41,7 @@ public class ParquetSchemaTest {
         assertEquals("message org.sv.flexobject.testdata.TestDataWithInferredSchema {\n" +
                 "  optional int32 intField;\n" +
                 "  optional int32 intFieldOptional;\n" +
-                "  optional binary intFieldStoredAsString (UTF8);\n" +
+                "  optional binary intFieldStoredAsString (STRING);\n" +
                 "  optional int32 intFieldStoredAsStringOptional;\n" +
                 "  optional group intArray (LIST) {\n" +
                 "    repeated group list {\n" +
@@ -55,7 +55,7 @@ public class ParquetSchemaTest {
                 "  }\n" +
                 "  optional group intMap (MAP) {\n" +
                 "    repeated group key_value {\n" +
-                "      required binary key (UTF8);\n" +
+                "      required binary key (STRING);\n" +
                 "      optional int32 value;\n" +
                 "    }\n" +
                 "  }\n" +
@@ -74,7 +74,7 @@ public class ParquetSchemaTest {
                 "  optional group subStruct {\n" +
                 "    optional int32 intField;\n" +
                 "    optional int32 intFieldOptional;\n" +
-                "    optional binary intFieldStoredAsString (UTF8);\n" +
+                "    optional binary intFieldStoredAsString (STRING);\n" +
                 "    optional int32 intFieldStoredAsStringOptional;\n" +
                 "    optional group intArray (LIST) {\n" +
                 "      repeated group list {\n" +
@@ -88,7 +88,7 @@ public class ParquetSchemaTest {
                 "    }\n" +
                 "    optional group intMap (MAP) {\n" +
                 "      repeated group key_value {\n" +
-                "        required binary key (UTF8);\n" +
+                "        required binary key (STRING);\n" +
                 "        optional int32 value;\n" +
                 "      }\n" +
                 "    }\n" +
@@ -117,12 +117,12 @@ public class ParquetSchemaTest {
         assertEquals("message org.sv.flexobject.hadoop.streaming.parquet.testdata.ListOfStrings {\n" +
                 "  optional group binaryFieldRepeated (LIST) {\n" +
                 "    repeated group list {\n" +
-                "      optional binary element (UTF8);\n" +
+                "      optional binary element (STRING);\n" +
                 "    }\n" +
                 "  }\n" +
                 "  optional group binaryFieldSimpleRepeated (LIST) {\n" +
                 "    repeated group list {\n" +
-                "      optional binary element (UTF8);\n" +
+                "      optional binary element (STRING);\n" +
                 "    }\n" +
                 "  }\n" +
                 "}\n", parquetSchema.toString());
@@ -141,7 +141,7 @@ public class ParquetSchemaTest {
                 "      optional group element {\n" +
                 "        optional int32 intField;\n" +
                 "        optional int32 intFieldOptional;\n" +
-                "        optional binary intFieldStoredAsString (UTF8);\n" +
+                "        optional binary intFieldStoredAsString (STRING);\n" +
                 "        optional int32 intFieldStoredAsStringOptional;\n" +
                 "        optional group intArray (LIST) {\n" +
                 "          repeated group list {\n" +
@@ -155,7 +155,7 @@ public class ParquetSchemaTest {
                 "        }\n" +
                 "        optional group intMap (MAP) {\n" +
                 "          repeated group key_value {\n" +
-                "            required binary key (UTF8);\n" +
+                "            required binary key (STRING);\n" +
                 "            optional int32 value;\n" +
                 "          }\n" +
                 "        }\n" +
@@ -168,7 +168,7 @@ public class ParquetSchemaTest {
                 "      optional group element {\n" +
                 "        optional int32 intField;\n" +
                 "        optional int32 intFieldOptional;\n" +
-                "        optional binary intFieldStoredAsString (UTF8);\n" +
+                "        optional binary intFieldStoredAsString (STRING);\n" +
                 "        optional int32 intFieldStoredAsStringOptional;\n" +
                 "        optional group intArray (LIST) {\n" +
                 "          repeated group list {\n" +
@@ -182,7 +182,7 @@ public class ParquetSchemaTest {
                 "        }\n" +
                 "        optional group intMap (MAP) {\n" +
                 "          repeated group key_value {\n" +
-                "            required binary key (UTF8);\n" +
+                "            required binary key (STRING);\n" +
                 "            optional int32 value;\n" +
                 "          }\n" +
                 "        }\n" +
@@ -192,11 +192,11 @@ public class ParquetSchemaTest {
                 "  }\n" +
                 "  optional group subStructMap (MAP) {\n" +
                 "    repeated group key_value {\n" +
-                "      required binary key (UTF8);\n" +
+                "      required binary key (STRING);\n" +
                 "      optional group value {\n" +
                 "        optional int32 intField;\n" +
                 "        optional int32 intFieldOptional;\n" +
-                "        optional binary intFieldStoredAsString (UTF8);\n" +
+                "        optional binary intFieldStoredAsString (STRING);\n" +
                 "        optional int32 intFieldStoredAsStringOptional;\n" +
                 "        optional group intArray (LIST) {\n" +
                 "          repeated group list {\n" +
@@ -210,7 +210,7 @@ public class ParquetSchemaTest {
                 "        }\n" +
                 "        optional group intMap (MAP) {\n" +
                 "          repeated group key_value {\n" +
-                "            required binary key (UTF8);\n" +
+                "            required binary key (STRING);\n" +
                 "            optional int32 value;\n" +
                 "          }\n" +
                 "        }\n" +

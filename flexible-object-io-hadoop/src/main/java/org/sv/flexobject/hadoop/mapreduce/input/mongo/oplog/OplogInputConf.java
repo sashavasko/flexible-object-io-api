@@ -1,16 +1,13 @@
 package org.sv.flexobject.hadoop.mapreduce.input.mongo.oplog;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.Path;
 import org.bson.BsonTimestamp;
-import org.sv.flexobject.hadoop.mapreduce.input.mongo.MongoInputConf;
 import org.sv.flexobject.hadoop.mapreduce.input.mongo.ShardedInputConf;
 import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
 import org.sv.flexobject.properties.Namespace;
 
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.Map;
 
 public class OplogInputConf<SELF extends HadoopPropertiesWrapper> extends ShardedInputConf<SELF> {
     public static final String SUBNAMESPACE = "oplog";

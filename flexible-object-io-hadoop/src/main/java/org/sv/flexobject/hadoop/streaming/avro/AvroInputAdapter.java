@@ -1,14 +1,10 @@
 package org.sv.flexobject.hadoop.streaming.avro;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.util.Utf8;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
 import org.sv.flexobject.adapter.GenericInAdapter;
-import org.sv.flexobject.json.JsonInputAdapter;
 import org.sv.flexobject.json.MapperFactory;
 import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.stream.Source;
@@ -17,7 +13,6 @@ import org.sv.flexobject.util.ConsumerWithException;
 
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 
 public class AvroInputAdapter extends GenericInAdapter<GenericRecord> {
     Schema schema;
@@ -89,13 +84,13 @@ public class AvroInputAdapter extends GenericInAdapter<GenericRecord> {
         if (value == null)
             return null;
 
-        if (value instanceof String) {
-            DateTime dt = DateTime.parse(((String)value), DateTimeFormat.forPattern(JsonInputAdapter.JSON_DATE_FORMAT));
-
-            LocalDate ld = LocalDate.of(dt.getYear(), dt.getMonthOfYear(), dt.getDayOfMonth());
-            return Date.valueOf(ld);
-        } else
-            return DataTypes.dateConverter(value);
+//        if (value instanceof String) {
+//            DateTime dt = DateTime.parse(((String)value), DateTimeFormat.forPattern(JsonInputAdapter.JSON_DATE_FORMAT));
+//
+//            LocalDate ld = LocalDate.of(dt.getYear(), dt.getMonthOfYear(), dt.getDayOfMonth());
+//            return Date.valueOf(ld);
+//        } else
+        return DataTypes.dateConverter(value);
     }
 
     @Override

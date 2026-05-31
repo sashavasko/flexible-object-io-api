@@ -46,8 +46,6 @@ public class AdapterRecordReaderTest {
     public void setUp() throws Exception {
         reader = Mockito.mock(AdapterRecordReader.class, Mockito.CALLS_REAL_METHODS);
         reader.setProgressReporter(mockReporter);
-        doReturn(100l).when((SizeReporter)mockAdapter1).getSize();
-        doReturn(200l).when((SizeReporter)mockAdapter2).getSize();
     }
 
     @Test

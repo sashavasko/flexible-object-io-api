@@ -1,6 +1,7 @@
 package org.sv.flexobject.hadoop.streaming.parquet.read.streamable;
 
 import org.apache.parquet.io.api.Binary;
+import org.apache.parquet.schema.LogicalTypeAnnotation;
 import org.apache.parquet.schema.OriginalType;
 import org.apache.parquet.schema.Type;
 import org.sv.flexobject.Streamable;
@@ -10,6 +11,9 @@ import org.sv.flexobject.schema.DataTypes;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 public class PrimitiveFieldConverter extends SchemedPrimitiveConverter<Streamable> {
 
@@ -27,7 +31,7 @@ public class PrimitiveFieldConverter extends SchemedPrimitiveConverter<Streamabl
         if (originalType == null) {
             set(value.getBytes());
         } else {
-            switch (getOriginalType()) {
+            switch (originalType) {
                 case UTF8:
                 case ENUM:
                     set(value.toStringUsingUTF8());
@@ -59,18 +63,39 @@ public class PrimitiveFieldConverter extends SchemedPrimitiveConverter<Streamabl
 
     @Override
     public void addLong(long value) {
-
-        // this shit is still evolving !!!!!!!!! Gosh darn it
-        if (getOriginalType() == OriginalType.TIME_MILLIS
-                || getOriginalType() == OriginalType.TIMESTAMP_MILLIS) {
-            set(new Timestamp(value));
-        } else if (getOriginalType() == OriginalType.TIME_MICROS
-                || getOriginalType() == OriginalType.TIMESTAMP_MICROS) {
-            Timestamp timestamp = new Timestamp(value);
-            timestamp.setNanos(((int)(value%1000))*999999999);
-            set(timestamp);
-        } else
+        LogicalTypeAnnotation logicalTypeAnnotation = getType().getLogicalTypeAnnotation();
+        if (logicalTypeAnnotation instanceof LogicalTypeAnnotation.TimestampLogicalTypeAnnotation){
+            Timestamp ts = convertTime(value, (LogicalTypeAnnotation.TimestampLogicalTypeAnnotation) logicalTypeAnnotation);
+            set(ts);
+        } else if (logicalTypeAnnotation instanceof LogicalTypeAnnotation.TimeLogicalTypeAnnotation){
+            Timestamp ts = convertTime(value, (LogicalTypeAnnotation.TimeLogicalTypeAnnotation) logicalTypeAnnotation);
+            set(ts);
+        }else
             set(value);
+    }
+
+    private static Timestamp convertTime(long value, LogicalTypeAnnotation.TimeLogicalTypeAnnotation tsAnnotation) {
+        return convertTime(value, tsAnnotation.getUnit(), tsAnnotation.isAdjustedToUTC());
+    }
+    private static Timestamp convertTime(long value, LogicalTypeAnnotation.TimestampLogicalTypeAnnotation tsAnnotation) {
+        return convertTime(value, tsAnnotation.getUnit(), tsAnnotation.isAdjustedToUTC());
+    }
+
+    private static Timestamp convertTime(long value, LogicalTypeAnnotation.TimeUnit unit, boolean adjustedToUTC) {
+        ZoneOffset offset = OffsetDateTime.now().getOffset();
+        long offsetSeconds = adjustedToUTC ? 0 : offset.getTotalSeconds();
+//        System.out.println("AdjustedToUTC: " + adjustedToUTC);
+        Timestamp ts = switch(unit){
+            case MILLIS -> new Timestamp(value + offsetSeconds * 1000);
+            case MICROS ->
+                    Timestamp.from(Instant.ofEpochSecond(
+                            offsetSeconds + (value / 1_000_000),           // Whole seconds
+                            (value % 1_000_000) * 1_000  // Remaining nanos
+                    ));
+            case NANOS ->
+                    Timestamp.from(Instant.ofEpochSecond(offsetSeconds, value));
+        };
+        return ts;
     }
 
     @Override

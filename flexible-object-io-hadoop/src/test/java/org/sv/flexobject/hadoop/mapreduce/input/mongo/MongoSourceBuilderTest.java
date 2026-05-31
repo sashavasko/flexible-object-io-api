@@ -96,7 +96,6 @@ public class MongoSourceBuilderTest {
 
     @Test
     public void buildWithNoValues() throws Exception {
-        doReturn(query).when(split).getQuery();
         doReturn(false).when(split).hasQuery();
         doReturn(false).when(split).hasLimit();
         doReturn(false).when(split).hasSkip();
