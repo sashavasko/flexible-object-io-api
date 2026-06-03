@@ -1,12 +1,13 @@
 package org.sv.flexobject.kafka;
 
 import org.apache.kafka.clients.producer.Callback;
+import org.sv.flexobject.Streamable;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class RecordFactory<K,T> {
+public class RecordFactory<K,T extends Streamable> {
     Function<T, K> keyExtractor;
     Consumer<RecordDetails<T>> successHandler = null;
     BiConsumer<RecordDetails<T>,Exception> errorHandler = null;

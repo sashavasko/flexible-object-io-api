@@ -5,6 +5,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.common.KafkaException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.connections.ConnectionManager;
 import org.sv.flexobject.kafka.PreparedRecord;
 import org.sv.flexobject.kafka.RecordDetails;
@@ -13,6 +14,7 @@ import org.sv.flexobject.stream.Sink;
 import org.sv.flexobject.util.AutoCloseables;
 import org.sv.flexobject.util.InstanceFactory;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -20,7 +22,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class KafkaSink<K, T> implements Sink<T>, AutoCloseable {
+public class KafkaSink<K, T extends Streamable> implements Sink<T>, AutoCloseable {
     Logger logger = LogManager.getLogger(KafkaSink.class);
     String topic;
     RecordFactory<K, T> recordFactory;
@@ -90,7 +92,7 @@ public class KafkaSink<K, T> implements Sink<T>, AutoCloseable {
 
     @Override
     public boolean put(T value) throws Exception {
-        PreparedRecord<K, T> record = recordFactory.get(topic, value);
+        PreparedRecord record = recordFactory.get(topic, value);
         kafkaProducer.send(record.getRecord(), record.getCallback());
         return true;
     }
@@ -111,6 +113,8 @@ public class KafkaSink<K, T> implements Sink<T>, AutoCloseable {
 
     @Override
     public void close() throws Exception {
-        AutoCloseables.close(kafkaProducer);
+        if (kafkaProducer != null){
+            kafkaProducer.close(Duration.ofMillis(10000));
+        }
     }
 }

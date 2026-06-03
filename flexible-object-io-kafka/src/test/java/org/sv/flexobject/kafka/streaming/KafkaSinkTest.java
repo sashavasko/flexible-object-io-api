@@ -18,6 +18,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.sv.flexobject.schema.DataTypes;
 
 import java.util.List;
 import java.util.Map;
@@ -44,7 +45,26 @@ public class KafkaSinkTest {
     @Mock
     Callback mockCallback;
 
-    KafkaSink<Long, String> sink;
+    public static class KafkaTestData extends StreamableImpl {
+        Long key;
+        String value;
+
+        public static KafkaTestData of(long key, String value) {
+            KafkaTestData kafkaTestData = new KafkaTestData();
+            kafkaTestData.key = key;
+            kafkaTestData.value = value;
+            return kafkaTestData;
+        }
+
+        public static byte[] getKey(KafkaTestData data) {
+            return DataTypes.longToByte(data.key);
+        }
+    }
+
+    @Mock
+    KafkaTestData mockTestData;
+
+    KafkaSink<Long, KafkaTestData> sink;
 
     public static final String TEST_KAFKA_CONNECTION = "test-connection";
 
@@ -58,10 +78,10 @@ public class KafkaSinkTest {
 
     @Test
     public void put() throws Exception {
-        Mockito.when(mockRecordFactory.get("test", "1234567"))
+        Mockito.when(mockRecordFactory.get("test", mockTestData))
                 .thenReturn(mockPreparedRecord);
 //        Mockito.when(mockProducer.send(mockRecord, mockCallback)).
-        boolean result = sink.put("1234567");
+        boolean result = sink.put(mockTestData);
 
         assertTrue(result);
         Mockito.verify(mockProducer).send(mockRecord, mockCallback);
@@ -82,22 +102,6 @@ public class KafkaSinkTest {
     public EmbeddedKafkaKraftBroker embeddedKafkaBroker(int count, int partitions, String[] topics) {
         EmbeddedKafkaKraftBroker embeddedKafkaBroker = new EmbeddedKafkaKraftBroker(count, partitions, topics);
         return embeddedKafkaBroker;
-    }
-
-    public static class KafkaTestData extends StreamableImpl {
-        Long key;
-        String value;
-
-        public static KafkaTestData of(long key, String value) {
-            KafkaTestData kafkaTestData = new KafkaTestData();
-            kafkaTestData.key = key;
-            kafkaTestData.value = value;
-            return kafkaTestData;
-        }
-
-        public static Long getKey(KafkaTestData data) {
-            return data.key;
-        }
     }
 
     public long countMessages(String topic) throws Exception {
@@ -124,9 +128,9 @@ public class KafkaSinkTest {
 
     @Test
     public void embeddedKafka() throws Exception {
-        Function<KafkaTestData, Long> keyExtractor = KafkaTestData::getKey;
+        Function<KafkaTestData, byte[]> keyExtractor = KafkaTestData::getKey;
 
-        long startingCount = countMessages("test");
+//        long startingCount = countMessages("test");
         KafkaTestData data1 = KafkaTestData.of(123l, "foo");
         KafkaTestData data2 = KafkaTestData.of(123l, "bar");
         try(KafkaSink sink = KafkaSink.builder()
@@ -136,6 +140,7 @@ public class KafkaSinkTest {
                 .build()){
             sink.put(data1);
             sink.put(data2);
+            System.out.println("Done publishing");
         }
 //        assertEquals(startingCount+2, countMessages("test"));
     }
