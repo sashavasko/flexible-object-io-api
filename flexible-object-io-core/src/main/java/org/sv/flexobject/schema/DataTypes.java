@@ -3,6 +3,7 @@ package org.sv.flexobject.schema;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.*;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.Conversion;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.sv.flexobject.InAdapter;
@@ -15,6 +16,7 @@ import org.sv.flexobject.util.FunctionWithException;
 import org.sv.flexobject.util.TriConsumerWithException;
 
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -225,6 +227,8 @@ public enum DataTypes {
             long epochDay = ((LocalDate) value).toEpochDay();
             return (int)epochDay;
         }
+        if (value instanceof byte[])
+            return bytesToInt((byte[]) value);
 
         return (Integer) DataTypes.int32.applyCustomConverter(value, (v)->((Number)v).intValue());
     }
@@ -277,7 +281,8 @@ public enum DataTypes {
             return ((ValueNode)value).asLong();
         if (value instanceof Timestamp)
             return ((Timestamp)value).getTime();
-
+        if (value instanceof byte[])
+            return bytesToLong((byte[]) value);
         return (Long) DataTypes.int64.applyCustomConverter(value, (v)->((Number)v).longValue());
     }
 
@@ -579,6 +584,26 @@ public enum DataTypes {
         return stringOut;
     }
 
+    public static byte[] intToByte(int x){
+        ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
+        buffer.putInt(x);
+        return buffer.array();
+    }
+
+    public static int bytesToInt(byte[] bytes){
+        return ByteBuffer.wrap(bytes).getInt();
+    }
+
+    public static byte[] longToByte(long x){
+        ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+        buffer.putLong(x);
+        return buffer.array();
+    }
+
+    public static long bytesToLong(byte[] bytes){
+        return ByteBuffer.wrap(bytes).getLong();
+    }
+
     public static byte[] binaryConverter(Object value) throws Exception{
         if (value == null || value instanceof byte[])
             return (byte[]) value;
@@ -587,6 +612,10 @@ public enum DataTypes {
             return ((BinaryNode)value).binaryValue();
         if (value instanceof String)
             return Hex.decodeHex(((String)value).toCharArray());
+        if (value instanceof Integer)
+            return intToByte((Integer)value);
+        if (value instanceof Long)
+            return longToByte((Long)value);
 
         return (byte[]) DataTypes.binary.applyCustomConverter(value, (v)->v.toString().getBytes(StandardCharsets.UTF_8));
     }

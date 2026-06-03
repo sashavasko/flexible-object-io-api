@@ -2,6 +2,7 @@ package org.sv.flexobject.schema;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import org.apache.commons.lang3.Conversion;
 import org.junit.After;
 import org.junit.Test;
 import org.sv.flexobject.SaveException;
@@ -513,5 +514,17 @@ public class DataTypesTest {
     @Test
     public void dateConverterHandlesParquetDate() throws Exception {
         assertEquals(testDate, DataTypes.dateConverter(testParquetDate));
+    }
+
+    @Test
+    public void longToBytes() {
+        long value = new Random().nextLong();
+        byte[] bytes = DataTypes.longToByte(value);
+
+        assertEquals(8, bytes.length);
+
+        long valueBack = DataTypes.bytesToLong(bytes);
+
+        assertEquals(value, valueBack);
     }
 }
