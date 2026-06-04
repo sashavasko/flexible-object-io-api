@@ -54,11 +54,6 @@ public class EmbeddedKafka {
                     } catch (Exception e) {
                         throw new KafkaException("Embedded broker failed to start", e);
                     }
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-
-                    }
                     started = true;
                 }
             }
