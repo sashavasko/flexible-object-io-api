@@ -64,6 +64,7 @@ public class KafkaSink<K, T extends Streamable> implements Sink<T>, AutoCloseabl
 
         public Builder forConnection(String name) throws Exception {
             sink.kafkaProducer = (KafkaProducer) ConnectionManager.getConnection(KafkaProducer.class, name);
+
             return this;
         }
 

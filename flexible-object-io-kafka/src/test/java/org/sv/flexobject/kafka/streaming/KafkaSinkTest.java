@@ -140,6 +140,7 @@ public class KafkaSinkTest {
                 .build()){
             sink.put(data1);
             sink.put(data2);
+            sink.setEOF();
             System.out.println("Done publishing");
         }
 //        assertEquals(startingCount+2, countMessages("test"));
