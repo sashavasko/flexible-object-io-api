@@ -6,13 +6,13 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public class CallbackWithDetails<T> implements Callback {
+public class CallbackWithDetails<T extends KafkaStreamable> implements Callback {
     RecordDetails<T> details;
     Consumer<RecordDetails<T>> onSuccess;
     BiConsumer<RecordDetails<T>, Exception> onFailure;
 
-    public CallbackWithDetails(RecordDetails<T> details, Consumer<RecordDetails<T>> onSuccess, BiConsumer<RecordDetails<T>, Exception> onFailure) {
-        this.details = details;
+    public CallbackWithDetails(String topic, T value, Consumer<RecordDetails<T>> onSuccess, BiConsumer<RecordDetails<T>, Exception> onFailure) {
+        this.details = new RecordDetails<>(topic, value);
         this.onSuccess = onSuccess;
         this.onFailure = onFailure;
     }

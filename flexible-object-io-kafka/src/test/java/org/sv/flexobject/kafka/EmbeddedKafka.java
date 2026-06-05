@@ -22,9 +22,6 @@ public class EmbeddedKafka {
 
     private static volatile boolean started;
 
-    //TODO add proper Builder to be able to set serializers/deserializes
-
-
     public static void configureConnectionManager(String connectionName){
         PropertiesProvider embeddedProperties = (connectionName1, deploymentLevel, environment) -> {
             getBroker();
@@ -47,9 +44,9 @@ public class EmbeddedKafka {
                         embeddedKafkaBroker.afterPropertiesSet();
                         props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, embeddedKafkaBroker.getBrokersAsString());
                         props.put("key.deserializer", ByteArrayDeserializer.class.getName());
-                        props.put("value.deserializer", StringDeserializer.class.getName());
+                        props.put("value.deserializer", ByteArrayDeserializer.class.getName());
                         props.put("key.serializer", ByteArraySerializer.class.getName());
-                        props.put("value.serializer", StringSerializer.class.getName());
+                        props.put("value.serializer", ByteArraySerializer.class.getName());
 
                     } catch (Exception e) {
                         throw new KafkaException("Embedded broker failed to start", e);

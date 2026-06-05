@@ -1,51 +1,38 @@
 package org.sv.flexobject.kafka.streaming;
 
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.common.PartitionInfo;
-import org.apache.kafka.common.TopicPartition;
-import org.springframework.kafka.test.EmbeddedKafkaKraftBroker;
-import org.sv.flexobject.StreamableImpl;
-import org.sv.flexobject.connections.ConnectionManager;
-import org.sv.flexobject.kafka.EmbeddedKafka;
-import org.sv.flexobject.kafka.PreparedRecord;
-import org.sv.flexobject.kafka.RecordFactory;
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.PartitionInfo;
+import org.apache.kafka.common.TopicPartition;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.sv.flexobject.StreamableImpl;
+import org.sv.flexobject.connections.ConnectionManager;
+import org.sv.flexobject.kafka.EmbeddedKafka;
+import org.sv.flexobject.kafka.KafkaStreamable;
 import org.sv.flexobject.schema.DataTypes;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.Optional;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class KafkaSinkTest {
 
-    @Mock
-    KafkaProducer mockProducer;
-
-    @Mock
-    RecordFactory mockRecordFactory;
-
-    @Mock
-    ProducerRecord mockRecord;
-
-    @Mock
-    PreparedRecord mockPreparedRecord;
-
-    @Mock
-    Callback mockCallback;
-
-    public static class KafkaTestData extends StreamableImpl {
+    public static class KafkaTestData extends StreamableImpl implements KafkaStreamable {
         Long key;
         String value;
 
@@ -56,52 +43,61 @@ public class KafkaSinkTest {
             return kafkaTestData;
         }
 
-        public static byte[] getKey(KafkaTestData data) {
-            return DataTypes.longToByte(data.key);
+        @Override
+        public byte[] getKafkaKey() {
+            return DataTypes.longToByte(key);
         }
     }
 
     @Mock
+    KafkaProducer mockProducer;
+
+    @Mock
     KafkaTestData mockTestData;
 
-    KafkaSink<Long, KafkaTestData> sink;
+    @Mock
+    ProducerRecord mockRecord;
+
+    @Mock
+    Callback mockCallback;
+
+    @Mock
+    Future<RecordMetadata> mockFuture;
+
+    @Spy
+    KafkaSink mockSink;
 
     public static final String TEST_KAFKA_CONNECTION = "test-connection";
 
     @Before
     public void setUp() throws Exception {
-        Mockito.when(mockPreparedRecord.getRecord()).thenReturn(mockRecord);
-        Mockito.when(mockPreparedRecord.getCallback()).thenReturn(mockCallback);
-        sink = KafkaSink.builder().topic("test").useProducer(mockProducer).recordFactory(mockRecordFactory).build();
+        when(mockSink.getKafkaProducer()).thenReturn(Optional.of(mockProducer));
+        when(mockSink.getTopic()).thenReturn("test");
+
         EmbeddedKafka.configureConnectionManager(TEST_KAFKA_CONNECTION);
     }
 
     @Test
     public void put() throws Exception {
-        Mockito.when(mockRecordFactory.get("test", mockTestData))
-                .thenReturn(mockPreparedRecord);
-//        Mockito.when(mockProducer.send(mockRecord, mockCallback)).
-        boolean result = sink.put(mockTestData);
+        when(mockSink.makeKafkaRecord(mockTestData)).thenReturn(mockRecord);
+        when(mockSink.makeKafkaCallback(mockTestData)).thenReturn(mockCallback);
+        when(mockProducer.send(mockRecord, mockCallback)).thenReturn(mockFuture);
 
+        boolean result = mockSink.put(mockTestData);
         assertTrue(result);
+
         Mockito.verify(mockProducer).send(mockRecord, mockCallback);
     }
 
     @Test
     public void setEOF() {
-        sink.setEOF();
+        mockSink.setEOF();
         Mockito.verify(mockProducer).flush();
     }
 
     @Test
     public void hasOutput() {
-        assertFalse(sink.hasOutput());
-    }
-
-
-    public EmbeddedKafkaKraftBroker embeddedKafkaBroker(int count, int partitions, String[] topics) {
-        EmbeddedKafkaKraftBroker embeddedKafkaBroker = new EmbeddedKafkaKraftBroker(count, partitions, topics);
-        return embeddedKafkaBroker;
+        assertFalse(mockSink.hasOutput());
     }
 
     public long countMessages(String topic) throws Exception {
@@ -128,21 +124,21 @@ public class KafkaSinkTest {
 
     @Test
     public void embeddedKafka() throws Exception {
-        Function<KafkaTestData, byte[]> keyExtractor = KafkaTestData::getKey;
 
-//        long startingCount = countMessages("test");
+        long startingCount = countMessages("test");
         KafkaTestData data1 = KafkaTestData.of(123l, "foo");
         KafkaTestData data2 = KafkaTestData.of(123l, "bar");
-        try(KafkaSink sink = KafkaSink.builder()
+        try(KafkaSink<KafkaTestData> sink = KafkaSink.<KafkaTestData>builder()
                 .forConnection(TEST_KAFKA_CONNECTION)
                 .topic("test")
-                .keyExtractor(keyExtractor)
                 .build()){
             sink.put(data1);
             sink.put(data2);
             sink.setEOF();
             System.out.println("Done publishing");
+            assertEquals(0, sink.getFailedAcks().size());
         }
-//        assertEquals(startingCount+2, countMessages("test"));
+
+        assertEquals(startingCount+2, countMessages("test"));
     }
 }

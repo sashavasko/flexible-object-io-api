@@ -1,84 +1,65 @@
 package org.sv.flexobject.kafka.streaming;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.KafkaException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.sv.flexobject.Streamable;
 import org.sv.flexobject.connections.ConnectionManager;
-import org.sv.flexobject.kafka.PreparedRecord;
+import org.sv.flexobject.kafka.CallbackWithDetails;
+import org.sv.flexobject.kafka.KafkaStreamable;
 import org.sv.flexobject.kafka.RecordDetails;
-import org.sv.flexobject.kafka.RecordFactory;
 import org.sv.flexobject.stream.Sink;
-import org.sv.flexobject.util.AutoCloseables;
 import org.sv.flexobject.util.InstanceFactory;
 
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.Optional;
 
-public class KafkaSink<K, T extends Streamable> implements Sink<T>, AutoCloseable {
+public class KafkaSink<T extends KafkaStreamable> implements Sink<T>, AutoCloseable {
     Logger logger = LogManager.getLogger(KafkaSink.class);
     String topic;
-    RecordFactory<K, T> recordFactory;
-    KafkaProducer<K, T> kafkaProducer;
+    KafkaProducer<byte[], byte[]> kafkaProducer;
     Map<T,Exception> failedAcks = new HashMap<>();
 
-    public void onSuccess(RecordDetails details) {
-        logger.debug("Kafka ack to the message " + details.getValue());
+    public void onSuccess(RecordDetails<T> details) {
+        logger.debug("Kafka ack to the message {}", details.getValue());
     }
 
     public void onFailure(RecordDetails<T> details, Exception e){
         failedAcks.put(details.getValue(), e);
-        logger.error("Kafka ack failed to the message " + details.getValue(), e);
+        logger.error("Kafka ack failed to the message {}", details.getValue(), e);
     }
 
     public KafkaSink() {
     }
 
-    public static class Builder{
+    public static class Builder<ST extends KafkaStreamable>{
 
-        KafkaSink sink = InstanceFactory.get(KafkaSink.class);
+        KafkaSink<ST> sink = InstanceFactory.get(KafkaSink.class);
 
-        public Builder topic(String topic){
+        public Builder<ST> topic(String topic){
             sink.topic = topic;
             return this;
         }
 
-        public Builder recordFactory(RecordFactory factory){
-            sink.recordFactory = factory;
-            return this;
-        }
-
-        public Builder keyExtractor(Function keyExtractor){
-            Consumer<RecordDetails> consumer = sink::onSuccess;
-            BiConsumer<RecordDetails,Exception> errorHandler = sink::onFailure;
-            sink.recordFactory = new RecordFactory(keyExtractor,consumer, errorHandler);
-            return this;
-        }
-
-        public Builder forConnection(String name) throws Exception {
-            sink.kafkaProducer = (KafkaProducer) ConnectionManager.getConnection(KafkaProducer.class, name);
+        public Builder<ST> forConnection(String name) throws Exception {
+            sink.kafkaProducer = (KafkaProducer<byte[], byte[]>) ConnectionManager.getConnection(KafkaProducer.class, name);
 
             return this;
         }
 
-        protected Builder useProducer(KafkaProducer producer){
+        protected Builder<ST> useProducer(KafkaProducer<byte[], byte[]> producer){
             sink.kafkaProducer = producer;
             return this;
         }
 
-        public KafkaSink build(){
+        public KafkaSink<ST> build(){
             if (StringUtils.isBlank(sink.topic)){
                 throw new KafkaException("Topic is empty");
-            }
-            if (sink.recordFactory == null){
-                throw new KafkaException("Key Extractor / Record Factory is not set");
             }
             if (sink.kafkaProducer == null){
                 throw new KafkaException("Kafka Connection is not set");
@@ -87,20 +68,20 @@ public class KafkaSink<K, T extends Streamable> implements Sink<T>, AutoCloseabl
         }
     }
 
-    public static Builder builder(){
-        return new Builder();
+    public static <SP extends KafkaStreamable> Builder<SP> builder(){
+        return new Builder<>();
     }
 
     @Override
     public boolean put(T value) throws Exception {
-        PreparedRecord record = recordFactory.get(topic, value);
-        kafkaProducer.send(record.getRecord(), record.getCallback());
-        return true;
+        return getKafkaProducer()
+                .map(p->p.send(makeKafkaRecord(value), makeKafkaCallback(value))!= null)
+                .orElse(false);
     }
 
     @Override
     public void setEOF() {
-        kafkaProducer.flush();
+        getKafkaProducer().ifPresent(KafkaProducer::flush);
     }
 
     @Override
@@ -114,8 +95,23 @@ public class KafkaSink<K, T extends Streamable> implements Sink<T>, AutoCloseabl
 
     @Override
     public void close() throws Exception {
-        if (kafkaProducer != null){
-            kafkaProducer.close(Duration.ofMillis(10000));
-        }
+        getKafkaProducer().ifPresent(p->p.close(Duration.ofMillis(10000)));
+        kafkaProducer = null;
+    }
+
+    public Optional<KafkaProducer<byte[], byte[]>> getKafkaProducer(){
+        return Optional.ofNullable(kafkaProducer);
+    }
+
+    public String getTopic() {
+        return topic;
+    }
+
+    protected ProducerRecord<byte[], byte[]> makeKafkaRecord(T value){
+        return new ProducerRecord<>(getTopic(), value.getKafkaKey(), value.getKafkaValue());
+    }
+
+    protected Callback makeKafkaCallback(T value){
+        return new CallbackWithDetails<T>(getTopic(), value, this::onSuccess, this::onFailure);
     }
 }
