@@ -7,6 +7,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.KafkaException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.connections.ConnectionManager;
 import org.sv.flexobject.kafka.CallbackWithDetails;
 import org.sv.flexobject.kafka.KafkaStreamable;
@@ -19,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class KafkaSink<T extends KafkaStreamable> implements Sink<T>, AutoCloseable {
+public class KafkaSink<T extends Streamable> implements Sink<T>, AutoCloseable {
     Logger logger = LogManager.getLogger(KafkaSink.class);
     String topic;
     KafkaProducer<byte[], byte[]> kafkaProducer;
@@ -37,7 +38,7 @@ public class KafkaSink<T extends KafkaStreamable> implements Sink<T>, AutoClosea
     public KafkaSink() {
     }
 
-    public static class Builder<ST extends KafkaStreamable>{
+    public static class Builder<ST extends Streamable>{
 
         KafkaSink<ST> sink = InstanceFactory.get(KafkaSink.class);
 
@@ -68,7 +69,7 @@ public class KafkaSink<T extends KafkaStreamable> implements Sink<T>, AutoClosea
         }
     }
 
-    public static <SP extends KafkaStreamable> Builder<SP> builder(){
+    public static <SP extends Streamable> Builder<SP> builder(){
         return new Builder<>();
     }
 
@@ -108,10 +109,14 @@ public class KafkaSink<T extends KafkaStreamable> implements Sink<T>, AutoClosea
     }
 
     protected ProducerRecord<byte[], byte[]> makeKafkaRecord(T value){
-        return new ProducerRecord<>(getTopic(), value.getKafkaKey(), value.getKafkaValue());
+        if (value instanceof KafkaStreamable kValue) {
+            return new ProducerRecord<>(getTopic(), kValue.getKafkaKey(), kValue.getKafkaValue());
+        } else {
+            return new ProducerRecord<>(getTopic(), null, KafkaStreamable.toBytes(value.toString()));
+        }
     }
 
     protected Callback makeKafkaCallback(T value){
-        return new CallbackWithDetails<T>(getTopic(), value, this::onSuccess, this::onFailure);
+        return new CallbackWithDetails<>(getTopic(), value, this::onSuccess, this::onFailure);
     }
 }

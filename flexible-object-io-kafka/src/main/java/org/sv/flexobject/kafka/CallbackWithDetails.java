@@ -2,11 +2,12 @@ package org.sv.flexobject.kafka;
 
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.sv.flexobject.Streamable;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public class CallbackWithDetails<T extends KafkaStreamable> implements Callback {
+public class CallbackWithDetails<T extends Streamable> implements Callback {
     RecordDetails<T> details;
     Consumer<RecordDetails<T>> onSuccess;
     BiConsumer<RecordDetails<T>, Exception> onFailure;
