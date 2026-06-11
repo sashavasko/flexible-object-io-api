@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class ConnectionManager {
-    private static ConnectionManager instance = new ConnectionManager();
+    private static final ConnectionManager instance = new ConnectionManager();
     private final Object lock = new Object();
 
     public enum DeploymentLevel{
@@ -19,9 +19,9 @@ public class ConnectionManager {
 
     private DeploymentLevel deploymentLevel = DeploymentLevel.alpha;
     private String environment = null;
-    private Map<Class<? extends AutoCloseable>, ConnectionProvider> connectionProviders = new HashMap<>();
-    private LinkedList<PropertiesProvider> propertiesProviders = new LinkedList<>();
-    private LinkedList<SecretProvider> secretProviders = new LinkedList<>();
+    private final Map<Class<? extends AutoCloseable>, ConnectionProvider> connectionProviders = new HashMap<>();
+    private final LinkedList<PropertiesProvider> propertiesProviders = new LinkedList<>();
+    private final LinkedList<SecretProvider> secretProviders = new LinkedList<>();
 
     private ConnectionManager(){
         environment = System.getProperty("os.name");
@@ -58,24 +58,23 @@ public class ConnectionManager {
         return environment;
     }
 
-    public static AutoCloseable getConnection(Class<? extends AutoCloseable> connectionType, String connectionName) throws Exception {
+    public static <T extends AutoCloseable> T getConnection(Class<T> connectionType, String connectionName) throws Exception {
         return getConnection(connectionType, connectionName, null);
     }
 
-    public static AutoCloseable getConnection(Class<? extends AutoCloseable> connectionType, String connectionName, Properties overrides) throws Exception {
-
-        return getInstance().getConnectionImpl(connectionType, connectionName, overrides);
+    public static <T extends AutoCloseable> T  getConnection(Class<T> connectionType, String connectionName, Properties overrides) throws Exception {
+        return (T) connectionType.cast(getInstance().getConnectionImpl(connectionType, connectionName, overrides));
     }
 
     /*
      * This method can be used to setup ConnectionManager from the list of provider classes configured at runtime,
      * such as command line, system property, configuration file etc.
      */
-    public static ConnectionManager addProviders(Class ... providerClasses){
+    public static ConnectionManager addProviders(Class<?> ... providerClasses){
         return getInstance().addProvidersImpl(Arrays.asList(providerClasses));
     }
 
-    public static ConnectionManager addProviders(Iterable<Class> providerClasses){
+    public static ConnectionManager addProviders(Iterable<Class<?>> providerClasses){
         return getInstance().addProvidersImpl(providerClasses);
     }
 
@@ -83,7 +82,7 @@ public class ConnectionManager {
         getInstance().forEachProviderImpl(null, consumer);
     }
 
-    public static void forEachProvider(Class implementsClass, ConsumerWithException<Provider, Exception> consumer) throws Exception {
+    public static void forEachProvider(Class<?> implementsClass, ConsumerWithException<Provider, Exception> consumer) throws Exception {
         getInstance().forEachProviderImpl(implementsClass, consumer);
     }
 
@@ -206,12 +205,15 @@ public class ConnectionManager {
         return this;
     }
 
-    protected ConnectionManager addProvidersImpl(Iterable<Class> providerClasses){
+    protected ConnectionManager addProvidersImpl(Iterable<Class<?>> providerClasses){
         synchronized (lock) {
-            for (Class clazz : providerClasses) {
+            for (Class<?> clazz : providerClasses) {
 
-                if (ConnectionProvider.class.isAssignableFrom(clazz))
-                    registerProvider(clazz);
+                if (ConnectionProvider.class.isAssignableFrom(clazz)) {
+                    @SuppressWarnings("unchecked")
+                    Class<? extends ConnectionProvider> connectionProviderClass = (Class<? extends ConnectionProvider>) clazz;
+                    registerProvider(connectionProviderClass);
+                }
 
                 if (PropertiesProvider.class.isAssignableFrom(clazz)) {
                     unregisterPropertiesProvider(clazz, propertiesProviders);
