@@ -32,12 +32,11 @@ public class KafkaSourceTest {
 
     Duration mockTimeout = Duration.ofSeconds(1234567);
 
-    KafkaSource<Long, String> source;
+    KafkaSource<KafkaTestData> source;
 
     @Before
     public void setUp() throws Exception {
-        source = new KafkaSource<>(mockConsumer);
-        source.setTimeout(mockTimeout);
+        source = KafkaSource.builder().useConsumer(mockConsumer).timeoutSeconds(1234567).build();
     }
 
     @Test

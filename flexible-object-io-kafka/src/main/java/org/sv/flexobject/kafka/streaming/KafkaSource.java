@@ -3,32 +3,76 @@ package org.sv.flexobject.kafka.streaming;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.sv.flexobject.Streamable;
+import org.sv.flexobject.connections.ConnectionManager;
 import org.sv.flexobject.stream.Source;
+import org.sv.flexobject.util.AutoCloseables;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.time.Duration;
 import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class KafkaSource<K, T> implements Source<T>, Iterator<T>, AutoCloseable {
-    KafkaConsumer<K, T> kafkaConsumer;
+public class KafkaSource<T extends Streamable> implements Source<T>, Iterator<T>, AutoCloseable {
+    KafkaConsumer<byte[], byte[]> kafkaConsumer;
     Duration timeout = Duration.ofSeconds(60);
-    ConsumerRecords<K,T> currentRecords = null;
-    Iterator<ConsumerRecord<K,T>> currentRecordIterator = null;
+    ConsumerRecords<byte[],byte[]> currentRecords = null;
+    Iterator<ConsumerRecord<byte[],byte[]>> currentRecordIterator = null;
+    Class <? extends Streamable> schema;
 
-    public KafkaSource(KafkaConsumer<K, T> kafkaConsumer) {
-        this.kafkaConsumer = kafkaConsumer;
+    protected KafkaSource(){}
+
+    public static class Builder<ST extends Streamable>{
+        KafkaSource<ST> source = new KafkaSource<>();
+        Set<String> topics = new HashSet<>();
+
+        public Builder<ST> addTopic(String topic){
+            topics.add(topic);
+            return this;
+        }
+
+        public Builder<ST> forSchema(Class<? extends Streamable> schema){
+            source.schema = schema;
+            return this;
+        }
+
+        public Builder<ST> forConnection(String name) throws Exception {
+            @SuppressWarnings("unchecked")
+            KafkaConsumer<byte[], byte[]> consumer = ConnectionManager.getConnection(KafkaConsumer.class, name);
+            source.kafkaConsumer = consumer;
+            return this;
+        }
+
+        public Builder<ST> useConsumer(KafkaConsumer<byte[], byte[]> consumer){
+            source.kafkaConsumer = consumer;
+            return this;
+        }
+        public Builder<ST> timeoutSeconds(long seconds){
+            source.timeout = Duration.ofSeconds(seconds);
+            return this;
+        }
+
+        public Builder<ST> timeoutMillis(long millis){
+            source.timeout = Duration.ofMillis(millis);
+            return this;
+        }
+
+        public KafkaSource build(){
+            if (topics.isEmpty())
+                throw new IllegalArgumentException("KafkaSource has to be subscribed to at least 1 topic");
+            if (source.kafkaConsumer == null)
+                throw new IllegalArgumentException("Must specify a valid connection name for Kafka");
+            if (source.schema == null)
+                throw new IllegalArgumentException("Must specify a Streamable class as a schema for Kafka Source");
+            source.kafkaConsumer.subscribe(topics);
+            return source;
+        }
     }
 
-    public KafkaSource(Properties props, List<String> topics, long timeoutSeconds) {
-        this(new KafkaConsumer<>(props));
-        kafkaConsumer.subscribe(topics);
-        if (timeoutSeconds > 0)
-            timeout = Duration.ofSeconds(timeoutSeconds);
-    }
-
-    public void setTimeout(Duration timeout) {
-        this.timeout = timeout;
+    public static <ST extends Streamable> Builder<ST> builder(){
+        return new Builder<>();
     }
 
     protected boolean pollRecords(){
@@ -60,7 +104,7 @@ public class KafkaSource<K, T> implements Source<T>, Iterator<T>, AutoCloseable 
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         kafkaConsumer.close();
         kafkaConsumer = null;
     }
@@ -72,11 +116,7 @@ public class KafkaSource<K, T> implements Source<T>, Iterator<T>, AutoCloseable 
 
     @Override
     public void setEOF() {
-        try {
-            close();
-        } catch (Exception e) {
-
-        }
+        AutoCloseables.closeQuietly(this);
     }
 
     @Override
@@ -86,6 +126,18 @@ public class KafkaSource<K, T> implements Source<T>, Iterator<T>, AutoCloseable 
 
     @Override
     public T next() {
-        return pollRecords() ? currentRecordIterator.next().value() : null;
+
+        if (!pollRecords())
+            return null;
+        byte[] bytes = currentRecordIterator.next().value();
+
+        @SuppressWarnings("unchecked")
+        T streamable = (T) InstanceFactory.get(schema);
+        try {
+            streamable.fromJsonBytes(bytes);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to deserialize " + schema.getName() + " from JSON bytes.", e);
+        }
+        return streamable;
     }
 }

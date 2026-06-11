@@ -14,11 +14,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.sv.flexobject.StreamableImpl;
 import org.sv.flexobject.connections.ConnectionManager;
 import org.sv.flexobject.kafka.EmbeddedKafka;
-import org.sv.flexobject.kafka.KafkaStreamable;
-import org.sv.flexobject.schema.DataTypes;
 
 import java.util.List;
 import java.util.Map;
@@ -31,23 +28,6 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class KafkaSinkTest {
-
-    public static class KafkaTestData extends StreamableImpl implements KafkaStreamable {
-        Long key;
-        String value;
-
-        public static KafkaTestData of(long key, String value) {
-            KafkaTestData kafkaTestData = new KafkaTestData();
-            kafkaTestData.key = key;
-            kafkaTestData.value = value;
-            return kafkaTestData;
-        }
-
-        @Override
-        public byte[] getKafkaKey() {
-            return DataTypes.longToByte(key);
-        }
-    }
 
     @Mock
     KafkaProducer mockProducer;
