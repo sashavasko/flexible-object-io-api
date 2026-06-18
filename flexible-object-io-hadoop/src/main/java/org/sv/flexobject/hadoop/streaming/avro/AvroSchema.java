@@ -13,6 +13,7 @@ import org.sv.flexobject.schema.FieldDescriptor;
 import org.sv.flexobject.schema.SchemaElement;
 import org.sv.flexobject.schema.SchemaException;
 import org.sv.flexobject.schema.reflect.FieldWrapper;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -140,8 +141,13 @@ public class AvroSchema {
 
     public static <T extends Streamable> T convertGenericRecord(GenericRecord src, Schema avroSchema) throws Exception {
         Class<? extends Streamable> dstClass = (Class<? extends Streamable>) Class.forName(avroSchema.getFullName());
-        Streamable dst = dstClass.newInstance();
+        Streamable dst = InstanceFactory.get(dstClass);
         return convertGenericRecord(src, avroSchema, dst);
+    }
+
+    public static <T extends Streamable> T convertGenericRecord(GenericRecord src, Class<? extends Streamable> dataClass) throws Exception {
+        Streamable dst = InstanceFactory.get(dataClass);
+        return convertGenericRecord(src, forClass(dataClass), dst);
     }
 
     public static <T extends Streamable> T convertGenericRecord(GenericRecord src, Schema avroSchema, Streamable dst) throws Exception {

@@ -6,6 +6,7 @@ import org.apache.avro.util.Utf8;
 import org.sv.flexobject.Streamable;
 import org.sv.flexobject.schema.FieldDescriptor;
 import org.sv.flexobject.schema.SchemaException;
+import org.sv.flexobject.util.InstanceFactory;
 
 public class StreamableAvroRecord implements GenericRecord {
 
@@ -17,6 +18,13 @@ public class StreamableAvroRecord implements GenericRecord {
 
     public StreamableAvroRecord(Streamable wrappedObject, Schema avroSchema) {
         set(wrappedObject, avroSchema);
+    }
+
+    public static StreamableAvroRecord forClass(Class<? extends Streamable> dataClass){
+        StreamableAvroRecord record = new StreamableAvroRecord();
+        record.schema = AvroSchema.forClass(dataClass);
+        record.wrappedObject = InstanceFactory.get(dataClass);
+        return record;
     }
 
     public void set(Streamable wrappedObject, Schema avroSchema) {
@@ -47,11 +55,15 @@ public class StreamableAvroRecord implements GenericRecord {
         try {
             org.sv.flexobject.schema.Schema wrappedSchema = wrappedObject.getSchema();
             FieldDescriptor descriptor = wrappedSchema.getDescriptor(i);
-            if (v instanceof Utf8)
+            if (v instanceof Utf8) {
                 descriptor.set(wrappedObject, v.toString());
-            else
+            } else if (v instanceof GenericRecord) {
+                Streamable subRecord = AvroSchema.convertGenericRecord((GenericRecord)v, descriptor.getSubschema());
+                descriptor.set(wrappedObject, subRecord);
+            }else {
                 descriptor.set(wrappedObject, v);
-        } catch (SchemaException e) {
+            }
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
