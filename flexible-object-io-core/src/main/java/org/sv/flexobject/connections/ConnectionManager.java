@@ -70,11 +70,11 @@ public class ConnectionManager {
      * This method can be used to setup ConnectionManager from the list of provider classes configured at runtime,
      * such as command line, system property, configuration file etc.
      */
-    public static ConnectionManager addProviders(Class<?> ... providerClasses){
+    public static ConnectionManager addProviders(Class<? extends Provider> ... providerClasses){
         return getInstance().addProvidersImpl(Arrays.asList(providerClasses));
     }
 
-    public static ConnectionManager addProviders(Iterable<Class<?>> providerClasses){
+    public static ConnectionManager addProviders(Iterable<Class<? extends Provider>> providerClasses){
         return getInstance().addProvidersImpl(providerClasses);
     }
 
@@ -205,7 +205,7 @@ public class ConnectionManager {
         return this;
     }
 
-    protected ConnectionManager addProvidersImpl(Iterable<Class<?>> providerClasses){
+    protected ConnectionManager addProvidersImpl(Iterable<Class<? extends Provider>> providerClasses){
         synchronized (lock) {
             for (Class<?> clazz : providerClasses) {
 

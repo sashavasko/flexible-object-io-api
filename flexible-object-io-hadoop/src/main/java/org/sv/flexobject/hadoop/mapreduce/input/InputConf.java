@@ -7,7 +7,7 @@ import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
 import org.sv.flexobject.properties.Namespace;
 import org.sv.flexobject.util.InstanceFactory;
 
-public class InputConf<SELF extends HadoopPropertiesWrapper> extends HadoopPropertiesWrapper<SELF> {
+public class InputConf<SELF extends InputConf<?>> extends HadoopPropertiesWrapper<SELF> {
     public static final String SUBNAMESPACE = "input";
 
     protected Class<? extends Splitter> splitterClass;

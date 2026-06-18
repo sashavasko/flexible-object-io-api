@@ -11,7 +11,11 @@ import org.apache.log4j.Logger;
 import org.apache.spark.SparkContext;
 import org.sv.flexobject.connections.ConnectionManager;
 import org.sv.flexobject.connections.ConnectionProvider;
+import org.sv.flexobject.connections.Provider;
 import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
+import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapperBase;
+import org.sv.flexobject.mongo.streaming.MongoSource;
+import org.sv.flexobject.schema.Schema;
 import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.IOException;
@@ -127,6 +131,11 @@ public class HadoopTask extends Configured {
     }
 
     public static void configure (Configuration conf) throws Exception {
+        logger.info("Configuring Hadoop Task using libraries:");
+        logger.info("\t core v." + Schema.class.getPackage().getImplementationVersion());
+        logger.info("\t mongo v." + MongoSource.class.getPackage().getImplementationVersion());
+        logger.info("\t hadoop-properties v." + HadoopPropertiesWrapperBase.class.getPackage().getImplementationVersion());
+        logger.info("\t hadoop v." + HadoopTask.class.getPackage().getImplementationVersion());
         HadoopInstanceFactory.setConf(conf);
         getInstance().setConf(conf);
         getInstance().postConfigure();
@@ -154,9 +163,9 @@ public class HadoopTask extends Configured {
     public static class Builder{
         private ConnectionManager.DeploymentLevel deploymentLevel;
         private String connectionManagerEnvironment;
-        private List<Class> connectionManagerProviders = new ArrayList<>();
-        private List<ConnectionProvider> connectionProviders = new ArrayList<>();
-        private List<URL> configurationResources = new ArrayList<>();
+        private final List<Class<? extends Provider>> connectionManagerProviders = new ArrayList<>();
+        private final List<ConnectionProvider> connectionProviders = new ArrayList<>();
+        private final List<URL> configurationResources = new ArrayList<>();
 
         protected Builder(){}
 
@@ -170,17 +179,17 @@ public class HadoopTask extends Configured {
             return this;
         }
 
-        public Builder addProvider(Class providerClass){
+        public Builder addProvider(Class<? extends Provider> providerClass){
             this.connectionManagerProviders.add(providerClass);
             return this;
         }
 
-        public Builder addProviders(Class ... providerClasses){
+        public Builder addProviders(Class<? extends Provider> ... providerClasses){
             this.connectionManagerProviders.addAll(Arrays.asList(providerClasses));
             return this;
         }
 
-        public Builder addProviders(Collection<Class> providerClasses){
+        public Builder addProviders(Collection<Class<? extends Provider>> providerClasses){
             this.connectionManagerProviders.addAll(providerClasses);
             return this;
         }

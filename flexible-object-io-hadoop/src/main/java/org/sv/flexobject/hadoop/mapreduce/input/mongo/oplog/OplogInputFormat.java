@@ -7,7 +7,7 @@ import org.sv.flexobject.util.InstanceFactory;
 
 public class OplogInputFormat<K,V> extends ConfiguredInputFormat<K,V> {
     @Override
-    protected InputConf<InputConf> makeInputConf() {
+    protected InputConf<InputConf<?>> makeInputConf() {
         return InstanceFactory.get(OplogInputConf.class);
     }
 }

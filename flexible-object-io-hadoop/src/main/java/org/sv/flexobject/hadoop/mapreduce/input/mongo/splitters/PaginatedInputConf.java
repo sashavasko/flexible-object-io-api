@@ -8,7 +8,7 @@ import org.sv.flexobject.hadoop.mapreduce.input.mongo.MongoInputConf;
 import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
 import org.sv.flexobject.properties.Namespace;
 
-public class PaginatedInputConf<SELF extends HadoopPropertiesWrapper> extends MongoInputConf<SELF> {
+public class PaginatedInputConf<SELF extends PaginatedInputConf<?>> extends MongoInputConf<SELF> {
     public static final String SUBNAMESPACE = "pagination";
 
     String splitKey;

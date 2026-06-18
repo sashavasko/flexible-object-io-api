@@ -6,7 +6,7 @@ import org.sv.flexobject.properties.Namespace;
 
 import java.sql.Timestamp;
 
-public class TimeRangeConf<SELF extends InputConf> extends InputConf<SELF> {
+public class TimeRangeConf<SELF extends TimeRangeConf<?>> extends InputConf<SELF> {
     public static final String SUBNAMESPACE = "time.range";
 
     public Timestamp startdate;

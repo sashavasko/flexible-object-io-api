@@ -12,7 +12,7 @@ import org.sv.flexobject.mongo.streaming.MongoDocumentSource;
 import org.sv.flexobject.properties.Namespace;
 import org.sv.flexobject.util.InstanceFactory;
 
-public class MongoInputConf<SELF extends HadoopPropertiesWrapper> extends InputConf<SELF> {
+public class MongoInputConf<SELF extends MongoInputConf<?>> extends InputConf<SELF> {
     public static final Logger logger = Logger.getLogger(MongoInputConf.class);
 
     public static final String SUBNAMESPACE = "mongo";

@@ -3,6 +3,8 @@ package org.sv.flexobject.hadoop;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.util.Tool;
 import org.sv.flexobject.connections.ConnectionManager;
+import org.sv.flexobject.connections.ConnectionProvider;
+import org.sv.flexobject.connections.Provider;
 import org.sv.flexobject.ftp.providers.FtpProvider;
 import org.sv.flexobject.hadoop.properties.HadoopPropertiesProvider;
 import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapper;
@@ -20,7 +22,7 @@ import java.util.List;
 public class HadoopTaskConf extends HadoopPropertiesWrapper<HadoopTaskConf> {
 
     public static final String SUBNAMESPACE = "hadoop";
-    public static final List<Class> DEFAULT_PROVIDERS = Arrays.asList(
+    public static final List<Class<? extends Provider>> DEFAULT_PROVIDERS = Arrays.asList(
             HadoopSecretProvider.class,
             HadoopPropertiesProvider.class,
             UnPooledConnectionProvider.class,
@@ -34,10 +36,10 @@ public class HadoopTaskConf extends HadoopPropertiesWrapper<HadoopTaskConf> {
     private String dbEnvironment;
     private String deploymentLevel;
     @ValueType(type= DataTypes.classObject)
-    private List<Class> connectionManagerProviders;
+    private List<Class<? extends Provider>> connectionManagerProviders;
     private String connectionManagerEnvironment;
     private Class<? extends Tool> toolClass;
-    private Class<? extends HadoopPropertiesWrapper> confClass;
+    private Class<? extends HadoopPropertiesWrapper<?>> confClass;
 
     @Override
     protected String getSubNamespace() {
@@ -67,8 +69,8 @@ public class HadoopTaskConf extends HadoopPropertiesWrapper<HadoopTaskConf> {
                 : DEFAULT_DEPLOYMENT_LEVEL;
     }
 
-    public Iterable<Class> getConnectionManagerProviders() {
-        return connectionManagerProviders != null && connectionManagerProviders.size() > 0 ? connectionManagerProviders
+    public Iterable<Class<? extends Provider>> getConnectionManagerProviders() {
+        return connectionManagerProviders != null && !connectionManagerProviders.isEmpty() ? connectionManagerProviders
                 : DEFAULT_PROVIDERS;
     }
 
@@ -85,7 +87,7 @@ public class HadoopTaskConf extends HadoopPropertiesWrapper<HadoopTaskConf> {
         this.connectionManagerEnvironment = connectionManagerEnvironment;
     }
 
-    public void setConnectionManagerProviders(List<Class> connectionManagerProviders) {
+    public void setConnectionManagerProviders(List<Class<? extends Provider>> connectionManagerProviders) {
         this.connectionManagerProviders = connectionManagerProviders;
     }
 
@@ -99,24 +101,27 @@ public class HadoopTaskConf extends HadoopPropertiesWrapper<HadoopTaskConf> {
         if (toolClass == null)
             return null;
 
-        Tool tool = InstanceFactory.get(toolClass);
-        return (T)tool.getClass().cast(tool);
+        @SuppressWarnings("unchecked")
+        T tool = (T)InstanceFactory.get(toolClass);
+        return tool;
     }
 
-    public Class<? extends HadoopPropertiesWrapper> getConfClass(){
+    public Class<? extends HadoopPropertiesWrapper<?>> getConfClass(){
         return confClass;
     }
 
-    public <T extends HadoopPropertiesWrapper> T instantiateConf(Class<? extends HadoopPropertiesWrapper> defaultConfClass){
-        Class<? extends HadoopPropertiesWrapper> confClass = this.confClass == null ? defaultConfClass : this.confClass;
+    public <T extends HadoopPropertiesWrapper<?>> T instantiateConf(Class<?> defaultConfClass){
+        @SuppressWarnings("unchecked")
+        Class<? extends HadoopPropertiesWrapper<?>> confClass = this.confClass == null ? (Class<? extends HadoopPropertiesWrapper<?>>) defaultConfClass : this.confClass;
         if (confClass == null)
             return null;
 
-        HadoopPropertiesWrapper conf = InstanceFactory.get(confClass);
-        return (T)conf.getClass().cast(conf);
+        @SuppressWarnings("unchecked")
+        T conf = (T)InstanceFactory.get(confClass);
+        return conf;
 
     }
-    public <T extends HadoopPropertiesWrapper> T instantiateConf(){
+    public <T extends HadoopPropertiesWrapper<?>> T instantiateConf(){
         return instantiateConf(null);
     }
 }

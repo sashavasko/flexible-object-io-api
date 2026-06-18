@@ -9,7 +9,7 @@ import org.sv.flexobject.properties.Namespace;
 
 import java.sql.Timestamp;
 
-public class OplogInputConf<SELF extends HadoopPropertiesWrapper> extends ShardedInputConf<SELF> {
+public class OplogInputConf<SELF extends OplogInputConf<?>> extends ShardedInputConf<SELF> {
     public static final String SUBNAMESPACE = "oplog";
 
     String splitOps;
