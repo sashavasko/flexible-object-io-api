@@ -1,8 +1,7 @@
 package org.sv.flexobject.kafka;
 
-import org.sv.flexobject.Streamable;
+import org.sv.flexobject.util.ByteRepresentable;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public interface KafkaStreamable {
@@ -15,6 +14,9 @@ public interface KafkaStreamable {
     }
 
     default byte[] getKafkaValue(){
+        if (this instanceof ByteRepresentable)
+            return ((ByteRepresentable)this).toBytes();
+
         return toBytes(toString());
     }
 }

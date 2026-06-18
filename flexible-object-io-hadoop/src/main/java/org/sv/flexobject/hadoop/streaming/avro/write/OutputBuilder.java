@@ -7,6 +7,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.sv.flexobject.Streamable;
 import org.sv.flexobject.hadoop.streaming.avro.AvroSchema;
+import org.sv.flexobject.schema.SchemaException;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -68,15 +69,18 @@ abstract public class OutputBuilder<SELF extends OutputBuilder, T> {
     }
 
     protected void ensureOutput() throws IOException {
-        if (avroSchema == null) {
-            avroSchema = AvroSchema.forClass(dataClass);
-        }
+        getAvroSchema();
         if (outputStream == null) {
             outputStream = filePath.getFileSystem(configuration).create(filePath, overwrite);
         }
     }
 
     public Schema getAvroSchema() {
+        if (avroSchema == null) {
+            if (dataClass == null)
+                throw new IllegalArgumentException("Either Avro schema or a class implementing Streamable must be specified");
+            avroSchema = AvroSchema.forClass(dataClass);
+        }
         return avroSchema;
     }
 }
