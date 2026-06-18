@@ -75,7 +75,8 @@ dependencies {
 
     api group: 'javax.mail', name: 'mail', version: '1.4'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.0'
     testImplementation group: 'org.apache.hadoop', name: 'hadoop-minicluster', version: "${hadoopVersion}"
     testImplementation ("org.apache.hadoop:hadoop-client:${hadoopVersion}"){
         exclude group: 'com.fasterxml.jackson.core', module:'jackson-databind'
@@ -91,6 +92,11 @@ dependencies {
 
     testImplementation group: 'org.mockftpserver', name: 'MockFtpServer', version: '2.7.1'
 
+}
+
+
+test {
+    useJUnitPlatform()
 }
 
 tasks.register('printProps'){
