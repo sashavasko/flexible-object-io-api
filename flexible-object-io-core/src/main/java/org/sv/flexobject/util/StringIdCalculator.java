@@ -13,6 +13,7 @@ public class StringIdCalculator {
     Long base64crc32c;
     byte[] base64;
 
+    //  Equivalent Singlestore statement: (CRC32(s)<<31)|CRC32(TO_BASE64(s))
     public long calculate(String s){
         crc32Codec.reset();
         byte[] bytes = s.getBytes();
