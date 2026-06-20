@@ -267,7 +267,7 @@ public class AvroSchema {
             return null;
 
         if (avroSubSchema != null)
-            return  new StreamableAvroRecord((Streamable) value, avroSubSchema);
+            return new StreamableAvroRecord((Streamable) value, avroSubSchema);
 
         switch (descriptor.getValueType()){
             case jsonNode :

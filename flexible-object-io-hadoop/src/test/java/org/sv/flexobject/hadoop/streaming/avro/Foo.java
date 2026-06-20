@@ -20,9 +20,9 @@ public class Foo extends StreamableWithSchema {
 //    public Integer intFieldOptional;
 //    @ScalarFieldTyped(type = DataTypes.string) public int intFieldStoredAsString;
 //    public Integer intFieldStoredAsStringOptional;
-    // Arrays must not be arrays of primitives to allow for null values
+////     Arrays must not be arrays of primitives to allow for null values
 //    public Integer[] intArray = new Integer[10];
-    // ScalarFieldTyped is ignored for arrays, lists and maps
+//    // ScalarFieldTyped is ignored for arrays, lists and maps
 //    @ScalarFieldTyped(type = DataTypes.string) @ValueType(type=DataTypes.int32)  public List intList = new ArrayList();
 //    @ValueType(type=DataTypes.int32) public Map intMap;
 //    public ObjectNode json;
@@ -33,6 +33,7 @@ public class Foo extends StreamableWithSchema {
         d.intField = (int)Math.round(Math.random() * Integer.MAX_VALUE);
 //        d.intFieldOptional = (int)Math.round(Math.random() * Integer.MAX_VALUE);
 //        d.intFieldStoredAsString = (int)Math.round(Math.random() * Integer.MAX_VALUE);
+//        d.intFieldStoredAsStringOptional = (int)Math.round(Math.random() * Integer.MAX_VALUE);
 //        for (int i = 0 ; i < 5 ; ++i )
 //            d.intArray[i] = (int)Math.round(Math.random() * Integer.MAX_VALUE);
 //        d.intList = new ArrayList();
@@ -41,7 +42,7 @@ public class Foo extends StreamableWithSchema {
 //        d.intMap = new HashMap();
 //        for (int i = 0 ; i < 5 ; ++i )
 //            d.intMap.put("value"+i, (int)Math.round(Math.random() * Integer.MAX_VALUE));
-
+//
 //        if (withJson)
 //            d.json = random(false).toJson();
         return d;

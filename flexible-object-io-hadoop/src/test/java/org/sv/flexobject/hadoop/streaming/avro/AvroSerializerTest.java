@@ -1,12 +1,15 @@
 package org.sv.flexobject.hadoop.streaming.avro;
 
 import org.junit.jupiter.api.Test;
+import org.sv.flexobject.json.MapperFactory;
+import org.sv.flexobject.testdata.TestDataWithEnumAndClass;
 import org.sv.flexobject.testdata.TestDataWithSubSchema;
 import org.sv.flexobject.testdata.TestDataWithSubSchemaInCollection;
 import org.sv.flexobject.testdata.levelone.ObjectWithNestedObject;
 import org.sv.flexobject.testdata.levelone.leveltwo.SimpleObject;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -69,7 +72,7 @@ class AvroSerializerTest {
 
     @Test
     void fooBar() throws Exception {
-        FooBar recordIn = FooBar.random(true);
+        FooBar recordIn = FooBar.random(false);
 
         byte[] bytes = AvroSerializer.toBytes(AvroSerializer.toBytes(recordIn));
 
@@ -84,12 +87,15 @@ class AvroSerializerTest {
     void subSchema() throws Exception {
         TestDataWithSubSchema recordIn = TestDataWithSubSchema.random(false);
 
+        System.out.println(MapperFactory.pretty(recordIn.toJson()));
+
         byte[] bytes = AvroSerializer.toBytes(AvroSerializer.toBytes(recordIn));
+        System.out.println(Arrays.toString(bytes));
 
         System.out.println("JSON bytes length:" + recordIn.toJsonBytes().length);
         System.out.println("AVRO bytes length:" + bytes.length);
 
-        TestDataWithSubSchemaInCollection recordOut = AvroSerializer.fromBytes(bytes, TestDataWithSubSchemaInCollection.class);
+        TestDataWithSubSchema recordOut = AvroSerializer.fromBytes(bytes, TestDataWithSubSchema.class);
         assertEquals(recordIn, recordOut);
     }
 
@@ -103,6 +109,19 @@ class AvroSerializerTest {
         System.out.println("AVRO bytes length:" + bytes.length);
 
         TestDataWithSubSchemaInCollection recordOut = AvroSerializer.fromBytes(bytes, TestDataWithSubSchemaInCollection.class);
+        assertEquals(recordIn, recordOut);
+    }
+
+    @Test
+    void enumAndClass() throws Exception {
+        TestDataWithEnumAndClass recordIn = TestDataWithEnumAndClass.random();
+
+        byte[] bytes = AvroSerializer.toBytes(AvroSerializer.toBytes(recordIn));
+
+        System.out.println("JSON bytes length:" + recordIn.toJsonBytes().length);
+        System.out.println("AVRO bytes length:" + bytes.length);
+
+        TestDataWithEnumAndClass recordOut = AvroSerializer.fromBytes(bytes, TestDataWithEnumAndClass.class);
         assertEquals(recordIn, recordOut);
     }
 }

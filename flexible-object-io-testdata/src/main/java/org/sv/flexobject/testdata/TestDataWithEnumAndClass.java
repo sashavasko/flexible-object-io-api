@@ -14,11 +14,22 @@ public class TestDataWithEnumAndClass extends StreamableWithSchema {
         tres
     }
 
-    public TestDataWithEnumAndClass() throws NoSuchFieldException {
+    public TestDataWithEnumAndClass() {
     }
 
     public Class clazz;
     public TestEnum enumValue;
     @EnumSetField(enumClass = TestEnum.class, emptyValue = "none")
     public EnumSet<TestEnum> enumSet = EnumSet.noneOf(TestEnum.class);
+
+    public static TestDataWithEnumAndClass random(){
+        TestDataWithEnumAndClass d = new TestDataWithEnumAndClass();
+
+        d.clazz = SimpleTestDataWithSchema.class;
+        d.enumValue = TestEnum.uno;
+        d.enumSet = EnumSet.of(TestEnum.tres, TestEnum.dos);
+
+        return d;
+    }
+
 }

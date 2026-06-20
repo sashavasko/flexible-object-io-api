@@ -8,6 +8,11 @@ import org.sv.flexobject.schema.FieldDescriptor;
 import org.sv.flexobject.schema.SchemaException;
 import org.sv.flexobject.util.InstanceFactory;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class StreamableAvroRecord implements GenericRecord {
 
     Streamable wrappedObject;
@@ -55,11 +60,38 @@ public class StreamableAvroRecord implements GenericRecord {
         try {
             org.sv.flexobject.schema.Schema wrappedSchema = wrappedObject.getSchema();
             FieldDescriptor descriptor = wrappedSchema.getDescriptor(i);
+            Class<? extends Streamable> subSchema = descriptor.getSubschema();
             if (v instanceof Utf8) {
                 descriptor.set(wrappedObject, v.toString());
-            } else if (v instanceof GenericRecord) {
-                Streamable subRecord = AvroSchema.convertGenericRecord((GenericRecord)v, descriptor.getSubschema());
-                descriptor.set(wrappedObject, subRecord);
+            } else if (subSchema != null){
+                if (v instanceof GenericRecord) {
+                    Streamable subRecord = AvroSchema.convertGenericRecord((GenericRecord)v, subSchema);
+                    descriptor.set(wrappedObject, subRecord);
+                }else if (v instanceof List<?>) {
+                    @SuppressWarnings("unchecked")
+                    List<GenericRecord> listOfRecords = (List<GenericRecord>) v;
+                    List<Streamable> usableList = new ArrayList<>(listOfRecords.size());
+                    for (GenericRecord genericRecord : listOfRecords) {
+                        if (genericRecord == null)
+                            usableList.add(null);
+                        else
+                            usableList.add(AvroSchema.convertGenericRecord(genericRecord, subSchema));
+                    }
+                    descriptor.set(wrappedObject, usableList);
+                }else if (v instanceof Map<?,?>) {
+                    @SuppressWarnings("unchecked")
+                    Map<?,GenericRecord> mapOfRecords = (Map<?,GenericRecord>) v;
+                    Map<Object, Streamable> usableMap = new HashMap<>();
+                    for (Map.Entry<?,GenericRecord> entry : mapOfRecords.entrySet()) {
+                        Object key = entry.getKey();
+                        if (entry.getValue() == null)
+                            usableMap.put(key, null);
+                        else
+                            usableMap.put(key, AvroSchema.convertGenericRecord(entry.getValue(), subSchema));
+                    }
+                    descriptor.set(wrappedObject, usableMap);
+                }else
+                    throw new SchemaException("Unknown Avro collection class: " + v.getClass().getName());
             }else {
                 descriptor.set(wrappedObject, v);
             }
