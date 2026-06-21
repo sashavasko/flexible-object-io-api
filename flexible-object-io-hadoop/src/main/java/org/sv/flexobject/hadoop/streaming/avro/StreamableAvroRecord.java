@@ -63,41 +63,53 @@ public class StreamableAvroRecord implements GenericRecord {
             Class<? extends Streamable> subSchema = descriptor.getSubschema();
             if (v instanceof Utf8) {
                 descriptor.set(wrappedObject, v.toString());
-            } else if (subSchema != null){
+            } else if (subSchema != null) {
                 if (v instanceof GenericRecord) {
-                    Streamable subRecord = AvroSchema.convertGenericRecord((GenericRecord)v, subSchema);
+                    Streamable subRecord = AvroSchema.convertGenericRecord((GenericRecord) v, subSchema);
                     descriptor.set(wrappedObject, subRecord);
-                }else if (v instanceof List<?>) {
-                    @SuppressWarnings("unchecked")
-                    List<GenericRecord> listOfRecords = (List<GenericRecord>) v;
+                } else if (v instanceof List<?> listOfRecords) {
                     List<Streamable> usableList = new ArrayList<>(listOfRecords.size());
-                    for (GenericRecord genericRecord : listOfRecords) {
+                    for (Object genericRecord : listOfRecords) {
                         if (genericRecord == null)
                             usableList.add(null);
                         else
-                            usableList.add(AvroSchema.convertGenericRecord(genericRecord, subSchema));
+                            usableList.add(AvroSchema.convertGenericRecord((GenericRecord) genericRecord, subSchema));
                     }
                     descriptor.set(wrappedObject, usableList);
-                }else if (v instanceof Map<?,?>) {
-                    @SuppressWarnings("unchecked")
-                    Map<?,GenericRecord> mapOfRecords = (Map<?,GenericRecord>) v;
+                } else if (v instanceof Map<?, ?> mapOfRecords) {
                     Map<Object, Streamable> usableMap = new HashMap<>();
-                    for (Map.Entry<?,GenericRecord> entry : mapOfRecords.entrySet()) {
+                    for (Map.Entry<?, ?> entry : mapOfRecords.entrySet()) {
                         Object key = entry.getKey();
                         if (entry.getValue() == null)
                             usableMap.put(key, null);
                         else
-                            usableMap.put(key, AvroSchema.convertGenericRecord(entry.getValue(), subSchema));
+                            usableMap.put(key, AvroSchema.convertGenericRecord((GenericRecord) entry.getValue(), subSchema));
                     }
                     descriptor.set(wrappedObject, usableMap);
-                }else
+                } else
                     throw new SchemaException("Unknown Avro collection class: " + v.getClass().getName());
-            }else {
+            } else if (v instanceof Map<?,?> map){
+                descriptor.set(wrappedObject, convertKeysToStrings(map));
+            } else {
                 descriptor.set(wrappedObject, v);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Map<?, ?> convertKeysToStrings(Map<?, ?> map) {
+        if (map.isEmpty())
+            return map;
+        final Object key1 = map.keySet().iterator().next();
+        if (key1 instanceof Utf8) {
+            Map<String, Object> stringMap = new HashMap<>();
+            for (Map.Entry<?, ?> entry : map.entrySet()){
+                stringMap.put(((Utf8)entry.getKey()).toString(), entry.getValue());
+            }
+            return stringMap;
+        }
+        return map;
     }
 
     @Override
@@ -126,5 +138,15 @@ public class StreamableAvroRecord implements GenericRecord {
                 "wrappedObject=" + wrappedObject +
                 ", schema=" + schema +
                 '}';
+    }
+
+    public boolean isWrapped(Class<? extends Streamable> dataClass) {
+        return wrappedObject.getClass().equals(dataClass);
+    }
+
+    public <T extends Streamable> T getWrapped() {
+        @SuppressWarnings("unchecked")
+        T wrapped = (T) wrappedObject;
+        return wrapped;
     }
 }

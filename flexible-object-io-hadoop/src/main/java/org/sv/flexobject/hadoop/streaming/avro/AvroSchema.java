@@ -141,13 +141,24 @@ public class AvroSchema {
 
     public static <T extends Streamable> T convertGenericRecord(GenericRecord src, Schema avroSchema) throws Exception {
         Class<? extends Streamable> dstClass = (Class<? extends Streamable>) Class.forName(avroSchema.getFullName());
+
+        if (src instanceof StreamableAvroRecord streamableAvroRecord){
+            if (streamableAvroRecord.isWrapped(dstClass))
+                return streamableAvroRecord.getWrapped();
+        }
+
         Streamable dst = InstanceFactory.get(dstClass);
         return convertGenericRecord(src, avroSchema, dst);
     }
 
     public static <T extends Streamable> T convertGenericRecord(GenericRecord src, Class<? extends Streamable> dataClass) throws Exception {
+        if (src instanceof StreamableAvroRecord streamableAvroRecord){
+            if (streamableAvroRecord.isWrapped(dataClass))
+                return streamableAvroRecord.getWrapped();
+        }
+
         Streamable dst = InstanceFactory.get(dataClass);
-        return convertGenericRecord(src, forClass(dataClass), dst);
+        return convertGenericRecord(src, forClass(dst.getClass()), dst);
     }
 
     public static <T extends Streamable> T convertGenericRecord(GenericRecord src, Schema avroSchema, Streamable dst) throws Exception {
