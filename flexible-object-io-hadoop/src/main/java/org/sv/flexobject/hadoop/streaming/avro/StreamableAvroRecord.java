@@ -2,7 +2,6 @@ package org.sv.flexobject.hadoop.streaming.avro;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.util.Utf8;
 import org.sv.flexobject.Streamable;
 import org.sv.flexobject.schema.FieldDescriptor;
 import org.sv.flexobject.schema.SchemaException;
@@ -61,9 +60,7 @@ public class StreamableAvroRecord implements GenericRecord {
             org.sv.flexobject.schema.Schema wrappedSchema = wrappedObject.getSchema();
             FieldDescriptor descriptor = wrappedSchema.getDescriptor(i);
             Class<? extends Streamable> subSchema = descriptor.getSubschema();
-            if (v instanceof Utf8) {
-                descriptor.set(wrappedObject, v.toString());
-            } else if (subSchema != null) {
+            if (subSchema != null) {
                 if (v instanceof GenericRecord) {
                     Streamable subRecord = AvroSchema.convertGenericRecord((GenericRecord) v, subSchema);
                     descriptor.set(wrappedObject, subRecord);
@@ -88,28 +85,12 @@ public class StreamableAvroRecord implements GenericRecord {
                     descriptor.set(wrappedObject, usableMap);
                 } else
                     throw new SchemaException("Unknown Avro collection class: " + v.getClass().getName());
-            } else if (v instanceof Map<?,?> map){
-                descriptor.set(wrappedObject, convertKeysToStrings(map));
             } else {
                 descriptor.set(wrappedObject, v);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private Map<?, ?> convertKeysToStrings(Map<?, ?> map) {
-        if (map.isEmpty())
-            return map;
-        final Object key1 = map.keySet().iterator().next();
-        if (key1 instanceof Utf8) {
-            Map<String, Object> stringMap = new HashMap<>();
-            for (Map.Entry<?, ?> entry : map.entrySet()){
-                stringMap.put(((Utf8)entry.getKey()).toString(), entry.getValue());
-            }
-            return stringMap;
-        }
-        return map;
     }
 
     @Override

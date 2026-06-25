@@ -7,6 +7,7 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.*;
 import org.apache.avro.util.NonCopyingByteArrayOutputStream;
 import org.sv.flexobject.Streamable;
+import org.sv.flexobject.hadoop.streaming.avro.read.StreamableDatumReader;
 import org.sv.flexobject.hadoop.streaming.avro.read.StreamableGenericData;
 import org.sv.flexobject.util.InstanceFactory;
 
@@ -64,8 +65,7 @@ public class AvroSerializer {
         T data = (T) InstanceFactory.get(dataClass);
 
         BinaryDecoder datumIn = DecoderFactory.get().binaryDecoder(bytes, null);
-        DatumReader<GenericRecord> reader = new GenericDatumReader<>(null, null, StreamableGenericData.get());
-        reader.setSchema(avroSchema);
+        StreamableDatumReader reader = new StreamableDatumReader(avroSchema);
         StreamableAvroRecord wrapped = new StreamableAvroRecord(data, avroSchema);
         reader.read(wrapped, datumIn);
 //        GenericRecord record = reader.read(null, datumIn);
