@@ -4,6 +4,7 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.io.*;
 import org.apache.avro.util.NonCopyingByteArrayOutputStream;
+import org.jetbrains.annotations.NotNull;
 import org.sv.flexobject.Streamable;
 import org.sv.flexobject.hadoop.streaming.avro.read.StreamableDatumReader;
 import org.sv.flexobject.schema.DataTypes;
@@ -14,9 +15,12 @@ import org.sv.flexobject.util.InstanceFactory;
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class AvroSerializer {
 
@@ -107,9 +111,17 @@ public class AvroSerializer {
         }
     }
 
-    public class ReadOperation {
+    public class ReadOperation implements Iterable<Streamable> {
         StreamableAvroRecord wrapper = new StreamableAvroRecord(schema);
         StreamableDatumReader reader = new StreamableDatumReader(schema);
+        byte[] data;
+
+        public ReadOperation() {
+        }
+
+        public ReadOperation(byte[] data) {
+            this.data = data;
+        }
 
         protected <T extends Streamable> T read(BinaryDecoder datumIn) throws IOException {
             @SuppressWarnings("unchecked")
@@ -119,6 +131,11 @@ public class AvroSerializer {
             return data;
         }
 
+        public ReadOperation setData(byte[] bytes){
+            this.data = bytes;
+            return this;
+        }
+
         public <T extends Streamable> T readOne(byte[] bytes) throws IOException {
             if (bytes == null)
                 return null;
@@ -126,9 +143,16 @@ public class AvroSerializer {
         }
 
         public Iterator<? extends Streamable> iterator(byte[] bytes) throws IOException {
-            if (bytes == null)
-                return null;
-            BinaryDecoder datumIn = DecoderFactory.get().binaryDecoder(bytes, null);
+            setData(bytes);
+            return iterator();
+        }
+
+        @Override
+        public @NotNull Iterator<Streamable> iterator() {
+            if (data == null)
+                return Collections.emptyIterator();
+
+            BinaryDecoder datumIn = DecoderFactory.get().binaryDecoder(data, null);
 
             return new Iterator<>() {
                 @Override
@@ -150,10 +174,18 @@ public class AvroSerializer {
                 }
             };
         }
+
+        public Stream<Streamable> stream() {
+            return StreamSupport.stream(spliterator(), false);
+        }
     }
 
     public WriteOperation start(){
         return new WriteOperation();
+    }
+
+    public ReadOperation start(byte[] bytes){
+        return new ReadOperation(bytes);
     }
 
     public ReadOperation startRead(){
