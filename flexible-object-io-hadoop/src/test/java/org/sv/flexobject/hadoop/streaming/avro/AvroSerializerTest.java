@@ -1,6 +1,7 @@
 package org.sv.flexobject.hadoop.streaming.avro;
 
 import org.junit.jupiter.api.Test;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.json.MapperFactory;
 import org.sv.flexobject.testdata.TestDataWithEnumAndClass;
 import org.sv.flexobject.testdata.TestDataWithSubSchema;
@@ -9,7 +10,10 @@ import org.sv.flexobject.testdata.levelone.ObjectWithNestedObject;
 import org.sv.flexobject.testdata.levelone.leveltwo.SimpleObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -42,6 +46,30 @@ class AvroSerializerTest {
 
         SimpleObject<?> recordOut = AvroSerializer.fromBytes(bytes, SimpleObject.class);
         assertEquals(recordIn, recordOut);
+    }
+
+    @Test
+    void multipleObjects() throws Exception {
+        ObjectWithNestedObject record1 = ObjectWithNestedObject.random();
+        ObjectWithNestedObject record2 = ObjectWithNestedObject.random();
+        ObjectWithNestedObject record3 = ObjectWithNestedObject.random();
+        AvroSerializer serializer = AvroSerializer.forClass(ObjectWithNestedObject.class);
+
+        byte[] bytes = serializer
+                .start()
+                .write(record1).write(record2).write(record3)
+                .asBytes();
+
+
+        List<ObjectWithNestedObject> output = serializer.start(bytes)
+                .stream()
+                .map(ObjectWithNestedObject.class::cast)
+                .toList();
+
+        assertEquals(3, output.size());
+        assertEquals(record1, output.get(0));
+        assertEquals(record2, output.get(1));
+        assertEquals(record3, output.get(2));
     }
 
     @Test
