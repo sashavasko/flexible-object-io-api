@@ -31,20 +31,7 @@ public class AvroSerializer {
         writer.write(wrapped, encoder);
         encoder.flush();
 
-        ByteBuffer output = outputStream.asByteBuffer();
-//
-//        TODO: Not sure how snappy compression is useful here
-//
-//        SnappyCodec codec = SnappyCodec.getInstance();
-//        if (codec != null)
-//            output = codec.compress(output);
-
-//        DataFileWriter way
-//        try (DataFileWriter<StreamableAvroRecord> fileWriter = new DataFileWriter<>(writer)) {
-//            fileWriter.create(schema, outputStream);
-//            fileWriter.append(wrapped);
-//        }
-        return output;
+        return outputStream.asByteBuffer();
     }
 
     public static byte[] toBytes(ByteBuffer byteBuffer){
@@ -63,18 +50,12 @@ public class AvroSerializer {
 
         @SuppressWarnings("unchecked")
         T data = (T) InstanceFactory.get(dataClass);
-
-        BinaryDecoder datumIn = DecoderFactory.get().binaryDecoder(bytes, null);
-        StreamableDatumReader reader = new StreamableDatumReader(avroSchema);
         StreamableAvroRecord wrapped = new StreamableAvroRecord(data, avroSchema);
+
+        StreamableDatumReader reader = new StreamableDatumReader(avroSchema);
+        BinaryDecoder datumIn = DecoderFactory.get().binaryDecoder(bytes, null);
         reader.read(wrapped, datumIn);
-//        GenericRecord record = reader.read(null, datumIn);
-//        AvroSchema.convertGenericRecord(record, avroSchema, data);
-//
-//        try(DataFileReader<GenericRecord> reader = GenericInputBuilder.forData(bytes, dataClass)) {
-//            GenericRecord record = reader.next();
-//            AvroSchema.convertGenericRecord(record, record.getSchema(), data);
-//        }
+
         return data;
     }
 }
