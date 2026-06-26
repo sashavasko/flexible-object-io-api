@@ -20,6 +20,10 @@ public class StreamableAvroRecord implements GenericRecord {
     public StreamableAvroRecord() {
     }
 
+    public StreamableAvroRecord(Schema avroSchema) {
+        this.schema = avroSchema;
+    }
+
     public StreamableAvroRecord(Streamable wrappedObject, Schema avroSchema) {
         set(wrappedObject, avroSchema);
     }
@@ -31,9 +35,15 @@ public class StreamableAvroRecord implements GenericRecord {
         return record;
     }
 
-    public void set(Streamable wrappedObject, Schema avroSchema) {
+    public StreamableAvroRecord set(Streamable wrappedObject, Schema avroSchema) {
         this.wrappedObject = wrappedObject;
         schema = avroSchema;
+        return this;
+    }
+
+    public StreamableAvroRecord set(Streamable wrappedObject) {
+        this.wrappedObject = wrappedObject;
+        return this;
     }
 
     @Override
