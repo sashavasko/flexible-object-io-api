@@ -60,34 +60,11 @@ public class StreamableAvroRecord implements GenericRecord {
             org.sv.flexobject.schema.Schema wrappedSchema = wrappedObject.getSchema();
             FieldDescriptor descriptor = wrappedSchema.getDescriptor(i);
             Class<? extends Streamable> subSchema = descriptor.getSubschema();
-            if (subSchema != null) {
-                if (v instanceof GenericRecord) {
-                    Streamable subRecord = AvroSchema.convertGenericRecord((GenericRecord) v, subSchema);
-                    descriptor.set(wrappedObject, subRecord);
-                } else if (v instanceof List<?> listOfRecords) {
-                    List<Streamable> usableList = new ArrayList<>(listOfRecords.size());
-                    for (Object genericRecord : listOfRecords) {
-                        if (genericRecord == null)
-                            usableList.add(null);
-                        else
-                            usableList.add(AvroSchema.convertGenericRecord((GenericRecord) genericRecord, subSchema));
-                    }
-                    descriptor.set(wrappedObject, usableList);
-                } else if (v instanceof Map<?, ?> mapOfRecords) {
-                    Map<Object, Streamable> usableMap = new HashMap<>();
-                    for (Map.Entry<?, ?> entry : mapOfRecords.entrySet()) {
-                        Object key = entry.getKey();
-                        if (entry.getValue() == null)
-                            usableMap.put(key, null);
-                        else
-                            usableMap.put(key, AvroSchema.convertGenericRecord((GenericRecord) entry.getValue(), subSchema));
-                    }
-                    descriptor.set(wrappedObject, usableMap);
-                } else
-                    throw new SchemaException("Unknown Avro collection class: " + v.getClass().getName());
-            } else {
-                descriptor.set(wrappedObject, v);
+            if (subSchema != null && v instanceof GenericRecord genericRecord) {
+                    v = AvroSchema.convertGenericRecord(genericRecord, subSchema);
             }
+
+            descriptor.set(wrappedObject, v);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

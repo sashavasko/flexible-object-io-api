@@ -23,4 +23,20 @@ public class StreamableDatumReader extends GenericDatumReader<StreamableAvroReco
     protected Object readString(Object old, Decoder in) throws IOException {
         return in.readString();
     }
+
+    @Override
+    protected void addToMap(Object map, Object key, Object value) {
+        if (value instanceof StreamableAvroRecord streamableAvroRecord) {
+            value = streamableAvroRecord.getWrapped();
+        }
+        super.addToMap(map, key, value);
+    }
+
+    @Override
+    protected void addToArray(Object array, long pos, Object e) {
+        if (e instanceof StreamableAvroRecord streamableAvroRecord) {
+            e = streamableAvroRecord.getWrapped();
+        }
+        super.addToArray(array, pos, e);
+    }
 }
