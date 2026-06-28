@@ -1,8 +1,8 @@
 pluginManagement {
     repositories {
         maven { url "https://plugins.gradle.org/m2/" }
-        maven { url 'https://repo1.maven.org/maven2/'}
-        maven { url 'https://maven.dremio.com/free/'  }
+        maven { url 'https://repo1.maven.org/maven2/' }
+        maven { url 'https://maven.dremio.com/free/' }
         gradlePluginPortal()
     }
 }
@@ -22,3 +22,4 @@ include 'flexible-object-io-docker'
 
 include 'flexible-object-io-arrow-flight'
 include 'flexible-object-io-hadoop-properties'
+include 'flexible-object-io-avro'

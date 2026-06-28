@@ -1,7 +1,7 @@
 package org.sv.flexobject.hadoop;
 
-import org.sv.flexobject.hadoop.streaming.avro.AvroSchema;
 import org.junit.Test;
+import org.sv.flexobject.avro.AvroSchema;
 import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.schema.annotations.ScalarFieldTyped;
 

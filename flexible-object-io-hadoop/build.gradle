@@ -2,7 +2,6 @@ test {
     jvmArgs "--add-opens=java.base/java.lang=ALL-UNNAMED", "--add-opens=java.base/java.util=ALL-UNNAMED"
 }
 
-
 dependencies {
     api group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.16'
     api group: 'ch.qos.logback', name: 'logback-core', version: '1.5.16'
@@ -30,7 +29,6 @@ dependencies {
     api ("org.apache.hadoop:hadoop-mapreduce-client-nativetask:${hadoopVersion}")
     api ("org.apache.hadoop:hadoop-yarn-client:${hadoopVersion}")
 
-
     api (group: 'org.apache.spark', name: 'spark-core_2.12', version: "${sparkVersion}"){
         exclude group: 'org.apache.avro', module:'avro-mapred'
         exclude(group:'log4j', module:'log4j')
@@ -52,8 +50,6 @@ dependencies {
         exclude(group:'org.apache.hadoop', module:'hadoop-client-api')
         exclude(group:'org.apache.hadoop', module:'hadoop-client-runtime')
     }
-
-    api group: 'org.apache.avro', name: 'avro', version: "${avroVersion}"
 
     api ("org.apache.parquet:parquet-hadoop:${parquetVersion}"){
         version {
@@ -93,7 +89,6 @@ dependencies {
     testImplementation group: 'org.mockftpserver', name: 'MockFtpServer', version: '2.7.1'
 
 }
-
 
 test {
     useJUnitPlatform()

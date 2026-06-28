@@ -68,6 +68,13 @@ project(':flexible-object-io-core') {
     }
 }
 
+project(':flexible-object-io-avro') {
+    dependencies {
+        api project(':flexible-object-io-core')
+        testImplementation project(':flexible-object-io-testdata')
+    }
+}
+
 project(':flexible-object-io-testdata') {
     dependencies {
         api project(':flexible-object-io-core')
@@ -110,6 +117,7 @@ project(':flexible-object-io-hadoop-properties') {
 project(':flexible-object-io-hadoop') {
     dependencies {
         api project(':flexible-object-io-core')
+        api project(':flexible-object-io-avro')
         api project(':flexible-object-io-hadoop-properties')
         api project(':flexible-object-io-mongo')
         testImplementation project(':flexible-object-io-testdata')
@@ -130,6 +138,7 @@ project(':flexible-object-io-kafka') {
 
     dependencies {
         api project(':flexible-object-io-core')
+        api project(':flexible-object-io-avro')
     }
 }
 
@@ -152,6 +161,7 @@ project(':flexible-object-io-mongo') {
 project(':flexible-object-io-examples') {
     dependencies {
         api project(':flexible-object-io-core')
+        api project(':flexible-object-io-avro')
         api project(':flexible-object-io-mongo')
         api project(':flexible-object-io-hadoop')
         api project(':flexible-object-io-rabbit')
