@@ -84,9 +84,8 @@ public class AvroSerializer {
                 return getInstance(dataClassName, null, avroSchema);
             }catch (SchemaException e){
                 lastException = e;
-                dataClassName = dataClassName.substring(0, dataClassName.lastIndexOf('.'))
-                        + "$"
-                        + dataClassName.substring(dataClassName.lastIndexOf('.') + 1);
+                int idx = dataClassName.lastIndexOf('.');
+                dataClassName = dataClassName.substring(0, idx) + "$" + dataClassName.substring(idx + 1);
             }
         }
         throw lastException == null
