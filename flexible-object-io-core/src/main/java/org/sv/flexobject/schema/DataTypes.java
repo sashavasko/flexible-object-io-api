@@ -604,10 +604,19 @@ public enum DataTypes {
         return ByteBuffer.wrap(bytes).getLong();
     }
 
+    public static byte[] toBytes(ByteBuffer byteBuffer){
+        byte[] bytes = new byte[byteBuffer.remaining()];
+        byteBuffer.get(bytes);
+        return bytes;
+    }
+
     public static byte[] binaryConverter(Object value) throws Exception{
         if (value == null || value instanceof byte[])
             return (byte[]) value;
 
+        if (value instanceof ByteBuffer){
+            return toBytes((ByteBuffer) value);
+        }
         if (value instanceof BinaryNode)
             return ((BinaryNode)value).binaryValue();
         if (value instanceof String)

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.sv.flexobject.Streamable;
 import org.sv.flexobject.avro.FooBar;
 import org.sv.flexobject.json.MapperFactory;
+import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.testdata.TestDataWithEnumAndClass;
 import org.sv.flexobject.testdata.TestDataWithSubSchema;
 import org.sv.flexobject.testdata.TestDataWithSubSchemaInCollection;
@@ -25,7 +26,7 @@ class AvroSerializerTest {
         SimpleObject<?> recordIn = new SimpleObject<>();
         recordIn.intField = 5;
 
-        byte[] bytes = AvroSerializer.toBytes(AvroSerializer.toBytes(recordIn));
+        byte[] bytes = DataTypes.toBytes(AvroSerializer.toBytes(recordIn));
 
         assertEquals(14, recordIn.toJsonBytes().length);
         assertEquals(2, bytes.length);
@@ -40,7 +41,7 @@ class AvroSerializerTest {
         SimpleObject<?> recordIn = new SimpleObject<>();
         recordIn.intField = 158052356;
 
-        byte[] bytes = AvroSerializer.toBytes(AvroSerializer.toBytes(recordIn));
+        byte[] bytes = DataTypes.toBytes(AvroSerializer.toBytes(recordIn));
 
         assertEquals(22, recordIn.toJsonBytes().length);
         assertEquals(6, bytes.length);
@@ -77,7 +78,7 @@ class AvroSerializerTest {
     void objectWithNestedObject() throws Exception {
         ObjectWithNestedObject recordIn = ObjectWithNestedObject.random();
 
-        byte[] bytes = AvroSerializer.toBytes(AvroSerializer.toBytes(recordIn));
+        byte[] bytes = DataTypes.toBytes(AvroSerializer.toBytes(recordIn));
 
         System.out.println("JSON bytes length:" + recordIn.toJsonBytes().length);
         System.out.println("AVRO bytes length:" + bytes.length);
@@ -90,7 +91,7 @@ class AvroSerializerTest {
     void objectWithNestedObjectInMap() throws Exception {
         ObjectWithNestedObject recordIn = ObjectWithNestedObject.random();
 
-        byte[] bytes = AvroSerializer.toBytes(AvroSerializer.toBytes(recordIn));
+        byte[] bytes = DataTypes.toBytes(AvroSerializer.toBytes(recordIn));
 
         System.out.println("JSON bytes length:" + recordIn.toJsonBytes().length);
         System.out.println("AVRO bytes length:" + bytes.length);
@@ -103,7 +104,7 @@ class AvroSerializerTest {
     void fooBar() throws Exception {
         FooBar recordIn = FooBar.random(false);
 
-        byte[] bytes = AvroSerializer.toBytes(AvroSerializer.toBytes(recordIn));
+        byte[] bytes = DataTypes.toBytes(AvroSerializer.toBytes(recordIn));
 
         System.out.println("JSON bytes length:" + recordIn.toJsonBytes().length);
         System.out.println("AVRO bytes length:" + bytes.length);
@@ -118,7 +119,7 @@ class AvroSerializerTest {
 
         System.out.println(MapperFactory.pretty(recordIn.toJson()));
 
-        byte[] bytes = AvroSerializer.toBytes(AvroSerializer.toBytes(recordIn));
+        byte[] bytes = DataTypes.toBytes(AvroSerializer.toBytes(recordIn));
         System.out.println(Arrays.toString(bytes));
 
         System.out.println("JSON bytes length:" + recordIn.toJsonBytes().length);
@@ -132,7 +133,7 @@ class AvroSerializerTest {
     void subSchemaInCollection() throws Exception {
         TestDataWithSubSchemaInCollection recordIn = TestDataWithSubSchemaInCollection.random(true);
 
-        byte[] bytes = AvroSerializer.toBytes(AvroSerializer.toBytes(recordIn));
+        byte[] bytes = DataTypes.toBytes(AvroSerializer.toBytes(recordIn));
 
         System.out.println("JSON bytes length:" + recordIn.toJsonBytes().length);
         System.out.println("AVRO bytes length:" + bytes.length);
@@ -145,7 +146,7 @@ class AvroSerializerTest {
     void enumAndClass() throws Exception {
         TestDataWithEnumAndClass recordIn = TestDataWithEnumAndClass.random();
 
-        byte[] bytes = AvroSerializer.toBytes(AvroSerializer.toBytes(recordIn));
+        byte[] bytes = DataTypes.toBytes(AvroSerializer.toBytes(recordIn));
 
         System.out.println("JSON bytes length:" + recordIn.toJsonBytes().length);
         System.out.println("AVRO bytes length:" + bytes.length);

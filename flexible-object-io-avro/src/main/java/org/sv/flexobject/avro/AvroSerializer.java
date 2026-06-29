@@ -78,7 +78,20 @@ public class AvroSerializer {
 
     public static AvroSerializer forSchema(Schema avroSchema){
         String dataClassName = avroSchema.getFullName();
-        return getInstance(dataClassName, null, avroSchema);
+        SchemaException lastException = null;
+        while (dataClassName.contains(".")) {
+            try {
+                return getInstance(dataClassName, null, avroSchema);
+            }catch (SchemaException e){
+                lastException = e;
+                dataClassName = dataClassName.substring(0, dataClassName.lastIndexOf('.'))
+                        + "$"
+                        + dataClassName.substring(dataClassName.lastIndexOf('.') + 1);
+            }
+        }
+        throw lastException == null
+                ? new SchemaException("Failed to load Avro Data class: " + avroSchema.getFullName())
+                : lastException;
     }
 
     public static AvroSerializer forClass(Class<? extends Streamable> dataClass, Schema avroSchema){
@@ -204,12 +217,6 @@ public class AvroSerializer {
 
     public static ByteBuffer toBytes(Streamable data, Schema schema) throws IOException {
         return forSchema(schema).start().write(data).asByteBuffer();
-    }
-
-    public static byte[] toBytes(ByteBuffer byteBuffer){
-        byte[] bytes = new byte[byteBuffer.remaining()];
-        byteBuffer.get(bytes);
-        return bytes;
     }
 
     public static <T extends Streamable> T fromBytes(byte[] bytes, Class<? extends Streamable> dataClass) throws Exception {

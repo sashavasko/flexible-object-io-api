@@ -3,6 +3,7 @@ package org.sv.flexobject.avro;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.junit.Test;
+import org.sv.flexobject.Streamable;
 import org.sv.flexobject.testdata.ObjectWithNestedObjectWithNestedObject;
 import org.sv.flexobject.testdata.TestDataWithSubSchemaInCollection;
 import org.sv.flexobject.testdata.levelone.ObjectWithNestedObject;
@@ -60,5 +61,20 @@ public class AvroSchemaTest {
         AvroInputAdapter.consume(avroSchema, avro, testDataBack::load);
 
         assertEquals(testData, testDataBack);
+    }
+
+    public static class InnerClass implements Streamable {
+        int foo;
+        String bar;
+    }
+
+    @Test
+    public void innerClassDollarSignReplacedWithDot() {
+        Schema schema = AvroSchema.forClass(InnerClass.class);
+        assertEquals("InnerClass", schema.getName());
+        assertEquals("org.sv.flexobject.avro.AvroSchemaTest", schema.getNamespace());
+
+        // verify that we can load the class back from Avro schema:
+        AvroSerializer.forSchema(schema);
     }
 }
