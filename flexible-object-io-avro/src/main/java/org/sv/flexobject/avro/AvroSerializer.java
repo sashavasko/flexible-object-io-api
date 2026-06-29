@@ -81,7 +81,11 @@ public class AvroSerializer {
         SchemaException lastException = null;
         while (dataClassName.contains(".")) {
             try {
-                return getInstance(dataClassName, null, avroSchema);
+                AvroSerializer instance = getInstance(dataClassName, null, avroSchema);
+                if (lastException != null) {
+                    instances.put(avroSchema.getFullName(), instance);
+                }
+                return instance;
             }catch (SchemaException e){
                 lastException = e;
                 int idx = dataClassName.lastIndexOf('.');
