@@ -2,28 +2,28 @@ package org.sv.flexobject.dremio.api;
 
 import org.sv.flexobject.dremio.DremioRestApp;
 import org.sv.flexobject.dremio.domain.catalog.config.HdfsConf;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.dremio.domain.catalog.*;
 import org.sv.flexobject.json.MapperFactory;
 
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CatalogAPITest {
     CatalogAPI catalogAPI;
     String username;
     String entityToDelete = null;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         catalogAPI = DremioRestApp.getClient().catalog();
         username = DremioRestApp.getClient().getConf().getUsername();
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         if (entityToDelete != null){
             catalogAPI.delete(entityToDelete);

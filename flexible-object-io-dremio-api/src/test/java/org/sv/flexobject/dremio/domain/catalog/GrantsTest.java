@@ -5,20 +5,20 @@ import org.sv.flexobject.dremio.DremioRestApp;
 import org.sv.flexobject.dremio.api.CatalogAPI;
 import org.sv.flexobject.dremio.api.UserAPI;
 import org.sv.flexobject.dremio.domain.Permissions;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GrantsTest {
     CatalogAPI catalogAPI;
     UserAPI userAPI;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         DremioClient enterpriseClient = DremioRestApp.getEnterpriseClient();
         if (enterpriseClient != null) {

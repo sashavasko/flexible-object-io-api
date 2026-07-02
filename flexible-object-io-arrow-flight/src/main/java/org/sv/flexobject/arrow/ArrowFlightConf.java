@@ -1,7 +1,6 @@
 package org.sv.flexobject.arrow;
 
 import org.sv.flexobject.hadoop.properties.HadoopPropertiesWrapperBase;
-import org.sv.flexobject.utility.InstanceFactory;
 import org.apache.arrow.flight.FlightClient;
 import org.apache.arrow.flight.FlightProducer;
 import org.apache.arrow.flight.FlightServer;
@@ -9,6 +8,7 @@ import org.apache.arrow.flight.Location;
 import org.apache.arrow.flight.impl.Flight;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +28,7 @@ public class ArrowFlightConf extends HadoopPropertiesWrapperBase<ArrowFlightConf
     @Override
     public ArrowFlightConf setDefaults() {
         scheme = "https";
-//        hostname = "dremiod02p.d.carfax.us";
+//        hostname = "foo.bar.com";
         flightPort = 32010;
         allocatorClass = RootAllocator.class;
         useTls = false;

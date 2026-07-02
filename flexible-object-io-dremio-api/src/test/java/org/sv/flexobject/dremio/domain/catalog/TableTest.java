@@ -2,16 +2,16 @@ package org.sv.flexobject.dremio.domain.catalog;
 
 import org.sv.flexobject.dremio.DremioRestApp;
 import org.sv.flexobject.dremio.api.CatalogAPI;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TableTest {
 
     CatalogAPI catalogAPI;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         catalogAPI = DremioRestApp.getClient().catalog();
     }

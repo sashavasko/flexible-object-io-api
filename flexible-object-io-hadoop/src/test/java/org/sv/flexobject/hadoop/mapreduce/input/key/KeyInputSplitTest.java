@@ -3,20 +3,20 @@ package org.sv.flexobject.hadoop.mapreduce.input.key;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.*;
 import java.util.Objects;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class KeyInputSplitTest {
 
     @Mock
@@ -24,12 +24,12 @@ public class KeyInputSplitTest {
 
     KeyInputSplit split;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         split = new KeyInputSplit();
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         InstanceFactory.reset();
     }

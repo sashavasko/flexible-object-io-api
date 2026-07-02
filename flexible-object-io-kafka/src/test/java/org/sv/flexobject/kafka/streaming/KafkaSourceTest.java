@@ -3,19 +3,19 @@ package org.sv.flexobject.kafka.streaming;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Duration;
 import java.util.Iterator;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class KafkaSourceTest {
 
     @Mock
@@ -34,7 +34,7 @@ public class KafkaSourceTest {
 
     KafkaSource<KafkaTestData> source;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         source = KafkaSource.builder().useConsumer(mockConsumer).timeoutSeconds(1234567).build();
     }

@@ -10,7 +10,7 @@ import org.bson.codecs.Encoder;
 import org.bson.codecs.EncoderContext;
 import org.bson.json.JsonWriterSettings;
 import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.testdata.TestDataWithInferredSchema;
 
 import java.io.IOException;

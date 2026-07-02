@@ -1,12 +1,12 @@
 package org.sv.flexobject.sql.dao;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.sv.flexobject.InAdapter;
 import org.sv.flexobject.OutAdapter;
 import org.sv.flexobject.adapter.AdapterFactory;
@@ -23,7 +23,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ConnectionDaoTest {
 
     @Mock
@@ -51,7 +51,7 @@ public class ConnectionDaoTest {
     @Mock
     OutAdapter outAdapter;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         mockProperties1.put("foo1", "bar1");
         mockProperties2.put("foo2", "bar2");
@@ -69,7 +69,7 @@ public class ConnectionDaoTest {
         when(adapterFactory.createOutputAdapter("output")).thenReturn(outAdapter);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         ConnectionManager.getInstance().clearAll();
     }

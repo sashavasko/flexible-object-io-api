@@ -3,8 +3,8 @@ package org.sv.flexobject.hadoop.mapreduce.util.cacheable;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.hadoop.ParquetReader;
 import org.apache.parquet.hadoop.ParquetWriter;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.hadoop.streaming.parquet.read.input.ByteArrayInputFile;
 import org.sv.flexobject.hadoop.streaming.parquet.read.streamable.ParquetReaderBuilder;
@@ -14,7 +14,7 @@ import org.sv.flexobject.hadoop.streaming.parquet.write.streamable.ParquetWriter
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HadoopCacheableParquetTest {
 
@@ -54,7 +54,7 @@ public class HadoopCacheableParquetTest {
         }
     };
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         keyValue.clear();
     }

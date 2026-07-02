@@ -12,7 +12,7 @@ import org.bson.conversions.Bson;
 import org.bson.json.JsonWriterSettings;
 import org.bson.types.ObjectId;
 import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.stream.sinks.SingleValueSink;
 import org.sv.flexobject.testdata.TestDataWithInferredSchema;
 

@@ -22,5 +22,5 @@ dependencies {
 
 test {
     useJUnitPlatform()
-    jvmArgs "--add-opens=java.base/java.nio=org.apache.arrow.memory.core,ALL-UNNAMED", "-Duser.language=en"
+    jvmArgs "--add-opens=java.base/java.nio=ALL-UNNAMED", "-Duser.language=en"
 }

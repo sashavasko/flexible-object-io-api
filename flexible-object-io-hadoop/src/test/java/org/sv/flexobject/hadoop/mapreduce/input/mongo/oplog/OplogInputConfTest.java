@@ -1,13 +1,13 @@
 package org.sv.flexobject.hadoop.mapreduce.input.mongo.oplog;
 
 import org.bson.BsonTimestamp;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class OplogInputConfTest {
 

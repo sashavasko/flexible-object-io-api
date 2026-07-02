@@ -1,21 +1,21 @@
 package org.sv.flexobject.dremio.domain.catalog;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.sv.flexobject.dremio.DremioRestApp;
 import org.sv.flexobject.dremio.api.CatalogAPI;
 import org.sv.flexobject.dremio.api.DremioApiException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TagTest {
     CatalogAPI catalogAPI;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         catalogAPI = DremioRestApp.getClient().catalog();
     }

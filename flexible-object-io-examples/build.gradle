@@ -1,7 +1,14 @@
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api "at.yawk.lz4:lz4-java:1.10.2"
+    api "org.lz4:lz4-java:1.8.0"
+}
+
 task jobsxml(type: Copy) {
     from 'src/dist/jobs'
     into 'build/libs/jobs'
     include '**/*.xml'
 }
-
-// the following requires adding carfax-indifferent-rpm plugin :

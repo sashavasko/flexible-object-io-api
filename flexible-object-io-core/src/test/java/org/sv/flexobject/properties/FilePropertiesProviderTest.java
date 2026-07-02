@@ -1,21 +1,21 @@
 package org.sv.flexobject.properties;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.sv.flexobject.connections.ConnectionManager;
 
 import java.util.Properties;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class FilePropertiesProviderTest {
 
     FilePropertiesProvider provider;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         provider = new FilePropertiesProvider("src/test/props/dir1", "src/test/props/dir2", "src/test/props/dir3", "src/test/props/dir4");
     }

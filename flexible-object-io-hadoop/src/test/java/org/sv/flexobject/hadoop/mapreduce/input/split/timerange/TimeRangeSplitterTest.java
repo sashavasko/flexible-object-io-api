@@ -2,13 +2,13 @@ package org.sv.flexobject.hadoop.mapreduce.input.split.timerange;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputSplit;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.hadoop.mapreduce.input.split.ProxyInputSplit;
 import org.sv.flexobject.schema.DataTypes;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class TimeRangeSplitterTest {

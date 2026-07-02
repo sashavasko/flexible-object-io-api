@@ -2,19 +2,19 @@ package org.sv.flexobject.hadoop.mapreduce.input.mongo.oplog;
 
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.bson.BsonTimestamp;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.sv.flexobject.hadoop.mapreduce.input.split.ProxyInputSplit;
 import org.sv.flexobject.stream.Source;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class OplogRecordReaderTest {
 
 
@@ -34,7 +34,7 @@ public class OplogRecordReaderTest {
 
     OplogRecordReader reader;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         reader = Mockito.mock(OplogRecordReader.class, Mockito.CALLS_REAL_METHODS);
         reader.setInputConf(conf);

@@ -2,20 +2,20 @@ package org.sv.flexobject.hadoop.mapreduce.input.batch;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputSplit;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.sv.flexobject.properties.Namespace;
 import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class BatchSplitterTest {
 
     BatchInputConf conf;
@@ -24,7 +24,7 @@ public class BatchSplitterTest {
 
     BatchSplitter splitter;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         splitter = new BatchSplitter();
         conf = new BatchInputConf(new Namespace("test", "."));
@@ -32,7 +32,7 @@ public class BatchSplitterTest {
         InstanceFactory.set(BatchInputConf.class, conf);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         InstanceFactory.reset();
     }

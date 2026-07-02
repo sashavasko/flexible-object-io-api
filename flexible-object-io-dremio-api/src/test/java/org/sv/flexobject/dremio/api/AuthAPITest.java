@@ -1,8 +1,8 @@
 package org.sv.flexobject.dremio.api;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.aws.AWSSecretProviderWithVault;
 import org.sv.flexobject.connections.ConnectionManager;
 import org.sv.flexobject.connections.PropertiesProvider;
@@ -14,7 +14,7 @@ import org.sv.flexobject.properties.FilePropertiesProvider;
 
 import java.util.Properties;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class AuthAPITest {
 

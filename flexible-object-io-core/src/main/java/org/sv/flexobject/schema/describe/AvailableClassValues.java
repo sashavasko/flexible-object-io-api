@@ -7,5 +7,5 @@ import java.lang.annotation.RetentionPolicy;
 public @interface AvailableClassValues {
     Class<?> extend() default Void.class;
     Class<?> implement() default Void.class;
-    String namespace() default "com.carfax";
+    String namespace() default "org.sv.flexobject";
 }

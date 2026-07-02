@@ -3,12 +3,12 @@ package org.sv.flexobject.hadoop.streaming.parquet;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.schema.MessageType;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.hadoop.streaming.parquet.json.ParquetJsonSink;
 import org.sv.flexobject.json.MapperFactory;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertNull;
 
 public class ParquetUtilsTest {
@@ -17,7 +17,7 @@ public class ParquetUtilsTest {
     Path testDataPath = new Path("testData/");;
 
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         Configuration conf = new Configuration();
         testDataPath.getFileSystem(conf).delete(testDataPath, true);

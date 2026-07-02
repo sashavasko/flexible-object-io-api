@@ -2,13 +2,13 @@ package org.sv.flexobject.mongo;
 
 import com.mongodb.Tag;
 import com.mongodb.TagSet;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MongoClientConfTest {
     MongoClientConf conf = new MongoClientConf();

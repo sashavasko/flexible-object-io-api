@@ -7,12 +7,12 @@ import com.github.dockerjava.api.model.Image;
 import com.github.dockerjava.api.model.Info;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DockerClientProviderTest {
 

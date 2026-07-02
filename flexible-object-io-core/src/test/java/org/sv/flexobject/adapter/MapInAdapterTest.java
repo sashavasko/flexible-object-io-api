@@ -1,8 +1,8 @@
 package org.sv.flexobject.adapter;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.stream.sources.SingleValueSource;
 import org.sv.flexobject.translate.NamespaceTranslator;
@@ -10,7 +10,7 @@ import org.sv.flexobject.translate.NamespaceTranslator;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MapInAdapterTest {
 
@@ -32,12 +32,12 @@ public class MapInAdapterTest {
         }
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         adapter = (MapInAdapter) GenericInAdapter.build(MapInAdapter.class, new SingleValueSource(propertiesMap));
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         propertiesMap.clear();
     }

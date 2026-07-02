@@ -1,14 +1,14 @@
 package org.sv.flexobject.hadoop.streaming.parquet.write.streamable;
 
 import org.apache.parquet.hadoop.ParquetWriter;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.sv.flexobject.hadoop.streaming.parquet.ParquetSchema;
 import org.sv.flexobject.hadoop.streaming.parquet.write.output.ByteArrayOutputFile;
 import org.sv.flexobject.testdata.TestDataWithInferredSchema;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ParquetWriterBuilderTest {
 
     @Test

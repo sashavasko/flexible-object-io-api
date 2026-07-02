@@ -1,20 +1,20 @@
 package org.sv.flexobject.dremio.domain.catalog;
 
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.sv.flexobject.dremio.DremioRestApp;
 import org.sv.flexobject.dremio.api.CatalogAPI;
 import org.sv.flexobject.dremio.api.DremioApiException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class WikiTest {
     CatalogAPI catalogAPI;
     Table table;
     View view;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         catalogAPI = DremioRestApp.getClient().catalog();
         table = Table.builder(catalogAPI)
@@ -30,7 +30,7 @@ public class WikiTest {
                 .create(null, false);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         catalogAPI.delete(view);
         catalogAPI.delete(table);

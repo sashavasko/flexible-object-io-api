@@ -4,15 +4,15 @@ import org.sv.flexobject.dremio.DremioClient;
 import org.sv.flexobject.dremio.DremioRestApp;
 import org.sv.flexobject.dremio.api.CatalogAPI;
 import org.sv.flexobject.dremio.domain.catalog.lineage.Dataset;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class LineageTest {
     CatalogAPI catalogAPI;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         DremioClient enterpriseClient = DremioRestApp.getEnterpriseClient();
         if (enterpriseClient != null) {

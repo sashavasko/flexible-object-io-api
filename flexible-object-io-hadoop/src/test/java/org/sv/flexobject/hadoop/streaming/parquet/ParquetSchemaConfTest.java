@@ -3,7 +3,7 @@ package org.sv.flexobject.hadoop.streaming.parquet;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.parquet.schema.MessageType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.hadoop.mapreduce.input.parquet.JsonParquetInputFormat;
 import org.sv.flexobject.hadoop.mapreduce.input.parquet.StreamableParquetInputFormat;
 import org.sv.flexobject.hadoop.mapreduce.output.parquet.JsonParquetOutputFormat;
@@ -11,7 +11,7 @@ import org.sv.flexobject.hadoop.mapreduce.output.parquet.StreamableParquetOutput
 import org.sv.flexobject.testdata.TestDataWithSubSchema;
 import org.sv.flexobject.testdata.TestDataWithSubSchemaInCollection;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ParquetSchemaConfTest {
 

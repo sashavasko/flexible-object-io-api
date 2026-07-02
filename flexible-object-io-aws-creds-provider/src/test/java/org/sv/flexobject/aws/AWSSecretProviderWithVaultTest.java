@@ -4,12 +4,12 @@ import com.bettercloud.vault.VaultException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.connections.ConnectionManager;
 
 import java.util.Properties;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class AWSSecretProviderWithVaultTest {
 

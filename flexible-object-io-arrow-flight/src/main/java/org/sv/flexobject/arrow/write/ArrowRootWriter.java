@@ -4,12 +4,12 @@ import org.sv.flexobject.arrow.ArrowSchema;
 import org.sv.flexobject.Streamable;
 import org.sv.flexobject.schema.SchemaException;
 import org.sv.flexobject.stream.Sink;
-import org.sv.flexobject.utility.InstanceFactory;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.FieldVector;
 import org.apache.arrow.vector.VectorSchemaRoot;
 import org.apache.arrow.vector.types.pojo.Schema;
+import org.sv.flexobject.util.InstanceFactory;
 
 public class ArrowRootWriter extends ArrowRecordWriter implements Sink<Streamable> {
     BufferAllocator allocator;

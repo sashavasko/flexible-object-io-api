@@ -2,13 +2,13 @@ package org.sv.flexobject.hadoop.mapreduce.input.batch;
 
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.sv.flexobject.InAdapter;
 import org.sv.flexobject.hadoop.mapreduce.input.AdapterRecordReader;
 import org.sv.flexobject.stream.report.ProgressReporter;
@@ -16,10 +16,10 @@ import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class BatchRecordReaderTest {
 
     @Mock
@@ -60,7 +60,7 @@ public class BatchRecordReaderTest {
 
     BatchRecordReader reader;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         reader = Mockito.mock(BatchRecordReader.class, Mockito.CALLS_REAL_METHODS);
 
@@ -69,7 +69,7 @@ public class BatchRecordReaderTest {
         doReturn(inputDao).when(reader).getDao();
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         InstanceFactory.reset();
     }

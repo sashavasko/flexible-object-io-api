@@ -1,12 +1,12 @@
 package org.sv.flexobject.avro;
 
 import org.apache.avro.generic.GenericRecord;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.testdata.ObjectWithDate;
 
 import java.sql.Date;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AvroOutputAdapterTest {
 

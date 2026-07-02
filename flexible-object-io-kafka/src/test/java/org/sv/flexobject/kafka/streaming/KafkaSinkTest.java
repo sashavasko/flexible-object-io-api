@@ -7,13 +7,13 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.TopicPartition;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.sv.flexobject.connections.ConnectionManager;
 import org.sv.flexobject.kafka.EmbeddedKafka;
 
@@ -23,10 +23,10 @@ import java.util.Optional;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class KafkaSinkTest {
 
     @Mock
@@ -49,7 +49,7 @@ public class KafkaSinkTest {
 
     public static final String TEST_KAFKA_CONNECTION = "test-connection";
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         when(mockSink.getKafkaProducer()).thenReturn(Optional.of(mockProducer));
         when(mockSink.getTopic()).thenReturn("test");

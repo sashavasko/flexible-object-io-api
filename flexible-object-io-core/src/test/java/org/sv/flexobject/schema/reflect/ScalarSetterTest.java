@@ -1,11 +1,11 @@
 package org.sv.flexobject.schema.reflect;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.StreamableWithSchema;
 
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ScalarSetterTest {
 

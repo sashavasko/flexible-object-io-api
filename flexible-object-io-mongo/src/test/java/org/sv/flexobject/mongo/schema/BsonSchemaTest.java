@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mongodb.client.MongoCollection;
 import org.bson.*;
 import org.bson.types.ObjectId;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.Streamable;
 import org.sv.flexobject.json.MapperFactory;
 import org.sv.flexobject.mongo.EmbeddedMongoTest;
@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BsonSchemaTest extends EmbeddedMongoTest {
 

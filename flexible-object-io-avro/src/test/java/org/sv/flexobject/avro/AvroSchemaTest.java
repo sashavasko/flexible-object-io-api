@@ -2,7 +2,7 @@ package org.sv.flexobject.avro;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.Streamable;
 import org.sv.flexobject.testdata.ObjectWithNestedObjectWithNestedObject;
 import org.sv.flexobject.testdata.TestDataWithSubSchemaInCollection;
@@ -10,7 +10,7 @@ import org.sv.flexobject.testdata.levelone.ObjectWithNestedObject;
 import org.sv.flexobject.testdata.levelone.ObjectWithNestedObjectInMap;
 import org.sv.flexobject.testdata.levelone.leveltwo.SimpleObject;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AvroSchemaTest {
 

@@ -3,12 +3,12 @@ package org.sv.flexobject.sql;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.sv.flexobject.SaveException;
 
 import java.sql.*;
@@ -16,10 +16,10 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class SqlOutAdapterTest {
 
     @Mock
@@ -29,7 +29,7 @@ public class SqlOutAdapterTest {
 
     Map<String, Integer> paramNamesXref = new HashMap();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         paramNamesXref.put("field", 1);
         paramNamesXref.put("anotherfield", 2);

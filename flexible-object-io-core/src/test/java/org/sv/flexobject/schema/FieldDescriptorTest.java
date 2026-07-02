@@ -1,9 +1,9 @@
 package org.sv.flexobject.schema;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.StreamableImpl;
 import org.sv.flexobject.copy.CopyAdapter;
 import org.sv.flexobject.schema.annotations.FieldName;
@@ -13,18 +13,18 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class FieldDescriptorTest {
 
     CopyAdapter adapter = new CopyAdapter();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         adapter.clear();
     }

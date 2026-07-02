@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.sv.flexobject.SaveException;
 import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.stream.sinks.SingleValueSink;
@@ -20,9 +20,9 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class JsonOutputAdapterTest {
 
     ObjectReader objectReader;
@@ -30,14 +30,14 @@ public class JsonOutputAdapterTest {
     SingleValueSink<ObjectNode> sink = new SingleValueSink<>();
     JsonOutputAdapter adapter;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         objectReader = new ObjectMapper().reader();
         MapperFactory.setObjectReader(objectReader);
         adapter = new JsonOutputAdapter(sink);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         adapter = null;
     }

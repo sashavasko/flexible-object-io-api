@@ -1,11 +1,11 @@
 package org.sv.flexobject.adapter;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.sv.flexobject.SaveException;
 import org.sv.flexobject.stream.Sink;
 
@@ -16,10 +16,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class GenericOutAdapterTest {
 
     @Mock
@@ -97,7 +97,7 @@ public class GenericOutAdapterTest {
 
     GenericOutAdapter adapter;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         TestAdapter.setRecords(Arrays.asList(mockRecord, mockRecord2));
         adapter = GenericOutAdapter.build(TestAdapter.class, mockSink);

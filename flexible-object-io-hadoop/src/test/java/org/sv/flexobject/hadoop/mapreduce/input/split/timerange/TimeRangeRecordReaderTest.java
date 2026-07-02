@@ -1,12 +1,12 @@
 package org.sv.flexobject.hadoop.mapreduce.input.split.timerange;
 
 import org.apache.hadoop.io.LongWritable;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.hadoop.mapreduce.input.split.ProxyInputSplit;
 
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TimeRangeRecordReaderTest {
     @Test

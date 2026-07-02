@@ -1,8 +1,8 @@
 package org.sv.flexobject.ftp.providers;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockftpserver.fake.FakeFtpServer;
 import org.mockftpserver.fake.UserAccount;
 import org.mockftpserver.fake.filesystem.FileEntry;
@@ -13,7 +13,7 @@ import org.sv.flexobject.ftp.FTPClient;
 import java.util.Arrays;
 import java.util.Properties;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class FtpProviderTest {
 
@@ -25,7 +25,7 @@ public class FtpProviderTest {
     private static final String FILE = "/dir/sample.txt";
     private static final String CONTENTS = "abcdef 1234567890";
 
-    @Before
+    @BeforeEach
     public void setUp() {
         fakeFtpServer = new FakeFtpServer();
         fakeFtpServer.setServerControlPort(port);
@@ -43,7 +43,7 @@ public class FtpProviderTest {
         fakeFtpServer.start();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         fakeFtpServer.stop();
     }

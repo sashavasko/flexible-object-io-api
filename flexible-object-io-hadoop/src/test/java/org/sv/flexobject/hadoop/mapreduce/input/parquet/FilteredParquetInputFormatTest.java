@@ -3,12 +3,12 @@ package org.sv.flexobject.hadoop.mapreduce.input.parquet;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.parquet.filter2.predicate.FilterPredicate;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.sv.flexobject.hadoop.streaming.parquet.ParquetFilterParser;
 import org.sv.flexobject.hadoop.streaming.parquet.ParquetSchema;
 import org.sv.flexobject.hadoop.streaming.parquet.ParquetSchemaConf;
@@ -19,10 +19,10 @@ import org.sv.flexobject.util.InstanceFactory;
 
 import static org.apache.parquet.filter2.predicate.FilterApi.eq;
 import static org.apache.parquet.filter2.predicate.FilterApi.intColumn;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class FilteredParquetInputFormatTest {
 
     ParquetSchemaConf parquetConf;
@@ -33,7 +33,7 @@ public class FilteredParquetInputFormatTest {
 
     FilteredParquetInputFormat format;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         parquetConf = new ParquetSchemaConf(new Namespace("test", "."));
         rawConf = new Configuration(false);
@@ -44,7 +44,7 @@ public class FilteredParquetInputFormatTest {
 
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         InstanceFactory.reset();
     }

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.parquet.hadoop.ParquetReader;
 import org.apache.parquet.hadoop.ParquetWriter;
 import org.apache.parquet.schema.MessageType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.hadoop.streaming.parquet.read.input.ByteArrayInputFile;
 import org.sv.flexobject.hadoop.streaming.parquet.read.streamable.ParquetReaderBuilder;
 import org.sv.flexobject.hadoop.streaming.parquet.testdata.*;
@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ParquetSchemaTest {
 

@@ -6,12 +6,12 @@ import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.ipc.message.ArrowRecordBatch;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ArrowSourceTest {
 

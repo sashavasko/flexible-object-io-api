@@ -1,11 +1,11 @@
 package org.sv.flexobject.arrow;
 
 import org.sv.flexobject.connections.ConnectionProvider;
-import org.sv.flexobject.utility.InstanceFactory;
 import org.apache.arrow.flight.FlightClient;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.sv.flexobject.util.InstanceFactory;
 
 import java.util.Arrays;
 import java.util.Properties;

@@ -1,13 +1,13 @@
 package org.sv.flexobject.hadoop.mapreduce.input.batch;
 
 import org.apache.hadoop.conf.Configuration;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.sv.flexobject.properties.Namespace;
 import org.sv.flexobject.schema.Schema;
 import org.sv.flexobject.schema.SchemaElement;
@@ -17,12 +17,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class BatchInputConfTest {
 
     @Mock
@@ -34,12 +34,12 @@ public class BatchInputConfTest {
 
     BatchInputConf conf;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         conf = new BatchInputConf();
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         InstanceFactory.reset();
     }

@@ -3,7 +3,7 @@ package org.sv.flexobject.mongo.streaming;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mongodb.client.model.Filters;
 import org.bson.types.ObjectId;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.json.MapperFactory;
 import org.sv.flexobject.mongo.EmbeddedMongoTest;
 import org.sv.flexobject.mongo.schema.BsonSchema;
@@ -13,7 +13,7 @@ import org.sv.flexobject.testdata.TestDataWithSubSchema;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MongoSourceTest extends EmbeddedMongoTest {
 

@@ -20,7 +20,7 @@ public class DremioClientConf extends ConnectionConf<DremioClientConf> {
     @Override
     public DremioClientConf setDefaults() {
         scheme = "https";
-//        hostname = "dremiod02p.d.carfax.us";
+//        hostname = "fooo.bar.com";
         port = 9047;
         flightPort = 32010;
         apiPath = "api/v3";

@@ -1,14 +1,14 @@
 package org.sv.flexobject.hadoop.mapreduce.input.key;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.util.InstanceFactory;
 
 import static org.junit.Assert.assertSame;
 
 public class KeyInputFormatTest {
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         InstanceFactory.reset();
     }

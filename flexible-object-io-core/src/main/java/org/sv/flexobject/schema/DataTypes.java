@@ -425,10 +425,7 @@ public enum DataTypes {
     public static LocalDateTime parseUTCTime(String timestampString){
         if (timestampString.endsWith("Z")) {
             DateTimeFormatter f;
-//            if (timestampString.length() > 20) // CRAZY Carfax Dates
             f = DateTimeFormatter.ISO_INSTANT.withZone(getDefaultZoneId());
-//            else
-//                f = DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.UTC);
             return LocalDateTime.parse(timestampString, f);
         }else {
             String timeString = timestampString.substring(11);

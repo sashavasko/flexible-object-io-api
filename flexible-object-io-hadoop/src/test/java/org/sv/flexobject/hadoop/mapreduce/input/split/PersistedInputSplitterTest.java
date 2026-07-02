@@ -3,14 +3,14 @@ package org.sv.flexobject.hadoop.mapreduce.input.split;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.InputSplit;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.hadoop.streaming.parquet.streamable.ParquetSink;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PersistedInputSplitterTest {
 
@@ -18,12 +18,12 @@ public class PersistedInputSplitterTest {
 
     Path testFileFolder = new Path("test-splits");
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         rawConf = new Configuration(false);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         testFileFolder.getFileSystem(rawConf).delete(testFileFolder, true);
     }

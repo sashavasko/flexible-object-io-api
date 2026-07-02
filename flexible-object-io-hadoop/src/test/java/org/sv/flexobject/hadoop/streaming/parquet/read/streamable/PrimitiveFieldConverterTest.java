@@ -1,13 +1,13 @@
 package org.sv.flexobject.hadoop.streaming.parquet.read.streamable;
 
 import org.apache.parquet.io.api.Binary;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.hadoop.streaming.parquet.ParquetSchema;
 import org.sv.flexobject.hadoop.streaming.parquet.testdata.RawBinary;
 
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PrimitiveFieldConverterTest {
 

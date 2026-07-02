@@ -1,12 +1,12 @@
 package org.sv.flexobject.clustering;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.properties.Namespace;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ProbabilityBasedThrottlingStrategyTest {
 

@@ -55,8 +55,11 @@ subprojects {
         api group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-protobuf', version: "${jacksonVersion}"
         api group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-toml', version: "${jacksonVersion}"
 
-        testImplementation "junit:junit:4.13.2"
-        testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.14.2'
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.0'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.0'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        testImplementation 'org.mockito:mockito-junit-jupiter:5.11.0'
+
         // Source: https://mvnrepository.com/artifact/com.carrotsearch/junit-benchmarks
         testImplementation("com.carrotsearch:junit-benchmarks:0.7.2")
     }
@@ -165,7 +168,7 @@ project(':flexible-object-io-examples') {
         api project(':flexible-object-io-mongo')
         api project(':flexible-object-io-hadoop')
         api project(':flexible-object-io-rabbit')
-        api project(':flexible-object-io-kafka')
+//        api project(':flexible-object-io-kafka')
         api project(':flexible-object-io-aws-creds-provider')
         api project(':flexible-object-io-dremio-api')
     }

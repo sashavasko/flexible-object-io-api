@@ -3,23 +3,23 @@ package org.sv.flexobject.hadoop.mapreduce.input;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.log4j.Logger;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.sv.flexobject.InAdapter;
 import org.sv.flexobject.stream.report.ProgressReporter;
 import org.sv.flexobject.stream.report.SizeReporter;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class AdapterRecordReaderTest {
 
     @Mock(extraInterfaces = SizeReporter.class)
@@ -42,7 +42,7 @@ public class AdapterRecordReaderTest {
 
     AdapterRecordReader reader;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         reader = Mockito.mock(AdapterRecordReader.class, Mockito.CALLS_REAL_METHODS);
         reader.setProgressReporter(mockReporter);

@@ -1,6 +1,6 @@
 package org.sv.flexobject.hadoop;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.avro.AvroSchema;
 import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.schema.annotations.ScalarFieldTyped;

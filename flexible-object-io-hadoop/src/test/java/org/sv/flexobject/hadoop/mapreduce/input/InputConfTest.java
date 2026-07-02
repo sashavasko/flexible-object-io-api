@@ -1,21 +1,21 @@
 package org.sv.flexobject.hadoop.mapreduce.input;
 
 import org.apache.hadoop.conf.Configuration;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.sv.flexobject.hadoop.mapreduce.input.key.KeyRecordReader;
 import org.sv.flexobject.hadoop.mapreduce.input.key.ModSplitter;
 import org.sv.flexobject.properties.Namespace;
 import org.sv.flexobject.util.InstanceFactory;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertSame;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class InputConfTest {
 
     @Mock
@@ -29,13 +29,13 @@ public class InputConfTest {
 
     Configuration rawConf;
     InputConf conf;
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         rawConf = new Configuration();
         conf = new InputConf();
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         InstanceFactory.reset();
     }

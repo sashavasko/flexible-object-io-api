@@ -5,11 +5,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import org.junit.After;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.sv.flexobject.testdata.ObjectWithClass;
 import org.sv.flexobject.testdata.ObjectWithDate;
 import org.sv.flexobject.testdata.TestDataWithSubSchemaInCollection;
@@ -21,9 +21,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class MapperFactoryTest {
 
     @Mock
@@ -35,7 +35,7 @@ public class MapperFactoryTest {
     @Mock
     ObjectWriter objectWriter;
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         MapperFactory.getInstance().reset();
     }

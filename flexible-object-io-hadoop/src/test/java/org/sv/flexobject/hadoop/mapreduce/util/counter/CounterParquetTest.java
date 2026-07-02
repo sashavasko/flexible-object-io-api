@@ -4,20 +4,22 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.TaskAttemptID;
 import org.apache.hadoop.mapreduce.TaskInputOutputContext;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.lenient;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CounterParquetTest {
 
     Configuration configuration = new Configuration(false);
+
     @Mock
     TaskInputOutputContext context;
 
@@ -26,11 +28,11 @@ public class CounterParquetTest {
 
     CounterParquet counter = new CounterParquet("Testing");
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        Mockito.when(context.getConfiguration()).thenReturn(configuration);
-        Mockito.when(context.getTaskAttemptID()).thenReturn(taskId);
-        Mockito.when(taskId.toString()).thenReturn("testTask");
+        lenient().when(context.getConfiguration()).thenReturn(configuration);
+        lenient().when(context.getTaskAttemptID()).thenReturn(taskId);
+        lenient().when(taskId.toString()).thenReturn("testTask");
         configuration.set("sv.hadoop.parquet.counters", "test_CounterParquet");
         configuration.set("fs.defaultFS", "file:///", "file:///");
         configuration.setInt("file.bytes-per-checksum", 512);
@@ -38,7 +40,7 @@ public class CounterParquetTest {
         counter.setContext(context);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         counter.close();
 

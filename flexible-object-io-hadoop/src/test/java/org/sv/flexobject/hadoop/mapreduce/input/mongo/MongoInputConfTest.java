@@ -1,12 +1,12 @@
 package org.sv.flexobject.hadoop.mapreduce.input.mongo;
 
 import org.apache.hadoop.conf.Configuration;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.mongo.connection.MongoConnection;
 import org.sv.flexobject.mongo.streaming.MongoBuilder;
@@ -16,12 +16,12 @@ import org.sv.flexobject.testdata.MapWithTypedKey;
 import org.sv.flexobject.testdata.TestDataWithSubSchema;
 import org.sv.flexobject.util.InstanceFactory;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class MongoInputConfTest {
 
     @Mock
@@ -36,14 +36,14 @@ public class MongoInputConfTest {
     MongoInputConf conf;
     Configuration rawConf;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         InstanceFactory.set(MongoConnection.Builder.class, mockBuilder);
         rawConf = new Configuration(false);
         conf = new MongoInputConf(Namespace.forPath(".", "test","input"));
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         InstanceFactory.reset();
     }

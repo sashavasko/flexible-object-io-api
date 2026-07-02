@@ -1,14 +1,14 @@
 package org.sv.flexobject.schema;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.StreamableImpl;
 import org.sv.flexobject.schema.annotations.ValueType;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SchemaTest {
 

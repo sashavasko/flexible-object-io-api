@@ -1,20 +1,20 @@
 package org.sv.flexobject.hadoop;
 
 import org.apache.hadoop.conf.Configuration;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class HadoopInstanceFactoryTest {
-    Configuration conf = new Configuration();
+    Configuration conf = new Configuration(false);
 
     public static class FooBar {
         public int foo;
         private String bar;
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         HadoopInstanceFactory.setConf(conf);
     }

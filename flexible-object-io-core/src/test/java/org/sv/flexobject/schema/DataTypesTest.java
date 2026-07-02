@@ -2,10 +2,8 @@ package org.sv.flexobject.schema;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import org.apache.commons.lang3.Conversion;
-import org.junit.After;
-import org.junit.Test;
-import org.sv.flexobject.SaveException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.copy.CopyAdapter;
 import org.sv.flexobject.json.MapperFactory;
 
@@ -17,7 +15,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DataTypesTest {
 
@@ -31,7 +29,7 @@ public class DataTypesTest {
     Date testDate = Date.valueOf(testLocalDate);
     Timestamp testTimestamp = new Timestamp(testDate.getTime());
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         adapter.clear();
     }
@@ -234,9 +232,9 @@ public class DataTypesTest {
         adapter.clear();
     }
 
-    @Test(expected = SchemaException.class)
+    @Test
     public void setBooleanThrowsOnWrongDatatype() throws Exception {
-        DataTypes.setBoolean(adapter, "boolField", JsonNodeFactory.instance.arrayNode());
+        assertThrows(SchemaException.class, () -> { DataTypes.setBoolean(adapter, "boolField", JsonNodeFactory.instance.arrayNode());});
     }
 
     @Test

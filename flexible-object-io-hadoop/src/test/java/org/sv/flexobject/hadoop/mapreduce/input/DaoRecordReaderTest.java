@@ -5,13 +5,13 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.sv.flexobject.InAdapter;
 import org.sv.flexobject.hadoop.mapreduce.util.MRDao;
 import org.sv.flexobject.properties.Namespace;
@@ -19,11 +19,10 @@ import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DaoRecordReaderTest {
 
     @Mock
@@ -48,7 +47,7 @@ public class DaoRecordReaderTest {
 
     DaoRecordReader reader;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         conf = new DaoRecordReaderConf(Namespace.forPath(".", "test"));
         rawConf = new Configuration(false);
@@ -65,18 +64,19 @@ public class DaoRecordReaderTest {
         doReturn(mockAdapter).when(reader).createAdapter(mockSplit, mockContext);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         InstanceFactory.reset();
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void setupInputNoDao() {
         rawConf.unset("test.record.reader.dao.class");
-        reader.setupInput(mockSplit, mockContext);
+
+        assertThrows(RuntimeException.class, ()-> {reader.setupInput(mockSplit, mockContext);});
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void setupInputAdapterFail() throws IOException {
 
         IOException testException = new IOException("tits");
@@ -84,7 +84,8 @@ public class DaoRecordReaderTest {
         rawConf.setInt("test.record.reader.max.retries", 2);
         doThrow(testException).when(reader).createAdapter(mockSplit, mockContext);
 
-        reader.setupInput(mockSplit, mockContext);
+
+        assertThrows(RuntimeException.class, ()-> {reader.setupInput(mockSplit, mockContext);});
     }
 
     @Test

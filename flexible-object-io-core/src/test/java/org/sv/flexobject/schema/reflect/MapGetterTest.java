@@ -1,18 +1,18 @@
 package org.sv.flexobject.schema.reflect;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertNull;
 
 public class MapGetterTest {
 
     Map<String, Integer> testMap = new HashMap<>();
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         testMap.put("one", 1);
         testMap.put("two", 2);

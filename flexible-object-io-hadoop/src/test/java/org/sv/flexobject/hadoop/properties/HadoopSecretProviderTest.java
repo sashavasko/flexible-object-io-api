@@ -4,31 +4,31 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.ClusterMapReduceTestCase;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.connections.ConnectionManager;
 import org.sv.flexobject.hadoop.HadoopTask;
-import org.sv.flexobject.hadoop.utils.FileSystemUtilsTest;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 
 public class HadoopSecretProviderTest extends ClusterMapReduceTestCase {
 
     Properties testClusterProperties;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() throws Exception {
         ClusterMapReduceTestCase.setupClassBase(HadoopSecretProviderTest.class);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         testClusterProperties = null;//new Properties();
     }

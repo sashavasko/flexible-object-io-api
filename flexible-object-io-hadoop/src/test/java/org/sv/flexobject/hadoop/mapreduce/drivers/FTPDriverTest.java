@@ -1,7 +1,7 @@
 package org.sv.flexobject.hadoop.mapreduce.drivers;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockftpserver.fake.FakeFtpServer;
 import org.mockftpserver.fake.UserAccount;
 import org.mockftpserver.fake.filesystem.DirectoryEntry;
@@ -18,7 +18,7 @@ import javax.mail.MessagingException;
 import java.io.IOException;
 import java.util.Properties;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class FTPDriverTest {
 
@@ -39,7 +39,7 @@ public class FTPDriverTest {
     TestFtpDriver driver = new TestFtpDriver(CONNECTION_NAME);
     private FakeFtpServer fakeFtpServer;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         InstanceFactory.reset();
         fakeFtpServer = new FakeFtpServer();

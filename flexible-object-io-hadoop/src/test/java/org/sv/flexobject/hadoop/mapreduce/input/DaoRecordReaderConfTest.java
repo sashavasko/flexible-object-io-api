@@ -1,11 +1,11 @@
 package org.sv.flexobject.hadoop.mapreduce.input;
 
 import org.apache.hadoop.conf.Configuration;
-import org.junit.After;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.sv.flexobject.hadoop.mapreduce.util.MRDao;
 import org.sv.flexobject.properties.Namespace;
 import org.sv.flexobject.schema.Schema;
@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DaoRecordReaderConfTest {
 
     @Mock
@@ -27,7 +27,7 @@ public class DaoRecordReaderConfTest {
     DaoRecordReaderConf conf = new DaoRecordReaderConf();
     Configuration rawConf = new Configuration(false);
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         InstanceFactory.reset();
     }

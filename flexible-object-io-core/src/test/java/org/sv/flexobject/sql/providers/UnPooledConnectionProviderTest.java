@@ -1,6 +1,6 @@
 package org.sv.flexobject.sql.providers;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.util.Properties;

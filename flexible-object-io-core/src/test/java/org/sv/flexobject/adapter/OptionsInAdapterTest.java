@@ -6,7 +6,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.StreamableWithSchema;
 import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.schema.annotations.ValueType;
@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class OptionsInAdapterTest {

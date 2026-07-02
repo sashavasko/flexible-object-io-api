@@ -7,8 +7,8 @@ import de.bwaldvogel.mongo.MongoServer;
 import de.bwaldvogel.mongo.backend.memory.MemoryBackend;
 import org.bson.Document;
 import org.bson.RawBsonDocument;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.sv.flexobject.connections.ConnectionManager;
 import org.sv.flexobject.connections.SecretProvider;
 
@@ -35,7 +35,7 @@ public class EmbeddedMongoTest {
         }
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         server = new MongoServer(new MemoryBackend());
 
@@ -59,7 +59,7 @@ public class EmbeddedMongoTest {
         collectionRaw = db.getCollection(COLLECTION_NAME, RawBsonDocument.class);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         client.close();
         server.shutdown();

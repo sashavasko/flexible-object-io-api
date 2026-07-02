@@ -1,14 +1,15 @@
 package org.sv.flexobject.schema.reflect;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ArrayGetterTest {
 
     @Test
@@ -27,19 +28,19 @@ public class ArrayGetterTest {
         assertEquals("three", getter.apply(testData));
     }
 
-    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    @Test
     public void applyToListOutOfBounds() throws Exception {
         TestData testData = new TestData(Arrays.asList("one", "two", "three"));
         ArrayGetter getter = new ArrayGetter(TestData.class, "listOfStrings", 3);
 
-        getter.apply(testData);
+        assertThrows(ArrayIndexOutOfBoundsException.class, ()->{getter.apply(testData);});
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void applyToArrayOutOfBounds() throws Exception {
         TestData testData = new TestData(new String[]{"one", "two", "three"});
         ArrayGetter getter = new ArrayGetter(TestData.class, "listOfStrings", 3);
 
-        getter.apply(testData);
+        assertThrows(IndexOutOfBoundsException.class, ()->{getter.apply(testData);});
     }
 }

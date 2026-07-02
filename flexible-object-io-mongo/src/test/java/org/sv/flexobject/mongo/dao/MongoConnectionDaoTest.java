@@ -1,12 +1,12 @@
 package org.sv.flexobject.mongo.dao;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.mongo.EmbeddedMongoTest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MongoConnectionDaoTest extends EmbeddedMongoTest {
 

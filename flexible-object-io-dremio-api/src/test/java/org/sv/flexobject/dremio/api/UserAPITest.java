@@ -2,18 +2,18 @@ package org.sv.flexobject.dremio.api;
 
 import org.sv.flexobject.dremio.DremioRestApp;
 import org.sv.flexobject.dremio.domain.user.User;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UserAPITest {
     UserAPI userAPI;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         userAPI = DremioRestApp.getClient().user();
     }

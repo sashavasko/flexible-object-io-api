@@ -4,13 +4,13 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.CountOptions;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputSplit;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.sv.flexobject.hadoop.mapreduce.input.mongo.MongoInputConf;
 import org.sv.flexobject.hadoop.mapreduce.input.mongo.MongoSplit;
 import org.sv.flexobject.hadoop.mapreduce.input.split.ProxyInputSplit;
@@ -20,11 +20,11 @@ import org.sv.flexobject.util.InstanceFactory;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class MongoSplitterTest {
 
     @Mock
@@ -50,7 +50,7 @@ public class MongoSplitterTest {
 
     MongoSplitter splitter;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         InstanceFactory.set(MongoInputConf.class, conf);
         InstanceFactory.set(CountOptions.class, countOptions);
@@ -63,7 +63,7 @@ public class MongoSplitterTest {
         splitter = Mockito.mock(MongoSplitter.class, Mockito.CALLS_REAL_METHODS);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         InstanceFactory.reset();
     }

@@ -1,20 +1,20 @@
 package org.sv.flexobject.sql;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.sv.flexobject.copy.CopyAdapter;
 import org.sv.flexobject.json.MapperFactory;
 
 import java.io.IOException;
 import java.sql.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class SqlInputAdapterTest {
 
     @Mock
@@ -31,7 +31,7 @@ public class SqlInputAdapterTest {
 
     SqlInputAdapter adapter;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         adapter = new SqlInputAdapter(rs, ps);
         when(rs.findColumn("boo")).thenReturn(1);
@@ -106,12 +106,12 @@ public class SqlInputAdapterTest {
         assertNull(adapter.getTimestamp("boo"));
     }
 
-    @Test(expected = SQLException.class)
+    @Test
     public void getZeroTimestampButOnlyForZeroDateFoo() throws SQLException {
         SQLException exception = new SQLException("foo");
         when(rs.getTimestamp(1)).thenThrow(exception);
 
-        adapter.getTimestamp("boo");
+        assertThrows(SQLException.class, ()->{adapter.getTimestamp("boo");});
     }
 
     @Test

@@ -1,20 +1,20 @@
 package org.sv.flexobject.sql;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class SqlOutBatchAdapterTest {
 
     @Mock
@@ -23,7 +23,7 @@ public class SqlOutBatchAdapterTest {
     Map<String, Integer> paramNamesXref = new HashMap();
     SqlOutBatchAdapter adapter;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         paramNamesXref.put("field", 1);
         paramNamesXref.put("anotherfield", 2);

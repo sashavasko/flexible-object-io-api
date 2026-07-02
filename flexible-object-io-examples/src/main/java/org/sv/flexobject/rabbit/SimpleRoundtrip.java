@@ -16,8 +16,6 @@ import org.sv.flexobject.rabbit.streaming.RoutingKeyGenerator;
 import java.util.Arrays;
 import java.util.List;
 
-// To run :
-// hdpjob -jar build/libs/lib/dt-streaming-examples-1.0.0-SNAPSHOT.jar -drv org.sv.flexobject.examples.rabbit.SimpleRoundtrip
 public class SimpleRoundtrip extends Configured implements Tool {
 
     Logger logger = Logger.getLogger(SimpleRoundtrip.class);
@@ -31,7 +29,7 @@ public class SimpleRoundtrip extends Configured implements Tool {
     // # sudo docker run -d --hostname test-rabbit-host -P --name test-rabbit rabbitmq:3-management
     // and you plug appropriate ports that are bound to rabbit
     // # sudo docker ps | grep 5672
-    public static final String RABBIT_HOST = "enthadoopcld02p.d.carfax.us";
+    public static final String RABBIT_HOST = "foobar.com";
     public static final int RABBIT_PORT = 32774;
 
     List<Streamable> simpleSamples = Arrays.asList(new PayloadSimple(10, "foo"), new PayloadSimple(11, "bar"), new PayloadSimple(12, "The big brown fox eats a lazy frog"));

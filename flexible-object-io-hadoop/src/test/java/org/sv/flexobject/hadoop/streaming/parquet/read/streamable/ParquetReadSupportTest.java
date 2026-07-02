@@ -4,9 +4,9 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.parquet.hadoop.api.ReadSupport;
 import org.apache.parquet.io.api.RecordMaterializer;
 import org.apache.parquet.schema.MessageType;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.sv.flexobject.hadoop.streaming.parquet.ParquetSchema;
 import org.sv.flexobject.hadoop.streaming.parquet.read.streamable.ParquetReadSupport;
 import org.sv.flexobject.testdata.SimpleTestDataWithSchema;
@@ -14,7 +14,7 @@ import org.sv.flexobject.testdata.TestDataWithSubSchema;
 
 import static org.junit.Assert.assertNotNull;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ParquetReadSupportTest {
 
     @Test

@@ -5,14 +5,14 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.ClusterMapReduceTestCase;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class FileSystemUtilsTest extends ClusterMapReduceTestCase {
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() throws Exception {
         ClusterMapReduceTestCase.setupClassBase(FileSystemUtilsTest.class);
     }

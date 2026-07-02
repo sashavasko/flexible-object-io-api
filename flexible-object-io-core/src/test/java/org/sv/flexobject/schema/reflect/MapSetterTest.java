@@ -1,17 +1,18 @@
 package org.sv.flexobject.schema.reflect;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 public class MapSetterTest {
     Map<String, Integer> testMap = new HashMap<>();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         testMap.put("one", 1);
         testMap.put("two", 2);
@@ -38,12 +39,12 @@ public class MapSetterTest {
         assertEquals(5, (int)testMap.get("five"));
     }
 
-    @Test(expected = ClassCastException.class)
+    @Test
     public void applyToNotMap() throws Exception {
         TestData testData = new TestData(testMap);
         MapSetter setter = new MapSetter(TestData.class, "listOfStrings", "five");
 
-        setter.accept(testData, 5);
+        assertThrows(ClassCastException.class, ()->{setter.accept(testData, 5);});
     }
 
 

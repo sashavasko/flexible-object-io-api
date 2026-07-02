@@ -3,8 +3,8 @@ package org.sv.flexobject.properties;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.sv.flexobject.InAdapter;
 import org.sv.flexobject.json.JsonInputAdapter;
 import org.sv.flexobject.translate.NamespaceTranslator;
@@ -15,7 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PropertiesWrapperTest {
 
@@ -35,7 +35,7 @@ public class PropertiesWrapperTest {
         }
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         testProps = new TestProps();
     }

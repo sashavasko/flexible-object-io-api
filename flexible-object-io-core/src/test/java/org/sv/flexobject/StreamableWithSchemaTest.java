@@ -4,12 +4,12 @@ import com.carrotsearch.junitbenchmarks.AbstractBenchmark;
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.sv.flexobject.copy.CopyAdapter;
 import org.sv.flexobject.json.JsonInputAdapter;
 import org.sv.flexobject.json.JsonOutputAdapter;
@@ -22,11 +22,11 @@ import org.sv.flexobject.testdata.*;
 
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class StreamableWithSchemaTest extends AbstractBenchmark {
 
     CopyAdapter adapter = new CopyAdapter();
@@ -34,13 +34,13 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
     @Mock
     TestDataWithInferredSchema mockTestDataWithInferredSchema;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         SchemaRegistry.getInstance().clear();
         when(mockTestDataWithInferredSchema.getSchema()).thenReturn(Schema.getRegisteredSchema(TestDataWithInferredSchema.class));
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         SchemaRegistry.getInstance().clear();
     }
