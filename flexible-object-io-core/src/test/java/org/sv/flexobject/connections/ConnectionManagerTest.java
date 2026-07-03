@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.sv.flexobject.SaveException;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -157,9 +158,9 @@ public class ConnectionManagerTest {
         assertSame(mockConnection, ConnectionManager.getInstance().getConnection(FakeConnection.class, connectionName, overrides));
     }
 
-    @Test(expected = IOException.class)
+    @Test
     public void getConnectionForUnknownClassShouldThrow() throws Exception {
-        ConnectionManager.getInstance().getConnection(AutoCloseable.class, connectionName);
+        assertThrows(IOException.class, ()->ConnectionManager.getInstance().getConnection(AutoCloseable.class, connectionName));
     }
 
     @Test
@@ -170,11 +171,11 @@ public class ConnectionManagerTest {
         assertSame(mockConnection2, ConnectionManager.getInstance().getConnection(AutoCloseable.class, connectionName));
     }
 
-    @Test(expected = IOException.class)
+    @Test
     public void unregisterProvider() throws Exception {
-        ConnectionManager.getInstance()
+        assertThrows(IOException.class, ()->ConnectionManager.getInstance()
                 .unregisterProvider(mockConnectionProvider)
-                .getConnection(FakeConnection.class, connectionName);
+                .getConnection(FakeConnection.class, connectionName));
     }
 
     @Test

@@ -63,6 +63,15 @@ subprojects {
         // Source: https://mvnrepository.com/artifact/com.carrotsearch/junit-benchmarks
         testImplementation("com.carrotsearch:junit-benchmarks:0.7.2")
     }
+    test {
+        useJUnitPlatform()
+        jvmArgs += [
+                "--add-opens=java.base/java.lang=ALL-UNNAMED",
+                "--add-opens=java.base/java.util=ALL-UNNAMED",
+                "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED"
+        ]
+    }
+
 }
 
 project(':flexible-object-io-core') {

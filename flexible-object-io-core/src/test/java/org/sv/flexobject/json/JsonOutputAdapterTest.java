@@ -42,10 +42,10 @@ public class JsonOutputAdapterTest {
         adapter = null;
     }
 
-    @Test(expected = SaveException.class)
+    @Test
     public void setStringNull() throws Exception {
         adapter.setString("field", null);
-        adapter.save();
+        assertThrows(SaveException.class, ()->adapter.save());
     }
 
     @Test
@@ -61,10 +61,10 @@ public class JsonOutputAdapterTest {
         assertEquals("yes", sink.get().get("field").asText());
     }
 
-    @Test(expected = SaveException.class)
+    @Test
     public void setJsonNull() throws Exception {
         adapter.setJson("field", null);
-        adapter.save();
+        assertThrows(SaveException.class, ()->adapter.save());
     }
 
     @Test
@@ -85,11 +85,11 @@ public class JsonOutputAdapterTest {
     }
 
 
-    @Test(expected = SaveException.class)
+    @Test
     public void setBooleanNotNull() throws Exception {
         Boolean value = null;
         adapter.setBoolean("field", value);
-        adapter.save();
+        assertThrows(SaveException.class, ()->adapter.save());
     }
 
     @Test
@@ -101,11 +101,11 @@ public class JsonOutputAdapterTest {
         assertFalse(adapter.hasOutput());
     }
 
-    @Test(expected = SaveException.class)
+    @Test
     public void setIntNotNull() throws Exception {
         Integer value = null;
         adapter.setInt("field", value);
-        adapter.save();
+        assertThrows(SaveException.class, ()->adapter.save());
     }
 
     @Test
@@ -116,11 +116,11 @@ public class JsonOutputAdapterTest {
         assertEquals((long) value, sink.get().get("field").asLong());
     }
 
-    @Test(expected = SaveException.class)
+    @Test
     public void setLongNotNull() throws Exception {
         Long value = null;
         adapter.setLong("field", value);
-        adapter.save();
+        assertThrows(SaveException.class, ()->adapter.save());
     }
 
     @Test
@@ -173,11 +173,11 @@ public class JsonOutputAdapterTest {
 
     }
 
-    @Test(expected = SaveException.class)
+    @Test
     public void setDateNotNull() throws Exception {
         Date date = null;
         adapter.setDate("date", date);
-        adapter.save();
+        assertThrows(SaveException.class, ()->adapter.save());
     }
 
     @Test
@@ -190,11 +190,11 @@ public class JsonOutputAdapterTest {
         assertEquals("{\"ts\":1544116803000}", sink.get().toString());
     }
 
-    @Test(expected = SaveException.class)
+    @Test
     public void setTimestampNotNull() throws Exception {
         Timestamp ts = null;
         adapter.setTimestamp("ts", ts);
-        adapter.save();
+        assertThrows(SaveException.class, ()->adapter.save());
     }
 
     @Test

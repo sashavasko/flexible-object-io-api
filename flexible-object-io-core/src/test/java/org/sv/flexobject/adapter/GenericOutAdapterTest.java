@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.sv.flexobject.SaveException;
 import org.sv.flexobject.stream.Sink;
 
+import java.io.IOException;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Arrays;
@@ -126,9 +127,9 @@ public class GenericOutAdapterTest {
         assertSame(mockRecord2, adapter.convertRecordForSink(mockRecord2));
     }
 
-    @Test(expected = SaveException.class)
+    @Test
     public void saveWithoutGetCurrent() throws Exception {
-        adapter.save();
+        assertThrows(SaveException.class, adapter::save);
     }
 
     @Test
