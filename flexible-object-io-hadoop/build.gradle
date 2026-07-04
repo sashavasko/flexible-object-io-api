@@ -95,21 +95,10 @@ dependencies {
         exclude(group:'org.apache.kerby')
         exclude(group:'log4j', module:'log4j')
     }
-//    testImplementation ("org.apache.hadoop:hadoop-client-api:${hadoopVersion}")
-//    testImplementation ("org.apache.hadoop:hadoop-client-runtime:${hadoopVersion}")
     testImplementation group: 'com.h2database', name: 'h2', version: '2.3.232'//'1.4.200'
-
     testImplementation group: 'org.mockftpserver', name: 'MockFtpServer', version: '2.7.1'
 }
 
-test {
-    useJUnitPlatform()
-    jvmArgs += [
-            "--add-opens=java.base/java.lang=ALL-UNNAMED",
-            "--add-opens=java.base/java.util=ALL-UNNAMED",
-            "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED"
-    ]
-}
 tasks.register('printProps'){
     project.properties.entrySet().forEach {
         if (it.value instanceof String) {

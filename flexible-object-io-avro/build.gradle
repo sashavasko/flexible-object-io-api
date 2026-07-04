@@ -1,16 +1,4 @@
-test {
-    jvmArgs "--add-opens=java.base/java.lang=ALL-UNNAMED", "--add-opens=java.base/java.util=ALL-UNNAMED"
-}
-
 dependencies {
     api group: 'org.apache.avro', name: 'avro', version: "${avroVersion}"
     api("org.xerial.snappy:snappy-java:1.1.10.8")
-
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
-
-test {
-    useJUnitPlatform()
 }
