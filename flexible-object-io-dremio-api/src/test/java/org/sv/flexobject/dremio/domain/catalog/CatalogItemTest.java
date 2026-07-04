@@ -1,6 +1,5 @@
 package org.sv.flexobject.dremio.domain.catalog;
 
-import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;

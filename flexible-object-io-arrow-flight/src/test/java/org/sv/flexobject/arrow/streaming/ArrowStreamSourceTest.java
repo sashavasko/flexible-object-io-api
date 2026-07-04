@@ -1,13 +1,13 @@
 package org.sv.flexobject.arrow.streaming;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.sv.flexobject.arrow.testdata.SubSchemaInList;
 import org.sv.flexobject.Streamable;
 import org.sv.flexobject.testdata.TestDataUtils;
 import org.sv.flexobject.testdata.levelone.leveltwo.SimpleObject;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -21,12 +21,12 @@ public class ArrowStreamSourceTest {
 
     static BufferAllocator rootAllocator;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() throws Exception {
         rootAllocator = new RootAllocator(Long.MAX_VALUE);
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterClass() throws Exception {
         rootAllocator.close();
     }

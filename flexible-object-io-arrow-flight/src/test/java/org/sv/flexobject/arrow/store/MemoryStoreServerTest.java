@@ -1,5 +1,7 @@
 package org.sv.flexobject.arrow.store;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.sv.flexobject.arrow.ArrowFlightConf;
 import org.sv.flexobject.arrow.read.ArrowRecordReader;
 import org.sv.flexobject.arrow.read.ArrowRootReader;
@@ -14,8 +16,6 @@ import org.apache.arrow.flight.*;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.VectorSchemaRoot;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -30,12 +30,12 @@ public class MemoryStoreServerTest {
     static BufferAllocator rootAllocator;
     FlightDescriptor testFlightDescriptor = FlightDescriptor.path("foobar");
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() throws Exception {
         rootAllocator = new RootAllocator(Long.MAX_VALUE);
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterClass() throws Exception {
         rootAllocator.close();
     }

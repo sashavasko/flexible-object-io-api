@@ -5,8 +5,8 @@ import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.model.Image;
 import com.github.dockerjava.api.model.Info;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -19,7 +19,7 @@ public class DockerClientProviderTest {
     static DockerClient dockerClient;
     static final String IMAGE_NAME = "hello-world";
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() throws Exception {
         dockerClient = DockerClientProvider.getDefault();
         List<Image> oldImages = DockerUtils.getImagesForRepoName(dockerClient, IMAGE_NAME);
@@ -27,7 +27,7 @@ public class DockerClientProviderTest {
             DockerUtils.removeImages(dockerClient, oldImages);
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterClass() throws Exception {
         dockerClient.close();
     }
