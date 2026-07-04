@@ -3,7 +3,7 @@ package org.sv.flexobject.aws;
 import com.bettercloud.vault.VaultException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.sv.flexobject.connections.ConnectionManager;
 
@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class AWSSecretProviderWithVaultTest {
 
-    @Ignore
+    @Disabled
     @Test
     public void getVhrAdeAlphaCreds() throws JsonProcessingException {
         AWSSecretProviderWithVault provider = new AWSSecretProviderWithVault();
@@ -29,7 +29,7 @@ public class AWSSecretProviderWithVaultTest {
     }
 
 
-    @Ignore
+    @Disabled
     @Test
     public void vaultAppRoleAuth() throws VaultException {
         AWSSecretProviderWithVault provider = AWSSecretProviderWithVault.builder()
