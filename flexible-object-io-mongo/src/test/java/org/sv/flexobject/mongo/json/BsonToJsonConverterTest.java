@@ -11,7 +11,6 @@ import org.bson.codecs.EncoderContext;
 import org.bson.conversions.Bson;
 import org.bson.json.JsonWriterSettings;
 import org.bson.types.ObjectId;
-import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 import org.sv.flexobject.stream.sinks.SingleValueSink;
 import org.sv.flexobject.testdata.TestDataWithInferredSchema;
@@ -21,7 +20,7 @@ import java.nio.ByteBuffer;
 import java.util.UUID;
 
 import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BsonToJsonConverterTest {
 

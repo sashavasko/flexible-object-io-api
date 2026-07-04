@@ -9,14 +9,13 @@ import org.bson.Document;
 import org.bson.codecs.Encoder;
 import org.bson.codecs.EncoderContext;
 import org.bson.json.JsonWriterSettings;
-import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 import org.sv.flexobject.testdata.TestDataWithInferredSchema;
 
 import java.io.IOException;
 
 import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class SimplisticJsonNodeWriterTest {
