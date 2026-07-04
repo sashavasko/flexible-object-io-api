@@ -30,6 +30,8 @@ dependencies {
     }
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.0'
+    testRuntimeOnly 'com.fasterxml.woodstox:woodstox-core:7.0.0'
+    testRuntimeOnly 'org.slf4j:slf4j-api:2.0.16'
 }
 
 test {
