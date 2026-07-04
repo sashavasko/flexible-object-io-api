@@ -12,7 +12,7 @@ import org.sv.flexobject.hadoop.streaming.parquet.read.streamable.ParquetReadSup
 import org.sv.flexobject.testdata.SimpleTestDataWithSchema;
 import org.sv.flexobject.testdata.TestDataWithSubSchema;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
 public class ParquetReadSupportTest {

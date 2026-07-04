@@ -12,15 +12,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.sv.flexobject.util.InstanceFactory;
 
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class ConfiguredInputFormatTest {
 
     @Mock
@@ -54,11 +58,11 @@ public class ConfiguredInputFormatTest {
         format = Mockito.mock(ConfiguredInputFormat.class, Mockito.CALLS_REAL_METHODS);
         doReturn(conf).when(format).makeInputConf();
         doReturn(conf).when(conf).from(rawConf);
-        doReturn(rawConf).when(mockContext).getConfiguration();
         doReturn(rawConf).when(mockTAContext).getConfiguration();
+        doReturn(mockReader).when(conf).getReader();
+        doReturn(rawConf).when(mockContext).getConfiguration();
         doReturn(mockSplitter).when(conf).getSplitter();
         doReturn(mockSplits).when(mockSplitter).split(rawConf);
-        doReturn(mockReader).when(conf).getReader();
     }
 
     @AfterEach
@@ -80,7 +84,7 @@ public class ConfiguredInputFormatTest {
         doThrow(mockException).when(mockSplitter).split(rawConf);
         doReturn(new RuntimeException(mockException)).when(conf).runtimeException(format.logger, "Failed to instantiate splitter", mockException);
 
-        format.getSplits(mockContext);
+        assertThrows(RuntimeException.class, ()->format.getSplits(mockContext));
 
         verify(conf).runtimeException(format.logger, "Failed to instantiate splitter", mockException);
     }

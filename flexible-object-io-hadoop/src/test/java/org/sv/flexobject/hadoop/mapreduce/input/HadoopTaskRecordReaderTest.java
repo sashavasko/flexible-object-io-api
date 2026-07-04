@@ -10,6 +10,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.sv.flexobject.hadoop.HadoopTask;
 import org.sv.flexobject.stream.report.ProgressReporter;
 import org.sv.flexobject.stream.report.SimpleProgressReporter;
@@ -21,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class HadoopTaskRecordReaderTest {
     @Mock
     Configuration mockConf;

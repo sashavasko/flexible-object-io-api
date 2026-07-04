@@ -13,7 +13,7 @@ import org.sv.flexobject.properties.Namespace;
 import org.sv.flexobject.util.InstanceFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 @ExtendWith(MockitoExtension.class)
 public class InputConfTest {

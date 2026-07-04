@@ -6,9 +6,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.ClusterMapReduceTestCase;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.BeforeClass;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.sv.flexobject.connections.ConnectionManager;
 import org.sv.flexobject.hadoop.HadoopTask;
@@ -20,7 +18,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.sql.Connection;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class HadoopPropertiesProviderTest extends ClusterMapReduceTestCase {
 

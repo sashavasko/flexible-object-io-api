@@ -16,7 +16,7 @@ import org.sv.flexobject.stream.report.ProgressReporter;
 import org.sv.flexobject.stream.report.SizeReporter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

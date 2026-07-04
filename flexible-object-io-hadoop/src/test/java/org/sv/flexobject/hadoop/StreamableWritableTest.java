@@ -8,7 +8,7 @@ import org.sv.flexobject.schema.annotations.ScalarFieldTyped;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 public class StreamableWritableTest {
 

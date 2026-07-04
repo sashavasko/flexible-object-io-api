@@ -3,7 +3,6 @@ package org.sv.flexobject.hadoop.mapreduce.util.driver;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.Assert.assertTrue;
 
 public class ConfiguredDriverTest {
     @Test

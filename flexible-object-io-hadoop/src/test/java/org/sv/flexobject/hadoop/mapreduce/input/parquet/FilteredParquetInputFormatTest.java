@@ -20,7 +20,7 @@ import org.sv.flexobject.util.InstanceFactory;
 import static org.apache.parquet.filter2.predicate.FilterApi.eq;
 import static org.apache.parquet.filter2.predicate.FilterApi.intColumn;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 public class FilteredParquetInputFormatTest {

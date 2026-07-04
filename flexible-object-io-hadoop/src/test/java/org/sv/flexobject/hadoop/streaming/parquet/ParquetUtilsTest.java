@@ -9,7 +9,7 @@ import org.sv.flexobject.hadoop.streaming.parquet.json.ParquetJsonSink;
 import org.sv.flexobject.json.MapperFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ParquetUtilsTest {
 

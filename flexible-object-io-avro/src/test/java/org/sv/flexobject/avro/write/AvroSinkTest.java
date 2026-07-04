@@ -12,7 +12,7 @@ import org.sv.flexobject.testdata.levelone.ObjectWithNestedObject;
 import java.io.ByteArrayOutputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AvroSinkTest {
 

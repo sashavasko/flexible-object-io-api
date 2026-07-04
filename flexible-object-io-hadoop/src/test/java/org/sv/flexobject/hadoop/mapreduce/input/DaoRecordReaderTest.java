@@ -61,7 +61,6 @@ public class DaoRecordReaderTest {
         InstanceFactory.set(DaoRecordReaderConf.class, conf);
 
         reader = Mockito.mock(DaoRecordReader.class, Mockito.CALLS_REAL_METHODS);
-        doReturn(mockAdapter).when(reader).createAdapter(mockSplit, mockContext);
     }
 
     @AfterEach
@@ -89,7 +88,8 @@ public class DaoRecordReaderTest {
     }
 
     @Test
-    public void setupInput() {
+    public void setupInput() throws IOException {
+        doReturn(mockAdapter).when(reader).createAdapter(mockSplit, mockContext);
         reader.setupInput(mockSplit, mockContext);
 
         assertSame(conf, reader.getConf());
@@ -102,6 +102,7 @@ public class DaoRecordReaderTest {
 
     @Test
     public void close() throws Exception {
+        doReturn(mockAdapter).when(reader).createAdapter(mockSplit, mockContext);
         reader.setupInput(mockSplit, mockContext);
 
         reader.close();
