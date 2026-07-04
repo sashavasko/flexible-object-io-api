@@ -1,7 +1,5 @@
 package org.sv.flexobject;
 
-import com.carrotsearch.junitbenchmarks.AbstractBenchmark;
-import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.AfterEach;
@@ -27,7 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class StreamableWithSchemaTest extends AbstractBenchmark {
+public class StreamableWithSchemaTest {
 
     CopyAdapter adapter = new CopyAdapter();
 
@@ -37,7 +35,6 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
     @BeforeEach
     public void setUp() throws Exception {
         SchemaRegistry.getInstance().clear();
-        when(mockTestDataWithInferredSchema.getSchema()).thenReturn(Schema.getRegisteredSchema(TestDataWithInferredSchema.class));
     }
 
     @AfterEach
@@ -62,7 +59,6 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
 
 
     // There really is no difference as far as what is used for getters/setters
-//    @BenchmarkOptions(benchmarkRounds = 10000000, warmupRounds = 1)
     @Test
     public void direct() throws Exception {
         SimpleTestDataWithSchema data = new SimpleTestDataWithSchema();
@@ -78,8 +74,6 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
         testData.set("intArray", values);
     }
 
-    //    @BenchmarkOptions(benchmarkRounds = 10000000, warmupRounds = 1)
-    @BenchmarkOptions(benchmarkRounds = 2, warmupRounds = 1)
     @Test
     public void fullyExplicit() throws Exception {
         SimpleTestDataWithSchema data = new SimpleTestDataWithSchema();
@@ -88,8 +82,6 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
         assertEquals(777, data.get(SimpleTestDataWithSchema.FIELDS.int32Field));
     }
 
-//    @BenchmarkOptions(benchmarkRounds = 10000000, warmupRounds = 1)
-    @BenchmarkOptions(benchmarkRounds = 2, warmupRounds = 1)
     @Test
     public void genericSetter() throws Exception {
         SimpleTestDataWithSchema data = new SimpleTestDataWithSchema();
@@ -98,8 +90,6 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
         assertEquals(777, data.get(SimpleTestDataWithSchema.FIELDS.int32FieldGenericSetter));
     }
 
-//    @BenchmarkOptions(benchmarkRounds = 10000000, warmupRounds = 1)
-    @BenchmarkOptions(benchmarkRounds = 2, warmupRounds = 1)
     @Test
     public void genericSetterAndGetter() throws Exception {
         SimpleTestDataWithSchema data = new SimpleTestDataWithSchema();
@@ -108,8 +98,6 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
         assertEquals(777, data.get(SimpleTestDataWithSchema.FIELDS.int32FieldGeneric));
     }
 
-//    @BenchmarkOptions(benchmarkRounds = 10000000, warmupRounds = 1)
-    @BenchmarkOptions(benchmarkRounds = 2, warmupRounds = 1)
     @Test
     public void annotatedSchema() throws Exception {
         TestDataWithAnnotatedSchema testData = new TestDataWithAnnotatedSchema();
@@ -152,8 +140,6 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
         assertEquals(expectedJsonString, jsonOut.toString());
     }
 
-    //    @BenchmarkOptions(benchmarkRounds = 10000000, warmupRounds = 1)
-    @BenchmarkOptions(benchmarkRounds = 2, warmupRounds = 1)
     @Test
     public void inferredSchema() throws Exception {
         TestDataWithInferredSchema testData = new TestDataWithInferredSchema();
@@ -231,7 +217,6 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
         assertEquals(expectedSubStruct, testData.subStruct);
     }
 
-    @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0)
     @Test
     public void clearSubschemaClears() throws Exception {
         TestDataWithSubSchema testData = new TestDataWithSubSchema();
@@ -346,7 +331,6 @@ public class StreamableWithSchemaTest extends AbstractBenchmark {
         assertEquals(testData, reloaded);
     }
 
-    @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0)
     @Test
     public void clearSubschemaClearsCollections() throws Exception {
         TestDataWithSubSchemaInCollection testData = TestDataWithSubSchemaInCollection.random(true);

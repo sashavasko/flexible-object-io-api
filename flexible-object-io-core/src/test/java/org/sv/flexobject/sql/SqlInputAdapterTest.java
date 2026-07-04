@@ -5,16 +5,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.sv.flexobject.copy.CopyAdapter;
 import org.sv.flexobject.json.MapperFactory;
 
-import java.io.IOException;
 import java.sql.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class SqlInputAdapterTest {
 
     @Mock
@@ -34,10 +36,10 @@ public class SqlInputAdapterTest {
     @BeforeEach
     public void setUp() throws Exception {
         adapter = new SqlInputAdapter(rs, ps);
-        when(rs.findColumn("boo")).thenReturn(1);
-        when(rs.findColumn("foo")).thenReturn(-1);
+        //        when(rs.findColumn("boo")).thenReturn(1);
+//        when(rs.findColumn("foo")).thenReturn(-1);
+//        when(rs.getMetaData()).thenReturn(resultSetMetaData);
 
-        when(rs.getMetaData()).thenReturn(resultSetMetaData);
     }
 
     @Test
@@ -49,6 +51,7 @@ public class SqlInputAdapterTest {
 
     @Test
     public void getString() throws SQLException {
+        when(rs.findColumn("boo")).thenReturn(1);
         when(rs.getString(1)).thenReturn("Pika");
         assertEquals("Pika", adapter.getString("boo"));
 
@@ -57,6 +60,8 @@ public class SqlInputAdapterTest {
 
     @Test
     public void getInt() throws SQLException {
+        when(rs.findColumn("boo")).thenReturn(1);
+        when(rs.findColumn("foo")).thenReturn(-1);
         when(rs.getInt(1)).thenReturn(29);
         assertEquals(29, (int)adapter.getInt("boo"));
 
@@ -65,6 +70,8 @@ public class SqlInputAdapterTest {
 
     @Test
     public void getBoolean() throws Exception {
+        when(rs.findColumn("boo")).thenReturn(1);
+        when(rs.findColumn("foo")).thenReturn(-1);
         when(rs.getBoolean(1)).thenReturn(true);
         assertTrue( adapter.getBoolean("boo"));
 
@@ -73,6 +80,8 @@ public class SqlInputAdapterTest {
 
     @Test
     public void getLong() throws SQLException {
+        when(rs.findColumn("boo")).thenReturn(1);
+        when(rs.findColumn("foo")).thenReturn(-1);
         when(rs.getLong(1)).thenReturn(29l);
         assertEquals(29l, (long)adapter.getLong("boo"));
 
@@ -82,6 +91,7 @@ public class SqlInputAdapterTest {
     @Test
     public void getDate() throws SQLException {
         Date date = new Date(1234567l);
+        when(rs.findColumn("boo")).thenReturn(1);
         when(rs.getDate(1)).thenReturn(date);
         assertEquals(date, adapter.getDate("boo"));
 
@@ -91,6 +101,7 @@ public class SqlInputAdapterTest {
     @Test
     public void getTimestamp() throws SQLException {
         Timestamp timestamp = new Timestamp(1234567l);
+        when(rs.findColumn("boo")).thenReturn(1);
         when(rs.getTimestamp(1)).thenReturn(timestamp);
         assertEquals(timestamp, adapter.getTimestamp("boo"));
 
@@ -109,6 +120,7 @@ public class SqlInputAdapterTest {
     @Test
     public void getZeroTimestampButOnlyForZeroDateFoo() throws SQLException {
         SQLException exception = new SQLException("foo");
+        when(rs.findColumn("boo")).thenReturn(1);
         when(rs.getTimestamp(1)).thenThrow(exception);
 
         assertThrows(SQLException.class, ()->{adapter.getTimestamp("boo");});
@@ -131,6 +143,7 @@ public class SqlInputAdapterTest {
     @Test
     public void getJson() throws Exception {
         String jsonString = "{'a':'tango', 'b':'bravo'}".replace('\'', '"');
+        when(rs.findColumn("boo")).thenReturn(1);
         when(rs.getString(1)).thenReturn(jsonString);
         assertEquals(MapperFactory.getObjectReader().readTree(jsonString), adapter.getJson("boo"));
 
@@ -161,6 +174,7 @@ public class SqlInputAdapterTest {
         when(resultSetMetaData.getColumnName(2)).thenReturn("bar");
         when(rs.getObject(1)).thenReturn("tango");
         when(rs.getObject(2)).thenReturn("bravo");
+        when(rs.getMetaData()).thenReturn(resultSetMetaData);
 
         adapter.copyRecord(copyAdapter);
 

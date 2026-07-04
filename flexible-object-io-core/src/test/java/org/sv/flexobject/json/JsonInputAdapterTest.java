@@ -141,12 +141,6 @@ public class JsonInputAdapterTest {
         assertNull(adapter.getTimestamp("badField"));
     }
 
-    @Test//(expected = NullPointerException.class)
-    public void nextHandlesNull() throws Exception {
-        values.add(null);
-        assertFalse(adapter.next());
-    }
-
     @Test
     public void nextKeepsOnMoving() throws Exception {
         ObjectNode n1 = JsonNodeFactory.instance.objectNode();

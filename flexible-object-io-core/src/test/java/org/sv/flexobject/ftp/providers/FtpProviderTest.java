@@ -102,7 +102,7 @@ public class FtpProviderTest {
         }
     }
 
-    @Test//(expected = RuntimeException.class)
+    @Test
     public void throwsErrorOnNoConnection() throws Exception {
         Properties properties = new Properties();
         properties.setProperty("host", "localhost");
@@ -111,7 +111,7 @@ public class FtpProviderTest {
         properties.setProperty("port", String.valueOf(port));
         FtpProvider provider = new FtpProvider();
 
-        FTPClient client = (FTPClient) provider.getConnection("foo", properties, null);
+        assertThrows(RuntimeException.class, ()->provider.getConnection("foo", properties, null));
     }
 
 

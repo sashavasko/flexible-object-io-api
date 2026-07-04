@@ -16,6 +16,10 @@ subprojects {
     apply plugin: 'java-library'
     apply plugin: 'idea'
 
+    configurations {
+        mockitoAgent { transitive = false }
+    }
+
     java {
         sourceCompatibility = '17'
         targetCompatibility = '17'
@@ -59,16 +63,19 @@ subprojects {
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.0'
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
         testImplementation 'org.mockito:mockito-junit-jupiter:5.11.0'
-
-        // Source: https://mvnrepository.com/artifact/com.carrotsearch/junit-benchmarks
-        testImplementation("com.carrotsearch:junit-benchmarks:0.7.2")
+        testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.14.2'
+        mockitoAgent 'org.mockito:mockito-core:5.14.2'
     }
     test {
         useJUnitPlatform()
         jvmArgs += [
                 "--add-opens=java.base/java.lang=ALL-UNNAMED",
                 "--add-opens=java.base/java.util=ALL-UNNAMED",
-                "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED"
+                "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
+                "-Dnet.bytebuddy.experimental=true",
+                "-XX:+EnableDynamicAgentLoading",
+                "-javaagent:${configurations.mockitoAgent.asPath}",
+                "-Xshare:off"
         ]
     }
 

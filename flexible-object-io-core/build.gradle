@@ -7,7 +7,12 @@ tasks.withType(JavaCompile) {
 dependencies {
     testImplementation group: 'com.h2database', name: 'h2', version: '2.3.232'
     testImplementation group: 'org.mockftpserver', name: 'MockFtpServer', version: '2.7.1'
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.14.2'
+}
+
+test {
+    jvmArgs += [
+                "-javaagent:${configurations.testRuntimeClasspath.find { it.name.contains('mockito-core') }.absolutePath}"
+    ]
 }
 
 tasks.register('printProps'){
