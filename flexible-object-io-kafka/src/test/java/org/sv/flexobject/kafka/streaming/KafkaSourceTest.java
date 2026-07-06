@@ -36,7 +36,12 @@ public class KafkaSourceTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        source = KafkaSource.builder().useConsumer(mockConsumer).timeoutSeconds(1234567).build();
+        source = KafkaSource.builder()
+                .addTopic("foo")
+                .forSchema(KafkaTestData.class)
+                .useConsumer(mockConsumer)
+                .timeoutSeconds(1234567)
+                .build();
     }
 
     @Test

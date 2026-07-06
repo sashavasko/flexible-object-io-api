@@ -51,14 +51,13 @@ public class KafkaSinkTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        when(mockSink.getKafkaProducer()).thenReturn(Optional.of(mockProducer));
-        when(mockSink.getTopic()).thenReturn("test");
-
         EmbeddedKafka.configureConnectionManager(TEST_KAFKA_CONNECTION);
     }
 
     @Test
     public void put() throws Exception {
+        when(mockSink.getKafkaProducer()).thenReturn(Optional.of(mockProducer));
+        when(mockSink.getTopic()).thenReturn("test");
         when(mockSink.makeKafkaRecord(mockTestData)).thenReturn(mockRecord);
         when(mockSink.makeKafkaCallback(mockTestData)).thenReturn(mockCallback);
         when(mockProducer.send(mockRecord, mockCallback)).thenReturn(mockFuture);
@@ -71,6 +70,7 @@ public class KafkaSinkTest {
 
     @Test
     public void setEOF() {
+        when(mockSink.getKafkaProducer()).thenReturn(Optional.of(mockProducer));
         mockSink.setEOF();
         Mockito.verify(mockProducer).flush();
     }
