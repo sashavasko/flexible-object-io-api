@@ -51,9 +51,13 @@ public class KafkaSourceTest {
         Mockito.when(mockRecords.isEmpty()).thenReturn(false, true);
         Mockito.when(mockIterator.hasNext()).thenReturn(true,true, true, false);
         Mockito.when(mockIterator.next()).thenReturn(mockRecord);
-        Mockito.when(mockRecord.value()).thenReturn("foo", "bar");
-        assertEquals("foo", source.get());
-        assertEquals("bar", source.get());
+
+        KafkaTestData data1 = KafkaTestData.of(1L, "foo");
+        KafkaTestData data2 = KafkaTestData.of(2L, "bar");
+
+        Mockito.when(mockRecord.value()).thenReturn(data1.getKafkaValue(), data2.getKafkaValue());
+        assertEquals(data1, source.get());
+        assertEquals(data2, source.get());
         assertNull(source.get());
     }
 
