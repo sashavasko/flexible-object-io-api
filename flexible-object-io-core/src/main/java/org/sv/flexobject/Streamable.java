@@ -12,6 +12,7 @@ import org.sv.flexobject.schema.AbstractFieldDescriptor;
 import org.sv.flexobject.schema.Schema;
 import org.sv.flexobject.schema.SchemaException;
 
+import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -79,7 +80,15 @@ public interface Streamable extends Savable, Loadable {
     }
 
     default void fromJsonBytes(byte[] bytes, final String charset) throws Exception {
-        String containerJsonString = new String(bytes, charset);
+        fromJsonBytes(bytes, 0, bytes.length, Charset.forName(charset));
+    }
+
+    default void fromJsonBytes(byte[] bytes, final Charset charset) throws Exception {
+        fromJsonBytes(bytes, 0, bytes.length, charset);
+    }
+
+    default void fromJsonBytes(byte[] bytes, int offset, int length, final Charset charset) throws Exception {
+        String containerJsonString = new String(bytes, offset, length, charset);
         JsonNode container = MapperFactory.getObjectReader().readTree(containerJsonString);
         JsonInputAdapter.consume(container, this::load);
     }
@@ -88,9 +97,13 @@ public interface Streamable extends Savable, Loadable {
         return toJsonBytes(Constants.DEFAULT_CHARSET);
     }
 
-    default byte[] toJsonBytes(final String charset) throws Exception {
+    default byte[] toJsonBytes(final Charset charset) throws Exception {
         ObjectNode container = JsonOutputAdapter.produce(this);
         return MapperFactory.getObjectWriter().writeValueAsString(container).getBytes(charset);
+    }
+
+    default byte[] toJsonBytes(final String charset) throws Exception {
+        return toJsonBytes(Charset.forName(charset));
     }
 
     default ObjectNode toJson() throws Exception {

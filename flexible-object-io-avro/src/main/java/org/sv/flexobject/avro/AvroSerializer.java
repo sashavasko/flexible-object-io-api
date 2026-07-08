@@ -131,12 +131,16 @@ public class AvroSerializer {
         StreamableAvroRecord wrapper = new StreamableAvroRecord(schema);
         StreamableDatumReader reader = new StreamableDatumReader(schema);
         byte[] data;
+        int offset;
+        int length;
 
         public ReadOperation() {
         }
 
-        public ReadOperation(byte[] data) {
+        public ReadOperation(byte[] data, int offset, int length) {
             this.data = data;
+            this.offset = offset;
+            this.length = length;
         }
 
         protected <T extends Streamable> T read(BinaryDecoder datumIn, T destination) throws IOException {
@@ -148,24 +152,41 @@ public class AvroSerializer {
         }
 
         public ReadOperation setData(byte[] bytes){
+            return setData(bytes, 0, bytes.length);
+        }
+
+        public ReadOperation setData(byte[] bytes, int offset, int length){
             this.data = bytes;
+            this.offset = offset;
+            this.length = length;
             return this;
         }
 
         public <T extends Streamable> T readOne(byte[] bytes) throws IOException {
+            return readOne(bytes, 0, bytes.length);
+        }
+
+        public <T extends Streamable> T readOne(byte[] bytes, int offset, int length) throws IOException {
             if (bytes == null)
                 return null;
-            return read(DecoderFactory.get().binaryDecoder(bytes, null), null);
+            return read(DecoderFactory.get().binaryDecoder(bytes, offset, length, null), null);
         }
 
         public <T extends Streamable> T readOne(byte[] bytes, T destination) throws IOException {
+            return readOne(bytes, 0, bytes.length, destination);
+        }
+
+        public <T extends Streamable> T readOne(byte[] bytes, int offset, int length, T destination) throws IOException {
             if (bytes == null)
                 return null;
-            return read(DecoderFactory.get().binaryDecoder(bytes, null), destination);
+            return read(DecoderFactory.get().binaryDecoder(bytes, offset, length, null), destination);
         }
 
         public Iterator<? extends Streamable> iterator(byte[] bytes) throws IOException {
-            setData(bytes);
+            return iterator(bytes, 0, bytes.length);
+        }
+        public Iterator<? extends Streamable> iterator(byte[] bytes, int offset, int length) throws IOException {
+            setData(bytes, offset, length);
             return iterator();
         }
 
@@ -174,7 +195,7 @@ public class AvroSerializer {
             if (data == null)
                 return Collections.emptyIterator();
 
-            BinaryDecoder datumIn = DecoderFactory.get().binaryDecoder(data, null);
+            BinaryDecoder datumIn = DecoderFactory.get().binaryDecoder(data, offset, length, null);
 
             return new Iterator<>() {
                 @Override
@@ -207,7 +228,10 @@ public class AvroSerializer {
     }
 
     public ReadOperation start(byte[] bytes){
-        return new ReadOperation(bytes);
+        return start(bytes, 0, bytes.length);
+    }
+    public ReadOperation start(byte[] bytes, int offset, int length){
+        return new ReadOperation(bytes, offset, length);
     }
 
     public ReadOperation startRead(){

@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.sv.flexobject.avro.AvroSchema;
 import org.sv.flexobject.schema.DataTypes;
 import org.sv.flexobject.schema.annotations.ScalarFieldTyped;
+import org.sv.flexobject.serde.JsonSerializationStrategy;
+import org.sv.flexobject.serde.SerializationStrategy;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -17,8 +19,8 @@ public class StreamableWritableTest {
         public byte[] modifiedRawRecord;
 
         @Override
-        public Strategy getStrategy() throws IOException {
-            return Strategy.json;
+        public SerializationStrategy getStrategy() throws IOException {
+            return JsonSerializationStrategy.JSON;
         }
     }
 

@@ -3,6 +3,7 @@ package org.sv.flexobject.kafka.streaming;
 import org.sv.flexobject.StreamableImpl;
 import org.sv.flexobject.kafka.KafkaStreamable;
 import org.sv.flexobject.schema.DataTypes;
+import org.sv.flexobject.serde.SerializationStrategy;
 
 public class KafkaTestData extends StreamableImpl implements KafkaStreamable {
     Long key;

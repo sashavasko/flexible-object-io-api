@@ -12,9 +12,12 @@ import org.sv.flexobject.connections.ConnectionManager;
 import org.sv.flexobject.kafka.CallbackWithDetails;
 import org.sv.flexobject.kafka.KafkaStreamable;
 import org.sv.flexobject.kafka.RecordDetails;
+import org.sv.flexobject.serde.JsonSerializationStrategy;
+import org.sv.flexobject.serde.SerializationStrategy;
 import org.sv.flexobject.stream.Sink;
 import org.sv.flexobject.util.InstanceFactory;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +26,7 @@ import java.util.Optional;
 public class KafkaSink<T extends Streamable> implements Sink<T>, AutoCloseable {
     Logger logger = LogManager.getLogger(KafkaSink.class);
     String topic;
+    SerializationStrategy serde = JsonSerializationStrategy.JSON;
     KafkaProducer<byte[], byte[]> kafkaProducer;
     Map<T,Exception> failedAcks = new HashMap<>();
 
@@ -44,6 +48,11 @@ public class KafkaSink<T extends Streamable> implements Sink<T>, AutoCloseable {
 
         public Builder<ST> topic(String topic){
             sink.topic = topic;
+            return this;
+        }
+
+        public Builder<ST> serializeWith(SerializationStrategy strategy){
+            sink.serde = strategy;
             return this;
         }
 
@@ -75,8 +84,9 @@ public class KafkaSink<T extends Streamable> implements Sink<T>, AutoCloseable {
 
     @Override
     public boolean put(T value) throws Exception {
+        ProducerRecord<byte[], byte[]> record = makeKafkaRecord(value);
         return getKafkaProducer()
-                .map(p->p.send(makeKafkaRecord(value), makeKafkaCallback(value))!= null)
+                .map(p->p.send(record, makeKafkaCallback(value))!= null)
                 .orElse(false);
     }
 
@@ -108,11 +118,11 @@ public class KafkaSink<T extends Streamable> implements Sink<T>, AutoCloseable {
         return topic;
     }
 
-    protected ProducerRecord<byte[], byte[]> makeKafkaRecord(T value){
+    protected ProducerRecord<byte[], byte[]> makeKafkaRecord(T value) throws Exception {
         if (value instanceof KafkaStreamable kValue) {
-            return new ProducerRecord<>(getTopic(), kValue.getKafkaKey(), kValue.getKafkaValue());
+            return new ProducerRecord<>(getTopic(), kValue.getKafkaKey(), kValue.getKafkaValue(serde));
         } else {
-            return new ProducerRecord<>(getTopic(), null, KafkaStreamable.toBytes(value.toString()));
+            return new ProducerRecord<>(getTopic(), null, serde.serialize(value));
         }
     }
 

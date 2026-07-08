@@ -6,6 +6,8 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.sv.flexobject.Streamable;
 import org.sv.flexobject.connections.ConnectionManager;
+import org.sv.flexobject.serde.JsonSerializationStrategy;
+import org.sv.flexobject.serde.SerializationStrategy;
 import org.sv.flexobject.stream.Source;
 import org.sv.flexobject.util.AutoCloseables;
 import org.sv.flexobject.util.InstanceFactory;
@@ -18,6 +20,7 @@ import java.util.stream.StreamSupport;
 public class KafkaSource<T extends Streamable> implements Source<T>, Iterator<T>, AutoCloseable {
     KafkaConsumer<byte[], byte[]> kafkaConsumer;
     Duration timeout = Duration.ofSeconds(60);
+    SerializationStrategy serde = JsonSerializationStrategy.JSON;
     ConsumerRecords<byte[],byte[]> currentRecords = null;
     Iterator<ConsumerRecord<byte[],byte[]>> currentRecordIterator = null;
     Class <? extends Streamable> schema;
@@ -35,6 +38,11 @@ public class KafkaSource<T extends Streamable> implements Source<T>, Iterator<T>
 
         public Builder<ST> forSchema(Class<? extends Streamable> schema){
             source.schema = schema;
+            return this;
+        }
+
+        public Builder<ST> deserializeWith(SerializationStrategy strategy){
+            source.serde = strategy;
             return this;
         }
 
@@ -134,7 +142,7 @@ public class KafkaSource<T extends Streamable> implements Source<T>, Iterator<T>
         @SuppressWarnings("unchecked")
         T streamable = (T) InstanceFactory.get(schema);
         try {
-            streamable.fromJsonBytes(bytes);
+            serde.deserialize(streamable, bytes);
         } catch (Exception e) {
             throw new RuntimeException("Failed to deserialize " + schema.getName() + " from JSON bytes.", e);
         }

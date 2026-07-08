@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.sv.flexobject.avro.AvroSerializationStrategy;
 
 import java.time.Duration;
 import java.util.Iterator;
@@ -40,6 +41,7 @@ public class KafkaSourceTest {
                 .addTopic("foo")
                 .forSchema(KafkaTestData.class)
                 .useConsumer(mockConsumer)
+                .deserializeWith(AvroSerializationStrategy.AVRO)
                 .timeoutSeconds(1234567)
                 .build();
     }
@@ -55,7 +57,7 @@ public class KafkaSourceTest {
         KafkaTestData data1 = KafkaTestData.of(1L, "foo");
         KafkaTestData data2 = KafkaTestData.of(2L, "bar");
 
-        Mockito.when(mockRecord.value()).thenReturn(data1.getKafkaValue(), data2.getKafkaValue());
+        Mockito.when(mockRecord.value()).thenReturn(data1.getKafkaValue(AvroSerializationStrategy.AVRO), data2.getKafkaValue(AvroSerializationStrategy.AVRO));
         assertEquals(data1, source.get());
         assertEquals(data2, source.get());
         assertNull(source.get());

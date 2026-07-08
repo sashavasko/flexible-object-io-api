@@ -106,7 +106,7 @@ public class ByteStreamSource<T extends ByteRepresentable>  implements Iterator<
                 return null;
 
             ByteRepresentable datum = clazz.newInstance();
-            datum.fromBytes(readBuffer, pos);
+            datum.fromBytes(readBuffer, 0, pos);
             return (T) datum;
         } catch (IOException | InstantiationException | IllegalAccessException e) {
             return null;
