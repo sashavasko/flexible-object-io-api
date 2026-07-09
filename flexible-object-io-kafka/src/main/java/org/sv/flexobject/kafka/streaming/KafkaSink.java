@@ -27,6 +27,7 @@ public class KafkaSink<T extends Streamable> implements Sink<T>, AutoCloseable {
     Logger logger = LogManager.getLogger(KafkaSink.class);
     String topic;
     SerializationStrategy serde = JsonSerializationStrategy.JSON;
+    //TODO add configurable parameters for headers and schema ID
     KafkaProducer<byte[], byte[]> kafkaProducer;
     Map<T,Exception> failedAcks = new HashMap<>();
 
