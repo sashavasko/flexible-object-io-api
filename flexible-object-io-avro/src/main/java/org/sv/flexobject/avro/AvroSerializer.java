@@ -125,6 +125,10 @@ public class AvroSerializer {
             encoder.flush();
             return outputStream.toByteArray();
         }
+
+        public WriteOperation write(byte magic) {
+            return null;
+        }
     }
 
     public class ReadOperation implements Iterable<Streamable> {

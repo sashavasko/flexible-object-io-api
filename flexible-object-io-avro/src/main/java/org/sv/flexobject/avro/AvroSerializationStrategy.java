@@ -9,7 +9,7 @@ public class AvroSerializationStrategy implements SerializationStrategy {
 
     public static final SerializationStrategy AVRO = new AvroSerializationStrategy();
 
-    private AvroSerializationStrategy(){}
+    protected AvroSerializationStrategy(){}
 
     @Override
     public byte[] serialize(Streamable datum) throws IOException {

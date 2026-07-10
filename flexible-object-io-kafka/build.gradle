@@ -2,6 +2,8 @@
 dependencies {
     api "org.apache.kafka:connect-api:$kafkaVersion"
     api "org.apache.kafka:kafka-clients:$kafkaVersion"
+    api "io.confluent:kafka-schema-registry-client:$confluentVerion"
+
     testImplementation("org.springframework.kafka:spring-kafka-test:4.0.5")
     testImplementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.23.1'//'ch.qos.logback:logback-classic:1.5.6'
 }
