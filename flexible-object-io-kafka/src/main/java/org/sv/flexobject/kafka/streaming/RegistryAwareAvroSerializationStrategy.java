@@ -3,6 +3,7 @@ package org.sv.flexobject.kafka.streaming;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
+import io.confluent.kafka.schemaregistry.client.rest.entities.requests.RegisterSchemaResponse;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import org.sv.flexobject.Streamable;
 import org.sv.flexobject.avro.AvroSerializationStrategy;
@@ -10,13 +11,35 @@ import org.sv.flexobject.avro.AvroSerializer;
 import org.sv.flexobject.connections.ConnectionManager;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 public class RegistryAwareAvroSerializationStrategy extends AvroSerializationStrategy {
 
     Class<? extends Streamable> schema;
     Integer schemaId;
     public static final byte MAGIC = 0x0;
+
+    public static Integer getRegisteredSchemaId(Class<? extends Streamable> schema, SchemaRegistryClient schemaRegistryClient, boolean autoRegister, String topic) throws RestClientException, IOException {
+        ParsedSchema parsedSchema = new AvroSchema(org.sv.flexobject.avro.AvroSchema.forClass(schema));
+        String subject = topic + "-value";
+        if (autoRegister){
+            return schemaRegistryClient.register(subject, parsedSchema);
+        } else if (schemaRegistryClient != null){
+            return schemaRegistryClient.getId(subject, parsedSchema);
+        }
+        return null;
+    }
+
+    public static String getRegisteredSchemaGuid(Class<? extends Streamable> schema, SchemaRegistryClient schemaRegistryClient, boolean autoRegister, String topic) throws RestClientException, IOException {
+        ParsedSchema parsedSchema = new AvroSchema(org.sv.flexobject.avro.AvroSchema.forClass(schema));
+        String subject = topic + "-value";
+        if (autoRegister){
+            RegisterSchemaResponse response = schemaRegistryClient.registerWithResponse(subject, parsedSchema, false);
+            return response.getGuid();
+        } else if (schemaRegistryClient != null){
+            return schemaRegistryClient.getGuid(subject, parsedSchema);
+        }
+        return null;
+    }
 
     public static class Builder{
         RegistryAwareAvroSerializationStrategy strategy = new RegistryAwareAvroSerializationStrategy();
@@ -44,24 +67,17 @@ public class RegistryAwareAvroSerializationStrategy extends AvroSerializationStr
         }
 
         public RegistryAwareAvroSerializationStrategy build() throws RestClientException, IOException {
-            String subject = topic + "-value";
-            ParsedSchema parsedSchema = new AvroSchema(org.sv.flexobject.avro.AvroSchema.forClass(strategy.schema));
-            if (autoRegister){
-                strategy.schemaId = schemaRegistryClient.register(subject, parsedSchema);
-            } else if (schemaRegistryClient != null){
-                strategy.schemaId = schemaRegistryClient.getId(subject, parsedSchema);
-            }
+            strategy.schemaId = getRegisteredSchemaId(strategy.schema, schemaRegistryClient, autoRegister, topic);
             return strategy;
         }
     }
 
     @Override
     public byte[] serialize(Streamable datum) throws IOException {
-        if (schemaId == null)
+        if (schemaId == null) {
             return super.serialize(datum);
-        else {
+        } else {
             return AvroSerializer.forData(datum).start().write(MAGIC).write(schemaId).write(datum).asBytes();
-            ByteBuffer bb = ByteBuffer;
         }
     }
 }

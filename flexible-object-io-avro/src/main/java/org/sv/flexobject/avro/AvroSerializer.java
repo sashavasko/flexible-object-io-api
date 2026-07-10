@@ -127,6 +127,16 @@ public class AvroSerializer {
         }
 
         public WriteOperation write(byte magic) {
+            outputStream.write(magic);
+            return this;
+        }
+
+
+        public WriteOperation write(int value) {
+            outputStream.write((value & 0xFF000000) >> 24);
+            outputStream.write((value & 0x0FF0000) >> 16);
+            outputStream.write((value & 0x0FF00) >> 8);
+            outputStream.write(value);
             return null;
         }
     }

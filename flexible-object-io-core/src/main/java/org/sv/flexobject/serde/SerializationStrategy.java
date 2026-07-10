@@ -11,4 +11,6 @@ public interface SerializationStrategy {
         deserialize(datum, bytes, 0, bytes.length);
     }
     void deserialize(Streamable datum, byte[] bytes, int offset, int length) throws IOException;
+
+    byte[] getContentType();
 }

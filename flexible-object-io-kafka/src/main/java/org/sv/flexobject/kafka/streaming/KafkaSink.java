@@ -17,19 +17,22 @@ import org.sv.flexobject.serde.SerializationStrategy;
 import org.sv.flexobject.stream.Sink;
 import org.sv.flexobject.util.InstanceFactory;
 
-import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 public class KafkaSink<T extends Streamable> implements Sink<T>, AutoCloseable {
-    Logger logger = LogManager.getLogger(KafkaSink.class);
+    public static final Logger logger = LogManager.getLogger(KafkaSink.class);
+
+    public static final String SCHEMA_GUID_HEADER = "value.schema.id";
+    public static final String SCHEMA_CLASS_HEADER = "__TypeId__";
+
     String topic;
     SerializationStrategy serde = JsonSerializationStrategy.JSON;
-    //TODO add configurable parameters for headers and schema ID
-    int schemaId;
-    boolean schemaIdInHeader;
+    String schemaGuid;
+    boolean schemaClassInHeader;
 
     KafkaProducer<byte[], byte[]> kafkaProducer;
     Map<T,Exception> failedAcks = new HashMap<>();
@@ -60,9 +63,18 @@ public class KafkaSink<T extends Streamable> implements Sink<T>, AutoCloseable {
             return this;
         }
 
+        public Builder<ST> shemaGuid(String guid){
+            sink.schemaGuid = guid;
+            return this;
+        }
+
+        public Builder<ST> shemaClassHeader(boolean value){
+            sink.schemaClassInHeader = value;
+            return this;
+        }
+
         public Builder<ST> forConnection(String name) throws Exception {
             sink.kafkaProducer = (KafkaProducer<byte[], byte[]>) ConnectionManager.getConnection(KafkaProducer.class, name);
-
             return this;
         }
 
@@ -123,11 +135,21 @@ public class KafkaSink<T extends Streamable> implements Sink<T>, AutoCloseable {
     }
 
     protected ProducerRecord<byte[], byte[]> makeKafkaRecord(T value) throws Exception {
+        ProducerRecord<byte[], byte[]> record;
         if (value instanceof KafkaStreamable kValue) {
-            return new ProducerRecord<>(getTopic(), kValue.getKafkaKey(), kValue.getKafkaValue(serde));
+            record = new ProducerRecord<>(getTopic(), kValue.getKafkaKey(), kValue.getKafkaValue(serde));
         } else {
-            return new ProducerRecord<>(getTopic(), null, serde.serialize(value));
+            record = new ProducerRecord<>(getTopic(), null, serde.serialize(value));
         }
+        if (schemaGuid != null) {
+            record.headers().add(SCHEMA_GUID_HEADER, schemaGuid.getBytes(StandardCharsets.UTF_8));
+        }
+        if (schemaClassInHeader){
+            record.headers().add(SCHEMA_CLASS_HEADER, value.getClass().getName().getBytes(StandardCharsets.UTF_8));
+        }
+        record.headers().add("content-type", serde.getContentType());
+
+        return record;
     }
 
     protected Callback makeKafkaCallback(T value){
