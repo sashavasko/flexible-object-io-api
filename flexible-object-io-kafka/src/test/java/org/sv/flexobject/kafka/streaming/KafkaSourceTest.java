@@ -41,7 +41,6 @@ public class KafkaSourceTest {
                 .addTopic("foo")
                 .forSchema(KafkaTestData.class)
                 .useConsumer(mockConsumer)
-                .deserializeWith(AvroSerializationStrategy.AVRO)
                 .timeoutSeconds(1234567)
                 .build();
     }

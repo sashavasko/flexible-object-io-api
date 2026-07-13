@@ -581,14 +581,28 @@ public enum DataTypes {
         return stringOut;
     }
 
-    public static byte[] intToByte(int x){
-        ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
-        buffer.putInt(x);
-        return buffer.array();
+    public static byte[] intToByte(int value){
+        byte[] bytes = new byte[4];
+        bytes[0] = (byte) ((value & 0xFF000000) >> 24);
+        bytes[1] = (byte) ((value & 0x0FF0000) >> 16);
+        bytes[2] = (byte) ((value & 0x0FF00) >> 8);
+        bytes[3] = (byte) value;
+        return bytes;
     }
 
     public static int bytesToInt(byte[] bytes){
-        return ByteBuffer.wrap(bytes).getInt();
+        return bytesToInt(bytes, 0);
+    }
+    public static int bytesToInt(byte[] bytes, int offset){
+        int highByte1 = bytes[offset];
+        int highByte2 = bytes[offset+1];
+        int highByte3 = bytes[offset+2];
+        int lowByte = bytes[offset+3];
+        return (highByte1 << 24) | (highByte2 << 16) | (highByte3 << 8) | lowByte;
+    }
+
+    public static int bytesToInt(ByteBuffer bytes){
+        return bytes.getInt();
     }
 
     public static byte[] longToByte(long x){

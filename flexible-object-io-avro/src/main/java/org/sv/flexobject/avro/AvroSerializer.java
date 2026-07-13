@@ -101,6 +101,10 @@ public class AvroSerializer {
         return getInstance(dataClass.getName(), dataClass, avroSchema);
     }
 
+    public Class<? extends Streamable> getDataClass() {
+        return dataClass;
+    }
+
     public class WriteOperation {
         NonCopyingByteArrayOutputStream outputStream = new NonCopyingByteArrayOutputStream(1024);
         BinaryEncoder encoder = new EncoderFactory().directBinaryEncoder(outputStream,null);

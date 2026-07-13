@@ -18,9 +18,13 @@ public class RegistryAwareAvroSerializationStrategy extends AvroSerializationStr
     Integer schemaId;
     public static final byte MAGIC = 0x0;
 
+    public static String formatSubject(String topic){
+        return topic + "-value";
+    }
+
     public static Integer getRegisteredSchemaId(Class<? extends Streamable> schema, SchemaRegistryClient schemaRegistryClient, boolean autoRegister, String topic) throws RestClientException, IOException {
         ParsedSchema parsedSchema = new AvroSchema(org.sv.flexobject.avro.AvroSchema.forClass(schema));
-        String subject = topic + "-value";
+        String subject = formatSubject(topic);
         if (autoRegister){
             return schemaRegistryClient.register(subject, parsedSchema);
         } else if (schemaRegistryClient != null){
@@ -31,7 +35,7 @@ public class RegistryAwareAvroSerializationStrategy extends AvroSerializationStr
 
     public static String getRegisteredSchemaGuid(Class<? extends Streamable> schema, SchemaRegistryClient schemaRegistryClient, boolean autoRegister, String topic) throws RestClientException, IOException {
         ParsedSchema parsedSchema = new AvroSchema(org.sv.flexobject.avro.AvroSchema.forClass(schema));
-        String subject = topic + "-value";
+        String subject = formatSubject(topic);
         if (autoRegister){
             RegisterSchemaResponse response = schemaRegistryClient.registerWithResponse(subject, parsedSchema, false);
             return response.getGuid();

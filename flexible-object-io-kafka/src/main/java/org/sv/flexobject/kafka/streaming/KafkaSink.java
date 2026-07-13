@@ -26,6 +26,7 @@ import java.util.Optional;
 public class KafkaSink<T extends Streamable> implements Sink<T>, AutoCloseable {
     public static final Logger logger = LogManager.getLogger(KafkaSink.class);
 
+    public static final String CONTENT_TYPE_HEADER = "content-type";
     public static final String SCHEMA_GUID_HEADER = "value.schema.id";
     public static final String SCHEMA_CLASS_HEADER = "__TypeId__";
 
@@ -147,7 +148,7 @@ public class KafkaSink<T extends Streamable> implements Sink<T>, AutoCloseable {
         if (schemaClassInHeader){
             record.headers().add(SCHEMA_CLASS_HEADER, value.getClass().getName().getBytes(StandardCharsets.UTF_8));
         }
-        record.headers().add("content-type", serde.getContentType());
+        record.headers().add(CONTENT_TYPE_HEADER, serde.getContentType());
 
         return record;
     }
