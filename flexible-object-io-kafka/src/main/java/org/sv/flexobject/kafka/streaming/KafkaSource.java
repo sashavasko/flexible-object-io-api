@@ -7,10 +7,12 @@ import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.Headers;
 import org.apache.logging.log4j.LogManager;
@@ -51,9 +53,30 @@ public class KafkaSource<T extends Streamable> implements Source<T>, Iterator<T>
     public static class Builder<ST extends Streamable>{
         KafkaSource<ST> source = new KafkaSource<>();
         Set<String> topics = new HashSet<>();
+        Integer partition;
+        boolean startAtTheBeginning = false;
+        Long startOffset;
+        String connectionName;
+        String groupId;
+
 
         public Builder<ST> addTopic(String topic){
             topics.add(topic);
+            return this;
+        }
+
+        public Builder<ST> forPartition(int partition){
+            this.partition = partition;
+            return this;
+        }
+
+        public Builder<ST> startingAt(long position){
+            this.startOffset = position;
+            return this;
+        }
+
+        public Builder<ST> startingAtTheBeginning(){
+            this.startAtTheBeginning = true;
             return this;
         }
 
@@ -62,15 +85,23 @@ public class KafkaSource<T extends Streamable> implements Source<T>, Iterator<T>
             return this;
         }
 
+        public Builder<ST> withSchemaRegistry(SchemaRegistryClient schemaRegistryClient){
+            source.schemaRegistryClient = schemaRegistryClient;
+            return this;
+        }
+
         public Builder<ST> deserializeWith(SerializationStrategy strategy){
             source.serde = strategy;
             return this;
         }
 
-        public Builder<ST> forConnection(String name) throws Exception {
-            @SuppressWarnings("unchecked")
-            KafkaConsumer<byte[], byte[]> consumer = ConnectionManager.getConnection(KafkaConsumer.class, name);
-            source.kafkaConsumer = consumer;
+        public Builder<ST> forConnection(String name) {
+            connectionName = name;
+            return this;
+        }
+
+        public Builder<ST> groupId(String groupId) {
+            this.groupId = groupId;
             return this;
         }
 
@@ -88,20 +119,58 @@ public class KafkaSource<T extends Streamable> implements Source<T>, Iterator<T>
             return this;
         }
 
-        public KafkaSource build(){
+        public KafkaSource<ST> build() throws Exception {
             if (topics.isEmpty())
                 throw new IllegalArgumentException("KafkaSource has to be subscribed to at least 1 topic");
-            if (source.kafkaConsumer == null)
-                throw new IllegalArgumentException("Must specify a valid connection name for Kafka");
             if (source.schema == null)
-                throw new IllegalArgumentException("Must specify a Streamable class as a schema for Kafka Source");
-            source.kafkaConsumer.subscribe(topics);
+                logger.warn("Schema for Kafka Source is not set - will attempt to derive schema from the message");
+
+            if (source.kafkaConsumer == null)
+                getKafkaConsumer();
+
+            if (partition == null) {
+                source.kafkaConsumer.subscribe(topics);
+            } else if (topics.size() != 1){
+                throw new IllegalArgumentException("Kafka Source can handle exactly one partition of a single topic");
+            } else {
+                String topic = topics.iterator().next();
+                TopicPartition topicPartition = new TopicPartition(topic, partition);
+                List<TopicPartition> partitions = List.of(topicPartition);
+                source.kafkaConsumer.assign(partitions);
+                if (startOffset != null) {
+                    source.kafkaConsumer.seek(topicPartition, startOffset);
+                } else if (startAtTheBeginning){
+                    source.kafkaConsumer.seekToBeginning(partitions);
+                } else
+                    source.kafkaConsumer.seekToEnd(partitions);
+            }
+
             return source;
+        }
+
+        private void getKafkaConsumer() {
+            Properties overrides = new Properties();
+            if (groupId != null)
+                overrides.put("group.id", groupId);
+            if (partition == null && startAtTheBeginning)
+                overrides.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");;
+
+            try {
+                @SuppressWarnings("unchecked")
+                KafkaConsumer<byte[], byte[]> consumer = ConnectionManager.getConnection(KafkaConsumer.class, connectionName, overrides);
+                source.kafkaConsumer = consumer;
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Kafka connection failed (invalid connection name?)", e);
+            }
         }
     }
 
     public static <ST extends Streamable> Builder<ST> builder(){
         return new Builder<>();
+    }
+
+    public KafkaConsumer<byte[], byte[]> getConsumer(){
+        return kafkaConsumer;
     }
 
     protected boolean pollRecords(){
@@ -122,6 +191,7 @@ public class KafkaSource<T extends Streamable> implements Source<T>, Iterator<T>
         return next();
     }
 
+
     @Override
     public boolean isEOF() {
         return !pollRecords();
@@ -129,7 +199,7 @@ public class KafkaSource<T extends Streamable> implements Source<T>, Iterator<T>
 
     @Override
     public void ack(){
-        kafkaConsumer.commitSync();
+        kafkaConsumer.commitSync(timeout);
     }
 
     @Override

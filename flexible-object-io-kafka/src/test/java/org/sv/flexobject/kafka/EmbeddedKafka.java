@@ -2,6 +2,7 @@ package org.sv.flexobject.kafka;
 
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
@@ -15,8 +16,11 @@ import org.sv.flexobject.connections.PropertiesProvider;
 import java.util.Properties;
 
 public class EmbeddedKafka {
+
+    public static final String TEST_TOPIC = "test";
+
     private static final EmbeddedKafkaBroker embeddedKafkaBroker =
-        new EmbeddedKafkaKraftBroker(1, 1, "test")
+        new EmbeddedKafkaKraftBroker(1, 1, TEST_TOPIC)
                 .brokerListProperty("spring.kafka.bootstrap-servers");
     private  static Properties props = new Properties();
 
@@ -47,6 +51,8 @@ public class EmbeddedKafka {
                         props.put("value.deserializer", ByteArrayDeserializer.class.getName());
                         props.put("key.serializer", ByteArraySerializer.class.getName());
                         props.put("value.serializer", ByteArraySerializer.class.getName());
+                        props.put("group.id", "test-group");
+                        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
                     } catch (Exception e) {
                         throw new KafkaException("Embedded broker failed to start", e);

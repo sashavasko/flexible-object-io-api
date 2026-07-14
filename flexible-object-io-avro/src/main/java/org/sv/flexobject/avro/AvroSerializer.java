@@ -141,7 +141,7 @@ public class AvroSerializer {
             outputStream.write((value & 0x0FF0000) >> 16);
             outputStream.write((value & 0x0FF00) >> 8);
             outputStream.write(value);
-            return null;
+            return this;
         }
     }
 

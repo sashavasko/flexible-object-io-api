@@ -14,9 +14,10 @@ import java.io.IOException;
 
 public class RegistryAwareAvroSerializationStrategy extends AvroSerializationStrategy {
 
+    public static final byte MAGIC = 0x0;
+
     Class<? extends Streamable> schema;
     Integer schemaId;
-    public static final byte MAGIC = 0x0;
 
     public static String formatSubject(String topic){
         return topic + "-value";
@@ -71,9 +72,15 @@ public class RegistryAwareAvroSerializationStrategy extends AvroSerializationStr
         }
 
         public RegistryAwareAvroSerializationStrategy build() throws RestClientException, IOException {
+            if (strategy.schema == null)
+                throw new IllegalArgumentException("Schema class extending Streamable must be specified for Schema Registry aware Serialization strategy.");
             strategy.schemaId = getRegisteredSchemaId(strategy.schema, schemaRegistryClient, autoRegister, topic);
             return strategy;
         }
+    }
+
+    public static Builder builder(){
+        return new Builder();
     }
 
     @Override
