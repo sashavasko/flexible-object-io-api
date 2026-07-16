@@ -9,7 +9,7 @@
         <Root level="info">
             <AppenderRef ref="Console"/>
         </Root>
-        <Logger name="org.sv.flexobject.arrow.store.MemoryStore" level="debug">
+        <Logger name="org.sv.flexobject.arrow.flight.store.MemoryStore" level="debug">
         </Logger>
         <Logger name="org.sv.flexobject.arrow.streaming.ArrowStreamSink" level="debug">
         </Logger>

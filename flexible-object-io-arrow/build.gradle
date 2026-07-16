@@ -1,0 +1,24 @@
+dependencies {
+//    api group: 'com.google.protobuf', name: 'protobuf-java', version: "${protobufVersion}"
+//    api group: 'com.google.protobuf', name: 'protobuf-java-util', version: "${protobufVersion}"
+//    api group: 'io.netty', name: 'netty-codec-http2', version: "${nettyVersion}"
+    api group: 'com.google.protobuf', name: 'protobuf-java', version: "${protobufVersion}"
+    api group: 'com.google.protobuf', name: 'protobuf-java-util', version: "${protobufVersion}"
+    api group: 'io.netty', name: 'netty-codec-http2', version: "${nettyVersion}"
+
+    implementation platform(
+            "org.apache.arrow:arrow-bom:${arrowVersion}"
+    )
+    api("org.apache.arrow:arrow-memory:${arrowVersion}")
+    api("org.apache.arrow:arrow-memory-netty:${arrowVersion}")
+    api("org.apache.arrow:arrow-vector:${arrowVersion}")
+    api group: 'org.apache.arrow', name: 'arrow-compression', version: "${arrowVersion}"
+
+}
+
+test {
+    jvmArgs += [
+        "--add-opens=java.base/java.nio=ALL-UNNAMED",
+        "-Duser.language=en"
+    ]
+}

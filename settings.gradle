@@ -18,8 +18,7 @@ include 'flexible-object-io-aws-creds-provider'
 include 'flexible-object-io-examples'
 include 'flexible-object-io-dremio-api'
 include 'flexible-object-io-docker'
-
-
 include 'flexible-object-io-arrow-flight'
 include 'flexible-object-io-hadoop-properties'
 include 'flexible-object-io-avro'
+include 'flexible-object-io-arrow'

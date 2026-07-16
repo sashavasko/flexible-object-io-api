@@ -1,0 +1,77 @@
+package org.sv.flexobject.arrow.streaming;
+
+import org.apache.arrow.memory.BufferAllocator;
+import org.apache.arrow.memory.RootAllocator;
+import org.apache.arrow.vector.ipc.message.ArrowRecordBatch;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.sv.flexobject.arrow.streaming.ArrowSink;
+import org.sv.flexobject.arrow.streaming.ArrowSource;
+import org.sv.flexobject.testdata.levelone.leveltwo.SimpleObject;
+
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+public class ArrowSourceTest {
+
+    static BufferAllocator rootAllocator;
+
+    @BeforeAll
+    public static void beforeClass() throws Exception {
+        rootAllocator = new RootAllocator(Long.MAX_VALUE);
+    }
+
+    @AfterAll
+    public static void afterClass() throws Exception {
+        rootAllocator.close();
+    }
+
+    @Test
+    public void readWriteSimpleData() throws Exception {
+        SimpleObject dataOut1 = SimpleObject.random();
+        SimpleObject dataOut2 = SimpleObject.random();
+        SimpleObject dataOut3 = SimpleObject.random();
+        BlockingQueue<ArrowRecordBatch> queue = new LinkedBlockingQueue<>();
+
+        try(ArrowSink sink = (ArrowSink) ArrowSink.sinkBuilder()
+                .batchConsumer(queue::put)
+                .batchSize(2)
+                .withRootAllocator(rootAllocator)
+                .forClass(SimpleObject.class)
+                .build()) {
+
+            sink.put(dataOut1);
+            sink.put(dataOut2);
+            sink.put(dataOut3);
+//            sink.commit();
+//            System.out.println(ArrowJson.toJsonString(sink.getRoot()));
+
+            sink.setEOF();
+
+
+            try(ArrowSource<SimpleObject> source = (ArrowSource) ArrowSource.sourceBuilder()
+                    .withRootAllocator(rootAllocator)
+                    .supplier(queue::poll)
+                    .forClass(SimpleObject.class)
+                    .build()) {
+
+                SimpleObject dataIn1 = source.get();
+                SimpleObject dataIn2 = source.get();
+                SimpleObject dataIn3 = source.get();
+                SimpleObject dataIn4 = source.get();
+
+                assertEquals(dataOut1, dataIn1);
+                assertEquals(dataOut2, dataIn2);
+                assertEquals(dataOut3, dataIn3);
+                assertNull(dataIn4);
+
+                assertEquals(2, sink.getBatchCount());
+                assertEquals(2, source.getBatchCount());
+            }
+        }
+    }
+}
