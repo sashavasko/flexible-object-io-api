@@ -223,3 +223,16 @@ project(':flexible-object-io-arrow-flight') {
     }
 }
 
+project(':flexible-object-io-arrow-duck') {
+    dependencies {
+        api project(':flexible-object-io-core')
+        api project(':flexible-object-io-hadoop-properties')
+        api project(':flexible-object-io-arrow')
+//        testImplementation project(':flexible-object-io-hadoop')
+        testImplementation project(':flexible-object-io-testdata')
+    }
+    processTestResources{
+        duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    }
+}
+

@@ -2,7 +2,7 @@ package org.sv.flexobject.arrow.read;
 
 import org.apache.arrow.vector.ValueVector;
 
-public abstract class VectorReader extends ArrowReader {
+public abstract class VectorReader extends DictionaryArrowReader {
 
     String fieldName;
     ValueVector vector;

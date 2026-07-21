@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class ArrowRecordReader extends ArrowReader{
+public abstract class ArrowRecordReader extends DictionaryArrowReader {
 
     public Class<? extends Streamable> getSchemaClass() {
         return schemaClass;
@@ -26,7 +26,7 @@ public abstract class ArrowRecordReader extends ArrowReader{
     org.sv.flexobject.schema.Schema internalSchema;
     int rowIndex = 0;
 
-    protected Map<String, ArrowReader> fieldReaders = new HashMap<>();
+    protected Map<String, DictionaryArrowReader> fieldReaders = new HashMap<>();
 
     public ArrowRecordReader() {
     }
@@ -58,7 +58,7 @@ public abstract class ArrowRecordReader extends ArrowReader{
     protected Streamable readRecordImpl(Streamable record, int recordIdx){
         for (Field field : fields) {
             String fieldName = field.getName();
-            ArrowReader reader = fieldReaders.get(fieldName);
+            DictionaryArrowReader reader = fieldReaders.get(fieldName);
             FieldDescriptor descriptor = internalSchema.getDescriptor(fieldName);
             if (descriptor != null && reader != null) {
                 Object value = reader.read(recordIdx);
@@ -143,7 +143,7 @@ public abstract class ArrowRecordReader extends ArrowReader{
         return descriptor.getSubschema();
     }
 
-    protected ArrowReader buildStructFieldReader(Field field, FieldVector vector, FieldDescriptor descriptor) throws NoSuchFieldException {
+    protected DictionaryArrowReader buildStructFieldReader(Field field, FieldVector vector, FieldDescriptor descriptor) throws NoSuchFieldException {
         String fieldName = field.getName();
         Class <? extends Streamable> subSchema = getFieldSubSchema(field, descriptor);
 
@@ -153,7 +153,7 @@ public abstract class ArrowRecordReader extends ArrowReader{
         return new ArrowStructReader(subSchema, field.getChildren(), fieldName, vector);
     }
 
-    private void addFieldReader(String fieldName, ArrowReader reader) {
+    private void addFieldReader(String fieldName, DictionaryArrowReader reader) {
         reader.setDictionaryMap(dictionaryMap);
         fieldReaders.put(fieldName, reader);
     }

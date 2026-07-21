@@ -1,0 +1,11 @@
+dependencies {
+    api("org.apache.arrow:arrow-c-data:${arrowVersion}")
+    api group: 'org.duckdb', name: 'duckdb_jdbc', version: "${duckdbVersion}"
+}
+
+test {
+    jvmArgs += [
+            "--add-opens=java.base/java.nio=ALL-UNNAMED",
+            "-Duser.language=en"
+    ]
+}

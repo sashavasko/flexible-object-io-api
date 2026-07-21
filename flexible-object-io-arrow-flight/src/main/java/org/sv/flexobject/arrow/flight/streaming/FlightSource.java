@@ -42,13 +42,13 @@ public class FlightSource<T extends Streamable> implements Source<T> {
         }
     }
 
-    public static FlightSourceBuilder<FlightSourceBuilder> builder(){
+    public static FlightSourceBuilder<?> builder(){
         return new FlightSourceBuilder();
     }
 
     @Override
     public <O extends T> O get() throws Exception {
-        if (ensureValidEndpoit())
+        if (ensureValidEndpoint())
             return currentSource.get();
 
         return null;
@@ -56,16 +56,16 @@ public class FlightSource<T extends Streamable> implements Source<T> {
 
     @Override
     public boolean isEOF() {
-        return !ensureValidEndpoit();
+        return !ensureValidEndpoint();
     }
 
     public boolean hasNext(){
-        if (!ensureValidEndpoit())
+        if (!ensureValidEndpoint())
             return false;
         return currentSource.hasNext();
     }
 
-    private boolean ensureValidEndpoit() {
+    private boolean ensureValidEndpoint() {
         if (currentSource != null && !currentSource.isEOF())
             return true;
         if (info.getEndpoints().size() <= currentEndpointIdx)

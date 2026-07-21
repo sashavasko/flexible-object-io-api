@@ -24,7 +24,7 @@ public class UnPooledConnectionProvider implements ConnectionProvider {
 
         String driverClassName = connectionProperties.getProperty("driverClassName");
         if (StringUtils.isNotBlank(driverClassName))
-            Class.forName(connectionProperties.getProperty("driverClassName"));
+            Class.forName(driverClassName);
         // otherwise DriverManager will load driver from
         // those listed in jdbc.drivers system property
 

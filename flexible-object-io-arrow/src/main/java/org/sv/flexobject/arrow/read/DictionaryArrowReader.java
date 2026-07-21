@@ -6,10 +6,10 @@ import org.apache.arrow.vector.dictionary.DictionaryEncoder;
 
 import java.util.Map;
 
-public abstract class ArrowReader {
+public abstract class DictionaryArrowReader {
     Map<Long, Dictionary> dictionaryMap;
 
-    public ArrowReader() {
+    public DictionaryArrowReader() {
     }
 
     public void setDictionaryMap(Map<Long, Dictionary> dictionaryMap) {
