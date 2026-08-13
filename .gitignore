@@ -34,3 +34,5 @@ hs_err_pid*
 /out
 /.idea/
 /.idea/
+/flexible-object-io-hadoop/null/.counter_for_testTask.snappy.parquet.crc
+/flexible-object-io-hadoop/null/counter_for_testTask.snappy.parquet
