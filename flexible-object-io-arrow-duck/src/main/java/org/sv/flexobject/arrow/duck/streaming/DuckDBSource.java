@@ -23,8 +23,6 @@ public class DuckDBSource <T extends Streamable> extends ArrowRootReader {
 
     public static class DuckDBSourceBuilder<SELF extends DuckDBSourceBuilder<?>> extends Builder<SELF> {
 
-        Class<? extends Streamable> schema;
-
         DuckDBConnection connection;
         PreparedStatement preparedStatement;
 
