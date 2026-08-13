@@ -302,6 +302,7 @@ public class ParquetSchema {
         return new PrimitiveType(repetition, BINARY, name, UTF8);
     }
 
+    // TODO this should be re-factored as a VARIANT logical Type : https://github.com/apache/parquet-format/blob/master/LogicalTypes.md#variant
     public static Type jsonField(String name){
         return jsonField(name, OPTIONAL);
     }
