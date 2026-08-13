@@ -30,6 +30,10 @@ public class ArrowRootReader extends ArrowRecordReader implements Source<Streama
         super(schemaClass, fields, internalSchema);
     }
 
+    public void setAllocator(BufferAllocator allocator) {
+        this.allocator = allocator;
+    }
+
     public VectorSchemaRoot getRoot() {
         return root;
     }
@@ -117,6 +121,12 @@ public class ArrowRootReader extends ArrowRecordReader implements Source<Streama
             return instanceOf.cast(o);
         }
 
+        protected BufferAllocator getAllocator(){
+            return rootAllocator == null
+                    ? new RootAllocator()
+                    : rootAllocator.newChildAllocator(schemaClass.getName() + "$read", 0, Long.MAX_VALUE);
+        }
+
         public <O extends ArrowRootReader> O build() throws ClassNotFoundException, NoSuchFieldException {
 
             if (schemaClass == null && internalSchema != null) {
@@ -144,7 +154,7 @@ public class ArrowRootReader extends ArrowRecordReader implements Source<Streama
             if (this.root != null) {
                 reader.root = this.root;
             } else {
-                reader.allocator = rootAllocator == null ? new RootAllocator() : rootAllocator.newChildAllocator(schemaClass.getName() + "$read", 0, Long.MAX_VALUE);
+                reader.allocator = getAllocator();
                 reader.root = VectorSchemaRoot.create(arrowSchema, reader.allocator);
             }
 
