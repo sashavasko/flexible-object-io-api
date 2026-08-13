@@ -1,0 +1,18 @@
+dependencies {
+//    api("org.apache.arrow:arrow-c-data:${arrowVersion}")
+//    api("io.github.dfa1.vortex:vortex-java:0.12.1")
+//    api("io.github.dfa1.vortex:vortex-reader:0.12.1")
+//    api("io.github.dfa1.vortex:vortex-writer:0.12.1")
+
+    // Source: https://mvnrepository.com/artifact/dev.vortex/vortex-jni
+    api 'dev.vortex:vortex-jni:0.79.0'
+    compileOnly("org.immutables:value:2.11.6")
+    annotationProcessor("org.immutables:value:2.11.6")
+}
+
+test {
+    jvmArgs += [
+            "--add-opens=java.base/java.nio=ALL-UNNAMED",
+            "-Duser.language=en"
+    ]
+}
