@@ -9,6 +9,7 @@ import org.sv.flexobject.util.AutoCloseables;
 import java.io.IOException;
 
 public class VortexSource  <T extends Streamable> extends ArrowRootReader {
+    // Docs: https://docs.vortex.dev/getting-started/rust
 
     Partition partition;
     ArrowReader arrowReader;
