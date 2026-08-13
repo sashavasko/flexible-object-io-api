@@ -6,7 +6,7 @@ public class SparkMain {
 
     /**
      * The entry point into Spark application. This will be run by Application Master.
-     * By default it will instantiate Spark session based on spark.* options supplied in
+     * By default, it will instantiate Spark session based on spark.* options supplied in
      * configuration file via -conf command line option. This configuration is bundled
      * with jar file and uploaded to the cluster by Spark Client when run via hdpspark command.
      *<p>
