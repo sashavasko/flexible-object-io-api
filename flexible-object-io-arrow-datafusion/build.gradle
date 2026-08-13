@@ -1,0 +1,11 @@
+dependencies {
+    // Source: https://mvnrepository.com/artifact/org.apache.datafusion/datafusion-java
+    api 'org.apache.datafusion:datafusion-java:0.1.0'
+}
+
+test {
+    jvmArgs += [
+            "--add-opens=java.base/java.nio=ALL-UNNAMED",
+            "-Duser.language=en"
+    ]
+}
